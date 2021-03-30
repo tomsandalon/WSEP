@@ -8,4 +8,6 @@ export interface Order {
     products: ProductPurchase[],
     date: Date,
     purchase_self: () => string | boolean
+
+
 }

@@ -12,4 +12,8 @@ export interface ShopInventory {
     purchase_policies: PurchasePolicyHandler
     discount_policies: DiscountPolicyHandler
     discount_types: DiscountType[]
+
+    getAllItems(): Product[]
+    search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[]
+    purchaseItems()
 }
