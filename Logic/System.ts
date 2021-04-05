@@ -5,6 +5,7 @@
 
 import {User} from "./Users/User";
 import {Shop} from "./Shop/Shop";
+import {logger} from "./Logger";
 
 interface System{
     shops: Shop[]
@@ -27,3 +28,10 @@ interface System{
     //     management: ShopManagement
 
 }
+// //LOGGED EXAMPLES:
+// logger.Critical("Critical", "message");
+// logger.Debug("Debug", "message");
+// logger.Error("Error", "message");
+// logger.Info("Info", "message");
+// logger.Warn("Warn", "message");
+//logger.Trace("message", "with trace");
