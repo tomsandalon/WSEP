@@ -5,6 +5,6 @@ export interface ProductPurchase {
     name: string,
     description: string,
     categories: string[]
-    amount_purchased: number,
+    amount: number,
     actual_price: number,
 }
