@@ -10,18 +10,68 @@ export interface ShopInventory {
     shop_id: number //TODO remove if unused
     shop_management: ShopManagement
     products: Product[]
+    /**
+     * @Requirement correctness requirement 5.a 5.b
+     */
     purchase_policies: PurchasePolicyHandler
     discount_policies: DiscountPolicyHandler
     discount_types: DiscountType[]
     orders: Order[]
 
+    /**
+     * @Requirement 2.5
+     * @return product list of the items currently sold in the store
+     */
     getAllItems(): Product[]
+
+    /**
+     * @Requirement 2.6
+     * @param name Product name
+     * @param category Product category
+     * @return product list of products list in the shop which match the search parameters
+     */
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[]
+
+    /**
+     * @Requirement 2.9
+     * @return true iff the purchase was successful
+     */
     purchaseItems(): boolean
 
+    /**
+     * @Requirement 4.1
+     * @param name name of the product
+     * @param description description of the product
+     * @param amount amount available for selling
+     * @param categories categories of the product
+     * @param base_price base price for the product
+     * @param discount_type discount type available for the product
+     * @param purchase_type purchase purchase type available for the product
+     * @return true iff the add was successful
+     */
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean
-    removeItem(item_id: number): boolean //TODO ADD PARAMETERS
+
+    /**
+     * @Requirement 4.1
+     * @param item_id product id of the item
+     * @return true iff the removal was successful
+     */
+    removeItem(item_id: number): boolean
+
+    /**
+     * @Requirement 4.11
+     * @return a string list representation of the shop purchase history
+     */
     getShopHistory(): string[]
+
+    /**
+     * @Requirement 2.6
+     * @param products Product list to filter from
+     * @param filters comprised of @filter_name and @filter_value
+     * @filter-param filter_name type of filter
+     * @filter-param filter_value the value of the filter
+     * @return the products from @param products which match the filter
+     */
     filter(products: Product[], filters: { filter_name: string; filter_value: string }[]): Product[];
 }
 

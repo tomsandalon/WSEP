@@ -5,19 +5,78 @@ import {Owner} from "../ShopPersonnel/Owner";
 export interface ShopManagement {
     shop_id: number //TODO remove if unused
     shop_inventory: ShopInventory,
+    /**
+     * @Requirement correctness requirement 4
+     */
     original_owner: Owner
-    owners: Owner[] // without original
+    owners: Owner[] // excluding the original
     managers: Manager[]
 
+    /**
+     * @param user_email email of the user trying to add items to the shop
+     * @return true iff the user representation of user_email is allowed to add items to the shop
+     */
     allowedAddItemToShop(user_email: string): boolean
+
+    /**
+     * @param user_email email of the user trying to remove items from the shop
+     * @return true iff the user representation of user_email is allowed to remove items from the shop
+     */
     allowedRemoveItemFromShop(user_email: string): boolean
+
+    /**
+     * @param user_email email of the user trying to manage policies of the shop
+     * @return true iff the user representation of user_email is allowed to manage policies of the shop
+     */
     allowedManagePolicies(user_email: string): boolean
+
+    /**
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the  appointee
+     * @return true iff the appointment was successful
+     */
     appointNewOwner(appointer_email: string, appointee_email: string): boolean
+
+    /**
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the  appointee
+     * @return true iff the appointment was successful
+     */
     appointNewManager(appointer_email: string, appointee_email: string): boolean
+
+    /**
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the  appointee
+     * @param permissions new permissions for the appointee
+     * @return true iff the edit was successful
+     */
     editPermissions(appointer_email: string, appointee_email: string, permissions: string[]): boolean
+
+    /**
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the  appointee
+     * @param permissions new permissions to add to the appointee
+     * @return true iff the addition was successful
+     */
     addPermissions(appointer_email: string, appointee_email: string, permissions: string[]): boolean
+
+    /**
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the  appointee
+     * @return true iff  the removal was successful
+     */
     removeManager(appointer_email: string, appointee_email: string): boolean
+
+    /**
+     * @param user_email email of the user trying to get info about the staff
+     * @param staff_email (optional) staff email list if trying to access information about specific staff members
+     */
     getStaffInfo(user_email: string, staff_email?: string[]): string[] | string
+
+    /**
+     * @param user_email email of the user trying to view shop purchase history
+     * @return true iff the user representation of user_email is allowed to view shop purchase history
+     */
     allowedToViewShopHistory(user_email: string): boolean
 }
 
