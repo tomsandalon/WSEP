@@ -2,7 +2,11 @@ import 'mocha';
 import { expect, assert } from 'chai';
 import {Product, ProductImpl} from "../../../Logic/ProductHandling/Product";
 import * as Error from "../../../Logic/ProductHandling/ErrorMessages";
-import {AmountNonPositiveValue, BasePriceNonPositiveValue} from "../../../Logic/ProductHandling/ErrorMessages";
+import {
+    AmountNonPositiveValue,
+    BasePriceNonPositiveValue,
+    DescriptionEmpty, ProductNameEmpty
+} from "../../../Logic/ProductHandling/ErrorMessages";
 import {CategoryImpl} from "../../../Logic/ProductHandling/Category";
 import {DiscountType} from "../../../Logic/PurchaseProperties/DiscountType";
 
@@ -26,11 +30,11 @@ describe('ProductImpl Class Test suit', () => {
         });
         it('Create with empty description', () => {
             expect(ProductImpl.create(1000, "", "LG monitor", {}))
-                .equal(Error.BasePriceNonPositiveValue)
+                .equal(Error.DescriptionEmpty)
         });
         it('Create with empty name', () => {
             expect(ProductImpl.create(1000, "29 inch monitor", "", {}))
-                .equal(Error.BasePriceNonPositiveValue)
+                .equal(Error.ProductNameEmpty)
         });
     });
     describe('Public functions', () => {
@@ -86,6 +90,7 @@ describe('ProductImpl Class Test suit', () => {
                 const result = product.changePrice(delta);
                 expect(typeof result).equal("boolean");
                 expect(product.base_price).not.equal(before);
+                expect(product.base_price).equal(delta);
             });
         });
         describe('addCategory', () => {
@@ -124,9 +129,71 @@ describe('ProductImpl Class Test suit', () => {
             });
         });
         describe('changeDescription', () => {
+            it('Change to non empty description', () => {
+                const product = createProduct();
+                const delta = "Best of the best of the best 29 inch monitor";
+                const before = product.description;
+                const result = product.changeDescription(delta);
+                expect(typeof result).equal("boolean");
+                expect(before).not.equal(product.description);
+                expect(delta).equal(product.description);
+            });
+            it('Change to empty description', () => {
+                const product = createProduct();
+                const delta = "";
+                const result = product.changeDescription(delta);
+                expect(result).equal(DescriptionEmpty);
+            });
+        });
+        describe('changeName', () => {
+            it('Change to non empty name', () => {
+                const product = createProduct();
+                const delta = "Samsung monitor";
+                const before = product.name;
+                const result = product.changeName(delta);
+                expect(typeof result).equal("boolean");
+                expect(before).not.equal(product.name);
+                expect(delta).equal(product.name);
+            });
+            it('Change to empty name', () => {
+                const product = createProduct();
+                const delta = "";
+                const result = product.changeName(delta);
+                expect(result).equal(ProductNameEmpty);
+            });
+        });
+        describe('changePurchaseType', () => {
             it('', () => {
                 const product = createProduct();
                 assert.fail("Test case not implemented")
+            });
+        });
+        describe('calculatePrice', () => {
+            it('', () => {
+                const product = createProduct();
+                assert.fail("Test case not implemented")
+            });
+        });
+        describe('returnAmount', () => {
+            it('Return negative amount', () => {
+                const product = createProduct();
+                const delta = -1;
+                const result = product.returnAmount(delta);
+                expect(result).equal(AmountNonPositiveValue);
+            });
+            it('Return zero amount', () => {
+                const product = createProduct();
+                const delta = 0;
+                const result = product.returnAmount(delta);
+                expect(result).equal(AmountNonPositiveValue);
+            });
+            it('Return positive amount', () => {
+                const product = createProduct();
+                const delta = 11;
+                const before = product.amount;
+                const result = product.returnAmount(delta);
+                expect(typeof result).equal("boolean");
+                expect(product.amount).equal(before + delta);
             });
         });
     });
