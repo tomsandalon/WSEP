@@ -1,14 +1,133 @@
-// import * as utils from "../../../Utils/ReadonlyArray";
+import 'mocha';
 import { expect, assert } from 'chai';
-// const assert = require('assert');
-// const expect = require('chai').expect;
-// const should = require('chai').should();
-describe('Simple Math Test', () => {
-    it('should return 2', () => {
-        const array = [1, 2, 3];
-        // let rdArray: utils.ImmutableList<number> = [];
-        for (let item of array){
-            console.log(item);
-        }
+import {Product, ProductImpl} from "../../../Logic/ProductHandling/Product";
+import * as Error from "../../../Logic/ProductHandling/ErrorMessages";
+import {AmountNonPositiveValue, BasePriceNonPositiveValue} from "../../../Logic/ProductHandling/ErrorMessages";
+import {CategoryImpl} from "../../../Logic/ProductHandling/Category";
+import {DiscountType} from "../../../Logic/PurchaseProperties/DiscountType";
+
+const createProduct = () => {
+    const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor", {});
+    if(typeof temp === "string"){
+        assert.fail("Failed to created product")
+    }
+    return temp
+};
+
+describe('ProductImpl Class Test suit', () => {
+    describe('Create Product', () => {
+        it('Create with negative base price', () => {
+            expect(ProductImpl.create(-1, "29 inch monitor", "LG monitor", {}))
+                .equal(Error.BasePriceNonPositiveValue)
+        });
+        it('Create with zero as base price', () => {
+            expect(ProductImpl.create(0, "29 inch monitor", "LG monitor", {}))
+                .equal(Error.BasePriceNonPositiveValue)
+        });
+        it('Create with empty description', () => {
+            expect(ProductImpl.create(1000, "", "LG monitor", {}))
+                .equal(Error.BasePriceNonPositiveValue)
+        });
+        it('Create with empty name', () => {
+            expect(ProductImpl.create(1000, "29 inch monitor", "", {}))
+                .equal(Error.BasePriceNonPositiveValue)
+        });
+    });
+    describe('Public functions', () => {
+        describe('addSupplies', () => {
+            it('Add negative amount', () => {
+                const product = createProduct();
+                expect(product.addSupplies(-1)).equal(AmountNonPositiveValue);
+            });
+            it('Add zero amount', () => {
+                const product = createProduct();
+                expect(product.addSupplies(0)).equal(AmountNonPositiveValue);
+            });
+            it('Add positive amount', () => {
+                const product = createProduct();
+                const before = product.amount;
+                const delta = 10;
+                const result = product.addSupplies(delta);
+                expect(typeof result).equal("boolean");
+                expect(product.amount).equal(before + delta);
+            });
+        });
+        describe('makePurchase', () => {
+            it('purchase negative amount', () => {
+                const product = createProduct();
+                expect(product.makePurchase(-1)).equal(AmountNonPositiveValue);
+            });
+            it('purchase zero amount', () => {
+                const product = createProduct();
+                expect(product.makePurchase(0)).equal(AmountNonPositiveValue);
+            });
+            it('purchase positive amount', () => {
+                const product = createProduct();
+                const before = product.amount;
+                const delta = 10;
+                const result = product.makePurchase(delta);
+                expect(typeof result).equal("boolean");
+                expect(product.amount).equal(before - delta);
+            });
+        });
+        describe('changePrice', () => {
+            it('change to negative price', () => {
+                const product = createProduct();
+                expect(product.changePrice(-1)).equal(BasePriceNonPositiveValue);
+            });
+            it('change to zero price', () => {
+                const product = createProduct();
+                expect(product.changePrice(0)).equal(BasePriceNonPositiveValue);
+            });
+            it('change to positive price', () => {
+                const product = createProduct();
+                const before = product.base_price;
+                const delta = 10;
+                const result = product.changePrice(delta);
+                expect(typeof result).equal("boolean");
+                expect(product.base_price).not.equal(before);
+            });
+        });
+        describe('addCategory', () => {
+            it('', () => {
+                const product = createProduct();
+                const delta = CategoryImpl.create("Monitors");
+                if (typeof delta === "string") assert.fail("Failed to create Category");
+                const result = product.addCategory(delta);
+                expect(typeof result).equal("boolean");
+                expect(product.category.indexOf(delta)).greaterThanOrEqual(0);
+            });
+        });
+        describe('removeCategory', () => {
+            it('', () => {
+                const product = createProduct();
+                const delta = CategoryImpl.create("Monitors");
+                if (typeof delta === "string") assert.fail("Failed to create Category");
+                const result = product.addCategory(delta);
+                expect(typeof result).equal("boolean");
+                expect(product.category.indexOf(delta)).greaterThanOrEqual(0);
+                const result2 = product.removeCategory(delta);
+                expect(typeof result2).equal("boolean");
+                expect(product.category.indexOf(delta)).lessThan(0);
+            });
+        });
+        describe('removeDiscountType', () => {
+            it('', () => {
+                const product = createProduct();
+                assert.fail("Test case not implemented")
+            });
+        });
+        describe('addDiscountType', () => {
+            it('', () => {
+                const product = createProduct();
+                assert.fail("Test case not implemented")
+            });
+        });
+        describe('changeDescription', () => {
+            it('', () => {
+                const product = createProduct();
+                assert.fail("Test case not implemented")
+            });
+        });
     });
 });

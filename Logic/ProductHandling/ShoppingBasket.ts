@@ -1,12 +1,81 @@
 import {Product} from "./Product";
 import {ProductPurchase} from "./ProductPurchase";
 
+export type Entry = {product: Product, amount: number}
+
 export interface ShoppingBasket {
     basket_id: number
-    shop_id: number
-    products: {product_id: number, amount: number}[]
+    shop: number
+    products: Entry[]
 
-    addToBasket(product_id: number, amount: number): void
-    editBasketItem(product_id: number, new_amount: number): void
-    displayBasket(shop_id): ProductPurchase[]
+    addToBasket(product_id: number, amount: number): boolean | string
+    editBasketItem(product_id: number, new_amount: number): boolean | string
+}
+
+export class ShoppingBasketImpl implements ShoppingBasket{
+    private static _basket_id_specifier: number = 0;
+    private _basket_id: number;
+    private _products:  Entry[];
+    private _shop: number;
+
+
+    private constructor(basket_id: number, shop: number, products: Entry[]) {
+        this._basket_id = basket_id;
+        this._products = products;
+        this._shop = shop;
+    }
+
+    public static create(shop: number, products: Entry[]): ShoppingBasket | string{
+        //TODO Chack if products exits in the store
+        const id = this._basket_id_specifier++;
+        return new ShoppingBasketImpl(id, shop, products)
+    }
+
+    get products(){
+        return this._products
+    }
+
+    get basket_id(){
+        return this._basket_id
+    }
+
+    get shop(){
+        return this._shop
+    }
+
+    public addToBasket(product_id: number, amount: number): boolean | string {
+        if(amount <= 0){
+            return "amount must be larger than 0"
+        } else if (this._products.reduce((acc: boolean, product: Entry) => acc && (product_id != product.product.product_id), true)){
+            return "product is already exists in basket"
+        }
+        // this._products.push(this.shop.getProduct(product_id))
+        return true
+    }
+
+    public editBasketItem(product_id: number, new_amount: number): boolean | string {
+        for (let product of this._products){
+            if(product_id == product.product.product_id){
+                const difference = product.amount - new_amount;
+                if (difference > 0){
+                    product.product.returnAmount(difference);
+                } else if (difference < 0) {
+                    product.product.makePurchase(difference);
+                }
+                //else aka do nothing
+                return true
+            }
+        }
+        return "product not found"
+    }
+
+    public removeItem(product_id: number): boolean | string {
+        const position: number = this._products.reduce((acc: number, product: Entry, index: number) => (product_id == product.product.product_id)? index: acc, -1);
+        if (position < 0){
+            return "product doesn't exist in basket"
+        }
+        this._products.splice(position, 1);
+        return true
+    }
+
 }

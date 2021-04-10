@@ -1,5 +1,6 @@
 import {Category} from "./Category";
 import {Product} from "./Product";
+import {DiscountType} from "../PurchaseProperties/DiscountType";
 
 export interface ProductPurchase {
     readonly product_id: number,
@@ -10,20 +11,28 @@ export interface ProductPurchase {
     readonly actual_price: number,
 }
 
-class ProductPurchaseImpl implements ProductPurchase{
-    private _actual_price: number;
-    private _amount: number;
+export class ProductPurchaseImpl implements ProductPurchase{
+    private readonly _actual_price: number;
+    private readonly _amount: number;
     private readonly _categories: ReadonlyArray<Category>;
     private readonly _description: string;
     private readonly _name: string;
     private readonly _product_id: number;
-    constructor(product: Product, discount: any) { //TODO discount any??
+    private constructor(product: Product, actual_price: number, amount: number) {
         this._product_id = product.product_id;
         this._name = product.name;
         this._description = product.description;
-        this._amount = product.amount;
-        // this.categories =
-        // this._actual_price = product.calculatePrice();
+        this._amount = amount;
+        this._categories = product.category;
+        this._actual_price = actual_price;
+    }
+
+    public static create(product: Product, coupons: DiscountType[], amount: number): ProductPurchase | string{
+        const final_price = product.calculatePrice(coupons);
+        if(typeof final_price === "string"){
+            return final_price
+        }
+        return new ProductPurchaseImpl(product, final_price, amount)
     }
     get product_id(){
         return this._product_id;
