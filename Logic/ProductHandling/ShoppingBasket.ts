@@ -1,7 +1,8 @@
 import {Product} from "./Product";
 import {ProductPurchase} from "./ProductPurchase";
 
-export type Entry = {product: Product, amount: number}
+type Entry = {product: Product, amount: number}
+export type ShoppingEntry = {productId: number, amount: number}
 
 export interface ShoppingBasket {
     basket_id: number
@@ -10,6 +11,7 @@ export interface ShoppingBasket {
 
     addToBasket(product_id: number, amount: number): boolean | string
     editBasketItem(product_id: number, new_amount: number): boolean | string
+    removeItem(product_id: number): boolean | string
 }
 
 export class ShoppingBasketImpl implements ShoppingBasket{
@@ -25,10 +27,10 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         this._shop = shop;
     }
 
-    public static create(shop: number, products: Entry[]): ShoppingBasket | string{
+    public static create(shop: number, products: ShoppingEntry[]): ShoppingBasket | string{
         //TODO Chack if products exits in the store
         const id = this._basket_id_specifier++;
-        return new ShoppingBasketImpl(id, shop, products)
+        return new ShoppingBasketImpl(id, shop, [])// TODO replace [] with @arg: products
     }
 
     get products(){
