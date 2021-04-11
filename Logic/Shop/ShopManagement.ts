@@ -84,7 +84,7 @@ export interface ShopManagement {
 export class ShopManagementImpl implements ShopManagement {
     private _managers: Manager[];
     private readonly _original_owner: Owner;
-    private readonly _owners: Owner[];
+    private _owners: Owner[];
     private readonly _shop_id: number;
     private _shop_inventory: ShopInventory;
 
@@ -152,13 +152,13 @@ export class ShopManagementImpl implements ShopManagement {
 
     appointNewManager(appointer_email: string, appointee_email: string): boolean {
         if (this._managers.some((m: Manager) => m.user_email == appointee_email)) return false;
-        this.managers.push(undefined) //TODO with users guy
+        this._managers = this.managers.concat([undefined]) //TODO with users guy
         return true;
     }
 
     appointNewOwner(appointer_email: string, appointee_email: string): boolean {
         if (this._owners.some((o: Owner) => o.user_email == appointee_email)) return false;
-        this._owners.push(undefined) //TODO with users guy
+        this._owners = this._owners.concat([undefined]) //TODO with users guy
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
         return true;
     }
@@ -190,5 +190,4 @@ export class ShopManagementImpl implements ShopManagement {
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
         return true;
     }
-
 }

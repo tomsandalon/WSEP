@@ -28,6 +28,7 @@ export interface ShopInventory {
      * @Requirement 2.6
      * @param name Product name
      * @param category Product category
+     * @param keyword keyword to search by
      * @return product list of products list in the shop which match the search parameters
      */
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[]
@@ -128,7 +129,7 @@ export class ShopInventoryImpl implements ShopInventory {
 
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean {
         const item: Product = undefined //TODO replace with constructor
-        this._products.push(item);
+        this._products = this._products.concat([item]);
         return true;
     }
 
