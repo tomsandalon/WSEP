@@ -17,6 +17,7 @@ export interface Shop {
     bank_info: string
     inventory: ShopInventory
     management: ShopManagement
+    is_active: boolean
 
     /**
      * @Requirement 2.5
@@ -117,6 +118,7 @@ export interface Shop {
      * @Requirement 4.6
      * @param appointer_email email of the appointer
      * @param appointee_email email of the appointee
+     * @param permissions permissions to add
      * @return true if the edit was successful, or a string containing the error message otherwise
      */
     editPermissions(appointer_email: string, appointee_email: string, permissions: string[]): boolean | string
@@ -162,6 +164,7 @@ export class ShopImpl implements Shop {
     private readonly _management: ShopManagement;
     private _name: string;
     private readonly _shop_id: number;
+    private readonly _is_active: boolean;
 
     /**
      * @Requirement 3.2
@@ -180,6 +183,7 @@ export class ShopImpl implements Shop {
         this._management = new ShopManagementImpl(this.shop_id, user_email)
         this._inventory = new ShopInventoryImpl(this.shop_id, this._management)
         this._management.shop_inventory = this._inventory;
+        this._is_active = true;
     }
 
     get bank_info(): string {
@@ -224,6 +228,10 @@ export class ShopImpl implements Shop {
 
     get shop_id(): number {
         return this._shop_id;
+    }
+
+    get is_active(): boolean {
+        return this._is_active;
     }
 
     addItem(user_email: string, name: string, description: string, amount: number, categories: string[], base_price: number,
