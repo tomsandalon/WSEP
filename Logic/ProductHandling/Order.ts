@@ -4,37 +4,38 @@ import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {ShoppingBasket} from "./ShoppingBasket";
 import {Product, ProductImpl} from "./Product";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
+import {ShopInventory} from "../Shop/ShopInventory";
+import {Shop} from "../Shop/Shop";
 
 export interface Order {
     order_id: number,
-    shop_id: any,
+    shop: ShopInventory,
     products: ReadonlyArray<ProductPurchase>,
     date: Date,
     purchase_self(): boolean | string
-
-
+    to_string(): string;
 }
 
 export class OrderImpl implements Order{
     private static  _order_id_specifier: number = 0;
     private readonly _order_id: number;
-    private readonly _shop_id: any;
+    private readonly _shop: ShopInventory;
     private readonly _date: Date;
     private readonly _products: ReadonlyArray<ProductPurchase>;
-    private constructor(date: Date, order_id: number, products: ReadonlyArray<ProductPurchase>, shop_id: any) {
+    private constructor(date: Date, order_id: number, products: ReadonlyArray<ProductPurchase>, shop: ShopInventory) {
         this._date = date;
         this._order_id = order_id;
         this._products = products;
-        this._shop_id = shop_id;
+        this._shop = shop;
     }
 
-    public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[], shop_id: any): Order | string{
+    public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[], shop: ShopInventory): Order | string{
         const products = OrderImpl.analyzeProducts(basket, coupons);
         if(typeof products === "string"){
             return products
         }
         const id = this._order_id_specifier++;
-        return new OrderImpl(date, id, products, shop_id)
+        return new OrderImpl(date, id, products, shop)
     }
 
     private static analyzeProducts(basket: ShoppingBasket, coupons: DiscountType[]): ReadonlyArray<ProductPurchase> | string {
@@ -53,8 +54,8 @@ export class OrderImpl implements Order{
         return this._order_id
     }
 
-    get shop_id(){
-        return this._shop_id
+    get shop(){
+        return this._shop
     }
 
     get date(){
@@ -67,5 +68,9 @@ export class OrderImpl implements Order{
     public purchase_self(): boolean | string  {
         //TODO save to DB
         return true;
+    }
+
+    public to_string(): string {//TODO implement this
+        return "";
     }
 }

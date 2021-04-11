@@ -3,7 +3,7 @@ import {Manager} from "../ShopPersonnel/Manager";
 import {Owner} from "../ShopPersonnel/Owner";
 
 export interface ShopManagement {
-    shop_id: number //TODO remove if unused
+    shop_id: number
     shop_inventory: ShopInventory,
     /**
      * @Requirement correctness requirement 4

@@ -1,12 +1,14 @@
 import {Product} from "./Product";
 import {ProductPurchase} from "./ProductPurchase";
+import {Shop} from "../Shop/Shop";
+import {ShopInventory} from "../Shop/ShopInventory";
 
 type Entry = {product: Product, amount: number}
 export type ShoppingEntry = {productId: number, amount: number}
 
 export interface ShoppingBasket {
     basket_id: number
-    shop: number
+    shop: ShopInventory
     products: Entry[]
 
     addToBasket(product_id: number, amount: number): boolean | string
@@ -18,19 +20,23 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     private static _basket_id_specifier: number = 0;
     private _basket_id: number;
     private _products:  Entry[];
-    private _shop: number;
+    private _shop: ShopInventory;
 
 
-    private constructor(basket_id: number, shop: number, products: Entry[]) {
+    private constructor(basket_id: number, shop: ShopInventory, product: Entry) {
         this._basket_id = basket_id;
-        this._products = products;
+        this._products = [product];
         this._shop = shop;
     }
 
-    public static create(shop: number, products: ShoppingEntry[]): ShoppingBasket | string{
-        //TODO Chack if products exits in the store
+    public static create(shop: ShopInventory, product: ShoppingEntry): ShoppingBasket | string{
+        const fetched_product = shop.getItem(product.productId);
+        if (typeof fetched_product === "string"){
+            return fetched_product
+        }
+        const final_product = {product: fetched_product, amount: product.amount};
         const id = this._basket_id_specifier++;
-        return new ShoppingBasketImpl(id, shop, [])// TODO replace [] with @arg: products
+        return new ShoppingBasketImpl(id, shop, final_product)
     }
 
     get products(){
@@ -51,7 +57,12 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         } else if (this._products.reduce((acc: boolean, product: Entry) => acc && (product_id != product.product.product_id), true)){
             return "product is already exists in basket"
         }
-        // this._products.push(this.shop.getProduct(product_id))
+        const fetched_product = this._shop.getItem(product_id);
+        if (typeof fetched_product === "string"){
+            return fetched_product
+        }
+        const product = {product: fetched_product, amount: amount};
+        this._products.push(product);
         return true
     }
 

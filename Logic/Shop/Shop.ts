@@ -64,7 +64,7 @@ export interface Shop {
      */
     addItem(user_email: string, name: string, description:string, amount: number,
             categories: string[], base_price: number,
-            discount_type?: DiscountType, purchase_type?: PurchaseType): boolean | string //TODO calls Shop management to check permissions and shop inventory to add an item.
+            discount_type?: DiscountType, purchase_type?: PurchaseType): boolean | string
 
     /**
      * @Requirement 4.1
@@ -246,7 +246,7 @@ export class ShopImpl implements Shop {
 
         const ret = this._inventory.addItem(name, description, amount, categories, base_price,
             discount_type, purchase_type)
-        if (!ret) logger.Error(`${failure_message}. Item probably exists`);
+        if (typeof ret === "string") logger.Error(`${failure_message}. ` + ret);
         else logger.Info(success_message);
         return ret;
     }

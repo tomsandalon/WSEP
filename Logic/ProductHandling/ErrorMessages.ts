@@ -4,3 +4,4 @@ export const ProductNameEmpty = "product name can't be empty";
 export const AmountNonPositiveValue = "amount must be larger than 0";
 export const DiscountExists = "discount already applied to the product";
 export const DiscountNotExists = "discount isn't already applied to the product";
+export const ProductNotFound = "Product not found by id";

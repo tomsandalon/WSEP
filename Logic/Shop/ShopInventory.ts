@@ -3,11 +3,12 @@ import {ShopManagement} from "./ShopManagement";
 import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler";
-import {Product} from "../ProductHandling/Product";
+import {Product, ProductImpl} from "../ProductHandling/Product";
 import {Order} from "../ProductHandling/Order";
+import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 
 export interface ShopInventory {
-    shop_id: number //TODO remove if unused
+    shop_id: number
     shop_management: ShopManagement
     products: Product[]
     /**
@@ -50,7 +51,7 @@ export interface ShopInventory {
      * @param purchase_type purchase purchase type available for the product
      * @return true iff the add was successful
      */
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
 
     /**
      * @Requirement 4.1
@@ -74,6 +75,13 @@ export interface ShopInventory {
      * @return the products from @param products which match the filter
      */
     filter(products: Product[], filters: { filter_name: string; filter_value: string }[]): Product[];
+
+    /**
+     *
+     * @param product_id
+     * TODO
+     */
+    getItem(product_id: number): Product | string
 }
 
 export class ShopInventoryImpl implements ShopInventory {
@@ -127,8 +135,11 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._shop_management;
     }
 
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean {
-        const item: Product = undefined //TODO replace with constructor
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+        const item: Product | string = ProductImpl.create(base_price, description, name, purchase_type);
+        if (typeof item === "string"){
+            return item
+        }
         this._products = this._products.concat([item]);
         return true;
     }
@@ -137,7 +148,7 @@ export class ShopInventoryImpl implements ShopInventory {
         const passed_filter = (f: { filter_name: string; filter_value: string }) => (product: Product) => {
             return (f.filter_name == "below_price") ? product.base_price <= Number(f.filter_value) :
                     (f.filter_name == "above_price") ? product.base_price >= Number(f.filter_value) :
-                    (f.filter_name == "rating") ? true :   //TODO add rating to product
+                    // (f.filter_name == "rating") ? true :   // add rating to product
                     (f.filter_name == "category") ? product.category.some(c => c.name == f.filter_value) :
                         //can add more
                     false;
@@ -151,7 +162,7 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     getShopHistory(): string[] {
-        return this._orders.map(o => "hi"); //TODO replace "hi" with order toString after merge with products
+        return this._orders.map(order => order.to_string());
     }
 
     purchaseItems() {
@@ -172,4 +183,13 @@ export class ShopInventoryImpl implements ShopInventory {
                 .toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
         ;
     }
+
+    getItem(product_id: number): Product | string {
+        const result = this._products.filter((product: Product) => product.product_id == product_id);
+        if (result.length == 0)
+            return ProductNotFound;//TODO logger
+        return result[0];
+    }
+
+
 }

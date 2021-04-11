@@ -1,7 +1,8 @@
-import {ShoppingBasket, ShoppingBasketImpl} from "../ProductHandling/ShoppingBasket";
+import {ShoppingBasket, ShoppingBasketImpl, ShoppingEntry} from "../ProductHandling/ShoppingBasket";
 import {Order} from "../ProductHandling/Order";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {logger} from "../Logger";
+import {ShopInventory} from "../Shop/ShopInventory";
 
 export interface User {
     user_email: string
@@ -10,10 +11,10 @@ export interface User {
     order_history: Order[]
     is_admin: boolean
 
-    addToBasket(shop_id: number,product_id: number, amount: number): void
-    editBasketItem(shop_id: number,product_id: number, new_amount: number): void
+    addToBasket(shop: ShopInventory,product_id: number, amount: number): void | string
+    editBasketItem(shop: ShopInventory,product_id: number, new_amount: number): void | string
     purchaseBasket(shop_id: number, payment_method: string): string | boolean
-    displayBasket(shop_id): ProductPurchase[]
+    displayBasket(shop_id: number): string[]
     removeItemFromBasket(shop_id: number,product_id: number):void
     //TODO req: 3.7 - add it.
 }
@@ -44,30 +45,37 @@ export class UserImpl implements User{
         return;
     }
 
-    addToBasket(shop_id: number, product_id: number, amount: number): void {
-        let shopping_basket = this._cart.filter(element => element.shop == shop_id) //basket for provided shop_id exists
+    addToBasket(shop: ShopInventory, product_id: number, amount: number): string | void {
+        let shopping_basket = this._cart.filter(element => element.shop.shop_id == shop.shop_id) //basket for provided shop_id exists
         if(shopping_basket.length == 0){ //new shopping basket
-            let new_basket = ShoppingBasketImpl.create(shop_id,[]);     //TODO why do i have to add items? and even if so i just have the product ID.
-            this._cart.push(<ShoppingBasket>new_basket); //TODO check this type assertion
+            const item: ShoppingEntry = {productId: product_id, amount: amount};
+            let new_basket = ShoppingBasketImpl.create(shop, item);
+            if (typeof new_basket === "string"){
+                return new_basket;
+            }
+            this._cart.push(new_basket);
         }
         else{//add to existing
             shopping_basket[0].addToBasket(product_id, amount);
         }
     }
 
-    editBasketItem(shop_id: number, product_id: number, new_amount: number): void {
-        let shopping_basket = this._cart.filter(element =>element.shop == shop_id);
+    editBasketItem(shop: ShopInventory, product_id: number, new_amount: number): void | string{
+        let shopping_basket = this._cart.filter(element =>element.shop.shop_id == shop.shop_id);
         if(shopping_basket.length == 0){// cant edit an item if the shopping basket doesnt exists  yet.
             logger.Error("Can't edit item information to a shop-basket that doesnt exist");
             return;
         }
         else{
-            shopping_basket[0].editBasketItem(product_id, new_amount);
+            const result = shopping_basket[0].editBasketItem(product_id, new_amount);
+            if (typeof result === "string"){
+                return result;
+            }
         }
 
     }
     purchaseBasket(shop_id: number, payment_method: string): string | boolean {
-        let shopping_basket = this._cart.filter(element =>element.shop == shop_id);
+        let shopping_basket = this._cart.filter(element =>element.shop.shop_id == shop_id);
         if(shopping_basket.length == 0){ //trying to purchase a basket that doesnt exist
             logger.Error("Trying to purchase a shop basket that doesnt exist");
             return false;
@@ -77,16 +85,16 @@ export class UserImpl implements User{
         }
 
     }
-    displayBasket(shop_id: any): ProductPurchase[] {
-        let shopping_basket = this._cart.filter(element =>element.shop == shop_id);
+    displayBasket(shop_id: number): string[] {
+        let shopping_basket = this._cart.filter(element =>element.shop.shop_id == shop_id);
         if(shopping_basket.length == 0){
             logger.Error("Trying to display a basket that doesnt exist")
             return [];
         }
         else{
-            let product_purchase = shopping_basket[0].products; //get products
-            let value = product_purchase.map(element => ProductPurchaseImpl.create(element.product , null , element.amount)) ; //TODO NULL IS DISCOUNT?
-            //TODO return the value but it may contain strings? talk to mark.
+            //TODO to string products + amount
+
+            return []
         }
     }
 
