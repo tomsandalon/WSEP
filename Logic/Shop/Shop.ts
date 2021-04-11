@@ -18,22 +18,139 @@ export interface Shop {
     inventory: ShopInventory
     management: ShopManagement
 
+    /**
+     * @Requirement 2.5
+     * @return product list of the items currently sold in the store
+     */
     getAllItems(): Product[]
+
+    /**
+     * @Requirement 2.5
+     * @return information regarding the store
+     */
     getInfo(): string //TODO shop info which we want to display to the user
+
+    /**
+     * @Requirement 2.6
+     * @param name Product name
+     * @param category Product category
+     * @param keyword Keywords
+     * @return product list of products list in the shop which match the search parameters
+     */
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[]
+
+    /**
+     * @Requirement 2.6
+     * @param products Product list to filter from
+     * @param filters comprised of @filter_name and @filter_value
+     * @filter-param filter_name type of filter
+     * @filter-param filter_value the value of the filter
+     * @return the products from @param products which match the filter
+     */
     filter(products: Product[], filters: { filter_name: string, filter_value: string }[]): Product[] //TODO change filter according to req 2.6
+
+    /**
+     * @Requirement 4.1
+     * @param user_email email of the user trying to add
+     * @param name name of the product
+     * @param description description of the product
+     * @param amount amount available for selling
+     * @param categories categories of the product
+     * @param base_price base price for the product
+     * @param discount_type discount type available for the product
+     * @param purchase_type purchase purchase type available for the product
+     * @return true if the add was successful, or a string containing the error message otherwise
+     */
     addItem(user_email: string, name: string, description:string, amount: number,
             categories: string[], base_price: number,
-            discount_type?: DiscountType, purchase_type?: PurchaseType): boolean | string//TODO calls Shop managment to check permissions and shop inventory to add an item.
+            discount_type?: DiscountType, purchase_type?: PurchaseType): boolean | string //TODO calls Shop management to check permissions and shop inventory to add an item.
+
+    /**
+     * @Requirement 4.1
+     * @param user_email email of the user trying to remove
+     * @param product_id product id of the item
+     * @return true if the removal was successful, or a string containing the error message otherwise
+     */
     removeItem(user_email: string, product_id: number): boolean | string
+
+    /**
+     * @Requirement 4.2
+     * @param user_email email of the user trying to add
+     * @param purchase_policy the policy to add
+     * @return true if the add was successful, or a string containing the error message otherwise
+     */
     addPolicy(user_email: string, purchase_policy?): boolean | string
+
+    /**
+     * @Requirement 4.2
+     * @param user_email email of the user trying to add
+     * @param purchase_policy the policy to remove
+     * @return true if the removal was successful, or a string containing the error message otherwise
+     */
     removePolicy(user_email: string, purchase_policy?): boolean | string
+
+    /**
+     * @Requirement 4.2
+     * @param user_email email of the user trying to edit
+     * @param purchase_policy the policy to edit
+     * @return true if the edit was successful, or a string containing the error message otherwise
+     */
     editPolicy(user_email: string, purchase_policy?): boolean | string
+
+    /**
+     * @Requirement 4.3
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the appointee
+     * @return true if the appointing was successful, or a string containing the error message otherwise
+     */
     appointNewOwner(appointer_email: string, appointee_email: string): boolean | string
+
+    /**
+     * @Requirement 4.5
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the appointee
+     * @return true if the appointing was successful, or a string containing the error message otherwise
+     */
     appointNewManager(appointer_email: string, appointee_email: string): boolean | string
+
+    /**
+     * @Requirement 4.6
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the appointee
+     * @return true if the edit was successful, or a string containing the error message otherwise
+     */
     editPermissions(appointer_email: string, appointee_email: string, permissions: string[]): boolean | string
+
+    /**
+     * @Requirement 4.6
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the appointee
+     * @param permissions permission list to add for the appointee
+     * @return true if the edit was successful, or a string containing the error message otherwise
+     */
     addPermissions(appointer_email: string, appointee_email: string, permissions: string[]): boolean | string
+
+    /**
+     * @Requirement 4.7
+     * @param appointer_email email of the appointer
+     * @param appointee_email email of the appointee
+     * @return true if the removal was successful, or a string containing the error message otherwise
+     */
     removeManager(appointer_email: string, appointee_email: string): boolean | string
+
+    /**
+     * @Requirement 4.11
+     * @param user_email email of the user trying to get info about the purchases
+     * @return a string list representation of the shop purchase history, or a string containing the error message otherwise
+     */
+    getShopHistory(user_email: string): string[] | string
+
+    /**
+     * @Requirement 2.5
+     * @param user_email email of the user trying to get info about the staff
+     * @param staff_email (optional) email of specific staff to view
+     * @return staff info if the function was successful, or a string containing the error message otherwise
+     */
     getStaffInfo(user_email: string, staff_email?: string[]): string[] | string
 }
 
@@ -46,7 +163,14 @@ export class ShopImpl implements Shop {
     private _name: string;
     private readonly _shop_id: number;
 
-
+    /**
+     * @Requirement 3.2
+     * @param user_email
+     * @param bank_info
+     * @param description
+     * @param location
+     * @param name
+     */
     constructor(user_email: string, bank_info: string, description: string, location: string, name: string) {
         this._shop_id = generateId();
         this._bank_info = bank_info;
@@ -211,6 +335,20 @@ export class ShopImpl implements Shop {
         const ret = this._management.removeManager(appointer_email, appointee_email);
         if (ret) logger.Info(`${appointer_email} removed ${appointee_email} from management`)
         else logger.Error(`${appointer_email} failed to remove ${appointer_email} from management`)
+        return ret;
+    }
+
+    getShopHistory(user_email: string): string[] | string {
+        const failure_message: string = `${user_email} failed to get shop history from shop ${this._shop_id}`
+        const success_message: string = `${user_email} successfully got shop history from shop ${this._shop_id}`
+
+        if (!this._management.allowedToViewShopHistory(user_email)) {
+            logger.Error(`${failure_message}. Permission denied.`);
+            return "Insufficient permissions";
+        }
+
+        const ret = this._inventory.getShopHistory();
+        logger.Info(success_message);
         return ret;
     }
 }
