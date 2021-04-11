@@ -53,7 +53,7 @@ describe('LoginImpl tests', () => {
         reg.register("liorpev@gmail.com","123456");
         let log = LoginImpl.getInstance();
         const user = (log.login("liorpev@gmail.com", "123456"));
-        expect(user.user_email === "liorpev@gmail.com")
+        expect(user !== null&& user.user_email === "liorpev@gmail.com")
 
     });
     it('Login without register', () => {
@@ -75,7 +75,7 @@ describe('LoginImpl tests', () => {
         log.login("liorpev@gmail.com", "123456");
         log.logout("liorpev@gmail.com")
         const user = (log.login("liorpev@gmail.com", "123456"));
-        expect(user.user_email).eq("liorpev@gmail.com");
+        expect(user !== null && user.user_email).eq("liorpev@gmail.com");
     });
     it('Register then login and then logout ', () => {
         let value = RegisterImpl.getInstance();

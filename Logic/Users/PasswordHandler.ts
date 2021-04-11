@@ -1,3 +1,4 @@
+import * as password_hash from "password-hash";
 export class PasswordHandler{
     private static instance: PasswordHandler;
 
@@ -13,12 +14,11 @@ export class PasswordHandler{
 
     /**
      *
-     * @param a password to hash - string
+     * @param password to hash - string
      * returns a hashed function
      */
     public hash(password: string): string {
-        let passwordHash = require('password-hash');
-        return passwordHash.generate(password);
+        return password_hash.generate(password);
     }
 
     /**
@@ -28,8 +28,7 @@ export class PasswordHandler{
      */
     public isHashed(password: string): boolean
     {
-        let passwordHash = require('password-hash');
-        return passwordHash.isHashed(password);
+        return password_hash.isHashed(password);
     }
 
     /**
@@ -40,8 +39,7 @@ export class PasswordHandler{
      */
     public verify(password:string, hashed_password:string)
     {
-        let passwordHash = require('password-hash');
-        return passwordHash.verify(password, hashed_password);
+        return password_hash.verify(password, hashed_password);
     }
 }
 

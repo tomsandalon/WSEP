@@ -12,16 +12,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "password-hash": "^1.2.2",
     "simplr-logger": "^1.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.16",
     "@types/mocha": "^8.2.2",
     "@types/node": "^14.14.37",
+    "@types/password-hash": "^1.2.20",
     "chai": "^4.3.4",
     "cross-env": "^7.0.3",
     "mocha": "^8.3.2",
+    "password-hash": "^1.2.2",
     "ts-mocha": "^8.0.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
