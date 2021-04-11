@@ -3,6 +3,7 @@
     "files": true
   },
   "compilerOptions": {
+    "strict": true,
     "target": "es5",
     "module": "CommonJS",
     "moduleResolution": "node"

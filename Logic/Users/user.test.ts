@@ -4,18 +4,17 @@ import {PasswordHandler} from "./PasswordHandler";
 import {RegisterImpl} from "./Register";
 import {LoginImpl} from "./Login";
 import {StringPair} from "./StringPair";
+import {UserImpl} from "./User";
+import type = Mocha.utils.type;
+import {ShopInventoryImpl} from "../Shop/ShopInventory";
 
 describe('PasswordHandler tests', () => {
     it('should return a hashed password ', () => {
         let handler = PasswordHandler.getInstance();
         expect(handler.hash("password")).to.not.equal("password")
         expect(handler.isHashed(handler.hash("password"))).eq(true)
-        let value:StringPair[] = []
-        value.push(new StringPair("hihi","byebye"));
-        let v:StringPair[] = value.filter(ele => "hihi" === ele.user_email)
-        console.log(v);
-        v[0].user_email = "rotem";
-        console.log(value);
+        expect(handler.isHashed("password")).eq(false)
+
 
     });
     it('given a hashed password should return true if its hashed or false if its not ', () => {
@@ -37,61 +36,89 @@ describe('RegisterImpl tests', () => {
         let value = RegisterImpl.getInstance();
         expect(value.register("liorpev", "123456")).eq(false)
     });
-    it('Registering with invalid email format ', () => {
+    it('Registering with valid email format ', () => {
         let value = RegisterImpl.getInstance();
         expect(value.register("liorpev@gmail.com", "123456")).eq(true)
     });
-    it('Registering with a useremail which is already in use ', () => {
+    it('Registering with a user email which is already in use ', () => {
         let value = RegisterImpl.getInstance();
-        expect(value.register("liorpev@gmail.com", "123456")).eq(true)
-        expect(value.register("liorpev@gmail.com", "123456")).eq(false)
+        expect(value.register("liorpev1@gmail.com", "123456")).eq(true)
+        expect(value.register("liorpev1@gmail.com", "123456")).eq(false)
     });
 });
+
+
+
+
 describe('LoginImpl tests', () => {
     it('Registering and trying to login ', () => {
         let reg = RegisterImpl.getInstance();
         reg.register("liorpev@gmail.com","123456");
         let log = LoginImpl.getInstance();
         const user = (log.login("liorpev@gmail.com", "123456"));
-        expect(user !== null&& user.user_email === "liorpev@gmail.com")
+        if(typeof user == "string")
+            assert.fail()
+        else
+            expect(user.user_email === "liorpev@gmail.com").eq(true)
 
     });
     it('Login without register', () => {
         let log = LoginImpl.getInstance();
-        const user = (log.login("liorpev@gmail.com", "123456"));
-        expect(user).eq(null)
+        const user = (log.login("liorpev15@gmail.com", "123456"));
+        expect(typeof user == "string").eq(true)
     });
     it('Register then login and try to login again(first time login) ', () => {
         let value = RegisterImpl.getInstance();
-        value.register("liorpev@gmail.com", "123456");
+        value.register("liorpev1@gmail.com", "123456");
         let log = LoginImpl.getInstance();
-        log.login("liorpev@gmail.com", "123456");
-        expect(log.login("liorpev@gmail.com", "123456")).eq(null);
+        log.login("liorpev1@gmail.com", "123456");
+        expect(typeof (log.login("liorpev1@gmail.com", "123456")) == "string").eq(true);
     });
     it('Register then login and logout then login again(already existing user) ', () => {
         let value = RegisterImpl.getInstance();
-        value.register("liorpev@gmail.com", "123456");
+        value.register("liorpev2@gmail.com", "123456");
         let log = LoginImpl.getInstance();
-        log.login("liorpev@gmail.com", "123456");
-        log.logout("liorpev@gmail.com")
-        const user = (log.login("liorpev@gmail.com", "123456"));
-        expect(user !== null && user.user_email).eq("liorpev@gmail.com");
+        log.login("liorpev2@gmail.com", "123456");
+        log.logout("liorpev2@gmail.com")
+        const user = (log.login("liorpev2@gmail.com", "123456"));
+        if(typeof user == "string")
+            assert.fail()
+        else
+            expect( user.user_email).eq("liorpev2@gmail.com");
     });
     it('Register then login and then logout ', () => {
         let value = RegisterImpl.getInstance();
-        value.register("liorpev@gmail.com", "123456");
+        value.register("liorpev3@gmail.com", "123456");
         let log = LoginImpl.getInstance();
-        log.login("liorpev@gmail.com", "123456");
-        log.logout("liorpev@gmail.com")
+        log.login("liorpev3@gmail.com", "123456");
+        log.logout("liorpev3@gmail.com")
         const values = log.logged_users;
-        expect(values.filter(element => element === "liorpev@gmail.com").length == 0).eq(true);
+        expect(values.filter(element => element === "liorpev3@gmail.com").length == 0).eq(true);
     });
     it('Register then login and check if the user is in the logged users list ', () => {
         let value = RegisterImpl.getInstance();
-        value.register("liorpev@gmail.com", "123456");
+        value.register("liorpev4@gmail.com", "123456");
         let log = LoginImpl.getInstance();
-        log.login("liorpev@gmail.com", "123456");
+        log.login("liorpev4@gmail.com", "123456");
         const values = log.logged_users;
-        expect(values.filter(element => element === "liorpev@gmail.com").length == 0).eq(false);
+        expect(values.filter(element => element === "liorpev4@gmail.com").length == 0).eq(false);
     });
+});
+
+
+describe('LoginImpl tests', () => {
+    it('Registering login and add item to basket ', () => {
+        let reg = RegisterImpl.getInstance();
+        reg.register("liorpev@gmail.com","123456");
+        let log = LoginImpl.getInstance();
+        const user = (log.login("liorpev@gmail.com", "123456"));
+        if(typeof user == "string")
+            assert.fail()
+        else
+        {
+
+        }
+
+    });
+
 });

@@ -14,6 +14,7 @@ export interface ShoppingBasket {
     addToBasket(product_id: number, amount: number): boolean | string
     editBasketItem(product_id: number, new_amount: number): boolean | string
     removeItem(product_id: number): boolean | string
+    toStringBasket():string[]
 }
 
 export class ShoppingBasketImpl implements ShoppingBasket{
@@ -90,5 +91,11 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         this._products.splice(position, 1);
         return true
     }
+
+    toStringBasket(): string[]{
+        return this._products.map(entry => `PID: ${entry.product.product_id} Product Name:${entry.product.name} Product Description:${entry.product.description} Product amount: ${entry.product.amount}`)
+
+    }
+
 
 }
