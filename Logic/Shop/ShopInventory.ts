@@ -1,3 +1,4 @@
+
 import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {ShopManagement} from "./ShopManagement";
 import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
@@ -6,6 +7,9 @@ import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler
 import {Product, ProductImpl} from "../ProductHandling/Product";
 import {Order} from "../ProductHandling/Order";
 import {ProductNotFound} from "../ProductHandling/ErrorMessages";
+import {logger} from "../Logger";
+
+type filter = { filter_name: string; filter_value: string }
 
 export interface ShopInventory {
     shop_id: number
@@ -14,8 +18,8 @@ export interface ShopInventory {
     /**
      * @Requirement correctness requirement 5.a 5.b
      */
-    purchase_policies: PurchasePolicyHandler
-    discount_policies: DiscountPolicyHandler
+    purchase_policies: PurchasePolicyHandler | undefined
+    discount_policies: DiscountPolicyHandler | undefined
     discount_types: DiscountType[]
     orders: Order[]
 
@@ -74,40 +78,39 @@ export interface ShopInventory {
      * @filter-param filter_value the value of the filter
      * @return the products from @param products which match the filter
      */
-    filter(products: Product[], filters: { filter_name: string; filter_value: string }[]): Product[];
+    filter(products: Product[], filters: filter[]): Product[];
 
     /**
-     *
-     * @param product_id
-     * TODO
+     * @param product_id product id of the requested product
+     * @return the product with a matching product id, or a string representing an error
      */
     getItem(product_id: number): Product | string
 }
 
 export class ShopInventoryImpl implements ShopInventory {
-    private readonly _discount_policies: DiscountPolicyHandler;
+    private readonly _discount_policies: DiscountPolicyHandler | undefined;
     private readonly _discount_types: DiscountType[];
     private readonly _orders: Order[];
     private _products: Product[];
-    private readonly _purchase_policies: PurchasePolicyHandler;
+    private readonly _purchase_policies: PurchasePolicyHandler | undefined;
     private readonly _shop_id: number;
     private _shop_management: ShopManagement;
 
-    constructor(shop_id: number, shop_management?: ShopManagement) {
+    constructor(shop_id: number, shop_management: ShopManagement) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
-        this._discount_policies = undefined;
+        // this._discount_policies = DiscountPolicyHandler.getInstance(); //TODO
         this._discount_types = [];
         this._products = [];
         this._orders = [];
-        this._purchase_policies = [];
+        // this._purchase_policies = PurchasePolicyHandler.getInstance(); //TODO
     }
 
     set shop_management(value: ShopManagement) {
         this._shop_management = value;
     }
 
-    get discount_policies(): DiscountPolicyHandler {
+    get discount_policies(): DiscountPolicyHandler | undefined {
         return this._discount_policies;
     }
 
@@ -123,7 +126,7 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._products;
     }
 
-    get purchase_policies(): PurchasePolicyHandler {
+    get purchase_policies(): PurchasePolicyHandler | undefined{
         return this._purchase_policies;
     }
 
@@ -186,10 +189,11 @@ export class ShopInventoryImpl implements ShopInventory {
 
     getItem(product_id: number): Product | string {
         const result = this._products.filter((product: Product) => product.product_id == product_id);
-        if (result.length == 0)
-            return ProductNotFound;//TODO logger
+        if (result.length == 0){
+            logger.Error(`Product id ${product_id} search for but doesn't exist`)
+            return ProductNotFound;
+        }
+        logger.Info(`Product id ${product_id} was search for and found ${result[0].name}`)
         return result[0];
     }
-
-
 }
