@@ -186,8 +186,8 @@ export class ShopManagementImpl implements ShopManagement {
         return true;
     }
 
-    getStaffInfo(user_email: string, staff_id?: string[]): string[] {
-        if (!this.isAllowed(user_email, Action.GetStaffInfo)) return [];
+    getStaffInfo(user_email: string, staff_id?: string[]): string[] | string {
+        if (!this.isAllowed(user_email, Action.GetStaffInfo)) return `${user_email} is not allowed to check for staff information`;
         const owners = !(staff_id) ? [this._original_owner].concat(this._owners) :
             [this._original_owner].concat(this._owners)
             .filter(o => staff_id.some(id => id == o.user_email));
