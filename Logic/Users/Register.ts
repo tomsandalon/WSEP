@@ -91,6 +91,10 @@ export class RegisterImpl implements Register{
     get registered_users(): StringPair[]{
         return this._registered_users
     }
+
+    verifyUserEmail(user_email: string):boolean {
+        //TODO
+    }
 }
 
 

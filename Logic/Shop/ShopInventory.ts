@@ -9,7 +9,7 @@ import {Order} from "../ProductHandling/Order";
 import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 
-type filter = { filter_name: string; filter_value: string }
+export type filter = { filter_name: string; filter_value: string }
 
 export interface ShopInventory {
     shop_id: number

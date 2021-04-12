@@ -14,6 +14,7 @@ export interface User {
     addToBasket(shop: ShopInventory,product_id: number, amount: number): void | string
     editBasketItem(shop: ShopInventory,product_id: number, new_amount: number): void | string
     purchaseBasket(shop_id: number, payment_method: string): string | boolean
+    purchaseCart(payment_method: string):any
     displayBasket(shop_id: number): string[] | string
     removeItemFromBasket(shop: ShopInventory, product_id: number):void
     displayBaskets(): string[][] | string
@@ -32,6 +33,10 @@ export class UserImpl implements User{
         this._is_admin = is_admin;
         this._cart = [];
         this._order_history = [];
+    }
+
+    purchaseCart(payment_method: string) {
+        throw new Error("Method not implemented.");
     }
 
     /**
@@ -74,7 +79,7 @@ export class UserImpl implements User{
             this._cart.push(new_basket);
         }
         else{//add to existing
-            shopping_basket[0].addToBasket(product_id, amount);
+            console.log(shopping_basket[0].addToBasket(product_id, amount));
         }
     }
 

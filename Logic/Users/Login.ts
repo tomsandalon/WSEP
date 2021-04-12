@@ -76,6 +76,8 @@ export class LoginImpl  implements  Login{
        this._logged_users = value;
     }
 
+
+
     get logged_users(): string[]{
         return this._logged_users;
     }

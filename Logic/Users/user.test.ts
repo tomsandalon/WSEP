@@ -7,6 +7,7 @@ import {StringPair} from "./StringPair";
 import {UserImpl} from "./User";
 import type = Mocha.utils.type;
 import {ShopInventoryImpl} from "../Shop/ShopInventory";
+import {ShopManagementImpl} from "../Shop/ShopManagement";
 
 describe('PasswordHandler tests', () => {
     it('should return a hashed password ', () => {
@@ -106,7 +107,7 @@ describe('LoginImpl tests', () => {
 });
 
 
-describe('LoginImpl tests', () => {
+describe('User tests', () => {
     it('Registering login and add item to basket ', () => {
         let reg = RegisterImpl.getInstance();
         reg.register("liorpev@gmail.com","123456");
@@ -116,9 +117,37 @@ describe('LoginImpl tests', () => {
             assert.fail()
         else
         {
-
+            let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"));
+            //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
+            // @ts-ignore
+            shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
+            expect(typeof (user.addToBasket(shop, 0,15)) !== "string").eq(true);
         }
-
     });
-
+    it('Adding item to cart', () => {
+        let reg = RegisterImpl.getInstance();
+        reg.register("liorpev1@gmail.com","123456");
+        let log = LoginImpl.getInstance();
+        const user = (log.login("liorpev1@gmail.com", "123456"));
+        if(typeof user == "string")
+            assert.fail()
+        else
+        {
+            let shop = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"));
+            //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
+            // @ts-ignore
+            shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
+            user.addToBasket(shop,0,50);
+            expect(user.cart[0].products[0].product.name === "vodka").eq(true)
+            expect(user.cart[0].products[0].amount == 50).eq(true)
+            console.log(user.cart[0].products[0].product.product_id)
+            // user.editBasketItem(shop,0,15) //TODO editing amount doesnt work?
+            // expect(user.cart[0].products[0].amount == 15).eq(true)
+            user.removeItemFromBasket(shop,0)
+            console.log(user.cart[0].products.length)
+            expect(user.cart[0].products.length == 0).eq(true)
+            console.log(user.addToBasket(shop,0,50));// TODO removing and adding results in no items? idk
+            console.log(user.cart[0].products.length)
+        }
+    });
 });
