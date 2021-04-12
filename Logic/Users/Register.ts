@@ -18,6 +18,11 @@ export class RegisterImpl implements Register{
         this._registered_users = []
     }
 
+    /**
+     * @param user_email
+     * @param password
+     * @return true if the user email and password are of a registered user.
+     */
     loginVerification(user_email: string, password: string): boolean {
         const value = this._registered_users.filter(element => element.user_email === user_email && this._password_handler.verify(password, element.hashed_password))
         if(value.length == 0) {
@@ -27,6 +32,9 @@ export class RegisterImpl implements Register{
         return true;
     }
 
+    /**
+     * Singelton design pattern.
+     */
     public static getInstance(): RegisterImpl {
         if(!RegisterImpl.instance)
         {
@@ -34,6 +42,14 @@ export class RegisterImpl implements Register{
         }
         return RegisterImpl.instance;
     }
+
+    /**
+     * Requirement number 2.3
+     * Saves the newly registered user in the registered user's list.
+     * @param user_email
+     * @param password
+     * @return true if the user's email password is unique and valid.
+     */
     register(user_email: string, password: string): boolean {
         if(this.validateEmail(user_email))
         {
@@ -47,7 +63,7 @@ export class RegisterImpl implements Register{
     /**
      *
      * @param user_email
-     * return if the email is already in use
+     * @return true if the email is not in use.
      */
     private alreadyExists(user_email: string): boolean {
         const value = this._registered_users.filter(element => user_email == element.user_email)
@@ -58,9 +74,9 @@ export class RegisterImpl implements Register{
         return true;
     }
     /**
-     *
+     * validates user email and checks if the format is correct.
      * @param user_email
-     * return true if its a correct email adress
+     * @return true if the format of the email is correct and the email is not in use.
      */
     private validateEmail(user_email: string): any{
         //regular expression which represents a example@example.example template
@@ -74,6 +90,10 @@ export class RegisterImpl implements Register{
 
     get registered_users(): StringPair[]{
         return this._registered_users
+    }
+
+    verifyUserEmail(user_email: string):boolean {
+        //TODO
     }
 }
 
