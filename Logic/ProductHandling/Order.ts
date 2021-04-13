@@ -1,11 +1,12 @@
 import {PaymentHandler} from "../Adapters/PaymentHandler";
-import {DeliveryHandler} from "../Adapters/DeliveryHandler";
+import {DeliveryHandler, DeliveryHandlerImpl} from "../Adapters/DeliveryHandler";
 import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {ShoppingBasket} from "./ShoppingBasket";
 import {Product, ProductImpl} from "./Product";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {Shop} from "../Shop/Shop";
+import {DiscountNotExists} from "./ErrorMessages";
 
 export interface Order {
     order_id: number,
@@ -16,6 +17,7 @@ export interface Order {
     /**
      * @Requirement 2.9
      * @param  payment_info of the customer
+     * @param   coupons     of Discount
      * @return true iff:
      *                  1. Charging the customer was successful
      *                  2. Calling the delivery service successfully
@@ -40,24 +42,13 @@ export class OrderImpl implements Order{
     }
 
     public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[]): Order | string{
-        const products = OrderImpl.analyzeProducts(basket, coupons);
-        if(typeof products === "string"){
-            return products
+        const products = basket.products.map((product) =>  ProductPurchaseImpl.create(product.product, coupons, product.amount));
+        const isBad = products.some((product) => typeof product === "string");
+        if(isBad){
+            return DiscountNotExists
         }
         const id = this._order_id_specifier++;
-        return new OrderImpl(date, id, products, basket.shop)
-    }
-
-    private static analyzeProducts(basket: ShoppingBasket, coupons: DiscountType[]): ReadonlyArray<ProductPurchase> | string {
-        let purchasedProducts: ProductPurchase[] = [];
-        for (let product of basket.products){
-            const purchased = ProductPurchaseImpl.create(product.product, coupons, product.amount);
-            if(typeof purchased === "string"){
-                return purchased
-            }
-            purchasedProducts.push(purchased)
-        }
-        return purchasedProducts
+        return new OrderImpl(date, id, products as ProductPurchase[], basket.shop)
     }
 
     get order_id(){
@@ -75,9 +66,16 @@ export class OrderImpl implements Order{
     get products(){
         return this._products
     }
-    public purchase_self(payment_info: string): boolean | string  {
-        //TODO save to DB
 
+    public purchase_self(payment_info: string): boolean | string  {
+        const result_of_purchase = this._shop.purchaseItems(this._products);
+        if(typeof result_of_purchase === "string"){
+            return result_of_purchase
+        }
+        //TODO save to DB
+        //TODO purchasehandler.charge
+        //TODO delivery handler
+        //TODO if something goes wrong -> shop.returnItems(this._products)
         return true;
     }
 

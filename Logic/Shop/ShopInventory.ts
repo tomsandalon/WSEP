@@ -8,6 +8,7 @@ import {Order} from "../ProductHandling/Order";
 import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
+import {ProductPurchase} from "../ProductHandling/ProductPurchase";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -29,6 +30,7 @@ export enum Item_Action {
 
 export interface ShopInventory {
     shop_id: number
+    //TODO tom add shop name
     shop_management: ShopManagement
     products: Product[]
     /**
@@ -58,8 +60,15 @@ export interface ShopInventory {
     /**
      * @Requirement 2.9
      * @return true iff the purchase was successful
+     * TODO edit documentation
      */
-    purchaseItems(): boolean
+    purchaseItems(products: ReadonlyArray<ProductPurchase>): boolean | string
+
+    /**
+     * //TODO fix stuff
+     * @param products
+     */
+    returnItems(products: ReadonlyArray<ProductPurchase>): void
 
     /**
      * @Requirement 4.1
@@ -205,8 +214,8 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._orders.map(order => order.to_string());
     }
 
-    purchaseItems() {
-        return false //TODO mega function, don't do alone
+    purchaseItems(products: ReadonlyArray<ProductPurchase>): string | boolean {
+        return false //TODO verify and reduce
     }
 
     removeItem(item_id: number): boolean {
@@ -247,5 +256,8 @@ export class ShopInventoryImpl implements ShopInventory {
                 (typeof category === "string") ? category :
                 (action == Item_Action.AddCategory) ? result.addCategory(category) :
                 (action == Item_Action.RemoveCategory) ? result.removeCategory(category) : "Should not get here";
+    }
+
+    returnItems(products: ReadonlyArray<ProductPurchase>): void {
     }
 }

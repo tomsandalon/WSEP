@@ -4,7 +4,7 @@ export interface DeliveryHandler {
     deliver(address: string, order: Order): string | boolean
 }
 
-class DeliveryHandlerImpl implements DeliveryHandler {
+export class DeliveryHandlerImpl implements DeliveryHandler {
     private static instance: DeliveryHandler;
 
     private constructor(){}

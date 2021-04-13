@@ -98,14 +98,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         }
         for (let product of this._products){
             if(product_id == product.product.product_id){
-                const difference = product.amount - new_amount;
-                if (difference > 0){
-                    product.product.returnAmount(difference);
-                } else if (difference < 0) {
-                    product.product.makePurchase(difference);
-                }
                 product.amount = new_amount;
-                //else aka do nothing
                 return true
             }
         }
