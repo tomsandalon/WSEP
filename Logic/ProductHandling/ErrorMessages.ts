@@ -5,3 +5,6 @@ export const AmountNonPositiveValue = "amount must be larger than 0";
 export const DiscountExists = "discount already applied to the product";
 export const DiscountNotExists = "discount isn't already applied to the product";
 export const ProductNotFound = "Product not found by id";
+export const CategoryNotFound = "Category not found";
+export const ProductExistsInBasket = "Product already exists in the basket";
+export const ProductNotExistInBasket = "Product not found in basket";
