@@ -1,13 +1,13 @@
 import 'mocha';
 import { expect, assert } from 'chai';
-import {PasswordHandler} from "./PasswordHandler";
-import {RegisterImpl} from "./Register";
-import {LoginImpl} from "./Login";
-import {StringPair} from "./StringPair";
-import {UserImpl} from "./User";
+import {PasswordHandler} from "../../../Logic/Users/PasswordHandler";
+import {RegisterImpl} from "../../../Logic/Users/Register";
+import {LoginImpl} from "../../../Logic/Users/Login";
+import {StringPair} from "../../../Logic/Users/StringPair";
+import {UserImpl} from "../../../Logic/Users/User";
 import type = Mocha.utils.type;
-import {ShopInventoryImpl} from "../Shop/ShopInventory";
-import {ShopManagementImpl} from "../Shop/ShopManagement";
+import {ShopInventoryImpl} from "../../../Logic/Shop/ShopInventory";
+import {ShopManagementImpl} from "../../../Logic/Shop/ShopManagement";
 
 describe('PasswordHandler tests', () => {
     it('should return a hashed password ', () => {

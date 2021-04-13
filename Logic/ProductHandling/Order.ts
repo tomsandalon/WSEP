@@ -39,13 +39,13 @@ export class OrderImpl implements Order{
         this._shop = shop;
     }
 
-    public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[], shop: ShopInventory): Order | string{
+    public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[]): Order | string{
         const products = OrderImpl.analyzeProducts(basket, coupons);
         if(typeof products === "string"){
             return products
         }
         const id = this._order_id_specifier++;
-        return new OrderImpl(date, id, products, shop)
+        return new OrderImpl(date, id, products, basket.shop)
     }
 
     private static analyzeProducts(basket: ShoppingBasket, coupons: DiscountType[]): ReadonlyArray<ProductPurchase> | string {
@@ -77,6 +77,7 @@ export class OrderImpl implements Order{
     }
     public purchase_self(payment_info: string): boolean | string  {
         //TODO save to DB
+
         return true;
     }
 

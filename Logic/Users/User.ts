@@ -1,8 +1,9 @@
 import {ShoppingBasket, ShoppingBasketImpl, ShoppingEntry} from "../ProductHandling/ShoppingBasket";
-import {Order} from "../ProductHandling/Order";
+import {Order, OrderImpl} from "../ProductHandling/Order";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {logger} from "../Logger";
 import {ShopInventory} from "../Shop/ShopInventory";
+import {PaymentHandler, PaymentHandlerImpl} from "../Adapters/PaymentHandler";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
@@ -30,10 +31,11 @@ export class UserImpl implements User {
     private readonly _user_email: string
     private readonly _password: string
     private readonly _is_admin: boolean
-    private readonly _cart: ShoppingBasket[]
+    private _cart: ShoppingBasket[]
     private readonly _order_history: Order[]
     private readonly _user_id: number
     private readonly _is_guest: boolean
+    private readonly _payment_handler: PaymentHandler
 
 
     constructor(user_email?:string, password?:string, is_admin?:boolean) {
@@ -52,6 +54,7 @@ export class UserImpl implements User {
         this._cart = [];
         this._order_history = [];
         this._user_id = generateId();
+        this._payment_handler = PaymentHandlerImpl.getInstance();
     }
 
     /**
@@ -139,11 +142,17 @@ export class UserImpl implements User {
             logger.Error("Trying to purchase a shop basket that doesnt exist");
             return false;
         }
-        else{//TODO payment_handler?
-            return true;
-        }
-
+        const order = OrderImpl.create(new Date(), shopping_basket[0],[]);
+        if(typeof order == "string")
+            return order
+        const order_purchase = order.purchase_self(payment_method);
+        if(typeof order_purchase == "string")
+            return order_purchase
+        this._order_history.push(order)
+        this._cart = this._cart.filter(basket => basket.shop.shop_id != shop_id)
+        return order_purchase;
     }
+
 
     /**
      * Requirement number 2.9

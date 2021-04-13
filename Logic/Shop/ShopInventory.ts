@@ -38,6 +38,7 @@ export interface ShopInventory {
     discount_policies: DiscountPolicyHandler | undefined
     discount_types: DiscountType[]
     orders: Order[]
+    bank_info: string
 
     /**
      * @Requirement 2.5
@@ -119,14 +120,16 @@ export class ShopInventoryImpl implements ShopInventory {
     private readonly _purchase_policies: PurchasePolicyHandler | undefined;
     private readonly _shop_id: number;
     private _shop_management: ShopManagement;
+    private readonly _bank_info:string;
 
-    constructor(shop_id: number, shop_management: ShopManagement) {
+    constructor(shop_id: number, shop_management: ShopManagement, bank_info:string) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
         // this._discount_policies = DiscountPolicyHandler.getInstance(); //TODO
         this._discount_types = [];
         this._products = [];
         this._orders = [];
+        this._bank_info = bank_info;
         // this._purchase_policies = PurchasePolicyHandler.getInstance(); //TODO
     }
 
@@ -160,6 +163,9 @@ export class ShopInventoryImpl implements ShopInventory {
 
     get shop_management(): ShopManagement {
         return this._shop_management;
+    }
+    get bank_info(): string{
+        return this._bank_info
     }
 
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {

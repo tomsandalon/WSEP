@@ -23,24 +23,24 @@ interface System{
     openSession(): void //TODO add guest to the system.
     closeSession(): void //TODO remove quest from system, if use logout.
     displayMenu():void // TODO UI JUST FOR US
-    performRegister(user_email:string, password: string): boolean //lior
-    performLogin(user_email:string, password: string): string | number//lior
-    performGuestLogin():number //lior
+    performRegister(user_email:string, password: string): boolean
+    performLogin(user_email:string, password: string): string | number
+    performGuestLogin():number
     logout(user_email: string): void //TODO after logout switch to guest, openSession? //lior
     displayShops():any
     getItemsFromShop(shop_id:number): any
     searchItemFromShops(search_type:SearchTypes, search_term: string):any
-    filterSearch(search_type:SearchTypes, search_term: string, filter:Filter):any
-    addItemToBasket(user_id:number, product_id: number, shop_id:number, amount:number):string //lior
-    displayShoppingCart(user_id:number): string | string[][] //lior
-    editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):string //lior
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):string | boolean //lior
-    purchaseCart(user_id: number, payment_info:string):string | boolean//lior
-    addShop(user_email: string, name: string, description: string,
+    filterSearch(search_type:SearchTypes, search_term: string, filters:Filter[]):string[]
+    addItemToBasket(user_id:number, product_id: number, shop_id:number, amount:number):string | void
+    displayShoppingCart(user_id:number): string | string[][]
+    editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):string | void
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):string | boolean
+    purchaseCart(user_id: number, payment_info:string):string | boolean
+    addShop(user_id: number, name: string, description: string,
             location: string, bank_info:string): number | string
-    UserOrderHistory(user_id: number):string | string[] //lior
-    addProduct(user_id: number, shop_id: shop_id, name: string, description: string, amount: number, categories: string[],
-               base_price: null, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
+    UserOrderHistory(user_id: number):string | string[]
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
+               base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
     appointOwner(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
@@ -48,10 +48,9 @@ interface System{
     editPermissions(user_id:number, shop_id:number, target_email:string,actions:Action[]): string | boolean
     displayStaffInfo(user_id:number,shop_id:number): string[] | string
     shopOrderHistory(user_id:number,shop_id:number): string | string[]
-
     adminDisplayShopHistory(user_id:number, shop_id: number): string | string[]
     adminDisplayUserHistory(user_id:number):any
-
+    //TODO edit product tom
     //shop_id: number
     //     name: string
     //     description: string
@@ -75,12 +74,17 @@ export class SystemImpl implements System {
 
     }
 
-    adminDisplayShopHistory(user_id: number, shop_id: number) {
+    adminDisplayShopHistory(user_id: number, shop_id: number):string | string[] {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
-        //TODO check if user is admin
-        return shop.adminGetShopHistory(user_email)
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string") //can't happen
+            return user
+        else if(user.is_admin)
+            return shop.adminGetShopHistory(user_email)
+        else
+            return `Email ${user.user_email} is not an admin`;
     }
     adminDisplayUserHistory(user_id: number) {
         throw new Error("Method not implemented.");
@@ -96,16 +100,18 @@ export class SystemImpl implements System {
         }
 
     }
-    editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number):string {
+    editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number):string | void {
         const user = this._login.retrieveUser(user_id);
         if(typeof user == "string"){
             return user
         }
         else{
-             // const edit_cart = user.editBasketItem(shop_id, product_id, amount) //TODO with tom
-            // if(typeof edit_cart == "string")
-             //   return edit_cart
-            return ""
+            const shop = this.getShopById(shop_id);
+            if(typeof shop == "undefined")
+                return `Shop id ${shop_id} doesnt exist`
+             const edit_cart = user.editBasketItem(shop.inventory, product_id, amount)
+            if(typeof edit_cart == "string")
+               return edit_cart
         }
     }
     purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string):string | boolean {
@@ -132,16 +138,15 @@ export class SystemImpl implements System {
             return purchase_cart
         }
     }
-    orderHistory(user_id: number) {
-
-    }
-    addProduct(user_id: number, shop_id: shop_id, name: string, description: string, amount: number, categories: string[],
-               base_price: null, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+    addProduct(user_id: number, shop_id:  number, name: string, description: string, amount: number, categories: string[],
+               base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
         const shop = this.getShopById(shop_id)
         if (!shop) return `Shop ${shop_id} not found`
-        if(!this._register.verifyUserEmail(String(user_id))) return "User is not registered" //TODO fix verify
-        const user_email = "temp" //TODO replace with getter
-        return shop.addItem(user_email, name, description, amount, categories, base_price, discount_type, purchase_type)
+        const user = this.login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        if(!this._register.verifyUserEmail(user.user_email)) return `User id ${user_id} is not registered`
+        return shop.addItem(user.user_email, name, description, amount, categories, base_price, discount_type, purchase_type)
     }
 
     searchItemFromShops(search_type: SearchTypes, search_term: string): string[] {
@@ -150,21 +155,32 @@ export class SystemImpl implements System {
                 (search_type == SearchTypes.category) ? shop.search(undefined, search_term, undefined) :
                     shop.search(undefined, undefined, search_term)
         }
+        return this._shops.flatMap(shop => search(shop)).map(product => product.toString())
+    }
+
+    filterSearch(search_type: SearchTypes, search_term: string, filters: Filter[]):string[] {
+        const search = (shop: Shop) => {
+            return (search_type == SearchTypes.name) ? shop.filter(shop.search(search_term, undefined, undefined), filters) :
+                (search_type == SearchTypes.category) ? shop.filter(shop.search(undefined, search_term, undefined), filters) :
+                    (search_type == SearchTypes.keyword) ? shop.filter(shop.search(undefined, undefined, search_term), filters) :
+                        [] //should not get here
+        }
         return this._shops.flatMap(shop => search(shop)).map(product => product.toString()) //TODO product toString
+
     }
-    filterSearch(search_type: SearchTypes, search_term: string, filter: Filter) {
-        throw new Error("Method not implemented.");
-    }
-    addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number):string{
+
+    addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number):string | void{
         const user = this._login.retrieveUser(user_id);
         if(typeof user == "string"){
             return user;
         }
         else{
-            // const add_basket = user.addToBasket(getshopinventory, product_id, amount)//TODO getter for shop inventory with tom
-            // if(typeof add_basket == "string")
-            //     return add_basket
-            return ""
+            const shop = this.getShopById(shop_id);
+            if(typeof shop == "undefined")
+                return `Shop id ${shop_id} doesnt exist`
+            const add_basket = user.addToBasket(shop.inventory, product_id, amount)
+            if(typeof add_basket == "string")
+                return add_basket
         }
     }
 
@@ -181,36 +197,45 @@ export class SystemImpl implements System {
     }
 
     private getShopById(shop_id: number): Shop | undefined {
-        return this.shops.filter(s => s.shop_id == shop_id)[0]
+        return this.shops.find(s => s.shop_id == shop_id)
     }
 
     getItemsFromShop(shop_id:number): string | string[]{
         const shop: Shop | undefined = this.getShopById(shop_id)
         if (shop == undefined) return "Shop not found"
-        return shop.getAllItems().map(item => item.toString()) //TODO add toString to product
+        return shop.getAllItems().map(item => item.toString())
     }
 
-    private getShopAndUser(shop_id: number, user_id: number): string | {shop: Shop, user_email: string} {//TODO show lior
+    private getShopAndUser(shop_id: number, user_id: number): string | {shop: Shop, user_email: string} {
         const shop = this.getShopById(shop_id)
         if (shop == undefined) return "Shop not found"
-        const user_email = "" //TODO show lior
-        if (false) return "User not found"
+        const user = this.login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        const user_email = user.user_email;
+        if(!this._register.verifyUserEmail(user_email))
+            return `User id ${user_id} is not a registered user`
         return {shop, user_email}
     }
 
     addShop(user_id: number, name: string, description: string, location: string, bank_info: string): number | string {
-        if(!this._register.verifyUserEmail(user_id)) return "User is not registered"
-        const shop = new ShopImpl("temp", bank_info, description, location, name) //TODO replace temp with email getter
+        const user = this.login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        if(!this._register.verifyUserEmail(user.user_email)) return "User is not registered"
+        const shop = new ShopImpl(user.user_email, bank_info, description, location, name)
         this._shops = this._shops.concat(shop)
         return shop.shop_id
     }
 
     displayMenu(): void {
+        //TODO ??
     }
 
 
     logout(user_email:string): void {
         this._login.logout(user_email);
+        this.openSession()
     }
 
     performLogin(user_email:string, password: string): string | number {
@@ -226,6 +251,74 @@ export class SystemImpl implements System {
 
     performRegister(user_email:string, password: string): boolean {
         return this._register.register(user_email,password)
+    }
+
+
+    UserOrderHistory(user_id: number): string | string[] {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string"){
+            return user
+        }
+        else{
+            return user.getOrderHistory();
+        }
+    }
+
+    addPermissions(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(target_email))
+            return `Target email ${target_email} doesnt belong to a registered user`
+        return shop.addPermissions(user_email, target_email, [action])
+    }
+
+    appointManager(user_id: number, shop_id: number, appointee_user_email: string): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(appointee_user_email))
+            return `Target email ${appointee_user_email} doesnt belong to a registered user`
+        return shop.appointNewManager(user_email, appointee_user_email)
+    }
+
+    appointOwner(user_id: number, shop_id: number, appointee_user_email: string): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(appointee_user_email))
+            return `Target email ${appointee_user_email} doesnt belong to a registered user`
+        return shop.appointNewOwner(user_email, appointee_user_email)
+    }
+
+    displayStaffInfo(user_id: number, shop_id: number): string[] | string {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.getStaffInfo(user_email)
+    }
+
+    editPermissions(user_id: number, shop_id: number, target_email: string, actions: Action[]): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(target_email))
+            return `Target email ${target_email} doesnt belong to a registered user`
+        return shop.editPermissions(user_email, target_email, actions)
+    }
+
+    shopOrderHistory(user_id: number, shop_id: number): string | string[] {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.getShopHistory(user_email)
+    }
+
+    removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.removeItem(user_email, product_id)
     }
 
     get login(): LoginImpl {
@@ -250,69 +343,6 @@ export class SystemImpl implements System {
 
     set shops(value: Shop[]) {
         this._shops = value;
-    }
-
-    UserOrderHistory(user_id: number): string | string[] {
-        const user = this._login.retrieveUser(user_id);
-        if(typeof user == "string"){
-            return user
-        }
-        else{
-            return user.getOrderHistory();
-        }
-    }
-
-    addPermissions(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
-        const result = this.getShopAndUser(user_id, shop_id)
-        if (typeof result == "string") return result
-        const {shop, user_email} = result
-        //TODO verify that target email is real
-        return shop.addPermissions(user_email, target_email, [action])
-    }
-
-    appointManager(user_id: number, shop_id: number, appointee_user_email: string): string | boolean {
-        const result = this.getShopAndUser(user_id, shop_id)
-        if (typeof result == "string") return result
-        const {shop, user_email} = result
-        //verify that appointee email is real
-        return shop.appointNewManager(user_email, appointee_user_email)
-    }
-
-    appointOwner(user_id: number, shop_id: number, appointee_user_email: string): string | boolean {
-        const result = this.getShopAndUser(user_id, shop_id)
-        if (typeof result == "string") return result
-        const {shop, user_email} = result
-        //verify that appointee email is real
-        return shop.appointNewOwner(user_email, appointee_user_email)
-    }
-
-    displayStaffInfo(user_id: number, shop_id: number): string[] | string {
-        const result = this.getShopAndUser(user_id, shop_id)
-        if (typeof result == "string") return result
-        const {shop, user_email} = result
-        return shop.getStaffInfo(user_email)
-    }
-
-    editPermissions(user_id: number, shop_id: number, target_email: string, actions: Action[]): string | boolean {
-        const result = this.getShopAndUser(user_id, shop_id)
-        if (typeof result == "string") return result
-        const {shop, user_email} = result
-        //TODO verify that target email is real
-        return shop.editPermissions(user_email, target_email, actions)
-    }
-
-    shopOrderHistory(user_id: number, shop_id: number): string | string[] {
-        const result = this.getShopAndUser(user_id, shop_id)
-        if (typeof result == "string") return result
-        const {shop, user_email} = result
-        return shop.getShopHistory(user_email)
-    }
-
-    removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string {
-        const result = this.getShopAndUser(user_id, shop_id)
-        if (typeof result == "string") return result
-        const {shop, user_email} = result
-        return shop.removeItem(user_email, product_id)
     }
 }
 

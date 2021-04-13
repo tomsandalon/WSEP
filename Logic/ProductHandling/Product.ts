@@ -269,4 +269,5 @@ export class ProductImpl implements Product{
         this._amount += amount;
         return true;
     }
+    //TODO toString of product
 }

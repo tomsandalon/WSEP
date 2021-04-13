@@ -199,7 +199,7 @@ export class ShopImpl implements Shop {
         this._location = location;
         this._name = name;
         this._management = new ShopManagementImpl(this.shop_id, user_email)
-        this._inventory = new ShopInventoryImpl(this.shop_id, this._management)
+        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, bank_info)
         this._management.shop_inventory = this._inventory;
         this._is_active = true;
     }
