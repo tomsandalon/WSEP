@@ -5,8 +5,8 @@
   "main": "index.js",
   "module": "CommonJS",
   "scripts": {
-    "test": "ts-mocha -p tsconfig.testing.json Tests/Domain/Product/*",
-    "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/Domain/Product/*"
+    "test": "ts-mocha -p tsconfig.testing.json Tests/Domain/*/*",
+    "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/Domain/*/*"
   },
   "keywords": [],
   "author": "",

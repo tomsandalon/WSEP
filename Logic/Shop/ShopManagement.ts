@@ -18,7 +18,7 @@ export interface ShopManagement {
      * @param user_email email of the user trying to add items to the shop
      * @return true iff the user representation of user_email is allowed to add items to the shop
      */
-    allowedAddItemToShop(user_email: string): boolean
+    allowedEditItems(user_email: string): boolean
 
     /**
      * @param user_email email of the user trying to remove items from the shop
@@ -140,7 +140,7 @@ export class ShopManagementImpl implements ShopManagement {
         return true;
     }
 
-    allowedAddItemToShop(user_email: string): boolean {
+    allowedEditItems(user_email: string): boolean {
         return this.isAllowed(user_email, Action.AddItem);
     }
 
@@ -177,12 +177,11 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     editPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean {
-        // const result = this._managers.filter((m: Manager) => m.user_email == appointee_email);
-        // if (result.length == 0) return false;
-        // const manager = result[0];
-        // let new_permissions: boolean[] = new Array<boolean>(TotalNumberOfPermissions).fill(false)
-        // permissions.forEach(a => {new_permissions[a] = true})
-        // manager.permissions = new ManagerPermissions(new_permissions);
+        const manager = this._managers.find((m: Manager) => m.user_email == appointee_email);
+        if (!manager) return false;
+        let new_permissions: boolean[] = new Array<boolean>(TotalNumberOfPermissions).fill(false)
+        permissions.forEach(a => {new_permissions[a] = true})
+        manager.permissions = new ManagerPermissions(new_permissions);
         return true;
     }
 
@@ -206,9 +205,9 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     private getManagerByEmail(manager_email: string): Manager | null {
-        const result = this._managers.filter(m => m.user_email == manager_email);
-        if (result.length == 0) return null;
-        return result[0];
+        const result = this._managers.find(m => m.user_email == manager_email);
+        if (!result) return null;
+        return result;
     }
 
     private isManager(manager_email: string): boolean {

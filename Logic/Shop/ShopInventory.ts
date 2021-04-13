@@ -1,4 +1,3 @@
-
 import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {ShopManagement} from "./ShopManagement";
 import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
@@ -8,8 +7,25 @@ import {Product, ProductImpl} from "../ProductHandling/Product";
 import {Order} from "../ProductHandling/Order";
 import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
+import {CategoryImpl} from "../ProductHandling/Category";
 
-export type Filter = { filter_name: string; filter_value: string }
+export type Filter = { filter_type: Filter_Type; filter_value: string }
+export enum Filter_Type {
+    BelowPrice,
+    AbovePrice,
+    Category,
+    // Rating
+}
+
+export enum Item_Action {
+    AddAmount,
+    ChangeName,
+    AddCategory,
+    RemoveCategory,
+    ChangePrice,
+    ChangeDescription,
+    //TODO add policies
+}
 
 export interface ShopInventory {
     shop_id: number
@@ -85,6 +101,14 @@ export interface ShopInventory {
      * @return the product with a matching product id, or a string representing an error
      */
     getItem(product_id: number): Product | string
+
+    /**
+     * @param product_id the product to edit
+     * @param action the action to perform
+     * @param value the value of the action
+     * @return true if the action was successful, or a string representing an error
+     */
+    editItem(product_id: number, action: Item_Action, value: string | number): string | boolean;
 }
 
 export class ShopInventoryImpl implements ShopInventory {
@@ -143,16 +167,23 @@ export class ShopInventoryImpl implements ShopInventory {
         if (typeof item === "string"){
             return item
         }
+        item.addSupplies(amount)
+        categories.forEach(c => {
+            const cat = CategoryImpl.create(c)
+            if (typeof cat == "string") return cat
+            item.addCategory(cat)
+        })
+        item.addDiscountType(discount_type)
         this._products = this._products.concat([item]);
         return true;
     }
 
-    filter(products: Product[], filters: { filter_name: string; filter_value: string }[]): Product[] {
-        const passed_filter = (f: { filter_name: string; filter_value: string }) => (product: Product) => {
-            return (f.filter_name == "below_price") ? product.base_price <= Number(f.filter_value) :
-                    (f.filter_name == "above_price") ? product.base_price >= Number(f.filter_value) :
-                    // (f.filter_name == "rating") ? true :   // add rating to product
-                    (f.filter_name == "category") ? product.category.some(c => c.name == f.filter_value) :
+    filter(products: Product[], filters: Filter[]): Product[] {
+        const passed_filter = (f: Filter) => (product: Product) => {
+            return (f.filter_type == Filter_Type.AbovePrice) ? product.base_price >= Number(f.filter_value) :
+                    (f.filter_type == Filter_Type.BelowPrice) ? product.base_price <= Number(f.filter_value) :
+                    // ((f.filter_type == Filter_Type.Rating) ? true :   // add rating to product
+                        (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
                         //can add more
                     false;
         }
@@ -161,7 +192,7 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     getAllItems(): Product[] {
-        return this.products;
+        return this.products.filter(p => p.amount > 0);
     }
 
     getShopHistory(): string[] {
@@ -179,21 +210,36 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[] {
-        return this._products
-            .filter(p => (name === undefined) ? true : p.name == name)
-            .filter(p => (category == undefined) ? true : p.category.some(c => c.name == category))
+        return this._products.filter(p => p.amount > 0)
+            .filter(p => (name === undefined) ? true : p.name.toLowerCase().includes(name.toLowerCase()))
+            .filter(p => (category == undefined) ? true : p.category.some(c => c.name.toLowerCase() === category.toLowerCase()))
             .filter(p => (keyword === undefined) ? true : `${p.description} ${String(p.amount)} ${String(p.product_id)}`
-                .toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
+                .toLowerCase().includes(keyword.toLowerCase()))
         ;
     }
 
     getItem(product_id: number): Product | string {
-        const result = this._products.filter((product: Product) => product.product_id == product_id);
-        if (result.length == 0){
+        const result = this._products.find((product: Product) => product.product_id == product_id);
+        if (!result){
             logger.Error(`Product id ${product_id} search for but doesn't exist`)
             return ProductNotFound;
         }
-        logger.Info(`Product id ${product_id} was search for and found ${result[0].name}`)
-        return result[0];
+        logger.Info(`Product id ${product_id} was search for and found ${result.name}`)
+        return result;
+    }
+
+    editItem(product_id: number, action: Item_Action, value: string | number): string | boolean {
+        const result = this.getItem(product_id)
+        if (typeof result === "string"){
+            return result
+        }
+        const category = CategoryImpl.create(String(value))
+        return  (action == Item_Action.AddAmount) ? result.addSupplies(Number(value)) :
+                (action == Item_Action.ChangeDescription) ? result.changeDescription(String(value)) :
+                (action == Item_Action.ChangeName) ? result.changeName(String(value)) :
+                (action == Item_Action.ChangePrice) ? result.changePrice(Number(value)) :
+                (typeof category === "string") ? category :
+                (action == Item_Action.AddCategory) ? result.addCategory(category) :
+                (action == Item_Action.RemoveCategory) ? result.removeCategory(category) : "Should not get here";
     }
 }

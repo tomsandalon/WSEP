@@ -1,4 +1,4 @@
-import {Filter, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
+import {Filter, Item_Action, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
 import {Category} from "../ProductHandling/Category";
@@ -49,7 +49,7 @@ export interface Shop {
      * @filter-param filter_value the value of the filter
      * @return the products from @param products which match the filter
      */
-    filter(products: Product[], filters: { filter_name: string, filter_value: string }[]): Product[]
+    filter(products: Product[], filters: Filter[]): Product[]
 
     /**
      * @Requirement 4.1
@@ -155,6 +155,23 @@ export interface Shop {
      * @return staff info if the function was successful, or a string containing the error message otherwise
      */
     getStaffInfo(user_email: string, staff_email?: string[]): string[] | string
+
+    /**
+     * @Requirement 6.4
+     * @param user_email email of the admin
+     * @return a string list representation of the shop purchase history
+     */
+    adminGetShopHistory(user_email: string): string[]
+
+    /**
+     *
+     * @param user_email email of the user trying to edit the item
+     * @param product_id id of the product
+     * @param action the action to perform
+     * @param value the value to apply to the action
+     * @return true if the edit was successful, or a string containing the error message otherwise
+     */
+    editProduct(user_email: string, product_id: number, action: Item_Action, value: string | number): string | boolean
 }
 
 export class ShopImpl implements Shop {
@@ -175,7 +192,6 @@ export class ShopImpl implements Shop {
      * @param location
      * @param name
      */
-    //TODO check if registered
     constructor(user_email: string, bank_info: string, description: string, location: string, name: string) {
         this._shop_id = generateId();
         this._bank_info = bank_info;
@@ -241,7 +257,7 @@ export class ShopImpl implements Shop {
         const failure_message: string = `${user_email} failed to add product ${name} to shop ${this._shop_id}`
         const success_message: string = `${user_email} successfully added product ${name} to shop ${this._shop_id}`
 
-        if (!this._management.allowedAddItemToShop(user_email)) {
+        if (!this._management.allowedEditItems(user_email)) {
             logger.Error(`${failure_message}. Permission denied`);
             return "Permission denied";
         }
@@ -306,7 +322,10 @@ export class ShopImpl implements Shop {
 
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[] {
         const ret = this._inventory.search(name, category, keyword);
-        logger.Info(`A search was performed in shop ${this._shop_id}: name: ${name}\tcategory: ${category}\tkeyword: ${keyword}`);
+        logger.Info(`A search was performed in shop ${this._shop_id}: ${
+            (name) ? `name: ${name}` :
+            (category) ? `category: ${category}` :
+            (keyword) ? `keyword: ${keyword}` : null}\t number of results: ${ret.length}`)
         return ret;
     }
 
@@ -378,6 +397,37 @@ export class ShopImpl implements Shop {
         }
 
         const ret = this._inventory.getShopHistory();
+        logger.Info(success_message);
+        return ret;
+    }
+
+    adminGetShopHistory(user_email: string): string[] {
+        const ret = this._inventory.getShopHistory()
+        logger.Info(`Admin ${user_email} searched for shop ${this.shop_id} order history`)
+        return ret;
+    }
+
+    toString(): string {
+        //TODO
+        return ""
+    }
+
+    editProduct(user_email: string, product_id: number, action: Item_Action, value: string | number): string | boolean {
+        const failure_message: string = `${user_email} failed to edit product ${name} in shop ${this._shop_id}`
+        const success_message: string = `${user_email} successfully edited product ${name} in shop ${this._shop_id}. 
+        EditType: ${action}\tValue: ${String(value)}`
+
+        if (!this._management.allowedEditItems(user_email)) {
+            logger.Error(`${failure_message}. Permission denied`);
+            return "Permission denied";
+        }
+
+        const ret = this._inventory.editItem(product_id, action, value)
+        if (typeof ret === "string") {
+            const error = `${failure_message}. ` + ret
+            logger.Error(error);
+            return error
+        }
         logger.Info(success_message);
         return ret;
     }
