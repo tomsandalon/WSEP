@@ -3,8 +3,10 @@ import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {
     AmountNonPositiveValue,
-    BasePriceNonPositiveValue,
-    DescriptionEmpty, DiscountExists, DiscountNotExists,
+    BasePriceNonPositiveValue, CategoryNotFound,
+    DescriptionEmpty,
+    DiscountExists,
+    DiscountNotExists,
     ProductNameEmpty
 } from "./ErrorMessages";
 
@@ -17,18 +19,99 @@ export interface Product {
     base_price: number // >= 0
     discount_types: DiscountType[]
     purchase_type: PurchaseType
+
+    /**
+     * @Requirement - Quality assurance No. 5a
+     * @param purchaseType
+     */
     changePurchaseType(purchaseType: PurchaseType): string | boolean
+
+    /**
+     * @Requirement 2.7
+     * @param quantity
+     * @functionality Reduce amount of supplies of this product
+     * @return true iff 0 < quantity < this.amount
+     * @return AmountNonPositiveValue otherwise
+     */
     makePurchase(quantity: number): string | boolean
+
+    /**
+     * @Requirement 4.1
+     * @param name
+     * @return true iff 0 < name.length
+     * @return ProductNameEmpty otherwise
+     */
     changeName(name: string): string | boolean
+
+    /**
+     * @Requirement 4.1
+     * @param category
+     * @return true
+     */
     addCategory(category: Category): string | boolean
+
+    /**
+     * @Requirement 4.1
+     * @param category
+     * @return true iff this.categories.contains(category) == true
+     * @return CategoryNotFound otherwise
+     */
     removeCategory(category: Category): string | boolean
+
+    /**
+     * @Requirement 4.1
+     * @param base_price
+     * @return true iff 0 < base_price
+     * @return BasePriceNonPositiveValue otherwise
+     */
     changePrice(base_price: number): string | boolean
+
+    /**
+     * @Requirement - Quality assurance No. 5b
+     * @param discountType
+     */
     addDiscountType(discountType: DiscountType): string | boolean
+
+    /**
+     * @Requirement 4.1
+     * @param description
+     * @return true iff 0 < description.len
+     * @return DescriptionEmpty otherwise
+     */
     changeDescription(description: string): string | boolean
+
+    /**
+     * @Requirement 4.1
+     * @param amount
+     * @return true iff 0 < amount
+     * @return AmountNonPositiveValue otherwise
+     */
     addSupplies(amount: number): string | boolean
+
+    /**
+     *
+     * @param coupons
+     * @return actual_price considering all discounts applied on this product and coupons that the customer applied
+     * @return DiscountNotExists iff the customer entered a coupon that can't be applied on this product
+     */
     calculatePrice(coupons: DiscountType[]): number | string
+
+    /**
+     * @Requirement - 4.1 and Quality assurance No. 5b
+     * @param discountType
+     * @return true iff this.discount_types.contains(discountType)
+     * @return DiscountNotExists otherwise
+     */
     removeDiscountType(discountType: DiscountType): string | boolean
-    returnAmount(difference: number): string | boolean;
+
+    /**
+     * @Requirement 2.7
+     * @functionality increase amount of supplies of this product account of what the user returned
+     * @param amount
+     * @return true iff amount > 0
+     * @return AmountNonPositiveValue otherwise
+     */
+    returnAmount(amount: number): string | boolean;
 }
 
 export class ProductImpl implements Product{
@@ -109,7 +192,10 @@ export class ProductImpl implements Product{
         return true;
     }
     public removeCategory(category: Category): string | boolean{
-        this._category.splice(this._category.indexOf(category),1);
+        const deleted = this._category.splice(this._category.indexOf(category),1);
+        if (deleted.length == 0){
+            return CategoryNotFound
+        }
         return true;
     }
     get discount_types(){
@@ -176,7 +262,7 @@ export class ProductImpl implements Product{
         return price
     }
 
-    returnAmount(amount: number): string | boolean {
+    public returnAmount(amount: number): string | boolean {
         if (amount <= 0){
             return AmountNonPositiveValue
         }

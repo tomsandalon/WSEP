@@ -23,21 +23,22 @@ interface System{
     openSession(): void //TODO add guest to the system.
     closeSession(): void //TODO remove quest from system, if use logout.
     displayMenu():void // TODO UI JUST FOR US
-    performRegister(user_email:string, password: string): boolean
-    performLogin(user_email:string, password: string): string | number
-    logout(user_email: string): void //TODO after logout switch to guest, openSession?
-    displayShops(): string[]
-    getItemsFromShop(shop_id:number): string | string[]
-    searchItemFromShops(search_type:SearchTypes, search_term: string): string[]
-    filterSearch(search_type:SearchTypes, search_term: string, filters: Filter[]): string[]
-    addItemToBasket(user_id:number, product_id: number, shop_id:number, amount:number):any
-    displayShoppingCart(user_id:number):any
-    editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):any
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):any
-    purchaseCart(user_id: number, payment_info:string):any
-    addShop(user_id: number, name: string, description: string,
+    performRegister(user_email:string, password: string): boolean //lior
+    performLogin(user_email:string, password: string): string | number//lior
+    performGuestLogin():number //lior
+    logout(user_email: string): void //TODO after logout switch to guest, openSession? //lior
+    displayShops():any
+    getItemsFromShop(shop_id:number): any
+    searchItemFromShops(search_type:SearchTypes, search_term: string):any
+    filterSearch(search_type:SearchTypes, search_term: string, filter:Filter):any
+    addItemToBasket(user_id:number, product_id: number, shop_id:number, amount:number):string //lior
+    displayShoppingCart(user_id:number): string | string[][] //lior
+    editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):string //lior
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):string | boolean //lior
+    purchaseCart(user_id: number, payment_info:string):string | boolean//lior
+    addShop(user_email: string, name: string, description: string,
             location: string, bank_info:string): number | string
-    UserOrderHistory(user_id: number):any
+    UserOrderHistory(user_id: number):string | string[] //lior
     addProduct(user_id: number, shop_id: shop_id, name: string, description: string, amount: number, categories: string[],
                base_price: null, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
@@ -85,17 +86,51 @@ export class SystemImpl implements System {
         throw new Error("Method not implemented.");
     }
 
-    displayShoppingCart(user_id: number) {
-        throw new Error("Method not implemented.");
+    displayShoppingCart(user_id: number): string | string[][] {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string"){
+            return user
+        }
+        else{
+            return user.displayBaskets()
+        }
+
     }
-    editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number) {
-        throw new Error("Method not implemented.");
+    editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number):string {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string"){
+            return user
+        }
+        else{
+             // const edit_cart = user.editBasketItem(shop_id, product_id, amount) //TODO with tom
+            // if(typeof edit_cart == "string")
+             //   return edit_cart
+            return ""
+        }
     }
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string) {
-        throw new Error("Method not implemented.");
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string):string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string"){
+            return user
+        }
+        else{
+            const purchase_basket = user.purchaseBasket(shop_id,payment_info);
+            if(typeof purchase_basket == "string")
+                return purchase_basket
+            return purchase_basket
+        }
     }
-    purchaseCart(user_id: number, payment_info: string) {
-        throw new Error("Method not implemented.");
+    purchaseCart(user_id: number, payment_info: string): string | boolean{
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string"){
+            return user
+        }
+        else{
+            const purchase_cart = user.purchaseCart(payment_info);
+            if(typeof purchase_cart == "string")
+                return purchase_cart
+            return purchase_cart
+        }
     }
     orderHistory(user_id: number) {
 
@@ -117,23 +152,25 @@ export class SystemImpl implements System {
         }
         return this._shops.flatMap(shop => search(shop)).map(product => product.toString()) //TODO product toString
     }
-
-    filterSearch(search_type: SearchTypes, search_term: string, filters: Filter[]): string[]{
-        const search = (shop: Shop) => {
-            return (search_type == SearchTypes.name) ? shop.filter(shop.search(search_term, undefined, undefined), filters) :
-                (search_type == SearchTypes.category) ? shop.filter(hop.search(undefined, search_term, undefined), filters) :
-                (search_type == SearchTypes.keyword) ? shop.filter(shop.search(undefined, undefined, search_term), filters) :
-                [] //should not get here
-        }
-        return this._shops.flatMap(shop => search(shop)).map(product => product.toString()) //TODO product toString
+    filterSearch(search_type: SearchTypes, search_term: string, filter: Filter) {
+        throw new Error("Method not implemented.");
     }
-
-    addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number) {
-        //TODO add user_id and to with mark
+    addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number):string{
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string"){
+            return user;
+        }
+        else{
+            // const add_basket = user.addToBasket(getshopinventory, product_id, amount)//TODO getter for shop inventory with tom
+            // if(typeof add_basket == "string")
+            //     return add_basket
+            return ""
+        }
     }
 
     openSession(): void {
-        throw new Error("Method not implemented.");
+        const user_guest = this.performGuestLogin();
+
     }
     closeSession(): void {
         throw new Error("Method not implemented.");
@@ -181,8 +218,10 @@ export class SystemImpl implements System {
         if(typeof logged_user == "string"){
             return logged_user;
         }
-        //TODO add id's to user as a number
-        return logged_user.user_email;
+        return logged_user;
+    }
+    performGuestLogin():number{
+        return this._login.guestLogin();
     }
 
     performRegister(user_email:string, password: string): boolean {
@@ -213,7 +252,14 @@ export class SystemImpl implements System {
         this._shops = value;
     }
 
-    UserOrderHistory(user_id: number): any {
+    UserOrderHistory(user_id: number): string | string[] {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string"){
+            return user
+        }
+        else{
+            return user.getOrderHistory();
+        }
     }
 
     addPermissions(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {

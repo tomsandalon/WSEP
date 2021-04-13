@@ -12,7 +12,17 @@ export interface Order {
     shop: ShopInventory,
     products: ReadonlyArray<ProductPurchase>,
     date: Date,
-    purchase_self(): boolean | string
+
+    /**
+     * @Requirement 2.9
+     * @param  payment_info of the customer
+     * @return true iff:
+     *                  1. Charging the customer was successful
+     *                  2. Calling the delivery service successfully
+     *                  3. Saving the order in DB was successful
+     * @return ErrorMessage otherwise
+     */
+    purchase_self(payment_info: string): boolean | string
     to_string(): string;
 }
 
@@ -65,12 +75,17 @@ export class OrderImpl implements Order{
     get products(){
         return this._products
     }
-    public purchase_self(): boolean | string  {
+    public purchase_self(payment_info: string): boolean | string  {
         //TODO save to DB
         return true;
     }
 
-    public to_string(): string {//TODO implement this
-        return "";
+    public to_string(): string {
+        return `Order details:\n` +
+            `Purchased in:` +//TODO tom add shop name this._shop.name + "\n" +
+            `Order number: ${this.order_id}\n` +
+            `Was performed: ${this.date.toString()}\n` +
+            `Products:\n${this.products.reduce((acc: string, product: ProductPurchase) =>
+                acc +`\t${product.name}\t${product.product_id}\t${product.amount}\n`, ``)}`;
     }
 }
