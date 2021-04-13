@@ -92,8 +92,13 @@ export class RegisterImpl implements Register{
         return this._registered_users
     }
 
+    /** checks if the user_email actually exists in the system
+     *
+     * @param user_email
+     * @return true if the user_email exists
+     */
     verifyUserEmail(user_email: string):boolean {
-        //TODO
+        return this._registered_users.filter(pair => pair.user_email == user_email).length > 0
     }
 }
 
