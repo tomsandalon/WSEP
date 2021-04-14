@@ -4,26 +4,28 @@ import {SystemImpl} from "../../Logic/System";
 import { expect, assert} from "chai";
 import {SystemDriver} from "./SystemDriver";
 import {System} from "./System";
+import symbols = Mocha.reporters.Base.symbols;
+import {Action} from "../../Logic/ShopPersonnel/Permissions";
 
 describe('Guest:', () => {
     it('2.1: Enter - enter to the system as a guest', () => {
-        const system: System = SystemDriver.getSystem();
+        const system: System = SystemDriver.getSystem(true);
         system.openSession();
     });
 
     it('2.2: Exit - exit', () => {
-        const system: System = SystemDriver.getSystem();
+        const system: System = SystemDriver.getSystem(true);
         system.closeSession();
     });
 
     it('2.3: Registration - Add a new user to the system.', () => {
-        const system: System = SystemDriver.getSystem();
+        const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
         expect(reg).to.be.true;
     });
 
     it('2.4: Login - User success to login', () => {
-        const system: System = SystemDriver.getSystem();
+        const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
         expect(reg).to.be.true;
         let user = system.performLogin("Test@test.com", "TESTER");
@@ -41,7 +43,7 @@ describe('Guest:', () => {
     it('2.7: Basket - add a produt to the basket', () => {
         //TODO
 
-        // const system: System = SystemDriver.getSystem();
+        // const system: System = SystemDriver.getSystem(true);
         // const user = system.openSession();
         // system.addItemToBasket(shopID,productID,amount);
         // expect(user.getBasket().getProduct()).not.equal(null);
@@ -121,46 +123,54 @@ describe('Guest:', () => {
 
 describe('Registered:', () => {
     it('3.1: Logout - user success to logout ', () => {
-        const system: System = SystemDriver.getSystem();
+        const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
         let user = system.performLogin("Test@test.com", "TESTER");
         expect(typeof user == "string").to.be.false
         expect(system.editUserDetails(user as number, 1, "Any"))//TODO ask lior
         system.logout("Test@test.com")
-        expect(typeof (system.addShop(user as number , "ad", "desc", "loc", "bnk")) == "string").to.be.true
+        //make sure logout worked. //TODO ask lior
     });
 
     it('3.2: Open shop - add a new shop to the system, add the user as original owner', () => {
-        const system: System = SystemDriver.getSystem();
+        const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
         let user = system.performLogin("Test@test.com", "TESTER");
         let shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef");
         expect(typeof shopID == "number").to.be.true
         expect( typeof (system.getShopInfo(shopID as number)) == "string").to.be.false
-        expect(system.getShopInfo(shopID as number).includes("Test@test.com")).to.be.true
+        expect(system.getShopInfo(shopID as number)[0].includes("Test@test.com")).to.be.true
     });
 
     it('3.7: Information - get the purchase history', () => {
-
+        //TODO
     });
 });
 
 describe('Owner:', () => {
     it('4.1.1: Product - add a new product to the shop', () => {
-        //ShopInventory.addItem(productID,amount);
-        //expect(ShopInventory.hasProduct(productID)).equal(amount);
-        //expect(ShopInventory.addItem(productID,amount,wrongPurchaseType)).to.be.false;
-        //let user = notAnOwner
-        //expect(ShopInventory.addItem(productID,amount)).to.be.false;
+        const system: System = SystemDriver.getSystem(true);
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        let userID = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let items = system.getItemsFromShop(shopID) as string[]
+        expect(items.some(p=>p.includes("TV"))).to.be.false
+        const res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        expect(typeof res == "boolean").to.be.true
+        items = system.getItemsFromShop(shopID) as string[]
+        expect(items.some(p=>p.includes("TV"))).to.be.true
     });
 
     it('4.1.2: Product - remove a product from the shop', () => {
-        //let oldAmount = ShopInventory.getAmount(productID);
-        //ShopInventory.removeItem(productID,amount);
-        //expect(ShopInventory.hasProduct(productID)).equal(oldAmount - amount);
-        //expect(ShopInventory.removeItem(WrongProductID)).to.be.false;
-        //let user = notAnOwner
-        //expect(ShopInventory.removeItem(productID,amount)).to.be.false;
+        const system: System = SystemDriver.getSystem(true);
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        let userID = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        let items = system.getItemsFromShop(shopID) as string[]
+        expect(items.some(p=>p.includes("TV"))).to.be.true
+        //FIXME: remove product needs productID, how to get the id.
+        expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.false
     });
 
     it('4.2.1: Purchase policy - add a new purchase policy to the shop', () => {
@@ -196,23 +206,71 @@ describe('Owner:', () => {
     });
 
     it('4.3: Appoint - appoint a new owner to the shop', () => {
-        //expect(ShopManagmentappointNewOwner(appointier_ID,apointee_ID)).to.be.true;
-        //expect(ShopManagmentappointNewOwner(appointier_ID,apointee_ID).to.be.false;//already an owner
-        //user is not the owner of the shop
-        //expect(ShopManagmentappointNewOwner(appointier_ID,apointee_ID).to.be.false;
+        const system: System = SystemDriver.getSystem(true);
+        //Original owner
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        let userID = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.logout("Test@test.com"); //FIXME: why i must logout?
+        //create new employee
+        let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
+        let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        expect(typeof res == "string").to.be.true
+        system.logout("OvedMetzuyan@post.co.il")
+        system.performLogin("Test@test.com", "TESTER")
+        expect(typeof (system.appointOwner(userID, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
+        system.logout("Test@test.com");
+        system.performLogin("OvedMetzuyan@post.co.il", "123")
+        res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        expect(typeof res == "string").to.be.false
     });
 
     it('4.5: Appoint - appoint a new manager to the shop', () => {
-        //expect(ShopManagment.appointNewManager(appointier_ID, apointee_ID)).to.be.true;
-        //expect(ShopManagment.appointNewManager(appointier_ID, apointee_ID)).to.be.false;//already an manager
-        //user is not the owner of the shop
-        //expect(ShopManagment.appointNewManager(appointier_ID, apointee_ID)).to.be.false;
+        const system: System = SystemDriver.getSystem(true);
+        //Original owner
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        let userID = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.logout("Test@test.com");
+        //create new employee
+        let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
+        let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        let shopInfo = (system.getShopInfo(shopID) as string[])[0]
+        expect( shopInfo.indexOf("Managers:") < shopInfo.indexOf("OvedMetzuyan@post.co.il") ).to.be.false
+        system.logout("OvedMetzuyan@post.co.il")
+        system.performLogin("Test@test.com", "TESTER")
+        expect(typeof (system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
+        system.logout("Test@test.com");
+        system.performLogin("OvedMetzuyan@post.co.il", "123")
+        shopInfo = (system.getShopInfo(shopID) as string[])[0]
+        expect( shopInfo.indexOf("Managers:") < shopInfo.indexOf("OvedMetzuyan@post.co.il") ).to.be.true
     });
 
     it('4.6: Manager permissions - modify a manager permission', () => {
-        //expect(ShopManagment.editPermissions(appointier_ID, apointee_ID, permissions)).to.be.true;
-        //expect(ShopManagment.editPermissions(appointier_ID, apointee_ID, permissions)).to.be.false;//already have the permissions
-        //expect(ShopManagment.editPermissions(appointier_ID, apointee_ID, permissions)).to.be.false;//apointee didnt promoted by the user
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.logout("Test@test.com");
+        //create new employee
+        let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
+        let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        system.logout("OvedMetzuyan@post.co.il")
+        system.performLogin("Test@test.com", "TESTER")
+        expect(typeof (system.appointManager(originOwner, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
+        system.logout("Test@test.com");
+        system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        expect(typeof res == "string").to.be.true
+        system.logout("OvedMetzuyan@post.co.il")
+        system.performLogin("Test@test.com", "TESTER")
+        expect(typeof system.addPermissions(originOwner,shopID,"OvedMetzuyan@post.co.il",Action.AddItem) == "boolean").to.be.true
+        system.logout("Test@test.com");
+        system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        expect(typeof res == "string").to.be.false
+
     });
 
     it('4.7: Manager - remove a manager from the shop', () => {

@@ -79,8 +79,8 @@ export class SystemImpl implements System {
 
     }
 
-    public static getInstance(): System{
-        if(this.instance == undefined){
+    public static getInstance(reset? : boolean): System{
+        if(this.instance == undefined || reset){
             this.instance = new SystemImpl();
         }
         return this.instance;
@@ -366,7 +366,10 @@ export class SystemImpl implements System {
     }
 
     getShopInfo(shop_id: number): string | string[] {
-        return ""; //TODO
+        const shop = this.getShopById(shop_id)
+        if (shop == undefined)
+            return `Shop ${shop_id} doesn't exist`
+        return [shop.toString()]; //TODO
     }
 }
 

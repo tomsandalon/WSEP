@@ -213,4 +213,10 @@ export class ShopManagementImpl implements ShopManagement {
     private isManager(manager_email: string): boolean {
         return this.getManagerByEmail(manager_email) != null
     }
+
+    toString(): string{
+        return `Original owner: ${this.original_owner.user_email}\t` +
+                `Owners: ${this.owners.reduce((acc, curr) => acc + ", " + curr.user_email, "")}\t` +
+                `Managers: ${this.managers.reduce((acc, curr) => acc + ", " + curr.user_email, "")}`
+    }
 }

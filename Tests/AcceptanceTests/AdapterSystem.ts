@@ -130,5 +130,9 @@ export class AdapterSystem implements Tests.System{
     editUserDetails(user_id: number, action: any, value: any): string | boolean {
         return this.system.editUserDetails(user_id, action, value);
     }
+
+    getShopInfo(shop_id: number): string | string[] {
+        return this.system.getShopInfo(shop_id);
+    }
     
 }

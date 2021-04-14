@@ -218,4 +218,11 @@ export class ProxySystem implements System{
         }
         return this.system.editProduct(user_id, shop_id, product_id, action, value)
     }
+
+    getShopInfo(shop_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getShopInfo(shop_id);
+    }
 }

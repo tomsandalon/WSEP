@@ -412,7 +412,8 @@ export class ShopImpl implements Shop {
             `Shop id: ${this._shop_id}\t` +
             `Description: ${this._description}\t` +
             `Status: ${this._is_active ? "Active" : "Inactive"}\t` +
-            `Owner: ${this._management.original_owner.user_email}\t`
+            // `Owner: ${this._management.original_owner.user_email}\t`
+            `${this.management.toString()}`
     }
 
     editProduct(user_email: string, product_id: number, action: Item_Action, value: string | number): string | boolean {
