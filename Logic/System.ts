@@ -53,6 +53,7 @@ export interface System{
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
     //TODO edit product tom
     editUserDetails(user_id: number, action: any, value: any): string | boolean
+    getShopInfo(shop_id: number) : string | string[]
     //TODO edit user details Lior
     //shop_id: number
     //     name: string
@@ -354,6 +355,18 @@ export class SystemImpl implements System {
 
     set shops(value: Shop[]) {
         this._shops = value;
+    }
+
+    editProduct(user_id: number, shop_id: number, product_id: number, action : Item_Action, value: string): string | boolean {
+        return ""; //TODO
+    }
+
+    editUserDetails(user_id: number, action: any, value: any): string | boolean {
+        return ""; //TODO
+    }
+
+    getShopInfo(shop_id: number): string | string[] {
+        return ""; //TODO
     }
 }
 

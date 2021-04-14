@@ -127,15 +127,17 @@ describe('Registered:', () => {
         expect(typeof user == "string").to.be.false
         expect(system.editUserDetails(user as number, 1, "Any"))//TODO ask lior
         system.logout("Test@test.com")
-        expect(user).equal(null);
+        expect(typeof (system.addShop(user as number , "ad", "desc", "loc", "bnk")) == "string").to.be.true
     });
 
     it('3.2: Open shop - add a new shop to the system, add the user as original owner', () => {
-        //let SID = System.addShop(user.user_email, user.name, description,location, bank_info);
-        //expect(SID).not.equal(null);
-        //expect(ShopManagement(isOwner(user))).to.be.true;
-        //let SID = System.addShop(user.user_email, user.name, description,location, corruptBankInfo);
-        //expect(SID).equal(null);
+        const system: System = SystemDriver.getSystem();
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        let user = system.performLogin("Test@test.com", "TESTER");
+        let shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef");
+        expect(typeof shopID == "number").to.be.true
+        expect( typeof (system.getShopInfo(shopID as number)) == "string").to.be.false
+        expect(system.getShopInfo(shopID as number).includes("Test@test.com")).to.be.true
     });
 
     it('3.7: Information - get the purchase history', () => {
