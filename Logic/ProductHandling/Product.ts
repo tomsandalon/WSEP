@@ -2,6 +2,7 @@ import {Category} from "./Category";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {
+    AmountIsLargerThanStock,
     AmountNonPositiveValue,
     BasePriceNonPositiveValue, CategoryNotFound,
     DescriptionEmpty,
@@ -30,7 +31,7 @@ export interface Product {
      * @Requirement 2.7
      * @param quantity
      * @functionality Reduce amount of supplies of this product
-     * @return true iff 0 < quantity < this.amount
+     * @return true iff 0 < quantity <= this.amount
      * @return AmountNonPositiveValue otherwise
      */
     makePurchase(quantity: number): string | boolean
@@ -167,6 +168,9 @@ export class ProductImpl implements Product{
     public makePurchase(amount: number): string | boolean{
         if(amount <= 0){
             return AmountNonPositiveValue;
+        }
+        if(amount > this._amount){
+            return AmountIsLargerThanStock
         }
         this._amount -= amount;
         return true;

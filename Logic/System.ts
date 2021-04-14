@@ -18,7 +18,7 @@ export enum SearchTypes {
     keyword
 }
 
-interface System{
+export interface System{
 
     openSession(): void //TODO add guest to the system.
     closeSession(): void //TODO remove quest from system, if use logout.
@@ -62,16 +62,24 @@ interface System{
 }
 
 export class SystemImpl implements System {
+    private static instance: SystemImpl;
     private _login: LoginImpl;
     private _register: RegisterImpl;
     private _shops: Shop[];
 
-    constructor() {
+    private constructor() {
         this._login = LoginImpl.getInstance();
         this._register = RegisterImpl.getInstance();
         this._shops = []
         //TODO create admin user , correctense requierment 2
 
+    }
+
+    public static getInstance(): System{
+        if(this.instance == undefined){
+            this.instance = new SystemImpl();
+        }
+        return this.instance;
     }
 
     adminDisplayShopHistory(user_id: number, shop_id: number):string | string[] {

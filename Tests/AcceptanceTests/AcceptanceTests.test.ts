@@ -1,29 +1,33 @@
-import { } from "../Users/Register";
-import { } from "../Users/Login";
-import { } from "../System";
+import { } from "../../Logic/Users/Register";
+import { } from "../../Logic/Users/Login";
+import {SystemImpl} from "../../Logic/System";
 import { expect } from "chai";
+import {SystemDriver} from "./SystemDriver";
+import {System} from "./System";
 
 describe('Guest:', () => {
-    // it('2.1: Enter - enter to the system as a guest', () => {
+    it('2.1: Enter - enter to the system as a guest', () => {
+        const system: System = SystemDriver.getSystem();
+        system.openSession();
+    });
 
-    // });
-
-    // it('2.2: Exit - exit', () => {
-
-    // });
+    it('2.2: Exit - exit', () => {
+        const system: System = SystemDriver.getSystem();
+        system.closeSession();
+    });
 
     it('2.3: Registration - Add a new user to the system.', () => {
-        // let reg = register("Test@test.com", "TESTER");
-        // expect(reg).to.be.true;
-        // expect(System.users.contains("Test@test.com")).to.be.true;
-        // reg = register("Test@test.com", "TESTER");
-        // expect(reg).to.be.false;
+        const system: System = SystemDriver.getSystem();
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        expect(reg).to.be.true;
     });
 
     it('2.4: Login - User success to login', () => {
-        // let reg = register("Test@test.com", "TESTER");
-        // let user = login("Tester@test.com", "TESTER");
-        // expect(user).not.equal(null);
+        const system: System = SystemDriver.getSystem();
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        expect(reg).to.be.true;
+        let user = system.performLogin("Test@test.com", "TESTER");
+        expect(user).is("number");
     });
 
     it('2.5: Information - get info about shop and its products', () => {

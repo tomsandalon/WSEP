@@ -8,3 +8,4 @@ export const ProductNotFound = "Product not found by id";
 export const CategoryNotFound = "Category not found";
 export const ProductExistsInBasket = "Product already exists in the basket";
 export const ProductNotExistInBasket = "Product not found in basket";
+export const AmountIsLargerThanStock = "Amount is larger than stock";
