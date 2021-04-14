@@ -9,6 +9,7 @@ import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
 import {ProductPurchase} from "../ProductHandling/ProductPurchase";
+import type = Mocha.utils.type;
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -25,12 +26,12 @@ export enum Item_Action {
     RemoveCategory,
     ChangePrice,
     ChangeDescription,
-    //TODO add policies
+    //add policies
 }
 
 export interface ShopInventory {
     shop_id: number
-    //TODO tom add shop name
+    shop_name: string
     shop_management: ShopManagement
     products: Product[]
     /**
@@ -59,13 +60,12 @@ export interface ShopInventory {
 
     /**
      * @Requirement 2.9
+     * @param products The products to purchase (reduce their amount)
      * @return true iff the purchase was successful
-     * TODO edit documentation
      */
     purchaseItems(products: ReadonlyArray<ProductPurchase>): boolean | string
 
     /**
-     * //TODO fix stuff
      * @param products
      */
     returnItems(products: ReadonlyArray<ProductPurchase>): void
@@ -122,6 +122,7 @@ export interface ShopInventory {
 }
 
 export class ShopInventoryImpl implements ShopInventory {
+    private _shop_name: string;
     private readonly _discount_policies: DiscountPolicyHandler | undefined;
     private readonly _discount_types: DiscountType[];
     private readonly _orders: Order[];
@@ -129,17 +130,24 @@ export class ShopInventoryImpl implements ShopInventory {
     private readonly _purchase_policies: PurchasePolicyHandler | undefined;
     private readonly _shop_id: number;
     private _shop_management: ShopManagement;
+
     private readonly _bank_info:string;
 
-    constructor(shop_id: number, shop_management: ShopManagement, bank_info:string) {
+
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info:string) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
-        // this._discount_policies = DiscountPolicyHandler.getInstance(); //TODO
         this._discount_types = [];
         this._products = [];
         this._orders = [];
         this._bank_info = bank_info;
+        this._shop_name = shop_name
+        // this._discount_policies = DiscountPolicyHandler.getInstance(); //TODO
         // this._purchase_policies = PurchasePolicyHandler.getInstance(); //TODO
+    }
+
+    get shop_name(): string {
+        return this._shop_name;
     }
 
     set shop_management(value: ShopManagement) {
@@ -169,10 +177,10 @@ export class ShopInventoryImpl implements ShopInventory {
     get shop_id(): number {
         return this._shop_id;
     }
-
     get shop_management(): ShopManagement {
         return this._shop_management;
     }
+
     get bank_info(): string{
         return this._bank_info
     }
@@ -215,7 +223,28 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     purchaseItems(products: ReadonlyArray<ProductPurchase>): string | boolean {
-        return false //TODO verify and reduce
+        products.forEach(p => {
+            const product = this.getItem(p.product_id)
+            if (typeof product == "string") {
+                logger.Error(`Failed to purchase as ${p.product_id} was not found`)
+                return `Product ${p.product_id} was not found`
+            }
+            if (product.amount < 1) {
+                logger.Error(`Failed to purchase as ${p.product_id} has an amount lower than 1`)
+                return `Product ${p.product_id} has an amount lower than 1`
+            }
+            if (product.amount < p.amount) {
+                logger.Error(`Failed to purchase as ${p.product_id} has ${product.amount} units but requires ${p.amount}`)
+                return `Product ${p.product_id} doesn't have enough in stock for this purchase`
+            }
+        })
+        this._products = this._products.map(p => {
+            const result = products.find(product_purchase => product_purchase.product_id == p.product_id)
+            if (!result) return p
+            p.makePurchase(result.amount)
+            return p
+        })
+        return true
     }
 
     removeItem(item_id: number): boolean {
@@ -259,5 +288,11 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     returnItems(products: ReadonlyArray<ProductPurchase>): void {
+        this._products = this._products.map(p => {
+            const result = products.find(product_purchase => product_purchase.product_id == p.product_id)
+            if (!result) return p
+            p.returnAmount(result.amount)
+            return p
+        })
     }
 }
