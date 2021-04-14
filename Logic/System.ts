@@ -7,7 +7,7 @@ import {Shop, ShopImpl} from "./Shop/Shop";
 import {logger} from "./Logger";
 import {LoginImpl} from "./Users/Login";
 import {RegisterImpl} from "./Users/Register";
-import {Filter} from "./Shop/ShopInventory";
+import {Filter, Item_Action} from "./Shop/ShopInventory";
 import {Action} from "./ShopPersonnel/Permissions";
 import {Product} from "./ProductHandling/Product";
 import {DiscountType} from "./PurchaseProperties/DiscountType";
@@ -50,7 +50,10 @@ export interface System{
     shopOrderHistory(user_id:number,shop_id:number): string | string[]
     adminDisplayShopHistory(user_id:number, shop_id: number): string | string[]
     adminDisplayUserHistory(user_id:number):any
+    editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
     //TODO edit product tom
+    editUserDetails(user_id: number, action: any, value: any): string | boolean
+    //TODO edit user details Lior
     //shop_id: number
     //     name: string
     //     description: string

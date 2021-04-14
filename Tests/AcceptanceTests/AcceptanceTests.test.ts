@@ -1,7 +1,7 @@
 import { } from "../../Logic/Users/Register";
 import { } from "../../Logic/Users/Login";
 import {SystemImpl} from "../../Logic/System";
-import { expect } from "chai";
+import { expect, assert} from "chai";
 import {SystemDriver} from "./SystemDriver";
 import {System} from "./System";
 
@@ -27,30 +27,35 @@ describe('Guest:', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         expect(reg).to.be.true;
         let user = system.performLogin("Test@test.com", "TESTER");
-        expect(user).is("number");
+        expect(typeof user == "number").to.be.true;
     });
 
     it('2.5: Information - get info about shop and its products', () => {
-
+        //TODO
     });
 
     it('2.6: Search - search an item by name and get all the shops that sells it', () => {
-
+        //TODO
     });
 
     it('2.7: Basket - add a produt to the basket', () => {
-        //user.addToBasket(shopID,productID,amount);
-        //expect(user.getBasket().getProduct()).not.equal(null);
-        //expect(user.getBasket().getProduct().getAmount()).equal.(amount);
-        //expect(ShopInventory.addItem(productID, largeAmount)).to.be.false;
-        //expect(ShopInventory.addItem(productID, negativeAmount)).to.be.false;
+        //TODO
+
+        // const system: System = SystemDriver.getSystem();
+        // const user = system.openSession();
+        // system.addItemToBasket(shopID,productID,amount);
+        // expect(user.getBasket().getProduct()).not.equal(null);
+        // expect(user.getBasket().getProduct().getAmount()).equal.(amount);
+        // expect(ShopInventory.addItem(productID, largeAmount)).to.be.false;
+        // expect(ShopInventory.addItem(productID, negativeAmount)).to.be.false;
     });
 
     it('2.8: Information - get info and edit the shopping basket', () => {
-
+        //TODO
     });
 
     it('2.9.1: Purchase - buy a specific basket', () => {
+        //TODO
         //user.addToBasket(shopID,productID,amount);
         //user.purchaseBasket(shopID,payment_method).to.be.true;
         //FIXME: puchase basket by name
@@ -58,12 +63,15 @@ describe('Guest:', () => {
     });
 
     it('2.9.2: Auction - add a bid to an auction', () => {
-        //expect(shop.addBid(productID, amount, paymentInfo)).to.be.true;
-        //expect(shop.addBid(productID, lowerAmount, paymentInfo)).to.be.false;
+        //TODO Milestone 2
 
+        // expect(shop.addBid(productID, amount, paymentInfo)).to.be.true;
+        // expect(shop.addBid(productID, lowerAmount, paymentInfo)).to.be.false;
     });
 
     it('2.9.3: Auction - credit card charged, product added to purchase history', () => {
+        //TODO Milestone 2
+
         //let balance = service.paymentService.getBalance();
         //shop.addBid(productID, amount, paymentInfo);
         //expect(service.paymentBalance.getBalance()).equal(balance - amount);
@@ -75,6 +83,8 @@ describe('Guest:', () => {
     });
 
     it('2.9.4: Offer -  credit card charged, product added to purchase history', () => {
+        //TODO Milestone 2
+
         //let balance = service.paymentService.getBalance();
         //shop.sendOffer(productID, amount, offer, paymentInfo); //manager accepts
         //expect(service.paymentBalance.getBalance()).equal(balance - offer);
@@ -86,6 +96,8 @@ describe('Guest:', () => {
     });
 
     it('2.9.5: Lottery -  choose random winner, credit card charged, product added to purchase history', () => {
+        //TODO Milestone 2
+
         //assuming user submmision reach the goal price and the user is the winner
         //let balance = service.paymentService.getBalance();
         //shop.buyLotteryTicket(productID, submission);
@@ -96,20 +108,26 @@ describe('Guest:', () => {
     });
 
     it('2.9.6: Lottery - credit card charged, product added to purchase history', () => {
+        //TODO Milestone 2
         //the difference from 2.9.5?
     });
 
     it('2.9.7: Discount - price changed by discount policy', () => {
+        //TODO Milestone 2
+
         //expect(shop.getDiscountedPrice(productID)).not.equal(shop.getPrice(productID));
     });
 });
 
 describe('Registered:', () => {
     it('3.1: Logout - user success to logout ', () => {
-        // let reg = register("Test@test.com", "TESTER");
-        // let user = login("Tester@test.com", "TESTER");
-        //Login.logout(user.email);
-        // expect(user).equal(null);
+        const system: System = SystemDriver.getSystem();
+        let reg = system.performRegister("Test@test.com", "TESTER");
+        let user = system.performLogin("Test@test.com", "TESTER");
+        expect(typeof user == "string").to.be.false
+        expect(system.editUserDetails(user as number, 1, "Any"))//TODO ask lior
+        system.logout("Test@test.com")
+        expect(user).equal(null);
     });
 
     it('3.2: Open shop - add a new shop to the system, add the user as original owner', () => {

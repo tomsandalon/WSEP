@@ -3,9 +3,10 @@ import {Action} from "../../Logic/ShopPersonnel/Permissions";
 import {DiscountType} from "../../Logic/PurchaseProperties/DiscountType";
 import {PurchaseType} from "../../Logic/PurchaseProperties/PurchaseType";
 import {TestNotAssociatedWithImplementation} from "./System";
-import {Filter} from "../../Logic/Shop/ShopInventory";
+import {Filter, Item_Action} from "../../Logic/Shop/ShopInventory";
+import * as Tests from "./System"
 
-export class AdapterSystem implements System{
+export class AdapterSystem implements Tests.System{
     private system: System;
     public constructor(system: System) {
         this.system = system
@@ -120,6 +121,14 @@ export class AdapterSystem implements System{
 
     shopOrderHistory(user_id: number, shop_id: number): string | string[] {
         return this.system.shopOrderHistory(user_id, shop_id)
+    }
+
+    editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean {
+        return this.system.editProduct(user_id, shop_id, product_id, action, value);
+    }
+
+    editUserDetails(user_id: number, action: any, value: any): string | boolean {
+        return this.system.editUserDetails(user_id, action, value);
     }
     
 }

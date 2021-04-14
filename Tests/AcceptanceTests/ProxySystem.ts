@@ -3,7 +3,7 @@ import {AdapterSystem} from "./AdapterSystem";
 import {DiscountType} from "../../Logic/PurchaseProperties/DiscountType";
 import {PurchaseType} from "../../Logic/PurchaseProperties/PurchaseType";
 import {Action} from "../../Logic/ShopPersonnel/Permissions";
-import {Filter} from "../../Logic/Shop/ShopInventory";
+import {Filter, Item_Action} from "../../Logic/Shop/ShopInventory";
 import {SearchTypes} from "../../Logic/System";
 
 export class ProxySystem implements System{
@@ -204,5 +204,18 @@ export class ProxySystem implements System{
         }
         return this.system.shopOrderHistory(user_id, shop_id)
     }
-    
+
+    editUserDetails(user_id: number, action: any, value: any): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.editUserDetails(user_id, action, value);
+    }
+
+    editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.editProduct(user_id, shop_id, product_id, action, value)
+    }
 }

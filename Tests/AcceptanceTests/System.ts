@@ -1,4 +1,4 @@
-import {Filter} from "../../Logic/Shop/ShopInventory";
+import {Filter, Item_Action} from "../../Logic/Shop/ShopInventory";
 import {DiscountType} from "../../Logic/PurchaseProperties/DiscountType";
 import {PurchaseType} from "../../Logic/PurchaseProperties/PurchaseType";
 import {Action} from "../../Logic/ShopPersonnel/Permissions";
@@ -35,6 +35,8 @@ export interface System{
     shopOrderHistory(user_id:number,shop_id:number): string | string[]
     adminDisplayShopHistory(user_id:number, shop_id: number): string | string[]
     adminDisplayUserHistory(user_id:number):any
+    editUserDetails(user_id: number, action: any, value: any): string | boolean
+    editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
 }
 
 export const TestNotAssociatedWithImplementation = "Test not associated with implementation";
