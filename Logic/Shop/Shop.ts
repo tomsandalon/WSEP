@@ -199,7 +199,7 @@ export class ShopImpl implements Shop {
         this._location = location;
         this._name = name;
         this._management = new ShopManagementImpl(this.shop_id, user_email)
-        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, bank_info)
+        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info)
         this._management.shop_inventory = this._inventory;
         this._is_active = true;
     }
@@ -408,13 +408,16 @@ export class ShopImpl implements Shop {
     }
 
     toString(): string {
-        //TODO
-        return ""
+        return `Shop name: ${this._name}\t` +
+            `Shop id: ${this._shop_id}\t` +
+            `Description: ${this._description}\t` +
+            `Status: ${this._is_active ? "Active" : "Inactive"}\t` +
+            `Owner: ${this._management.original_owner.user_email}\t`
     }
 
     editProduct(user_email: string, product_id: number, action: Item_Action, value: string | number): string | boolean {
-        const failure_message: string = `${user_email} failed to edit product ${name} in shop ${this._shop_id}`
-        const success_message: string = `${user_email} successfully edited product ${name} in shop ${this._shop_id}. 
+        const failure_message: string = `${user_email} failed to edit product ${product_id} in shop ${this._shop_id}`
+        const success_message: string = `${user_email} successfully edited product ${product_id} in shop ${this._shop_id}. 
         EditType: ${action}\tValue: ${String(value)}`
 
         if (!this._management.allowedEditItems(user_email)) {

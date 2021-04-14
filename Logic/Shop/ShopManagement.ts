@@ -93,7 +93,7 @@ export class ShopManagementImpl implements ShopManagement {
     constructor(shop_id: number, original_owner: string, shop_inventory?: ShopInventory) {
         this._shop_id = shop_id;
         //placing a temporary value which is immediately replaced
-        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this);
+        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "");
         this._original_owner = new OwnerImpl(original_owner);
         this._managers = [];
         this._owners = [];
