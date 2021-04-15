@@ -12,8 +12,8 @@ export class AdapterSystem implements Tests.System{
         this.system = system
     }
 
-    UserOrderHistory(user_id: number): string | string[] {
-        return this.system.UserOrderHistory(user_id);
+    userOrderHistory(user_id: number): string | string[] {
+        return this.system.userOrderHistory(user_id);
     }
 
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
@@ -36,8 +36,8 @@ export class AdapterSystem implements Tests.System{
         return this.system.adminDisplayShopHistory(user_id, shop_id);
     }
 
-    adminDisplayUserHistory(user_id: number): any {
-        return this.system.adminDisplayUserHistory(user_id)
+    adminDisplayUserHistory(admin:number, target_id:number): string | string[] {
+        return this.system.adminDisplayUserHistory(admin, target_id)
     }
 
     appointManager(user_id: number, shop_id: number, appointee_user_email: string): string | boolean {

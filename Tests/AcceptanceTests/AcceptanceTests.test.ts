@@ -41,27 +41,44 @@ describe('Guest:', () => {
     });
 
     it('2.7: Basket - add a produt to the basket', () => {
-        //TODO
-
-        // const system: System = SystemDriver.getSystem(true);
-        // const user = system.openSession();
-        // system.addItemToBasket(shopID,productID,amount);
-        // expect(user.getBasket().getProduct()).not.equal(null);
-        // expect(user.getBasket().getProduct().getAmount()).equal.(amount);
-        // expect(ShopInventory.addItem(productID, largeAmount)).to.be.false;
-        // expect(ShopInventory.addItem(productID, negativeAmount)).to.be.false;
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
     });
 
     it('2.8: Information - get info and edit the shopping basket', () => {
-        //TODO
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 10000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
+        system.editShoppingCart(user, shopID, 0, 9999)
+        let cart_info = system.displayShoppingCart(user) as string[][]
+        expect(cart_info[0][0].includes("9999")).to.be.true
     });
 
     it('2.9.1: Purchase - buy a specific basket', () => {
-        //TODO
-        //user.addToBasket(shopID,productID,amount);
-        //user.purchaseBasket(shopID,payment_method).to.be.true;
-        //FIXME: puchase basket by name
-        //user.purchaseBasket(shopID,WrongBasketName).to.be.false;
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
+        let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
+        expect(typeof purchase == "boolean").to.be.true
     });
 
     it('2.9.2: Auction - add a bid to an auction', () => {
@@ -127,9 +144,9 @@ describe('Registered:', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         let user = system.performLogin("Test@test.com", "TESTER");
         expect(typeof user == "string").to.be.false
-        expect(system.editUserDetails(user as number, 1, "Any"))//TODO ask lior
         system.logout("Test@test.com")
-        //make sure logout worked. //TODO ask lior
+        assert(true)
+        //TODO expand test when connection handler is implemented
     });
 
     it('3.2: Open shop - add a new shop to the system, add the user as original owner', () => {
@@ -143,7 +160,20 @@ describe('Registered:', () => {
     });
 
     it('3.7: Information - get the purchase history', () => {
-        //TODO
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        system.addItemToBasket(user, 0, shopID, 500)
+        let result = system.userOrderHistory(user) as string[]
+        expect(result[0]).to.be.eq("Empty order history")
+        system.purchaseShoppingBasket(user, shopID, "hello")
+        result = system.userOrderHistory(user) as string[]
+        expect(result[0]).to.be.not.eq("Empty order history")
+        expect(result[0].includes("TV")).to.be.true
     });
 });
 
@@ -211,17 +241,12 @@ describe('Owner:', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         let userID = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
-        system.logout("Test@test.com"); //FIXME: why i must logout?
         //create new employee
         let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
         let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
         let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         expect(typeof res == "string").to.be.true
-        system.logout("OvedMetzuyan@post.co.il")
-        system.performLogin("Test@test.com", "TESTER")
         expect(typeof (system.appointOwner(userID, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
-        system.logout("Test@test.com");
-        system.performLogin("OvedMetzuyan@post.co.il", "123")
         res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         expect(typeof res == "string").to.be.false
     });
@@ -232,17 +257,12 @@ describe('Owner:', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         let userID = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
-        system.logout("Test@test.com");
         //create new employee
         let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
         let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
         let shopInfo = (system.getShopInfo(shopID) as string[])[0]
         expect( shopInfo.indexOf("Managers:") < shopInfo.indexOf("OvedMetzuyan@post.co.il") ).to.be.false
-        system.logout("OvedMetzuyan@post.co.il")
-        system.performLogin("Test@test.com", "TESTER")
         expect(typeof (system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
-        system.logout("Test@test.com");
-        system.performLogin("OvedMetzuyan@post.co.il", "123")
         shopInfo = (system.getShopInfo(shopID) as string[])[0]
         expect( shopInfo.indexOf("Managers:") < shopInfo.indexOf("OvedMetzuyan@post.co.il") ).to.be.true
     });
@@ -252,25 +272,15 @@ describe('Owner:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
-        system.logout("Test@test.com");
         //create new employee
         let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
         let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
-        system.logout("OvedMetzuyan@post.co.il")
-        system.performLogin("Test@test.com", "TESTER")
         expect(typeof (system.appointManager(originOwner, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
-        system.logout("Test@test.com");
-        system.performLogin("OvedMetzuyan@post.co.il", "123") as number
         let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         expect(typeof res == "string").to.be.true
-        system.logout("OvedMetzuyan@post.co.il")
-        system.performLogin("Test@test.com", "TESTER")
         expect(typeof system.addPermissions(originOwner,shopID,"OvedMetzuyan@post.co.il",Action.AddItem) == "boolean").to.be.true
-        system.logout("Test@test.com");
-        system.performLogin("OvedMetzuyan@post.co.il", "123") as number
         res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         expect(typeof res == "string").to.be.false
-
     });
 
     it('4.7: Manager - remove a manager from the shop', () => {
@@ -286,13 +296,26 @@ describe('Owner:', () => {
     });
 
     it('4.11: Purchase History - gets a shop purchase history', () => {
-
+        
     });
 });
 
 describe('Admin:', () => {
     it('6.4.1: Information - gets a purchase history of a given user', () => {
-
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
+        let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
+        expect(typeof purchase == "boolean").to.be.true
+        let admin = system.performLogin("admin@gmail.com", "admin") as number
+        let result = system.adminDisplayUserHistory(admin, user) as string[]
+        expect(result.length).to.be.eq(1)
     });
 });
 

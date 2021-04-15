@@ -13,11 +13,11 @@ export class ProxySystem implements System{
         this.system = system;
     }
 
-    UserOrderHistory(user_id: number): string | string[] {
+    userOrderHistory(user_id: number): string | string[] {
         if(this.system == undefined){
             return TestNotAssociatedWithImplementation
         }
-        return this.system.UserOrderHistory(user_id);
+        return this.system.userOrderHistory(user_id);
     }
 
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
@@ -55,11 +55,11 @@ export class ProxySystem implements System{
         return this.system.adminDisplayShopHistory(user_id, shop_id);
     }
 
-    adminDisplayUserHistory(user_id: number): any {
+    adminDisplayUserHistory(admin:number, target_id:number): string | string[] {
         if(this.system == undefined){
             return TestNotAssociatedWithImplementation
         }
-        return this.system.adminDisplayUserHistory(user_id)
+        return this.system.adminDisplayUserHistory(admin, target_id)
     }
 
     appointManager(user_id: number, shop_id: number, appointee_user_email: string): string | boolean {
