@@ -8,6 +8,7 @@ import {Action} from "../ShopPersonnel/Permissions";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
+export const resetIDs = () => id_counter = 0
 
 export interface Shop {
     shop_id: number

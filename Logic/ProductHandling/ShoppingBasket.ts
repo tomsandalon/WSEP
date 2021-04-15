@@ -115,7 +115,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     }
 
     toStringBasket(): string[]{
-        return this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.product.amount}`)
+        return this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
 
     }
 
