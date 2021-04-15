@@ -1,6 +1,5 @@
 import { } from "../../Logic/Users/Register";
 import { } from "../../Logic/Users/Login";
-import {SystemImpl} from "../../Logic/System";
 import { expect, assert} from "chai";
 import {SystemDriver} from "./SystemDriver";
 import {System} from "./System";
@@ -20,8 +19,12 @@ describe('Guest:', () => {
 
     it('2.3: Registration - Add a new user to the system.', () => {
         const system: System = SystemDriver.getSystem(true);
-        let reg = system.performRegister("Test@test.com", "TESTER");
+        let reg = system.performRegister("Test@test.com", "TESTER"); //good
         expect(reg).to.be.true;
+        let sad_reg = system.performRegister("Test@test.com","blabla"); // sad
+        expect(sad_reg).to.be.false;
+        let bad_reg = system.performRegister("",""); //bad
+        expect(bad_reg).to.be.false
     });
 
     it('2.4: Login - User success to login', () => {
@@ -29,7 +32,11 @@ describe('Guest:', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         expect(reg).to.be.true;
         let user = system.performLogin("Test@test.com", "TESTER");
-        expect(typeof user == "number").to.be.true;
+        expect(typeof user == "number").to.be.true; //good
+        let sad_user = system.performLogin("Test@test.com","test")
+        expect(typeof sad_user == "string").to.be.true; // sad
+        let bad_user = system.performLogin("321321321321321312312312312312312312", "1232132131232132123213213")
+        expect(typeof bad_user == "string").to.be.true
     });
 
     it('2.5: Information - get info about shop and its products', () => {
@@ -49,7 +56,12 @@ describe('Guest:', () => {
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
-        expect(typeof add_to_basket == "string").to.be.false
+        expect(typeof add_to_basket == "string").to.be.false //good test
+        let sad_add = system.addItemToBasket(user, 0, shopID, 1500);
+        expect(typeof sad_add == "string").to.be.true // sad test // TODO how can i add more items amount than available amount in shop
+        let bad_add = system.addItemToBasket(user, 0, shopID, -150);
+        expect(typeof  bad_add == "string").to.be.true // bad test
+
     });
 
     it('2.8: Information - get info and edit the shopping basket', () => {
@@ -64,7 +76,11 @@ describe('Guest:', () => {
         expect(typeof add_to_basket == "string").to.be.false
         system.editShoppingCart(user, shopID, 0, 9999)
         let cart_info = system.displayShoppingCart(user) as string[][]
-        expect(cart_info[0][0].includes("9999")).to.be.true
+        expect(cart_info[0][0].includes("9999")).to.be.true // good
+        let sad_edit = system.editShoppingCart(user , 150, 0, 9999);
+        expect(typeof sad_edit == "string").to.be.true; //sad
+        let bad_edit = system.editShoppingCart(user,150,-125, -21321);
+        expect(typeof bad_edit == "string").to.be.true // bad
     });
 
     it('2.9.1: Purchase - buy a specific basket', () => {
@@ -78,7 +94,11 @@ describe('Guest:', () => {
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
         expect(typeof add_to_basket == "string").to.be.false
         let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
-        expect(typeof purchase == "boolean").to.be.true
+        expect(typeof purchase == "boolean").to.be.true // good
+        let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
+        expect(sad_purchase).to.be.false// sad
+        let bad_purchase = system.purchaseShoppingBasket(-150, 152, "hello");
+        expect(typeof bad_purchase == "string").to.be.true // bad
     });
 
     it('2.9.2: Auction - add a bid to an auction', () => {
@@ -144,7 +164,7 @@ describe('Registered:', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         let user = system.performLogin("Test@test.com", "TESTER");
         expect(typeof user == "string").to.be.false
-        system.logout("Test@test.com")
+        system.logout("Test@test.com")//good
         assert(true)
         //TODO expand test when connection handler is implemented
     });
@@ -156,7 +176,12 @@ describe('Registered:', () => {
         let shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef");
         expect(typeof shopID == "number").to.be.true
         expect( typeof (system.getShopInfo(shopID as number)) == "string").to.be.false
-        expect(system.getShopInfo(shopID as number)[0].includes("Test@test.com")).to.be.true
+        expect(system.getShopInfo(shopID as number)[0].includes("Test@test.com")).to.be.true // good
+        let sad_shopID = system.addShop(user as number, "", "shop for tests", "Beer Sheva", "En li kesef");
+        expect(typeof sad_shopID == "string").to.be.true // sad //TODO empty name is legal? fix it.
+        let bad_shopID = system.addShop(user as number, "", "", "", "");
+        expect(typeof bad_shopID == "string").to.be.true //bad TODO all fields empty is legal? fix it
+
     });
 
     it('3.7: Information - get the purchase history', () => {
@@ -169,11 +194,11 @@ describe('Registered:', () => {
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         system.addItemToBasket(user, 0, shopID, 500)
         let result = system.userOrderHistory(user) as string[]
-        expect(result[0]).to.be.eq("Empty order history")
+        expect(result[0]).to.be.eq("Empty order history") //sad
         system.purchaseShoppingBasket(user, shopID, "hello")
         result = system.userOrderHistory(user) as string[]
         expect(result[0]).to.be.not.eq("Empty order history")
-        expect(result[0].includes("TV")).to.be.true
+        expect(result[0].includes("TV")).to.be.true // good
     });
 });
 
@@ -188,7 +213,13 @@ describe('Owner:', () => {
         const res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         expect(typeof res == "boolean").to.be.true
         items = system.getItemsFromShop(shopID) as string[]
-        expect(items.some(p=>p.includes("TV"))).to.be.true
+        expect(items.some(p=>p.includes("TV"))).to.be.true //good
+        const sad_res = system.addProduct(userID, shopID,"", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        expect(typeof sad_res == "string").to.be.true // sad
+        let guest = system.performGuestLogin();
+        const bad_res = system.addProduct(guest, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        expect(typeof bad_res == "string").to.be.true // bad
+
     });
 
     it('4.1.2: Product - remove a product from the shop', () => {
@@ -201,6 +232,7 @@ describe('Owner:', () => {
         expect(items.some(p=>p.includes("TV"))).to.be.true
         //FIXME: remove product needs productID, how to get the id.
         expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.false
+        //TODO SAD/BAD
     });
 
     it('4.2.1: Purchase policy - add a new purchase policy to the shop', () => {
@@ -248,7 +280,11 @@ describe('Owner:', () => {
         expect(typeof res == "string").to.be.true
         expect(typeof (system.appointOwner(userID, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
         res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
-        expect(typeof res == "string").to.be.false
+        expect(typeof res == "string").to.be.false // good
+        let sad_appoint = system.appointOwner(userID, shopID,"OvedMetzuyan@post.co.il")
+        expect(typeof sad_appoint == "string").to.be.true //sad //TODO i can appoint a owner whos already an owner?
+        //TODO do the bad one, i got confused. a guest tries to promote a reg user to be an owner
+
     });
 
     it('4.5: Appoint - appoint a new manager to the shop', () => {
@@ -265,8 +301,10 @@ describe('Owner:', () => {
         expect(typeof (system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
         shopInfo = (system.getShopInfo(shopID) as string[])[0]
         expect( shopInfo.indexOf("Managers:") < shopInfo.indexOf("OvedMetzuyan@post.co.il") ).to.be.true
+        //TODO sad - reappoint same manager.
+        //TODO bad - guest appoints a manager.
     });
-
+//TODO mark - reset static counter for complete system reset
     it('4.6: Manager permissions - modify a manager permission', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -281,6 +319,7 @@ describe('Owner:', () => {
         expect(typeof system.addPermissions(originOwner,shopID,"OvedMetzuyan@post.co.il",Action.AddItem) == "boolean").to.be.true
         res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         expect(typeof res == "string").to.be.false
+        //TODO SAD BAD
     });
 
     it('4.7: Manager - remove a manager from the shop', () => {
@@ -316,15 +355,39 @@ describe('Admin:', () => {
         let admin = system.performLogin("admin@gmail.com", "admin") as number
         let result = system.adminDisplayUserHistory(admin, user) as string[]
         expect(result.length).to.be.eq(1)
+        let sad_result = system.adminDisplayUserHistory(150,user)
+        expect(typeof sad_result == "string").to.be.true
+        let bad_result = system.adminDisplayUserHistory(admin,150)
+        expect(typeof bad_result == "string").to.be.true
+    });
+    it('6.4.2: Information - gets a purchase history of a given shop', () => {
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
+        let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
+        expect(typeof purchase == "boolean").to.be.true
+        let admin = system.performLogin("admin@gmail.com", "admin") as number
+        let result = system.adminDisplayShopHistory(admin, shopID) as string[]
+        expect(result.length).to.be.eq(1) //good TODO purchase was made so why size is 0?
+        let sad_result = system.adminDisplayShopHistory(admin,150)
+        expect(typeof sad_result == "string").to.be.true // sad
+        let bad_result = system.adminDisplayShopHistory(12,shopID)
+        expect(typeof bad_result == "string").to.be.true //bad
     });
 });
 
 describe('Services:', () => {
     it('Payment Handler', () => {
-
+        //TODO milestone 2
     });
 
     it('Spell Checker', () => {
-
+        //TODO milestone 2
     });
 });
