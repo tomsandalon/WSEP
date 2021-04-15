@@ -9,9 +9,9 @@ import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
 import {ProductPurchase} from "../ProductHandling/ProductPurchase";
-import type = Mocha.utils.type;
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
+
 export enum Filter_Type {
     BelowPrice,
     AbovePrice,
@@ -118,23 +118,18 @@ export interface ShopInventory {
      * @param value the value of the action
      * @return true if the action was successful, or a string representing an error
      */
-    editItem(product_id: number, action: Item_Action, value: string | number): string | boolean;
+    editItem(product_id: number, action: Item_Action, value: string): string | boolean;
 }
 
 export class ShopInventoryImpl implements ShopInventory {
-    private _shop_name: string;
     private readonly _discount_policies: DiscountPolicyHandler | undefined;
     private readonly _discount_types: DiscountType[];
     private readonly _orders: Order[];
-    private _products: Product[];
     private readonly _purchase_policies: PurchasePolicyHandler | undefined;
     private readonly _shop_id: number;
-    private _shop_management: ShopManagement;
+    private readonly _bank_info: string;
 
-    private readonly _bank_info:string;
-
-
-    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info:string) {
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
         this._discount_types = [];
@@ -142,12 +137,32 @@ export class ShopInventoryImpl implements ShopInventory {
         this._orders = [];
         this._bank_info = bank_info;
         this._shop_name = shop_name
-        // this._discount_policies = DiscountPolicyHandler.getInstance(); //TODO
-        // this._purchase_policies = PurchasePolicyHandler.getInstance(); //TODO
+        /*
+        TODO policies
+         */
+        // this._discount_policies = DiscountPolicyHandler.getInstance();
+        // this._purchase_policies = PurchasePolicyHandler.getInstance();
+        /*
+        End
+         */
     }
+
+    private _shop_name: string;
 
     get shop_name(): string {
         return this._shop_name;
+    }
+
+    private _products: Product[];
+
+    get products(): Product[] {
+        return this._products;
+    }
+
+    private _shop_management: ShopManagement;
+
+    get shop_management(): ShopManagement {
+        return this._shop_management;
     }
 
     set shop_management(value: ShopManagement) {
@@ -166,28 +181,21 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._orders;
     }
 
-    get products(): Product[] {
-        return this._products;
-    }
-
-    get purchase_policies(): PurchasePolicyHandler | undefined{
+    get purchase_policies(): PurchasePolicyHandler | undefined {
         return this._purchase_policies;
     }
 
     get shop_id(): number {
         return this._shop_id;
     }
-    get shop_management(): ShopManagement {
-        return this._shop_management;
-    }
 
-    get bank_info(): string{
+    get bank_info(): string {
         return this._bank_info
     }
 
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
         const item: Product | string = ProductImpl.create(base_price, description, name, purchase_type);
-        if (typeof item === "string"){
+        if (typeof item === "string") {
             return item
         }
         item.addSupplies(amount)
@@ -204,11 +212,11 @@ export class ShopInventoryImpl implements ShopInventory {
     filter(products: Product[], filters: Filter[]): Product[] {
         const passed_filter = (f: Filter) => (product: Product) => {
             return (f.filter_type == Filter_Type.AbovePrice) ? product.base_price >= Number(f.filter_value) :
-                    (f.filter_type == Filter_Type.BelowPrice) ? product.base_price <= Number(f.filter_value) :
+                (f.filter_type == Filter_Type.BelowPrice) ? product.base_price <= Number(f.filter_value) :
                     // ((f.filter_type == Filter_Type.Rating) ? true :   // add rating to product
-                        (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
+                    (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
                         //can add more
-                    false;
+                        false;
         }
         return (filters.length == 0) ? products :
             this.filter(products.filter(passed_filter(filters[0])), filters.slice(1));
@@ -259,12 +267,12 @@ export class ShopInventoryImpl implements ShopInventory {
             .filter(p => (category == undefined) ? true : p.category.some(c => c.name.toLowerCase() === category.toLowerCase()))
             .filter(p => (keyword === undefined) ? true : `${p.description} ${String(p.amount)} ${String(p.product_id)}`
                 .toLowerCase().includes(keyword.toLowerCase()))
-        ;
+            ;
     }
 
     getItem(product_id: number): Product | string {
         const result = this._products.find((product: Product) => product.product_id == product_id);
-        if (!result){
+        if (!result) {
             logger.Error(`Product id ${product_id} search for but doesn't exist`)
             return ProductNotFound;
         }
@@ -272,19 +280,23 @@ export class ShopInventoryImpl implements ShopInventory {
         return result;
     }
 
-    editItem(product_id: number, action: Item_Action, value: string | number): string | boolean {
+    editItem(product_id: number, action: Item_Action, value: string): string | boolean {
         const result = this.getItem(product_id)
-        if (typeof result === "string"){
+        if (typeof result === "string") {
             return result
         }
+        if ((action == Item_Action.AddAmount || action == Item_Action.ChangePrice) && (isNaN(Number(value)))) {
+            return `Cannot edit Item ${product_id}. ${value} is not a number`
+        }
+
         const category = CategoryImpl.create(String(value))
-        return  (action == Item_Action.AddAmount) ? result.addSupplies(Number(value)) :
-                (action == Item_Action.ChangeDescription) ? result.changeDescription(String(value)) :
+        return (action == Item_Action.AddAmount) ? result.addSupplies(Number(value)) :
+            (action == Item_Action.ChangeDescription) ? result.changeDescription(String(value)) :
                 (action == Item_Action.ChangeName) ? result.changeName(String(value)) :
-                (action == Item_Action.ChangePrice) ? result.changePrice(Number(value)) :
-                (typeof category === "string") ? category :
-                (action == Item_Action.AddCategory) ? result.addCategory(category) :
-                (action == Item_Action.RemoveCategory) ? result.removeCategory(category) : "Should not get here";
+                    (action == Item_Action.ChangePrice) ? result.changePrice(Number(value)) :
+                        (typeof category === "string") ? category :
+                            (action == Item_Action.AddCategory) ? result.addCategory(category) :
+                                (action == Item_Action.RemoveCategory) ? result.removeCategory(category) : "Should not get here";
     }
 
     returnItems(products: ReadonlyArray<ProductPurchase>): void {

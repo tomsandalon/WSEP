@@ -30,25 +30,18 @@ export interface Permissions {
 
 // noinspection RedundantConditionalExpressionJS
 export class ManagerPermissions implements Permissions {
-    private _add_item: boolean;
-    private _get_staff_info: boolean;
-    private _manage_policies: boolean;
-    private _remove_item: boolean;
-    private _view_shop_history: boolean;
-
     /**
      * Get staff info:
      * @Requirement 4.5
      */
     constructor(actions?: boolean[]) {
-        if (actions == undefined){
+        if (actions == undefined) {
             this._add_item = false;
             this._get_staff_info = true;
             this._manage_policies = false;
             this._remove_item = false;
             this._view_shop_history = false;
-        }
-        else {
+        } else {
             //this weird method is necessary to ensure that the boolean array doesnt have "holes"
             this._add_item = (actions[Action.AddItem]) ? true : false;
             this._get_staff_info = actions[Action.GetStaffInfo] ? true : false;
@@ -58,6 +51,8 @@ export class ManagerPermissions implements Permissions {
         }
     }
 
+    private _add_item: boolean;
+
     get add_item(): boolean {
         return this._add_item;
     }
@@ -65,6 +60,8 @@ export class ManagerPermissions implements Permissions {
     set add_item(value: boolean) {
         this._add_item = value;
     }
+
+    private _get_staff_info: boolean;
 
     get get_staff_info(): boolean {
         return this._get_staff_info;
@@ -74,6 +71,8 @@ export class ManagerPermissions implements Permissions {
         this._get_staff_info = value;
     }
 
+    private _manage_policies: boolean;
+
     get manage_policies(): boolean {
         return this._manage_policies;
     }
@@ -82,6 +81,8 @@ export class ManagerPermissions implements Permissions {
         this._manage_policies = value;
     }
 
+    private _remove_item: boolean;
+
     get remove_item(): boolean {
         return this._remove_item;
     }
@@ -89,6 +90,8 @@ export class ManagerPermissions implements Permissions {
     set remove_item(value: boolean) {
         this._remove_item = value;
     }
+
+    private _view_shop_history: boolean;
 
     get view_shop_history(): boolean {
         return this._view_shop_history;
@@ -101,26 +104,26 @@ export class ManagerPermissions implements Permissions {
     isAllowed(action: Action): boolean {
         return action == Action.AddItem ? this.add_item :
             action == Action.ViewShopHistory ? this.view_shop_history :
-            action == Action.RemoveItem ? this.remove_item :
-            action == Action.ManagePolicies ? this.manage_policies :
-            action == Action.GetStaffInfo ? this.get_staff_info : false
+                action == Action.RemoveItem ? this.remove_item :
+                    action == Action.ManagePolicies ? this.manage_policies :
+                        action == Action.GetStaffInfo ? this.get_staff_info : false
     }
 
     toString(): string {
         const y = "Yes"
         const n = "No"
         return `Add items: ${this._add_item ? y : n}\n` +
-                `Manage Policies: ${this._manage_policies ? y : n}\n` +
-                `Remove items: ${this._remove_item ? y : n}\n` +
-                `View shop history: ${this._view_shop_history ? y : n}\n` +
-                `Get staff information: ${this._get_staff_info ? y : n}\n`;
+            `Manage Policies: ${this._manage_policies ? y : n}\n` +
+            `Remove items: ${this._remove_item ? y : n}\n` +
+            `View shop history: ${this._view_shop_history ? y : n}\n` +
+            `Get staff information: ${this._get_staff_info ? y : n}\n`;
     }
 
     editPermission(action: Action, value: boolean): void {
         action == Action.AddItem ? this.add_item = value :
-        action == Action.ViewShopHistory ? this.view_shop_history = value :
-        action == Action.RemoveItem ? this.remove_item = value :
-        action == Action.ManagePolicies ? this.manage_policies = value :
-        action == Action.GetStaffInfo ? this.get_staff_info = value : null
+            action == Action.ViewShopHistory ? this.view_shop_history = value :
+                action == Action.RemoveItem ? this.remove_item = value :
+                    action == Action.ManagePolicies ? this.manage_policies = value :
+                        action == Action.GetStaffInfo ? this.get_staff_info = value : null
     }
 }

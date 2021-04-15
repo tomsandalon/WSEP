@@ -5,6 +5,7 @@ import {ProductImpl} from "../../../Logic/ProductHandling/Product";
 import {DiscountType} from "../../../Logic/PurchaseProperties/DiscountType";
 import {PurchaseType} from "../../../Logic/PurchaseProperties/PurchaseType";
 import {Filter_Type} from "../../../Logic/Shop/ShopInventory";
+import {Action} from "../../../Logic/ShopPersonnel/Permissions";
 
 class SimpleDiscountType implements DiscountType {
     expiration_date: Date;
@@ -55,16 +56,6 @@ describe('Test Shop', () => {
         expect(shop.bank_info).to.be.equals("496351")
         expect(shop.management.original_owner.user_email).to.be.equals("tomsand@post.bgu.ac.il")
     })
-    it('Test add owner - requirement 4.3', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
-        let result = shop.appointNewOwner("wrong@mail.com", "new@bgu.ac.il")
-        expect(result).to.not.be.equals(true)
-        expect(result).to.not.be.equals(false)
-        expect(shop.management.owners.filter(o => o.user_email == "new@bgu.ac.il").length == 0).to.be.true
-        result = shop.appointNewOwner("tomsand@post.bgu.ac.il", "new@bgu.ac.il")
-        expect(result).to.be.equals(true)
-        expect(shop.management.owners.filter(o => o.user_email == "new@bgu.ac.il").length == 1).to.be.true
-    })
 
     it('Test add product - requirement 4.1', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
@@ -86,12 +77,9 @@ describe('Test Shop', () => {
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
             1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
         expect(shop.getAllItems().length).to.be.eq(1)
-        expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
-        expect(shop.getAllItems().length).to.be.eq(2)
-        expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
-        expect(shop.getAllItems().length).to.be.eq(3)
+        const productId = shop.inventory.products.map(p => p.product_id).reduce((acc, cur) => Math.max(acc, cur), -1)
+        expect(typeof shop.removeItem("tomsand@post.bgu.ac.il", productId) == "boolean").to.be.true
+        expect(shop.getAllItems().length).to.be.eq(0)
     })
 
     it('Test search - requirement 2.6', () => {
@@ -134,5 +122,64 @@ describe('Test Shop', () => {
         result = shop.filter(products, [{filter_type: Filter_Type.AbovePrice, filter_value: "999"}, {filter_type: Filter_Type.BelowPrice, filter_value: "1001"}])
         expect(result.length).to.be.eq(1)
         expect(result.some(r => r.base_price != 1000)).to.be.false
+    })
+
+    it('Test add owner - requirement 4.3', () => {
+        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        let result = shop.appointNewOwner("wrong@mail.com", "new@bgu.ac.il")
+        expect(typeof result == "string").to.be.true
+        expect(shop.management.owners.some(o => o.user_email == "new@bgu.ac.il")).to.be.false
+        result = shop.appointNewOwner("tomsand@post.bgu.ac.il", "new@bgu.ac.il")
+        expect(result).to.be.equals(true)
+        expect(shop.management.owners.filter(o => o.user_email == "new@bgu.ac.il").length == 1).to.be.true
+    })
+
+    it('Test add manager - requirement 4.5', () => {
+        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        let result = shop.appointNewManager("wrong@mail.com", "new@bgu.ac.il")
+        expect(typeof result == "string").to.be.true
+        expect(shop.management.managers.some(o => o.user_email == "new@bgu.ac.il")).to.be.false
+        result = shop.appointNewManager("tomsand@post.bgu.ac.il", "new@bgu.ac.il")
+        expect(result).to.be.equals(true)
+        expect(shop.management.managers.filter(o => o.user_email == "new@bgu.ac.il").length == 1).to.be.true
+    })
+
+    it('Test edit manager permissions - requirement 4.6', () => {
+        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner@bgu.ac.il")
+        shop.appointNewManager("tomsand@post.bgu.ac.il", "manager@bgu.ac.il")
+        shop.appointNewManager("owner@bgu.ac.il", "anothermanager@bgu.ac.il")
+        let result = shop.addPermissions("tomsand@post.bgu.ac.il", "anothermanager@bgu.ac.il", [Action.AddItem])
+        expect(typeof result == "string").to.be.true
+        result = shop.addPermissions("tomsand@post.bgu.ac.il", "manager@bgu.ac.il", [Action.AddItem])
+        expect(typeof result == "string").to.be.false
+        result = shop.addPermissions("owner@bgu.ac.il", "anothermanager@bgu.ac.il", [Action.RemoveItem])
+        expect(typeof result == "string").to.be.false
+        expect(typeof shop.addItem("manager@bgu.ac.il", "Best 29 inch", "Not the best desc",
+            1000, ["monitors"],500, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+        const productId = shop.inventory.products.map(p => p.product_id).reduce((acc, cur) => Math.max(acc, cur), -1)
+        expect(typeof shop.removeItem("anothermanager@bgu.ac.il", productId) == "boolean").to.be.true
+        expect(shop.getAllItems().length).to.be.eq(0)
+    })
+
+    it('Test remove manager - requirement 4.7', () => {
+        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner@bgu.ac.il")
+        shop.appointNewManager("tomsand@post.bgu.ac.il", "manager@bgu.ac.il")
+        shop.appointNewManager("owner@bgu.ac.il", "anothermanager@bgu.ac.il")
+        let number_of_managers = shop.management.managers.length
+        //bad scenario
+        expect(typeof shop.removeManager("owner@bgu.ac.il", "manager@bgu.ac.il") == "string").to.be.true
+        expect(typeof shop.removeManager("tomsand@post.bgu.ac.il", "anothermanager@bgu.ac.il") == "string").to.be.true
+        //good scenario
+        expect(typeof shop.removeManager("owner@bgu.ac.il", "anothermanager@bgu.ac.il") == "string").to.be.false
+        expect(typeof shop.removeManager("tomsand@post.bgu.ac.il", "manager@bgu.ac.il") == "string").to.be.false
+        expect(shop.management.managers.length).to.be.eq(number_of_managers - 2)
+    })
+
+    it('Test remove manager - requirement 4.9', () => {
+        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        expect(typeof shop.getStaffInfo("wrong@post.bgu.ac.il") == "string").to.be.true
+        expect(typeof shop.getStaffInfo("tomsand@post.bgu.ac.il") == "string").to.be.false
     })
 })

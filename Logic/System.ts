@@ -9,7 +9,7 @@ import {LoginImpl} from "./Users/Login";
 import {RegisterImpl} from "./Users/Register";
 import {Filter, Item_Action} from "./Shop/ShopInventory";
 import {Action} from "./ShopPersonnel/Permissions";
-import {Product} from "./ProductHandling/Product";
+import {Product, ProductImpl} from "./ProductHandling/Product";
 import {DiscountType} from "./PurchaseProperties/DiscountType";
 import {PurchaseType} from "./PurchaseProperties/PurchaseType";
 export enum SearchTypes {
@@ -38,7 +38,7 @@ export interface System{
     purchaseCart(user_id: number, payment_info:string):string | boolean
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info:string): number | string
-    UserOrderHistory(user_id: number):string | string[]
+    userOrderHistory(user_id: number):string | string[]
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
                base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
@@ -48,19 +48,11 @@ export interface System{
     editPermissions(user_id:number, shop_id:number, target_email:string,actions:Action[]): string | boolean
     displayStaffInfo(user_id:number,shop_id:number): string[] | string
     shopOrderHistory(user_id:number,shop_id:number): string | string[]
-    adminDisplayShopHistory(user_id:number, shop_id: number): string | string[]
-    adminDisplayUserHistory(user_id:number):any
+    adminDisplayShopHistory(admin:number, shop_id: number): string | string[]
+    adminDisplayUserHistory(admin:number, target_id: number): string | string[]
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
-    //TODO edit product tom
     editUserDetails(user_id: number, action: any, value: any): string | boolean
-    //TODO edit user details Lior
-    //shop_id: number
-    //     name: string
-    //     description: string
-    //     location: string
-    //     bank_info: string
-    //     inventory: ShopInventory
-    //     management: ShopManagement
+    getShopInfo(shop_id: number) : string | string[]
 
 }
 
@@ -70,26 +62,26 @@ export class SystemImpl implements System {
     private _register: RegisterImpl;
     private _shops: Shop[];
 
-    private constructor() {
-        this._login = LoginImpl.getInstance();
+    private constructor(reset?: boolean) {
+        this._login = LoginImpl.getInstance(reset);
         this._register = RegisterImpl.getInstance();
         this._shops = []
         //TODO create admin user , correctense requierment 2
 
     }
 
-    public static getInstance(): System{
-        if(this.instance == undefined){
-            this.instance = new SystemImpl();
+    public static getInstance(reset? : boolean): System{
+        if(this.instance == undefined || reset){
+            this.instance = new SystemImpl(reset);
         }
         return this.instance;
     }
 
-    adminDisplayShopHistory(user_id: number, shop_id: number):string | string[] {
-        const result = this.getShopAndUser(user_id, shop_id)
+    adminDisplayShopHistory(admin_id: number, shop_id: number):string | string[] {
+        const result = this.getShopAndUser(admin_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
-        const user = this._login.retrieveUser(user_id);
+        const user = this._login.retrieveUser(admin_id);
         if(typeof user == "string") //can't happen
             return user
         else if(user.is_admin)
@@ -97,8 +89,13 @@ export class SystemImpl implements System {
         else
             return `Email ${user.user_email} is not an admin`;
     }
-    adminDisplayUserHistory(user_id: number) {
-        throw new Error("Method not implemented.");
+    adminDisplayUserHistory(admin_id: number, target_id: number) {
+        const admin = this.login.retrieveUser(admin_id)
+        const target = this.login.retrieveUser(target_id)
+        if (typeof admin == "string") return admin
+        if (typeof target == "string") return target
+        if (!admin.is_admin) return `${admin.user_email} is not an admin`
+        return target.getOrderHistory()
     }
 
     displayShoppingCart(user_id: number): string | string[][] {
@@ -265,7 +262,7 @@ export class SystemImpl implements System {
     }
 
 
-    UserOrderHistory(user_id: number): string | string[] {
+    userOrderHistory(user_id: number): string | string[] {
         const user = this._login.retrieveUser(user_id);
         if(typeof user == "string"){
             return user
@@ -355,12 +352,22 @@ export class SystemImpl implements System {
     set shops(value: Shop[]) {
         this._shops = value;
     }
-}
 
-// //LOGGED EXAMPLES:
-// logger.Critical("Critical", "message");
-// logger.Debug("Debug", "message");
-// logger.Error("Error", "message");
-// logger.Info("Info", "message");
-// logger.Warn("Warn", "message");
-//logger.Trace("message", "with trace");
+    editProduct(user_id: number, shop_id: number, product_id: number, action : Item_Action, value: string): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.editProduct(user_email, product_id, action, value)
+    }
+
+    editUserDetails(user_id: number, action: any, value: any): string | boolean {
+        return ""; //TODO
+    }
+
+    getShopInfo(shop_id: number): string | string[] {
+        const shop = this.getShopById(shop_id)
+        if (shop == undefined)
+            return `Shop ${shop_id} doesn't exist`
+        return [shop.toString()]; //TODO
+    }
+}

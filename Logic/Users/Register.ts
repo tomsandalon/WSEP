@@ -35,8 +35,8 @@ export class RegisterImpl implements Register{
     /**
      * Singelton design pattern.
      */
-    public static getInstance(): RegisterImpl {
-        if(!RegisterImpl.instance)
+    public static getInstance(reset? : boolean): RegisterImpl {
+        if(!RegisterImpl.instance || reset)
         {
             RegisterImpl.instance = new RegisterImpl();
         }

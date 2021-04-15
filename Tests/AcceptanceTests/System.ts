@@ -12,9 +12,9 @@ export interface System{
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
     logout(user_email: string): void //TODO after logout switch to guest, openSession? //lior
-    displayShops():any
-    getItemsFromShop(shop_id:number): any
-    searchItemFromShops(search_type:SearchTypes, search_term: string):any
+    displayShops(): string[]
+    getItemsFromShop(shop_id:number): string | string[]
+    searchItemFromShops(search_type:SearchTypes, search_term: string): string[]
     filterSearch(search_type:SearchTypes, search_term: string, filters:Filter[]):string[]
     addItemToBasket(user_id:number, product_id: number, shop_id:number, amount:number):string | void
     displayShoppingCart(user_id:number): string | string[][]
@@ -23,9 +23,10 @@ export interface System{
     purchaseCart(user_id: number, payment_info:string):string | boolean
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info:string): number | string
-    UserOrderHistory(user_id: number):string | string[]
+    userOrderHistory(user_id: number):string | string[]
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
                base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
+
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
     appointOwner(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
@@ -33,10 +34,12 @@ export interface System{
     editPermissions(user_id:number, shop_id:number, target_email:string,actions:Action[]): string | boolean
     displayStaffInfo(user_id:number,shop_id:number): string[] | string
     shopOrderHistory(user_id:number,shop_id:number): string | string[]
-    adminDisplayShopHistory(user_id:number, shop_id: number): string | string[]
-    adminDisplayUserHistory(user_id:number):any
+
+    adminDisplayShopHistory(admin:number, shop_id: number): string | string[]
+    adminDisplayUserHistory(admin:number, target_id: number): string | string[]
     editUserDetails(user_id: number, action: any, value: any): string | boolean
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
+    getShopInfo(shop_id: number) : string | string[]
 }
 
 export const TestNotAssociatedWithImplementation = "Test not associated with implementation";

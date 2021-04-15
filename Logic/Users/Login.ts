@@ -19,20 +19,26 @@ export class LoginImpl  implements  Login{
     private _register:RegisterImpl
     private static instance: LoginImpl;
 
-    private constructor() {
+    private createAdmin() {
+        this._register.register("admin@gmail.com", "admin");
+        this.existing_users.push(new UserImpl("admin@gmail.com", "admin", true));
+    }
+
+    private constructor(reset?: boolean) {
         this._logged_users = [];
         this._logged_guests = []
         this._existing_user_guests = []
         this._existing_users = []
         this._password_handler = PasswordHandler.getInstance();
-        this._register = RegisterImpl.getInstance();
+        this._register = RegisterImpl.getInstance(reset);
+        this.createAdmin()
     }
 
     /**
      * Singelton design pattern.
      */
-    public static getInstance(): LoginImpl {
-        if(!LoginImpl.instance)
+    public static getInstance(reset?: boolean): LoginImpl {
+        if(!LoginImpl.instance || reset)
         {
             LoginImpl.instance = new LoginImpl();
         }
