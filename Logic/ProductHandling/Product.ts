@@ -195,11 +195,16 @@ export class ProductImpl implements Product{
         this._category.push(category);
         return true;
     }
-    public removeCategory(category: Category): string | boolean{
-        const deleted = this._category.splice(this._category.indexOf(category),1);
-        if (deleted.length == 0){
+    public removeCategory(toRemove: Category): string | boolean{
+        let position = -1;
+        this._category.forEach((category: Category, index: number) =>{
+            if(category.equals(toRemove))
+                position = index
+        });
+        if (position < 0){
             return CategoryNotFound
         }
+        this._category.splice(position,1);
         return true;
     }
     get discount_types(){

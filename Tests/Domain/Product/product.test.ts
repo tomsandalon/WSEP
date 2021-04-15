@@ -114,6 +114,8 @@ describe('ProductImpl Class Test suit', () => {
                 const result2 = product.removeCategory(delta);
                 expect(typeof result2).equal("boolean");
                 expect(product.category.indexOf(delta)).lessThan(0);
+                const otherDelta = CategoryImpl.create("Monitors");
+                if (typeof otherDelta === "string") assert.fail("Failed to create Category");
             });
         });
         describe('removeDiscountType', () => {

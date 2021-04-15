@@ -3,6 +3,7 @@
  */
 export interface Category {
     readonly name: string
+    equals(obj: Category): boolean
 }
 
 export class CategoryImpl implements Category{
@@ -21,5 +22,9 @@ export class CategoryImpl implements Category{
 
     get name(){
         return this._name;
+    }
+
+    public equals(obj: Category): boolean{
+        return this._name == obj.name
     }
 }
