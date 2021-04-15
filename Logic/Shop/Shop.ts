@@ -1,7 +1,6 @@
 import {Filter, Item_Action, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
-import {Category} from "../ProductHandling/Category";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {logger} from "../Logger";
@@ -63,7 +62,7 @@ export interface Shop {
      * @param purchase_type purchase purchase type available for the product
      * @return true if the add was successful, or a string containing the error message otherwise
      */
-    addItem(user_email: string, name: string, description:string, amount: number,
+    addItem(user_email: string, name: string, description: string, amount: number,
             categories: string[], base_price: number,
             discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
 
@@ -171,16 +170,12 @@ export interface Shop {
      * @param value the value to apply to the action
      * @return true if the edit was successful, or a string containing the error message otherwise
      */
-    editProduct(user_email: string, product_id: number, action: Item_Action, value: string | number): string | boolean
+    editProduct(user_email: string, product_id: number, action: Item_Action, value: string): string | boolean
 }
 
 export class ShopImpl implements Shop {
-    private _bank_info: string;
-    private _description: string;
     private readonly _inventory: ShopInventory;
-    private _location: string;
     private readonly _management: ShopManagement;
-    private _name: string;
     private readonly _shop_id: number;
     private readonly _is_active: boolean;
 
@@ -204,6 +199,8 @@ export class ShopImpl implements Shop {
         this._is_active = true;
     }
 
+    private _bank_info: string;
+
     get bank_info(): string {
         return this._bank_info;
     }
@@ -211,6 +208,8 @@ export class ShopImpl implements Shop {
     set bank_info(value: string) {
         this._bank_info = value;
     }
+
+    private _description: string;
 
     get description(): string {
         return this._description;
@@ -220,9 +219,7 @@ export class ShopImpl implements Shop {
         this._description = value;
     }
 
-    get inventory(): ShopInventory {
-        return this._inventory;
-    }
+    private _location: string;
 
     get location(): string {
         return this._location;
@@ -232,9 +229,7 @@ export class ShopImpl implements Shop {
         this._location = value;
     }
 
-    get management(): ShopManagement {
-        return this._management;
-    }
+    private _name: string;
 
     get name(): string {
         return this._name;
@@ -242,6 +237,14 @@ export class ShopImpl implements Shop {
 
     set name(value: string) {
         this._name = value;
+    }
+
+    get inventory(): ShopInventory {
+        return this._inventory;
+    }
+
+    get management(): ShopManagement {
+        return this._management;
     }
 
     get shop_id(): number {
@@ -273,13 +276,24 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
+    /*
+    TODO policies
+     */
     addPolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We don't have any policies yet :("; //TODO
+        return "We don't have any policies yet :(";
     }
 
     editPolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We dont have policies"; //TODO
+        return "We dont have policies";
     }
+
+    removePolicy(user_email: string, purchase_policy: any): boolean | string {
+        return "We don't have any policies yet :(";
+    }
+
+    /*
+    End
+     */
 
     filter(products: Product[], filters: Filter[]): Product[] {
         const ret = this._inventory.filter(products, filters);
@@ -316,40 +330,37 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
-    removePolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We don't have any policies yet :("; //TODO
-    }
-
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[] {
+        if (!this._is_active) return []
         const ret = this._inventory.search(name, category, keyword);
         logger.Info(`A search was performed in shop ${this._shop_id}: ${
             (name) ? `name: ${name}` :
-            (category) ? `category: ${category}` :
-            (keyword) ? `keyword: ${keyword}` : null}\t number of results: ${ret.length}`)
+                (category) ? `category: ${category}` :
+                    (keyword) ? `keyword: ${keyword}` : null}\t number of results: ${ret.length}`)
         return ret;
     }
 
     addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean | string {
         const ret = this._management.addPermissions(appointer_email, appointee_email, permissions);
-        if (ret) {
+        if (typeof ret == "boolean") {
             logger.Info(`Permissions ${permissions.map(p => Action[p])} granted to ${appointee_email} by ${appointer_email}`)
             return ret
         }
-        const error = `Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}`
+        const error = `Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}. ${ret}`
         logger.Error(error)
         return error;
     }
 
-    appointNewManager(appointer_email: string, appointee_email: string): boolean {
+    appointNewManager(appointer_email: string, appointee_email: string): boolean | string {
         const ret = this._management.appointNewManager(appointer_email, appointee_email);
-        if (ret) logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
+        if (typeof ret == "boolean") logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
         else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
         return ret;
     }
 
     appointNewOwner(appointer_email: string, appointee_email: string): boolean | string {
         const ret = this._management.appointNewOwner(appointer_email, appointee_email);
-        if (ret) logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
+        if (typeof ret == "boolean") logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
         else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
         return ret;
     }
@@ -411,12 +422,11 @@ export class ShopImpl implements Shop {
         return `Shop name: ${this._name}\t` +
             `Shop id: ${this._shop_id}\t` +
             `Description: ${this._description}\t` +
-            `Status: ${this._is_active ? "Active" : "Inactive"}\t` +
-            // `Owner: ${this._management.original_owner.user_email}\t`
+            `Status: ${this._is_active ? "Active" : "Inactive"}\n` +
             `${this.management.toString()}`
     }
 
-    editProduct(user_email: string, product_id: number, action: Item_Action, value: string | number): string | boolean {
+    editProduct(user_email: string, product_id: number, action: Item_Action, value: string): string | boolean {
         const failure_message: string = `${user_email} failed to edit product ${product_id} in shop ${this._shop_id}`
         const success_message: string = `${user_email} successfully edited product ${product_id} in shop ${this._shop_id}. 
         EditType: ${action}\tValue: ${String(value)}`

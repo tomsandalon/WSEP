@@ -51,7 +51,6 @@ export interface System{
     adminDisplayShopHistory(user_id:number, shop_id: number): string | string[]
     adminDisplayUserHistory(user_id:number):any
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
-    //TODO edit product tom
     editUserDetails(user_id: number, action: any, value: any): string | boolean
     getShopInfo(shop_id: number) : string | string[]
     //TODO edit user details Lior
@@ -358,7 +357,10 @@ export class SystemImpl implements System {
     }
 
     editProduct(user_id: number, shop_id: number, product_id: number, action : Item_Action, value: string): string | boolean {
-        return ""; //TODO
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.editProduct(user_email, product_id, action, value)
     }
 
     editUserDetails(user_id: number, action: any, value: any): string | boolean {
