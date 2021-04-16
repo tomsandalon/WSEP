@@ -214,7 +214,7 @@ export class SystemImpl implements System {
         return shop.getAllItems().map(item => item.toString())
     }
 
-    private getShopAndUser(shop_id: number, user_id: number): string | {shop: Shop, user_email: string} {
+    private getShopAndUser(user_id: number, shop_id: number): string | {shop: Shop, user_email: string} {
         const shop = this.getShopById(shop_id)
         if (shop == undefined) return "Shop not found"
         const user = this.login.retrieveUser(user_id);
@@ -231,7 +231,8 @@ export class SystemImpl implements System {
         if(typeof user == "string")
             return user
         if(!this._register.verifyUserEmail(user.user_email)) return "User is not registered"
-        const shop = new ShopImpl(user.user_email, bank_info, description, location, name)
+        const shop = ShopImpl.create(user.user_email, bank_info, description, location, name)
+        if (typeof shop == "string") return shop
         this._shops = this._shops.concat(shop)
         return shop.shop_id
     }

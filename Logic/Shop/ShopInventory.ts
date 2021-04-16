@@ -119,12 +119,17 @@ export interface ShopInventory {
      * @return true if the action was successful, or a string representing an error
      */
     editItem(product_id: number, action: Item_Action, value: string): string | boolean;
+
+    /**
+     * @param order the order to log in the shop order history
+     */
+    logOrder(order: Order): void
 }
 
 export class ShopInventoryImpl implements ShopInventory {
     private readonly _discount_policies: DiscountPolicyHandler | undefined;
     private readonly _discount_types: DiscountType[];
-    private readonly _orders: Order[];
+    private _orders: Order[];
     private readonly _purchase_policies: PurchasePolicyHandler | undefined;
     private readonly _shop_id: number;
     private readonly _bank_info: string;
@@ -306,5 +311,14 @@ export class ShopInventoryImpl implements ShopInventory {
             p.returnAmount(result.amount)
             return p
         })
+    }
+
+    toString(): string {
+        return this.products.reduce(function(acc, cur) {
+            return acc.concat(cur.amount != 0 ? cur.toString().concat("\n") : "")}, "")
+    }
+
+    logOrder(order: Order): void {
+        this._orders = this.orders.concat(order)
     }
 }

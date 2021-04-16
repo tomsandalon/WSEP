@@ -180,6 +180,13 @@ export class ShopImpl implements Shop {
     private readonly _shop_id: number;
     private readonly _is_active: boolean;
 
+    static create(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
+        if (bank_info.length == 0) return "Bank info can't be empty"
+        if (location.length == 0) return "Location can't be empty"
+        if (name.length == 0) return "Name can't be empty"
+        return new ShopImpl(user_email, bank_info, description, location, name)
+    }
+
     /**
      * @Requirement 3.2
      * @param user_email
@@ -424,7 +431,8 @@ export class ShopImpl implements Shop {
             `Shop id: ${this._shop_id}\t` +
             `Description: ${this._description}\t` +
             `Status: ${this._is_active ? "Active" : "Inactive"}\n` +
-            `${this.management.toString()}`
+            `${this.management.toString()}\n\n` +
+            `${this.inventory.toString()}\n\n`
     }
 
     editProduct(user_email: string, product_id: number, action: Item_Action, value: string): string | boolean {

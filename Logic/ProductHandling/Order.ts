@@ -72,6 +72,7 @@ export class OrderImpl implements Order{
         if(typeof result_of_purchase === "string"){
             return result_of_purchase
         }
+        this.shop.logOrder(this)
         //TODO save to DB
         //TODO purchasehandler.charge
         //TODO delivery handler

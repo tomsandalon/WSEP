@@ -87,7 +87,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         if (typeof fetched_product === "string"){
             return fetched_product
         }
-        const product = {product: fetched_product, amount: amount};
+        const product = {product: fetched_product, amount: amount}; //TODO check if amount is possible for the product (less than or equals to product.amount)
         this._products.push(product);
         return true
     }
