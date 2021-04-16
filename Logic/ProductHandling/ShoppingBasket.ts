@@ -2,7 +2,13 @@ import {Product} from "./Product";
 import {ProductPurchase} from "./ProductPurchase";
 import {Shop} from "../Shop/Shop";
 import {ShopInventory} from "../Shop/ShopInventory";
-import {AmountNonPositiveValue, ProductExistsInBasket, ProductNotExistInBasket, ProductNotFound} from "./ErrorMessages";
+import {
+    AmountNonPositiveValue,
+    ProductExistsInBasket,
+    ProductNotExistInBasket,
+    ProductNotFound,
+    StockLessThanBasket
+} from "./ErrorMessages";
 
 type Entry = {product: Product, amount: number}
 export type ShoppingEntry = {productId: number, amount: number}
@@ -87,7 +93,8 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         if (typeof fetched_product === "string"){
             return fetched_product
         }
-        const product = {product: fetched_product, amount: amount}; //TODO check if amount is possible for the product (less than or equals to product.amount)
+        if (fetched_product.amount < amount) return StockLessThanBasket
+        const product = {product: fetched_product, amount: amount};
         this._products.push(product);
         return true
     }

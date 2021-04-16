@@ -8,7 +8,6 @@ import {Action} from "../ShopPersonnel/Permissions";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
-export const resetIDs = () => id_counter = 0
 
 export interface Shop {
     shop_id: number
@@ -179,6 +178,8 @@ export class ShopImpl implements Shop {
     private readonly _management: ShopManagement;
     private readonly _shop_id: number;
     private readonly _is_active: boolean;
+
+    static resetIDs = () => id_counter = 0
 
     static create(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
         if (bank_info.length == 0) return "Bank info can't be empty"

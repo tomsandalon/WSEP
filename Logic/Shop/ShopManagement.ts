@@ -159,6 +159,10 @@ export class ShopManagementImpl implements ShopManagement {
             logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointee is already a manager`)
             return "Appointer is not an owner"
         }
+        if (this.isOwner(appointee_email)) {
+            logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointee is already an owner`)
+            return "Appointer is not an owner"
+        }
         if (!this.isOwner(appointer_email)) {
             logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointer is not a owner`)
             return "Appointer is not an owner"

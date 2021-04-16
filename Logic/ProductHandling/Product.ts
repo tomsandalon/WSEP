@@ -136,6 +136,9 @@ export class ProductImpl implements Product{
         this._amount = 0;
     }
 
+    static resetIDs = () => ProductImpl._product_id_specifier = 0
+
+
     public static create(base_price: number, description: string, name: string, purchase_type: PurchaseType): Product | string {
         const result = ProductImpl.isValid(base_price, description, name);
         if(typeof result === "string"){

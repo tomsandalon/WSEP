@@ -35,12 +35,12 @@ export class LoginImpl  implements  Login{
     }
 
     /**
-     * Singelton design pattern.
+     * Singleton design pattern.
      */
     public static getInstance(reset?: boolean): LoginImpl {
         if(!LoginImpl.instance || reset)
         {
-            LoginImpl.instance = new LoginImpl();
+            LoginImpl.instance = new LoginImpl(reset);
         }
         return LoginImpl.instance;
     }

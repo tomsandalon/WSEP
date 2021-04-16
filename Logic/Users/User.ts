@@ -37,6 +37,7 @@ export class UserImpl implements User {
     private readonly _is_guest: boolean
     private readonly _payment_handler: PaymentHandler
 
+    static resetIDs = () => id_counter = 0
 
     constructor(user_email?:string, password?:string, is_admin?:boolean) {
         if(user_email != undefined && password != undefined && is_admin != undefined) {

@@ -1,8 +1,4 @@
-//TODO Initialize the system and needed objects.
-//TODO create admin on init
-
-
-import {User} from "./Users/User";
+import {User, UserImpl} from "./Users/User";
 import {Shop, ShopImpl} from "./Shop/Shop";
 import {logger} from "./Logger";
 import {LoginImpl} from "./Users/Login";
@@ -12,6 +8,7 @@ import {Action} from "./ShopPersonnel/Permissions";
 import {Product, ProductImpl} from "./ProductHandling/Product";
 import {DiscountType} from "./PurchaseProperties/DiscountType";
 import {PurchaseType} from "./PurchaseProperties/PurchaseType";
+import {OrderImpl} from "./ProductHandling/Order";
 export enum SearchTypes {
     name,
     category,
@@ -20,14 +17,13 @@ export enum SearchTypes {
 
 export interface System{
 
-    openSession(): void //TODO add guest to the system.
-    closeSession(): void //TODO remove quest from system, if use logout.
-    displayMenu():void // TODO UI JUST FOR US
+    openSession(): number
+    closeSession(user_id: number): void
     performRegister(user_email:string, password: string): boolean
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
-    logout(user_email: string): void //TODO after logout switch to guest, openSession? //lior
-    displayShops():any
+    logout(user_email: string): number
+    displayShops():string | string[]
     getItemsFromShop(shop_id:number): any
     searchItemFromShops(search_type:SearchTypes, search_term: string):any
     filterSearch(search_type:SearchTypes, search_term: string, filters:Filter[]):string[]
@@ -43,6 +39,7 @@ export interface System{
                base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
+    removeManager(user_id: number, shop_id: number, target: string): string | boolean
     appointOwner(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
     addPermissions(user_id:number, shop_id:number, target_email:string,action:Action): string | boolean
     editPermissions(user_id:number, shop_id:number, target_email:string,actions:Action[]): string | boolean
@@ -51,7 +48,6 @@ export interface System{
     adminDisplayShopHistory(admin:number, shop_id: number): string | string[]
     adminDisplayUserHistory(admin:number, target_id: number): string | string[]
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
-    editUserDetails(user_id: number, action: any, value: any): string | boolean
     getShopInfo(shop_id: number) : string | string[]
 
 }
@@ -62,12 +58,18 @@ export class SystemImpl implements System {
     private _register: RegisterImpl;
     private _shops: Shop[];
 
+    private static reset() {
+        ShopImpl.resetIDs()
+        UserImpl.resetIDs()
+        ProductImpl.resetIDs()
+        OrderImpl.resetIDs()
+    }
+
     private constructor(reset?: boolean) {
+        if (reset) SystemImpl.reset()
         this._login = LoginImpl.getInstance(reset);
         this._register = RegisterImpl.getInstance();
         this._shops = []
-        //TODO create admin user , correctense requierment 2
-
     }
 
     public static getInstance(reset? : boolean): System{
@@ -173,7 +175,7 @@ export class SystemImpl implements System {
                     (search_type == SearchTypes.keyword) ? shop.filter(shop.search(undefined, undefined, search_term), filters) :
                         [] //should not get here
         }
-        return this._shops.flatMap(shop => search(shop)).map(product => product.toString()) //TODO product toString
+        return this._shops.flatMap(shop => search(shop)).map(product => product.toString())
 
     }
 
@@ -192,12 +194,11 @@ export class SystemImpl implements System {
         }
     }
 
-    openSession(): void {
-        const user_guest = this.performGuestLogin();
-
+    openSession(): number {
+        return this.performGuestLogin();
     }
-    closeSession(): void {
-        throw new Error("Method not implemented.");
+    closeSession(user_id: number): void {
+        this.login.exit(user_id)
     }
 
     displayShops(): string[] {
@@ -237,14 +238,9 @@ export class SystemImpl implements System {
         return shop.shop_id
     }
 
-    displayMenu(): void {
-        //TODO ??
-    }
-
-
-    logout(user_email:string): void {
+    logout(user_email:string): number {
         this._login.logout(user_email);
-        this.openSession()
+        return this.openSession()
     }
 
     performLogin(user_email:string, password: string): string | number {
@@ -361,14 +357,19 @@ export class SystemImpl implements System {
         return shop.editProduct(user_email, product_id, action, value)
     }
 
-    editUserDetails(user_id: number, action: any, value: any): string | boolean {
-        return ""; //TODO
-    }
-
     getShopInfo(shop_id: number): string | string[] {
         const shop = this.getShopById(shop_id)
         if (shop == undefined)
             return `Shop ${shop_id} doesn't exist`
-        return [shop.toString()]; //TODO
+        return [shop.toString()];
+    }
+
+    removeManager(user_id: number, shop_id: number, target: string): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(target))
+            return `Target email ${target} doesnt belong to a registered user`
+        return shop.removeManager(user_email, target)
     }
 }

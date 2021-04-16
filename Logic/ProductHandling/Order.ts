@@ -41,6 +41,8 @@ export class OrderImpl implements Order{
         this._shop = shop;
     }
 
+    static resetIDs = () => OrderImpl._order_id_specifier = 0
+
     public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[]): Order | string{
         const products = basket.products.map((product) =>  ProductPurchaseImpl.create(product.product, coupons, product.amount));
         const isBad = products.some((product) => typeof product === "string");
@@ -74,15 +76,15 @@ export class OrderImpl implements Order{
         }
         this.shop.logOrder(this)
         //TODO save to DB
-        //TODO purchasehandler.charge
-        //TODO delivery handler
-        //TODO if something goes wrong -> shop.returnItems(this._products)
+        //purchasehandler.charge
+        //delivery handler
+        //if something goes wrong -> shop.returnItems(this._products)
         return true;
     }
 
     public to_string(): string {
         return `Order details:\n` +
-            `Purchased in:` +//TODO tom add shop name this._shop.name + "\n" +
+            `Purchased in: ${this.shop.shop_name}\n` +
             `Order number: ${this.order_id}\n` +
             `Was performed: ${this.date.toString()}\n` +
             `Products:\n${this.products.reduce((acc: string, product: ProductPurchase) =>

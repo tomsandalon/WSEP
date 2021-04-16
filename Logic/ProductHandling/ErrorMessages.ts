@@ -9,3 +9,4 @@ export const CategoryNotFound = "Category not found";
 export const ProductExistsInBasket = "Product already exists in the basket";
 export const ProductNotExistInBasket = "Product not found in basket";
 export const AmountIsLargerThanStock = "Amount is larger than stock";
+export const StockLessThanBasket = "Can't add to basket more than the current stock";
