@@ -86,7 +86,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     public addToBasket(product_id: number, amount: number): boolean | string {
         if(amount <= 0){
             return AmountNonPositiveValue
-        } else if (this._products.reduce((acc: boolean, product: Entry) => acc && (product_id != product.product.product_id), true)){
+        } else if (this._products.reduce((acc: boolean, product: Entry) => acc || (product_id != product.product.product_id), false)){
             return ProductExistsInBasket
         }
         const fetched_product = this._shop.getItem(product_id);

@@ -8,6 +8,7 @@ import {UserImpl} from "../../../Logic/Users/User";
 import type = Mocha.utils.type;
 import {ShopInventoryImpl} from "../../../Logic/Shop/ShopInventory";
 import {ShopManagementImpl} from "../../../Logic/Shop/ShopManagement";
+import {ProductImpl} from "../../../Logic/ProductHandling/Product";
 
 describe('PasswordHandler tests', () => {
     it('should return a hashed password ', () => {
@@ -165,6 +166,7 @@ describe('User tests', () => {
         }
     });
     it('Adding item to cart', () => {
+        ProductImpl.resetIDs();
         let reg = RegisterImpl.getInstance();
         reg.register("liorpev1@gmail.com","123456");
         let log = LoginImpl.getInstance();
