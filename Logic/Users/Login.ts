@@ -95,7 +95,14 @@ export class LoginImpl  implements  Login{
     exit(user_id:number):void{
         const user = this._existing_user_guests.filter(user => user.user_id == user_id);
         if(user.length == 0){ //not a guest
-            this.logout(user[0].user_email)
+            const logged_user = this._existing_users.filter(user => user.user_id == user_id)
+            if(logged_user.length == 0) {
+                logger.Error(`User id ${user_id} which is neither a guest nor a user tried to exit system`)
+                return
+            }
+        else {
+                this.logout(logged_user[0].user_email);
+            }
         }
         else{
             this._existing_user_guests = this._existing_user_guests.filter(user => user.user_id != user_id)
