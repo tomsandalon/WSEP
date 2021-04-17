@@ -48,11 +48,8 @@ export class AdapterSystem implements Tests.System{
         return this.system.appointOwner(user_id, shop_id, appointee_user_email)
     }
 
-    closeSession(): void {
-        return this.system.closeSession()
-    }
-
-    displayMenu(): void {
+    closeSession(user_id: number): void {
+        return this.system.closeSession(user_id)
     }
 
     displayShoppingCart(user_id: number): string | string[][] {
@@ -83,11 +80,11 @@ export class AdapterSystem implements Tests.System{
         return this.system.getItemsFromShop(shop_id)
     }
 
-    logout(user_email: string): void {
+    logout(user_email: string): number {
         return this.system.logout(user_email)
     }
 
-    openSession(): void {
+    openSession(): number {
         return this.system.openSession()
     }
 
@@ -127,12 +124,12 @@ export class AdapterSystem implements Tests.System{
         return this.system.editProduct(user_id, shop_id, product_id, action, value);
     }
 
-    editUserDetails(user_id: number, action: any, value: any): string | boolean {
-        return this.system.editUserDetails(user_id, action, value);
-    }
-
     getShopInfo(shop_id: number): string | string[] {
         return this.system.getShopInfo(shop_id);
     }
-    
+
+    removeManager(user_id: number, shop_id: number, target: string): string | boolean {
+        return this.system.removeManager(user_id, shop_id, target)
+    }
+
 }

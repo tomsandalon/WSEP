@@ -76,14 +76,11 @@ export class ProxySystem implements System{
         return this.system.appointOwner(user_id, shop_id, appointee_user_email)
     }
 
-    closeSession(): void {
+    closeSession(user_id: number): void {
         if(this.system == undefined){
             return
         }
-        return this.system.closeSession()
-    }
-
-    displayMenu(): void {
+        return this.system.closeSession(user_id)
     }
 
     displayShoppingCart(user_id: number): string | string[][] {
@@ -135,16 +132,16 @@ export class ProxySystem implements System{
         return this.system.getItemsFromShop(shop_id)
     }
 
-    logout(user_email: string): void {
+    logout(user_email: string): number {
         if(this.system == undefined){
-            return
+            return -1
         }
         return this.system.logout(user_email)
     }
 
-    openSession(): void {
+    openSession(): number {
         if(this.system == undefined){
-            return
+            return -1
         }
         return this.system.openSession()
     }
@@ -205,13 +202,6 @@ export class ProxySystem implements System{
         return this.system.shopOrderHistory(user_id, shop_id)
     }
 
-    editUserDetails(user_id: number, action: any, value: any): string | boolean {
-        if(this.system == undefined){
-            return TestNotAssociatedWithImplementation
-        }
-        return this.system.editUserDetails(user_id, action, value);
-    }
-
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean {
         if(this.system == undefined){
             return TestNotAssociatedWithImplementation
@@ -224,5 +214,12 @@ export class ProxySystem implements System{
             return TestNotAssociatedWithImplementation
         }
         return this.system.getShopInfo(shop_id);
+    }
+
+    removeManager(user_id: number, shop_id: number, target: string): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removeManager(user_id, shop_id, target);
     }
 }

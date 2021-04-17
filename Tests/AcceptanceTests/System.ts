@@ -5,13 +5,12 @@ import {Action} from "../../Logic/ShopPersonnel/Permissions";
 import {SearchTypes} from "../../Logic/System";
 
 export interface System{
-    openSession(): void //TODO add guest to the system.
-    closeSession(): void //TODO remove quest from system, if use logout.
-    displayMenu():void // TODO UI JUST FOR US
+    openSession(): number
+    closeSession(user_id: number): void
     performRegister(user_email:string, password: string): boolean
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
-    logout(user_email: string): void //TODO after logout switch to guest, openSession? //lior
+    logout(user_email: string): number
     displayShops(): string[]
     getItemsFromShop(shop_id:number): string | string[]
     searchItemFromShops(search_type:SearchTypes, search_term: string): string[]
@@ -20,6 +19,7 @@ export interface System{
     displayShoppingCart(user_id:number): string | string[][]
     editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):string | void
     purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):string | boolean
+    removeManager(user_id: number, shop_id: number, target: string): string | boolean
     purchaseCart(user_id: number, payment_info:string):string | boolean
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info:string): number | string
@@ -37,7 +37,6 @@ export interface System{
 
     adminDisplayShopHistory(admin:number, shop_id: number): string | string[]
     adminDisplayUserHistory(admin:number, target_id: number): string | string[]
-    editUserDetails(user_id: number, action: any, value: any): string | boolean
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
     getShopInfo(shop_id: number) : string | string[]
 }
