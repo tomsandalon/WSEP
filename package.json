@@ -3,13 +3,26 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "module": "CommonJS",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-mocha -p tsconfig.testing.json Tests/Domain/Product/*",
+    "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/Domain/Product/*"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "simplr-logger": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.16",
+    "@types/mocha": "^8.2.2",
+    "@types/password-hash": "^1.2.20",
+    "chai": "^4.3.4",
+    "cross-env": "^7.0.3",
+    "mocha": "^8.3.2",
+    "password-hash": "^1.2.2",
+    "ts-mocha": "^8.0.0",
+    "ts-node": "^9.1.1"
   }
 }

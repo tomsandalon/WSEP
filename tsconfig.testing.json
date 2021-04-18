@@ -1,0 +1,23 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "compilerOptions": {
+    "strict": true,
+    "target": "es5",
+    "module": "CommonJS",
+    "moduleResolution": "node"
+  },
+  "include": [
+    "Tests/*",
+    "Utils/*",
+    "Logic/*"
+  ],
+  "exclude": [
+    "./node_modules/",
+    "./dist/"
+  ],
+  "files": [
+
+  ]
+}

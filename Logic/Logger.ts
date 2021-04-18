@@ -5,7 +5,7 @@ const config = new LoggerConfigurationBuilder()
     .SetDefaultLogLevel(LogLevel.Trace)
     .AddWriteMessageHandlers([
         { Handler: new ConsoleMessageHandler() },
-        { Handler: new FileMessageHandler("C:\\Users\\liorp\\OneDrive\\Desktop\\New folder (2)\\logs.txt") }]
+        { Handler: new FileMessageHandler("./Logs/Log.log") }]
     )
     .Build();
 
