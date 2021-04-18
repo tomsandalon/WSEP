@@ -5,7 +5,7 @@
   "main": "index.js",
   "module": "CommonJS",
   "scripts": {
-    "test": "ts-mocha -p tsconfig.testing.json Tests/*/*/*",
+    "test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*",
     "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/*/*/*",
     "acceptance_tests": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*"
   },
