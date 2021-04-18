@@ -1,4 +1,4 @@
-import {ShopInventory, ShopInventoryImpl} from "./ShopInventory";
+import {Filter, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
 import {Category} from "../ProductHandling/Category";
@@ -248,8 +248,12 @@ export class ShopImpl implements Shop {
 
         const ret = this._inventory.addItem(name, description, amount, categories, base_price,
             discount_type, purchase_type)
-        if (typeof ret === "string") logger.Error(`${failure_message}. ` + ret);
-        else logger.Info(success_message);
+        if (typeof ret === "string") {
+            const error = `${failure_message}. ` + ret
+            logger.Error(error);
+            return error
+        }
+        logger.Info(success_message);
         return ret;
     }
 
@@ -261,7 +265,7 @@ export class ShopImpl implements Shop {
         return "We dont have policies"; //TODO
     }
 
-    filter(products: Product[], filters: { filter_name: string, filter_value: string }[]): Product[] {
+    filter(products: Product[], filters: Filter[]): Product[] {
         const ret = this._inventory.filter(products, filters);
         logger.Info(`A filter was performed in shop ${this._shop_id} with the following filters: ${filters}`);
         return ret;
@@ -282,15 +286,17 @@ export class ShopImpl implements Shop {
     removeItem(user_email: string, product_id: number): boolean | string {
         const failure_message: string = `${user_email} failed to remove product ${product_id} from shop ${this._shop_id}`
         const success_message: string = `${user_email} successfully removed product ${product_id} from shop ${this._shop_id}`
-
         if (!this._management.allowedRemoveItemFromShop(user_email)) {
             logger.Error(`${failure_message}. Permission denied.`);
             return "Insufficient permissions";
         }
-
         const ret = this._inventory.removeItem(product_id);
-        if (!ret) logger.Error(`${failure_message}. Item doesn't exist.`);
-        else logger.Info(success_message);
+        if (!ret) {
+            const error = `${failure_message}. Item doesn't exist.`
+            logger.Error(error);
+            return error
+        }
+        logger.Info(success_message);
         return ret;
     }
 
@@ -306,9 +312,13 @@ export class ShopImpl implements Shop {
 
     addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean | string {
         const ret = this._management.addPermissions(appointer_email, appointee_email, permissions);
-        if (ret) logger.Info(`Permissions ${permissions.map(p => Action[p])} granted to ${appointee_email} by ${appointer_email}`)
-        else logger.Error(`Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}`)
-        return ret;
+        if (ret) {
+            logger.Info(`Permissions ${permissions.map(p => Action[p])} granted to ${appointee_email} by ${appointer_email}`)
+            return ret
+        }
+        const error = `Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}`
+        logger.Error(error)
+        return error;
     }
 
     appointNewManager(appointer_email: string, appointee_email: string): boolean {
@@ -327,25 +337,35 @@ export class ShopImpl implements Shop {
 
     editPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean | string {
         const ret = this._management.editPermissions(appointer_email, appointee_email, permissions);
-        if (ret) logger.Info(`${appointer_email} gave ${appointee_email} permissions: ${permissions.map(p => Action[p])}`)
-        else logger.Error(`Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}`)
-        return ret;
+        if (ret) {
+            logger.Info(`${appointer_email} gave ${appointee_email} permissions: ${permissions.map(p => Action[p])}`)
+            return ret
+        }
+        logger.Error(`Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}`)
+        return "Insufficient permissions";
     }
 
     getStaffInfo(user_email: string, staff_email?: string[]): string[] | string {
         const ret = this._management.getStaffInfo(user_email, staff_email);
-        if (ret.length > 0) logger.Info(`${user_email} requested information regarding ${
-            staff_email !== undefined ? staff_email : "all the shop staff" 
-        }`)
-        else logger.Error(`Failed to view all staff by ${user_email}. Permission denied.`)
+        if (Array.isArray(ret)) {
+            logger.Info(`${user_email} requested information regarding ${
+                staff_email !== undefined ? staff_email : "all the shop staff"
+            }`)
+            return ret;
+        }
+        logger.Error(`Failed to view all staff by ${user_email}. Permission denied.`)
         return ret;
     }
 
     removeManager(appointer_email: string, appointee_email: string): boolean | string {
         const ret = this._management.removeManager(appointer_email, appointee_email);
-        if (ret) logger.Info(`${appointer_email} removed ${appointee_email} from management`)
-        else logger.Error(`${appointer_email} failed to remove ${appointer_email} from management`)
-        return ret;
+        if (ret) {
+            logger.Info(`${appointer_email} removed ${appointee_email} from management`)
+            return ret
+        }
+        const error = `${appointer_email} failed to remove ${appointer_email} from management`
+        logger.Error(error)
+        return error;
     }
 
     getShopHistory(user_email: string): string[] | string {

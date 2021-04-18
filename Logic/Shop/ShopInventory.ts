@@ -9,7 +9,9 @@ import {Order} from "../ProductHandling/Order";
 import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 
-export type filter = { filter_name: string; filter_value: string }
+
+export type Filter = { filter_name: string; filter_value: string }
+
 
 export interface ShopInventory {
     shop_id: number
@@ -78,7 +80,7 @@ export interface ShopInventory {
      * @filter-param filter_value the value of the filter
      * @return the products from @param products which match the filter
      */
-    filter(products: Product[], filters: filter[]): Product[];
+    filter(products: Product[], filters: Filter[]): Product[];
 
     /**
      * @param product_id product id of the requested product
