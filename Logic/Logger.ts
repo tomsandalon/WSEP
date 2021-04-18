@@ -4,7 +4,7 @@ import { FileMessageHandler, ConsoleMessageHandler } from "simplr-logger/handler
 const config = new LoggerConfigurationBuilder()
     .SetDefaultLogLevel(LogLevel.Trace)
     .AddWriteMessageHandlers([
-        { Handler: new ConsoleMessageHandler() },
+        // { Handler: new ConsoleMessageHandler() },
         { Handler: new FileMessageHandler("./Logs/Log.log") }]
     )
     .Build();

@@ -3,6 +3,7 @@ import { expect, assert } from 'chai';
 import {Product, ProductImpl} from "../../../Logic/ProductHandling/Product";
 import * as Error from "../../../Logic/ProductHandling/ErrorMessages";
 import {
+    AmountIsLargerThanStock,
     AmountNonPositiveValue,
     BasePriceNonPositiveValue,
     DescriptionEmpty, ProductNameEmpty
@@ -65,13 +66,33 @@ describe('ProductImpl Class Test suit', () => {
                 const product = createProduct();
                 expect(product.makePurchase(0)).equal(AmountNonPositiveValue);
             });
-            it('purchase positive amount', () => {
-                const product = createProduct();
-                const before = product.amount;
+            it('purchase positive amount and equal to stock', () => {
                 const delta = 10;
+                const product = createProduct();
+                const addSuppliesResult = product.addSupplies(delta);
+                expect(typeof addSuppliesResult).equal("boolean");
+                const before = product.amount;
                 const result = product.makePurchase(delta);
                 expect(typeof result).equal("boolean");
                 expect(product.amount).equal(before - delta);
+            });
+            it('purchase positive amount and less than stock', () => {
+                const delta = 10;
+                const product = createProduct();
+                const addSuppliesResult = product.addSupplies(2*delta);
+                expect(typeof addSuppliesResult).equal("boolean");
+                const before = product.amount;
+                const result = product.makePurchase(delta);
+                expect(typeof result).equal("boolean");
+                expect(product.amount).equal(before - delta);
+            });
+            it('purchase positive amount and more than stock', () => {
+                const delta = 10;
+                const product = createProduct();
+                const addSuppliesResult = product.addSupplies(delta/2);
+                expect(typeof addSuppliesResult).equal("boolean");
+                const result = product.makePurchase(delta);
+                expect(result).equal(AmountIsLargerThanStock);
             });
         });
         describe('changePrice', () => {
@@ -114,18 +135,24 @@ describe('ProductImpl Class Test suit', () => {
                 const result2 = product.removeCategory(delta);
                 expect(typeof result2).equal("boolean");
                 expect(product.category.indexOf(delta)).lessThan(0);
+                const otherDelta = CategoryImpl.create("Monitors");
+                if (typeof otherDelta === "string") assert.fail("Failed to create Category");
             });
         });
         describe('removeDiscountType', () => {
             it('', () => {
                 const product = createProduct();
-                assert.fail("Test case not implemented")
+                //TODO Implement Milestone 2
+
+                // assert.fail("Test case not implemented")
             });
         });
         describe('addDiscountType', () => {
             it('', () => {
                 const product = createProduct();
-                assert.fail("Test case not implemented")
+                //TODO Implement Milestone 2
+
+                // assert.fail("Test case not implemented")
             });
         });
         describe('changeDescription', () => {
@@ -165,13 +192,17 @@ describe('ProductImpl Class Test suit', () => {
         describe('changePurchaseType', () => {
             it('', () => {
                 const product = createProduct();
-                assert.fail("Test case not implemented")
+                //TODO Implement Milestone 2
+
+                // assert.fail("Test case not implemented")
             });
         });
         describe('calculatePrice', () => {
             it('', () => {
                 const product = createProduct();
-                assert.fail("Test case not implemented")
+                //TODO Implement Milestone 2
+
+                // assert.fail("Test case not implemented")
             });
         });
         describe('returnAmount', () => {

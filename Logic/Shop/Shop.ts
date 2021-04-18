@@ -1,7 +1,6 @@
-import {Filter, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
+import {Filter, Item_Action, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
-import {Category} from "../ProductHandling/Category";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {logger} from "../Logger";
@@ -49,7 +48,7 @@ export interface Shop {
      * @filter-param filter_value the value of the filter
      * @return the products from @param products which match the filter
      */
-    filter(products: Product[], filters: { filter_name: string, filter_value: string }[]): Product[]
+    filter(products: Product[], filters: Filter[]): Product[]
 
     /**
      * @Requirement 4.1
@@ -63,7 +62,7 @@ export interface Shop {
      * @param purchase_type purchase purchase type available for the product
      * @return true if the add was successful, or a string containing the error message otherwise
      */
-    addItem(user_email: string, name: string, description:string, amount: number,
+    addItem(user_email: string, name: string, description: string, amount: number,
             categories: string[], base_price: number,
             discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
 
@@ -155,17 +154,39 @@ export interface Shop {
      * @return staff info if the function was successful, or a string containing the error message otherwise
      */
     getStaffInfo(user_email: string, staff_email?: string[]): string[] | string
+
+    /**
+     * @Requirement 6.4
+     * @param user_email email of the admin
+     * @return a string list representation of the shop purchase history
+     */
+    adminGetShopHistory(user_email: string): string[]
+
+    /**
+     *
+     * @param user_email email of the user trying to edit the item
+     * @param product_id id of the product
+     * @param action the action to perform
+     * @param value the value to apply to the action
+     * @return true if the edit was successful, or a string containing the error message otherwise
+     */
+    editProduct(user_email: string, product_id: number, action: Item_Action, value: string): string | boolean
 }
 
 export class ShopImpl implements Shop {
-    private _bank_info: string;
-    private _description: string;
     private readonly _inventory: ShopInventory;
-    private _location: string;
     private readonly _management: ShopManagement;
-    private _name: string;
     private readonly _shop_id: number;
     private readonly _is_active: boolean;
+
+    static resetIDs = () => id_counter = 0
+
+    static create(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
+        if (bank_info.length == 0) return "Bank info can't be empty"
+        if (location.length == 0) return "Location can't be empty"
+        if (name.length == 0) return "Name can't be empty"
+        return new ShopImpl(user_email, bank_info, description, location, name)
+    }
 
     /**
      * @Requirement 3.2
@@ -175,7 +196,6 @@ export class ShopImpl implements Shop {
      * @param location
      * @param name
      */
-    //TODO check if registered
     constructor(user_email: string, bank_info: string, description: string, location: string, name: string) {
         this._shop_id = generateId();
         this._bank_info = bank_info;
@@ -183,10 +203,12 @@ export class ShopImpl implements Shop {
         this._location = location;
         this._name = name;
         this._management = new ShopManagementImpl(this.shop_id, user_email)
-        this._inventory = new ShopInventoryImpl(this.shop_id, this._management)
+        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info)
         this._management.shop_inventory = this._inventory;
         this._is_active = true;
     }
+
+    private _bank_info: string;
 
     get bank_info(): string {
         return this._bank_info;
@@ -196,6 +218,8 @@ export class ShopImpl implements Shop {
         this._bank_info = value;
     }
 
+    private _description: string;
+
     get description(): string {
         return this._description;
     }
@@ -204,9 +228,7 @@ export class ShopImpl implements Shop {
         this._description = value;
     }
 
-    get inventory(): ShopInventory {
-        return this._inventory;
-    }
+    private _location: string;
 
     get location(): string {
         return this._location;
@@ -216,9 +238,7 @@ export class ShopImpl implements Shop {
         this._location = value;
     }
 
-    get management(): ShopManagement {
-        return this._management;
-    }
+    private _name: string;
 
     get name(): string {
         return this._name;
@@ -226,6 +246,14 @@ export class ShopImpl implements Shop {
 
     set name(value: string) {
         this._name = value;
+    }
+
+    get inventory(): ShopInventory {
+        return this._inventory;
+    }
+
+    get management(): ShopManagement {
+        return this._management;
     }
 
     get shop_id(): number {
@@ -241,7 +269,7 @@ export class ShopImpl implements Shop {
         const failure_message: string = `${user_email} failed to add product ${name} to shop ${this._shop_id}`
         const success_message: string = `${user_email} successfully added product ${name} to shop ${this._shop_id}`
 
-        if (!this._management.allowedAddItemToShop(user_email)) {
+        if (!this._management.allowedEditItems(user_email)) {
             logger.Error(`${failure_message}. Permission denied`);
             return "Permission denied";
         }
@@ -257,13 +285,24 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
+    /*
+    TODO policies
+     */
     addPolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We don't have any policies yet :("; //TODO
+        return "We don't have any policies yet :(";
     }
 
     editPolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We dont have policies"; //TODO
+        return "We dont have policies";
     }
+
+    removePolicy(user_email: string, purchase_policy: any): boolean | string {
+        return "We don't have any policies yet :(";
+    }
+
+    /*
+    End
+     */
 
     filter(products: Product[], filters: Filter[]): Product[] {
         const ret = this._inventory.filter(products, filters);
@@ -300,37 +339,37 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
-    removePolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We don't have any policies yet :("; //TODO
-    }
-
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[] {
+        if (!this._is_active) return []
         const ret = this._inventory.search(name, category, keyword);
-        logger.Info(`A search was performed in shop ${this._shop_id}: name: ${name}\tcategory: ${category}\tkeyword: ${keyword}`);
+        logger.Info(`A search was performed in shop ${this._shop_id}: ${
+            (name) ? `name: ${name}` :
+                (category) ? `category: ${category}` :
+                    (keyword) ? `keyword: ${keyword}` : null}\t number of results: ${ret.length}`)
         return ret;
     }
 
     addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean | string {
         const ret = this._management.addPermissions(appointer_email, appointee_email, permissions);
-        if (ret) {
+        if (typeof ret == "boolean") {
             logger.Info(`Permissions ${permissions.map(p => Action[p])} granted to ${appointee_email} by ${appointer_email}`)
             return ret
         }
-        const error = `Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}`
+        const error = `Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}. ${ret}`
         logger.Error(error)
         return error;
     }
 
-    appointNewManager(appointer_email: string, appointee_email: string): boolean {
+    appointNewManager(appointer_email: string, appointee_email: string): boolean | string {
         const ret = this._management.appointNewManager(appointer_email, appointee_email);
-        if (ret) logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
+        if (typeof ret == "boolean") logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
         else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
         return ret;
     }
 
     appointNewOwner(appointer_email: string, appointee_email: string): boolean | string {
         const ret = this._management.appointNewOwner(appointer_email, appointee_email);
-        if (ret) logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
+        if (typeof ret == "boolean") logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
         else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
         return ret;
     }
@@ -378,6 +417,41 @@ export class ShopImpl implements Shop {
         }
 
         const ret = this._inventory.getShopHistory();
+        logger.Info(success_message);
+        return ret;
+    }
+
+    adminGetShopHistory(user_email: string): string[] {
+        const ret = this._inventory.getShopHistory()
+        logger.Info(`Admin ${user_email} searched for shop ${this.shop_id} order history`)
+        return ret;
+    }
+
+    toString(): string {
+        return `Shop name: ${this._name}\t` +
+            `Shop id: ${this._shop_id}\t` +
+            `Description: ${this._description}\t` +
+            `Status: ${this._is_active ? "Active" : "Inactive"}\n` +
+            `${this.management.toString()}\n\n` +
+            `${this.inventory.toString()}\n\n`
+    }
+
+    editProduct(user_email: string, product_id: number, action: Item_Action, value: string): string | boolean {
+        const failure_message: string = `${user_email} failed to edit product ${product_id} in shop ${this._shop_id}`
+        const success_message: string = `${user_email} successfully edited product ${product_id} in shop ${this._shop_id}. 
+        EditType: ${action}\tValue: ${String(value)}`
+
+        if (!this._management.allowedEditItems(user_email)) {
+            logger.Error(`${failure_message}. Permission denied`);
+            return "Permission denied";
+        }
+
+        const ret = this._inventory.editItem(product_id, action, value)
+        if (typeof ret === "string") {
+            const error = `${failure_message}. ` + ret
+            logger.Error(error);
+            return error
+        }
         logger.Info(success_message);
         return ret;
     }

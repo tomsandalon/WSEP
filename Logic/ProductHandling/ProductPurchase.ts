@@ -34,6 +34,7 @@ export class ProductPurchaseImpl implements ProductPurchase{
         }
         return new ProductPurchaseImpl(product, final_price, amount)
     }
+
     get product_id(){
         return this._product_id;
     }

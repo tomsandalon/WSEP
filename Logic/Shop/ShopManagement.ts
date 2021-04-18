@@ -18,7 +18,7 @@ export interface ShopManagement {
      * @param user_email email of the user trying to add items to the shop
      * @return true iff the user representation of user_email is allowed to add items to the shop
      */
-    allowedAddItemToShop(user_email: string): boolean
+    allowedEditItems(user_email: string): boolean
 
     /**
      * @param user_email email of the user trying to remove items from the shop
@@ -42,9 +42,9 @@ export interface ShopManagement {
     /**
      * @param appointer_email email of the appointer
      * @param appointee_email email of the  appointee
-     * @return true iff the appointment was successful
+     * @return true if the appointment was successful, or a string representing the error otherwise
      */
-    appointNewManager(appointer_email: string, appointee_email: string): boolean
+    appointNewManager(appointer_email: string, appointee_email: string): boolean | string
 
     /**
      * @param appointer_email email of the appointer
@@ -58,9 +58,9 @@ export interface ShopManagement {
      * @param appointer_email email of the appointer
      * @param appointee_email email of the  appointee
      * @param permissions new permissions to add to the appointee
-     * @return true iff the addition was successful
+     * @return true if the addition was successful, or a string representing an error otherwise
      */
-    addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean
+    addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean | string
 
     /**
      * @param appointer_email email of the appointer
@@ -84,63 +84,61 @@ export interface ShopManagement {
 
 
 export class ShopManagementImpl implements ShopManagement {
-    private _managers: Manager[];
     private readonly _original_owner: Owner;
-    private _owners: Owner[];
     private readonly _shop_id: number;
-    private _shop_inventory: ShopInventory;
 
     constructor(shop_id: number, original_owner: string, shop_inventory?: ShopInventory) {
         this._shop_id = shop_id;
         //placing a temporary value which is immediately replaced
-        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this);
+        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "");
         this._original_owner = new OwnerImpl(original_owner);
         this._managers = [];
         this._owners = [];
     }
 
+    private _managers: Manager[];
+
     get managers(): Manager[] {
         return this._managers;
+    }
+
+    private _owners: Owner[];
+
+    get owners(): Owner[] {
+        return this._owners;
+    }
+
+    private _shop_inventory: ShopInventory;
+
+    get shop_inventory(): ShopInventory {
+        return this._shop_inventory;
+    }
+
+    set shop_inventory(value: ShopInventory) {
+        this._shop_inventory = value;
     }
 
     get original_owner(): Owner {
         return this._original_owner;
     }
 
-    get owners(): Owner[] {
-        return this._owners;
-    }
-
     get shop_id(): number {
         return this._shop_id;
     }
 
-    get shop_inventory(): ShopInventory {
-        return this._shop_inventory;
-    }
-    
-    set shop_inventory(value: ShopInventory) {
-        this._shop_inventory = value;
-    }
-
-    private isOwner(user_email: string) {
-        return [this._original_owner].concat(this._owners).some((o: Owner) => o.user_email == user_email)
-    }
-
-    private isAllowed(user_email: string, action: Action) {
-        return this.isOwner(user_email) ||
-            this._managers.some((m: Manager) => m.user_email == user_email && m.permissions?.isAllowed(action));
-    }
-    
-    addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean {
-        if (!this.isOwner(appointer_email) || !this.isManager(appointee_email)) return false;
-        const manager = this.getManagerByEmail(appointee_email)
-        if (manager == null) return false;
+    addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean | string {
+        if (!this.isOwner(appointer_email))
+            return `${appointer_email} is not an owner`;
+        if (!this.isManager(appointee_email))
+            return `${appointee_email} is not a manager`
+        const manager = this.getManagerByEmail(appointee_email) as Manager
+        if (manager.appointer_user_email != appointer_email)
+            return `${appointer_email} is not the appointer of ${appointee_email}`
         permissions.forEach(p => manager.permissions.editPermission(p, true))
         return true;
     }
 
-    allowedAddItemToShop(user_email: string): boolean {
+    allowedEditItems(user_email: string): boolean {
         return this.isAllowed(user_email, Action.AddItem);
     }
 
@@ -156,16 +154,28 @@ export class ShopManagementImpl implements ShopManagement {
         return this.isAllowed(user_email, Action.ViewShopHistory);
     }
 
-    appointNewManager(appointer_email: string, appointee_email: string): boolean {
-        if (this.isManager(appointee_email) || !this.isOwner(appointer_email)) return false;
-        this._managers = this.managers.concat([new ManagerImpl(appointee_email, appointer_email)])
+    appointNewManager(appointer_email: string, appointee_email: string): boolean | string {
+        if (this.isManager(appointee_email)) {
+            logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointee is already a manager`)
+            return "Appointer is not an owner"
+        }
+        if (this.isOwner(appointee_email)) {
+            logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointee is already an owner`)
+            return "Appointer is not an owner"
+        }
+        if (!this.isOwner(appointer_email)) {
+            logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointer is not a owner`)
+            return "Appointer is not an owner"
+        }
+
+        this._managers = this._managers.concat([new ManagerImpl(appointee_email, appointer_email)])
         return true;
     }
 
     appointNewOwner(appointer_email: string, appointee_email: string): boolean | string {
         if (this.isOwner(appointee_email)) {
             logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointee is already an owner`)
-            return "Appointer is not an owner"
+            return "Appointee is already an owner"
         }
         if (!this.isOwner(appointer_email)) {
             logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointer is not a owner`)
@@ -177,12 +187,13 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     editPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean {
-        // const result = this._managers.filter((m: Manager) => m.user_email == appointee_email);
-        // if (result.length == 0) return false;
-        // const manager = result[0];
-        // let new_permissions: boolean[] = new Array<boolean>(TotalNumberOfPermissions).fill(false)
-        // permissions.forEach(a => {new_permissions[a] = true})
-        // manager.permissions = new ManagerPermissions(new_permissions);
+        const manager = this._managers.find((m: Manager) => m.user_email == appointee_email);
+        if (!manager) return false;
+        let new_permissions: boolean[] = new Array<boolean>(TotalNumberOfPermissions).fill(false)
+        permissions.forEach(a => {
+            new_permissions[a] = true
+        })
+        manager.permissions = new ManagerPermissions(new_permissions);
         return true;
     }
 
@@ -190,10 +201,10 @@ export class ShopManagementImpl implements ShopManagement {
         if (!this.isAllowed(user_email, Action.GetStaffInfo)) return `${user_email} is not allowed to check for staff information`;
         const owners = !(staff_id) ? [this._original_owner].concat(this._owners) :
             [this._original_owner].concat(this._owners)
-            .filter(o => staff_id.some(id => id == o.user_email));
+                .filter(o => staff_id.some(id => id == o.user_email));
         const managers = !(staff_id) ? this._managers :
             this._managers
-            .filter((m) => staff_id.some(id => id == m.user_email));
+                .filter((m) => staff_id.some(id => id == m.user_email));
         return owners.map(o => o.toString()).concat(managers.map(m => m.toString()))
     }
 
@@ -205,10 +216,25 @@ export class ShopManagementImpl implements ShopManagement {
         return true;
     }
 
+    toString(): string {
+        return `Original owner: ${this.original_owner.user_email}\t` +
+            `Owners: ${this.owners.reduce((acc, curr) => acc + ", " + curr.user_email, "")}\t` +
+            `Managers: ${this.managers.reduce((acc, curr) => acc + ", " + curr.user_email, "")}`
+    }
+
+    private isOwner(user_email: string) {
+        return [this._original_owner].concat(this._owners).some((o: Owner) => o.user_email == user_email)
+    }
+
+    private isAllowed(user_email: string, action: Action) {
+        return this.isOwner(user_email) ||
+            this._managers.some((m: Manager) => m.user_email == user_email && m.permissions?.isAllowed(action));
+    }
+
     private getManagerByEmail(manager_email: string): Manager | null {
-        const result = this._managers.filter(m => m.user_email == manager_email);
-        if (result.length == 0) return null;
-        return result[0];
+        const result = this._managers.find(m => m.user_email == manager_email);
+        if (!result) return null;
+        return result;
     }
 
     private isManager(manager_email: string): boolean {

@@ -2,6 +2,13 @@ import {Product} from "./Product";
 import {ProductPurchase} from "./ProductPurchase";
 import {Shop} from "../Shop/Shop";
 import {ShopInventory} from "../Shop/ShopInventory";
+import {
+    AmountNonPositiveValue,
+    ProductExistsInBasket,
+    ProductNotExistInBasket,
+    ProductNotFound,
+    StockLessThanBasket
+} from "./ErrorMessages";
 
 type Entry = {product: Product, amount: number}
 export type ShoppingEntry = {productId: number, amount: number}
@@ -11,8 +18,32 @@ export interface ShoppingBasket {
     shop: ShopInventory
     products: Entry[]
 
+    /**
+     * @Requirement 2.7
+     * @param product_id
+     * @param amount to purchase
+     * @return true iff 0 < amount <= product.amount and product_id exists in the shop and this.products.contains(product) == false
+     * @return AmountNonPositiveValue iff amount <= 0
+     * @return ProductExistsInBasket iff this.product.contains(product) == true
+     * @return ErrorOfShop iff product is not found in the shop
+     */
     addToBasket(product_id: number, amount: number): boolean | string
+    /**
+     * @Requirement 2.7
+     * @param product_id
+     * @param amount to purchase
+     * @return true iff 0 < amount <= product.amount and product_id exists in the basket
+     * @return ProductNotFound iff product not found in store
+     * @return AmountNonPositiveValue iff amount <= 0
+     */
     editBasketItem(product_id: number, new_amount: number): boolean | string
+    /**
+     * @Requirement 2.7
+     * @param product_id
+     * @param amount to purchase
+     * @return true iff 0 < amount <= product.amount and product_id exists in the basket
+     * @return ProductNotExistInBasket otherwise
+     */
     removeItem(product_id: number): boolean | string
     toStringBasket():string[]
 }
@@ -53,49 +84,45 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     }
 
     public addToBasket(product_id: number, amount: number): boolean | string {
-        //TODO item wont remove user.tests.ts line 130-148 add then remove then add again scenario
         if(amount <= 0){
-            return "amount must be larger than 0"
-        } else if (this._products.reduce((acc: boolean, product: Entry) => acc && (product_id != product.product.product_id), true)){
-            return "product is already exists in basket"
+            return AmountNonPositiveValue
+        } else if (this._products.reduce((acc: boolean, product: Entry) => acc || (product_id != product.product.product_id), false)){
+            return ProductExistsInBasket
         }
         const fetched_product = this._shop.getItem(product_id);
         if (typeof fetched_product === "string"){
             return fetched_product
         }
+        if (fetched_product.amount < amount) return StockLessThanBasket
         const product = {product: fetched_product, amount: amount};
         this._products.push(product);
         return true
     }
 
     public editBasketItem(product_id: number, new_amount: number): boolean | string {
+        if (new_amount <= 0) {
+            return AmountNonPositiveValue
+        }
         for (let product of this._products){
-            //TODO edit item in basket.
             if(product_id == product.product.product_id){
-                const difference = product.amount - new_amount;
-                if (difference > 0){
-                    product.product.returnAmount(difference);
-                } else if (difference < 0) {
-                    product.product.makePurchase(difference);
-                }
-                //else aka do nothing
+                product.amount = new_amount;
                 return true
             }
         }
-        return "product not found"
+        return ProductNotFound
     }
 
     public removeItem(product_id: number): boolean | string {
         const position: number = this._products.reduce((acc: number, product: Entry, index: number) => (product_id == product.product.product_id)? index: acc, -1);
         if (position < 0){
-            return "product doesn't exist in basket"
+            return ProductNotExistInBasket
         }
         this._products.splice(position, 1);
         return true
     }
 
     toStringBasket(): string[]{
-        return this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.product.amount}`)
+        return this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
 
     }
 

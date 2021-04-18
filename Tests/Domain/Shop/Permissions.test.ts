@@ -1,6 +1,6 @@
 import 'mocha';
 import {expect} from 'chai';
-import {Action, ManagerPermissions} from "../../Logic/ShopPersonnel/Permissions";
+import {Action, ManagerPermissions} from "../../../Logic/ShopPersonnel/Permissions";
 
 describe('Permissions test', () => {
     it('Create default permissions', () => {
@@ -51,5 +51,3 @@ describe('Permissions test', () => {
         expect(p.isAllowed(Action.ViewShopHistory)).to.be.false;
     })
 })
-
-// describe('') //

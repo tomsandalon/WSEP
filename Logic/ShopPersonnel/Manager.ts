@@ -7,15 +7,13 @@ export interface Manager {
 }
 
 export class ManagerImpl implements Manager {
-    private _appointer_user_email: string;
-    private _permissions: Permissions;
-    private _user_email: string;
-
     constructor(user_email: string, appointer_user_email: string) {
         this._appointer_user_email = appointer_user_email;
         this._permissions = new ManagerPermissions();
         this._user_email = user_email;
     }
+
+    private _appointer_user_email: string;
 
     get appointer_user_email(): string {
         return this._appointer_user_email;
@@ -25,6 +23,8 @@ export class ManagerImpl implements Manager {
         this._appointer_user_email = value;
     }
 
+    private _permissions: Permissions;
+
     get permissions(): Permissions {
         return this._permissions;
     }
@@ -32,6 +32,8 @@ export class ManagerImpl implements Manager {
     set permissions(value: Permissions) {
         this._permissions = value;
     }
+
+    private _user_email: string;
 
     get user_email(): string {
         return this._user_email;

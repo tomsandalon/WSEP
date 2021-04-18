@@ -1,8 +1,12 @@
 import {ShoppingBasket, ShoppingBasketImpl, ShoppingEntry} from "../ProductHandling/ShoppingBasket";
-import {Order} from "../ProductHandling/Order";
+import {Order, OrderImpl} from "../ProductHandling/Order";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {logger} from "../Logger";
 import {ShopInventory} from "../Shop/ShopInventory";
+import {PaymentHandler, PaymentHandlerImpl} from "../Adapters/PaymentHandler";
+
+let id_counter: number = 0;
+const generateId = () => id_counter++;
 
 export interface User {
     user_email: string
@@ -10,33 +14,48 @@ export interface User {
     cart: ShoppingBasket[]
     order_history: Order[]
     is_admin: boolean
+    user_id: number
+    is_guest: boolean
 
     addToBasket(shop: ShopInventory,product_id: number, amount: number): void | string
     editBasketItem(shop: ShopInventory,product_id: number, new_amount: number): void | string
     purchaseBasket(shop_id: number, payment_method: string): string | boolean
-    purchaseCart(payment_method: string):any
+    purchaseCart(payment_method: string):string | boolean
     displayBasket(shop_id: number): string[] | string
     removeItemFromBasket(shop: ShopInventory, product_id: number):void
     displayBaskets(): string[][] | string
-    //TODO req: 3.7 - add it.
+    getOrderHistory():string[]
 }
-export class UserImpl implements User{
+
+export class UserImpl implements User {
     private readonly _user_email: string
     private readonly _password: string
     private readonly _is_admin: boolean
-    private readonly _cart: ShoppingBasket[]
+    private _cart: ShoppingBasket[]
     private readonly _order_history: Order[]
+    private readonly _user_id: number
+    private readonly _is_guest: boolean
+    private readonly _payment_handler: PaymentHandler
 
-    constructor(user_email:string, password:string, is_admin:boolean) {
-        this._user_email = user_email;
-        this._password = password;
-        this._is_admin = is_admin;
+    static resetIDs = () => id_counter = 0
+
+    constructor(user_email?:string, password?:string, is_admin?:boolean) {
+        if(user_email != undefined && password != undefined && is_admin != undefined) {
+            this._user_email = user_email;
+            this._password = password;
+            this._is_admin = is_admin;
+            this._is_guest = false
+        }
+        else{
+            this._user_email = "";
+            this._password = "";
+            this._is_admin = false;
+            this._is_guest = true;
+        }
         this._cart = [];
         this._order_history = [];
-    }
-
-    purchaseCart(payment_method: string) {
-        throw new Error("Method not implemented.");
+        this._user_id = generateId();
+        this._payment_handler = PaymentHandlerImpl.getInstance();
     }
 
     /**
@@ -57,6 +76,7 @@ export class UserImpl implements User{
                 return value;
             }
         }
+        logger.Info(`Product id ${product_id} was removed successfully from shop_id ${shop.shop_id}`)
         return;
     }
 
@@ -79,7 +99,12 @@ export class UserImpl implements User{
             this._cart.push(new_basket);
         }
         else{//add to existing
-            console.log(shopping_basket[0].addToBasket(product_id, amount));
+            const add = shopping_basket[0].addToBasket(product_id, amount)
+            if(typeof add == "boolean"){
+                logger.Info(`Product id ${product_id} was added successfully to the basket of shop_id ${shop.shop_id}`)
+                return
+            }
+        return add;
         }
     }
 
@@ -102,6 +127,7 @@ export class UserImpl implements User{
             if (typeof result === "string"){
                 return result;
             }
+            logger.Info(`Product id ${product_id} was edited successfully for shop_id ${shop.shop_id}`)
         }
     }
 
@@ -117,10 +143,26 @@ export class UserImpl implements User{
             logger.Error("Trying to purchase a shop basket that doesnt exist");
             return false;
         }
-        else{//TODO payment_handler?
-            return true;
-        }
+        const order = OrderImpl.create(new Date(), shopping_basket[0],[]);
+        if(typeof order == "string")
+            return order
+        const order_purchase = order.purchase_self(payment_method);
+        if(typeof order_purchase == "string")
+            return order_purchase
+        this._order_history.push(order)
+        this._cart = this._cart.filter(basket => basket.shop.shop_id != shop_id)
+        return order_purchase;
+    }
 
+
+    /**
+     * Requirement number 2.9
+     * @param payment_method
+     * @return true if all baskets could be purchased
+     */
+    purchaseCart(payment_method: string):string | boolean {
+        //TODO PAYMENT HANDLER
+        return true;
     }
 
     /**
@@ -136,6 +178,7 @@ export class UserImpl implements User{
         }
         else{
             let basket = shopping_basket[0];
+            logger.Info(`Basket of shop id ${shop_id} was displayed`)
             return basket.toStringBasket();
         }
     }
@@ -145,12 +188,24 @@ export class UserImpl implements User{
      */
     displayBaskets(): string[][] | string{
         if(this._cart.length == 0){
-            logger.Error("Trying to display an empty shopping cart")
-            return "Trying to display an empty shopping cart";
+            logger.Info("Trying to display an empty shopping cart")
+            return "Your shopping cart is empty"
         }
         else{
+            logger.Info(`Cart of user_id ${this._user_id} was displayed`)
             return this._cart.map(basket => basket.toStringBasket());
         }
+    }
+
+    /**
+     * Requirement number 3.7
+     * @return a string representation of order history
+     */
+    getOrderHistory():string[]{
+        if(this._order_history.length == 0)
+            return ["Empty order history"];
+        logger.Info(`Order history of user id ${this._user_id} was displayed`)
+        return this._order_history.map(order => order.to_string())
     }
     get user_email(): string {
         return this._user_email;
@@ -170,6 +225,14 @@ export class UserImpl implements User{
     get order_history():Order[]
     {
         return this._order_history;
+    }
+    get user_id():number
+    {
+        return this._user_id;
+    }
+    get is_guest():boolean
+    {
+        return this._is_guest;
     }
 
 }
