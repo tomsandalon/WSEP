@@ -14,6 +14,7 @@ export interface ShoppingBasket {
     addToBasket(product_id: number, amount: number): boolean | string
     editBasketItem(product_id: number, new_amount: number): boolean | string
     removeItem(product_id: number): boolean | string
+    toStringBasket():string[]
 }
 
 export class ShoppingBasketImpl implements ShoppingBasket{
@@ -52,6 +53,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     }
 
     public addToBasket(product_id: number, amount: number): boolean | string {
+        //TODO item wont remove user.tests.ts line 130-148 add then remove then add again scenario
         if(amount <= 0){
             return "amount must be larger than 0"
         } else if (this._products.reduce((acc: boolean, product: Entry) => acc && (product_id != product.product.product_id), true)){
@@ -68,6 +70,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
 
     public editBasketItem(product_id: number, new_amount: number): boolean | string {
         for (let product of this._products){
+            //TODO edit item in basket.
             if(product_id == product.product.product_id){
                 const difference = product.amount - new_amount;
                 if (difference > 0){
@@ -90,5 +93,11 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         this._products.splice(position, 1);
         return true
     }
+
+    toStringBasket(): string[]{
+        return this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.product.amount}`)
+
+    }
+
 
 }

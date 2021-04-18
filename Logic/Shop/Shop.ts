@@ -175,6 +175,7 @@ export class ShopImpl implements Shop {
      * @param location
      * @param name
      */
+    //TODO check if registered
     constructor(user_email: string, bank_info: string, description: string, location: string, name: string) {
         this._shop_id = generateId();
         this._bank_info = bank_info;

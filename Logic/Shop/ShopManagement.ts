@@ -177,12 +177,12 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     editPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean {
-        const result = this._managers.filter((m: Manager) => m.user_email == appointee_email);
-        if (result.length == 0) return false;
-        const manager = result[0];
-        let new_permissions: boolean[] = new Array<boolean>(TotalNumberOfPermissions).fill(false)
-        permissions.forEach(a => {new_permissions[a] = true})
-        manager.permissions = new ManagerPermissions(new_permissions);
+        // const result = this._managers.filter((m: Manager) => m.user_email == appointee_email);
+        // if (result.length == 0) return false;
+        // const manager = result[0];
+        // let new_permissions: boolean[] = new Array<boolean>(TotalNumberOfPermissions).fill(false)
+        // permissions.forEach(a => {new_permissions[a] = true})
+        // manager.permissions = new ManagerPermissions(new_permissions);
         return true;
     }
 

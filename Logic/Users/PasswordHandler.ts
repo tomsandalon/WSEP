@@ -1,9 +1,17 @@
 import * as password_hash from "password-hash";
+
+/**
+ * Service-Level Requirement number 1 - Privacy.
+ */
 export class PasswordHandler{
     private static instance: PasswordHandler;
 
     private constructor() {
     }
+
+    /**
+     * Singelton design pattern
+     */
     public static getInstance(): PasswordHandler {
         if(!PasswordHandler.instance)
         {
@@ -15,7 +23,7 @@ export class PasswordHandler{
     /**
      *
      * @param password to hash - string
-     * returns a hashed function
+     * @return a hashed value of the provided string with salt
      */
     public hash(password: string): string {
         return password_hash.generate(password);
@@ -24,7 +32,7 @@ export class PasswordHandler{
     /**
      *
      * @param password as a string
-     * return if a password was hashed using the hashing function or not
+     * @return if a password was hashed using the hashing function
      */
     public isHashed(password: string): boolean
     {
@@ -35,9 +43,9 @@ export class PasswordHandler{
      *
      * @param password
      * @param hashed_password
-     * returns whether the password matches its hash value.
+     * @return true if the the hashed_password is the password's hashed value.
      */
-    public verify(password:string, hashed_password:string)
+    public verify(password:string, hashed_password:string):boolean
     {
         return password_hash.verify(password, hashed_password);
     }
