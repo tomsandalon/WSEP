@@ -1,5 +1,5 @@
-import {PaymentHandler} from "../Adapters/PaymentHandler";
-import {DeliveryHandler, DeliveryHandlerImpl} from "../Adapters/DeliveryHandler";
+import {PaymentHandler} from "../../Service/Adapters/PaymentHandler";
+import {DeliveryHandler, DeliveryHandlerImpl} from "../../Service/Adapters/DeliveryHandler";
 import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {ShoppingBasket} from "./ShoppingBasket";
 import {Product, ProductImpl} from "./Product";

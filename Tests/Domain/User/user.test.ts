@@ -1,14 +1,14 @@
 import 'mocha';
 import { expect, assert } from 'chai';
-import {PasswordHandler} from "../../../Logic/Users/PasswordHandler";
-import {RegisterImpl} from "../../../Logic/Users/Register";
-import {LoginImpl} from "../../../Logic/Users/Login";
-import {StringPair} from "../../../Logic/Users/StringPair";
-import {UserImpl} from "../../../Logic/Users/User";
+import {PasswordHandler} from "../../../Logic/Domain/Users/PasswordHandler";
+import {RegisterImpl} from "../../../Logic/Domain/Users/Register";
+import {LoginImpl} from "../../../Logic/Domain/Users/Login";
+import {StringPair} from "../../../Logic/Domain/Users/StringPair";
+import {UserImpl} from "../../../Logic/Domain/Users/User";
 import type = Mocha.utils.type;
-import {ShopInventoryImpl} from "../../../Logic/Shop/ShopInventory";
-import {ShopManagementImpl} from "../../../Logic/Shop/ShopManagement";
-import {ProductImpl} from "../../../Logic/ProductHandling/Product";
+import {ShopInventoryImpl} from "../../../Logic/Domain/Shop/ShopInventory";
+import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
+import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 
 describe('PasswordHandler tests', () => {
     it('should return a hashed password ', () => {

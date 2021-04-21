@@ -1,4 +1,4 @@
-import {Order} from "../ProductHandling/Order";
+import {Order} from "../../Domain/ProductHandling/Order";
 
 export interface DeliveryHandler {
     deliver(address: string, order: Order): string | boolean

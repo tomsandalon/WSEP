@@ -3,7 +3,7 @@ import {Order, OrderImpl} from "../ProductHandling/Order";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {logger} from "../Logger";
 import {ShopInventory} from "../Shop/ShopInventory";
-import {PaymentHandler, PaymentHandlerImpl} from "../Adapters/PaymentHandler";
+import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/PaymentHandler";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
