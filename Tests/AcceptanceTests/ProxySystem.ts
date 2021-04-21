@@ -1,10 +1,10 @@
 import {System, TestNotAssociatedWithImplementation} from "./System";
 import {AdapterSystem} from "./AdapterSystem";
-import {DiscountType} from "../../Logic/PurchaseProperties/DiscountType";
-import {PurchaseType} from "../../Logic/PurchaseProperties/PurchaseType";
-import {Action} from "../../Logic/ShopPersonnel/Permissions";
-import {Filter, Item_Action} from "../../Logic/Shop/ShopInventory";
-import {SearchTypes} from "../../Logic/System";
+import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
+import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
+import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
+import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
+import {SearchTypes} from "../../Logic/Domain/System";
 
 export class ProxySystem implements System{
     private readonly system: AdapterSystem | undefined

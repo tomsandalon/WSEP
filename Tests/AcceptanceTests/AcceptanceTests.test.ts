@@ -1,9 +1,9 @@
 import {assert, expect} from "chai";
 import {SystemDriver} from "./SystemDriver";
 import {System} from "./System";
-import {Action} from "../../Logic/ShopPersonnel/Permissions";
-import {SearchTypes} from "../../Logic/System";
-import {Filter_Type} from "../../Logic/Shop/ShopInventory";
+import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
+import {SearchTypes} from "../../Logic/Domain/System";
+import {Filter_Type} from "../../Logic/Domain/Shop/ShopInventory";
 
 describe('Guest:', () => {
     it('2.1: Enter - enter to the system as a guest', () => {

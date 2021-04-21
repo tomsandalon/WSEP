@@ -1,9 +1,9 @@
-import {SearchTypes, System} from "../../Logic/System";
-import {Action} from "../../Logic/ShopPersonnel/Permissions";
-import {DiscountType} from "../../Logic/PurchaseProperties/DiscountType";
-import {PurchaseType} from "../../Logic/PurchaseProperties/PurchaseType";
+import {SearchTypes, System} from "../../Logic/Domain/System";
+import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
+import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
+import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
 import {TestNotAssociatedWithImplementation} from "./System";
-import {Filter, Item_Action} from "../../Logic/Shop/ShopInventory";
+import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
 import * as Tests from "./System"
 
 export class AdapterSystem implements Tests.System{

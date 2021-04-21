@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect, assert } from 'chai';
-import {ProductImpl} from "../../../Logic/ProductHandling/Product";
+import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor", {});
