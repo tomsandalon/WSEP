@@ -19,6 +19,7 @@
     "@types/chai": "^4.2.16",
     "@types/mocha": "^8.2.2",
     "@types/password-hash": "^1.2.20",
+    "async-parallel": "^1.2.3",
     "chai": "^4.3.4",
     "cross-env": "^7.0.3",
     "mocha": "^8.3.2",

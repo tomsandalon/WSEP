@@ -4,7 +4,7 @@ import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler";
 import {Product, ProductImpl} from "../ProductHandling/Product";
-import {Order} from "../ProductHandling/Order";
+import {Purchase} from "../ProductHandling/Purchase";
 import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
@@ -40,7 +40,7 @@ export interface ShopInventory {
     purchase_policies: PurchasePolicyHandler | undefined
     discount_policies: DiscountPolicyHandler | undefined
     discount_types: DiscountType[]
-    orders: Order[]
+    orders: Purchase[]
     bank_info: string
 
     /**
@@ -123,13 +123,13 @@ export interface ShopInventory {
     /**
      * @param order the order to log in the shop order history
      */
-    logOrder(order: Order): void
+    logOrder(order: Purchase): void
 }
 
 export class ShopInventoryImpl implements ShopInventory {
     private readonly _discount_policies: DiscountPolicyHandler | undefined;
     private readonly _discount_types: DiscountType[];
-    private _orders: Order[];
+    private _orders: Purchase[];
     private readonly _purchase_policies: PurchasePolicyHandler | undefined;
     private readonly _shop_id: number;
     private readonly _bank_info: string;
@@ -182,7 +182,7 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._discount_types;
     }
 
-    get orders(): Order[] {
+    get orders(): Purchase[] {
         return this._orders;
     }
 
@@ -318,7 +318,7 @@ export class ShopInventoryImpl implements ShopInventory {
             return acc.concat(cur.amount != 0 ? cur.toString().concat("\n") : "")}, "")
     }
 
-    logOrder(order: Order): void {
+    logOrder(order: Purchase): void {
         this._orders = this.orders.concat(order)
     }
 }

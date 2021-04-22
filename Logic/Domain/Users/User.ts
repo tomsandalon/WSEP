@@ -1,5 +1,5 @@
 import {ShoppingBasket, ShoppingBasketImpl, ShoppingEntry} from "../ProductHandling/ShoppingBasket";
-import {Order, OrderImpl} from "../ProductHandling/Order";
+import {Purchase, PurchaseImpl} from "../ProductHandling/Purchase";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {logger} from "../Logger";
 import {ShopInventory} from "../Shop/ShopInventory";
@@ -12,7 +12,7 @@ export interface User {
     user_email: string
     password: string
     cart: ShoppingBasket[]
-    order_history: Order[]
+    order_history: Purchase[]
     is_admin: boolean
     user_id: number
     is_guest: boolean
@@ -32,7 +32,7 @@ export class UserImpl implements User {
     private readonly _password: string
     private readonly _is_admin: boolean
     private _cart: ShoppingBasket[]
-    private readonly _order_history: Order[]
+    private readonly _order_history: Purchase[]
     private readonly _user_id: number
     private readonly _is_guest: boolean
     private readonly _payment_handler: PaymentHandler
@@ -143,7 +143,7 @@ export class UserImpl implements User {
             logger.Error("Trying to purchase a shop basket that doesnt exist");
             return false;
         }
-        const order = OrderImpl.create(new Date(), shopping_basket[0],[]);
+        const order = PurchaseImpl.create(new Date(), shopping_basket[0],[]);
         if(typeof order == "string")
             return order
         const order_purchase = order.purchase_self(payment_method);
@@ -222,7 +222,7 @@ export class UserImpl implements User {
     get cart():ShoppingBasket[] {
         return this._cart;
     }
-    get order_history():Order[]
+    get order_history():Purchase[]
     {
         return this._order_history;
     }

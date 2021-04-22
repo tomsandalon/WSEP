@@ -1,4 +1,4 @@
-import {PaymentHandler} from "../../Service/Adapters/PaymentHandler";
+import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/PaymentHandler";
 import {DeliveryHandler, DeliveryHandlerImpl} from "../../Service/Adapters/DeliveryHandler";
 import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {ShoppingBasket} from "./ShoppingBasket";
@@ -8,7 +8,7 @@ import {ShopInventory} from "../Shop/ShopInventory";
 import {Shop} from "../Shop/Shop";
 import {DiscountNotExists} from "./ErrorMessages";
 
-export interface Order {
+export interface Purchase {
     order_id: number,
     shop: ShopInventory,
     products: ReadonlyArray<ProductPurchase>,
@@ -28,7 +28,7 @@ export interface Order {
     to_string(): string;
 }
 
-export class OrderImpl implements Order{
+export class PurchaseImpl implements Purchase{
     private static  _order_id_specifier: number = 0;
     private readonly _order_id: number;
     private readonly _shop: ShopInventory;
@@ -41,16 +41,16 @@ export class OrderImpl implements Order{
         this._shop = shop;
     }
 
-    static resetIDs = () => OrderImpl._order_id_specifier = 0
+    static resetIDs = () => PurchaseImpl._order_id_specifier = 0
 
-    public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[]): Order | string{
+    public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[]): Purchase | string{
         const products = basket.products.map((product) =>  ProductPurchaseImpl.create(product.product, coupons, product.amount));
         const isBad = products.some((product) => typeof product === "string");
         if(isBad){
             return DiscountNotExists
         }
         const id = this._order_id_specifier++;
-        return new OrderImpl(date, id, products as ProductPurchase[], basket.shop)
+        return new PurchaseImpl(date, id, products as ProductPurchase[], basket.shop)
     }
 
     get order_id(){
@@ -69,16 +69,28 @@ export class OrderImpl implements Order{
         return this._products
     }
 
+    private calculatePrice(){
+        return this._products.reduce((sum, product) => sum + product.actual_price, 0);
+    }
+
     public purchase_self(payment_info: string): boolean | string  {
         const result_of_purchase = this._shop.purchaseItems(this._products);
         if(typeof result_of_purchase === "string"){
             return result_of_purchase
         }
         this.shop.logOrder(this)
-        //TODO save to DB
-        //purchasehandler.charge
-        //delivery handler
-        //if something goes wrong -> shop.returnItems(this._products)
+        const total_price =  this.calculatePrice();
+        const result_payment = PaymentHandlerImpl.getInstance().charge(payment_info, total_price, this._shop.bank_info);
+        if (typeof result_payment == "string"){
+            this._shop.returnItems(this._products)
+            return result_payment
+        }
+        const result_delivery = DeliveryHandlerImpl.getInstance().deliver(payment_info, this);
+        if (typeof result_delivery == "string"){
+            PaymentHandlerImpl.getInstance().cancelCharge(payment_info, total_price, this._shop.bank_info);
+            this._shop.returnItems(this._products)
+            return result_delivery
+        }
         return true;
     }
 

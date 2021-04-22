@@ -8,7 +8,7 @@ import {Action} from "./ShopPersonnel/Permissions";
 import {Product, ProductImpl} from "./ProductHandling/Product";
 import {DiscountType} from "./PurchaseProperties/DiscountType";
 import {PurchaseType} from "./PurchaseProperties/PurchaseType";
-import {OrderImpl} from "./ProductHandling/Order";
+import {PurchaseImpl} from "./ProductHandling/Purchase";
 export enum SearchTypes {
     name,
     category,
@@ -62,7 +62,7 @@ export class SystemImpl implements System {
         ShopImpl.resetIDs()
         UserImpl.resetIDs()
         ProductImpl.resetIDs()
-        OrderImpl.resetIDs()
+        PurchaseImpl.resetIDs()
     }
 
     private constructor(reset?: boolean) {
