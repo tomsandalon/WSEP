@@ -20,6 +20,7 @@ const createProduct = () => {
 };
 
 describe('ProductImpl Class Test suit', () => {
+    ProductImpl.resetIDs();
     describe('Create Product', () => {
         it('Create with negative base price', () => {
             expect(ProductImpl.create(-1, "29 inch monitor", "LG monitor", {}))

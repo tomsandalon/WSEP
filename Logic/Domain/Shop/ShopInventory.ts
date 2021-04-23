@@ -11,7 +11,7 @@ import {CategoryImpl} from "../ProductHandling/Category";
 import {ProductPurchase} from "../ProductHandling/ProductPurchase";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
-
+//TODO check policies
 export enum Filter_Type {
     BelowPrice,
     AbovePrice,
@@ -134,7 +134,7 @@ export class ShopInventoryImpl implements ShopInventory {
     private readonly _shop_id: number;
     private readonly _bank_info: string;
 
-    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string) {
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string,  purchasePolicy?: PurchasePolicyHandler, discountPolicy?: DiscountPolicyHandler) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
         this._discount_types = [];
@@ -145,8 +145,8 @@ export class ShopInventoryImpl implements ShopInventory {
         /*
         TODO policies
          */
-        // this._discount_policies = DiscountPolicyHandler.getInstance();
-        // this._purchase_policies = PurchasePolicyHandler.getInstance();
+        this._discount_policies = discountPolicy;
+        this._purchase_policies = purchasePolicy;
         /*
         End
          */

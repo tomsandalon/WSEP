@@ -143,6 +143,7 @@ export class UserImpl implements User {
             logger.Error("Trying to purchase a shop basket that doesnt exist");
             return false;
         }
+        //TODO move lines 146 - 152 to shopping basket.purchase(payment_method)
         const order = PurchaseImpl.create(new Date(), shopping_basket[0],[]);
         if(typeof order == "string")
             return order
@@ -161,7 +162,7 @@ export class UserImpl implements User {
      * @return true if all baskets could be purchased
      */
     purchaseCart(payment_method: string):string | boolean {
-        //TODO PAYMENT HANDLER
+        //FIXME Implement this
         return true;
     }
 

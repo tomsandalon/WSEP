@@ -5,6 +5,8 @@ import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {logger} from "../Logger";
 import {Action} from "../ShopPersonnel/Permissions";
+import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler";
+import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
@@ -196,14 +198,14 @@ export class ShopImpl implements Shop {
      * @param location
      * @param name
      */
-    constructor(user_email: string, bank_info: string, description: string, location: string, name: string) {
+    constructor(user_email: string, bank_info: string, description: string, location: string, name: string, purchasePolicy?: PurchasePolicyHandler, discountPolicy?: DiscountPolicyHandler) {
         this._shop_id = generateId();
         this._bank_info = bank_info;
         this._description = description;
         this._location = location;
         this._name = name;
         this._management = new ShopManagementImpl(this.shop_id, user_email)
-        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info)
+        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info, purchasePolicy, discountPolicy)
         this._management.shop_inventory = this._inventory;
         this._is_active = true;
     }
