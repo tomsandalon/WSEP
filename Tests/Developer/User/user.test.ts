@@ -9,6 +9,7 @@ import type = Mocha.utils.type;
 import {ShopInventoryImpl} from "../../../Logic/Domain/Shop/ShopInventory";
 import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
+import {panicLogger} from "../../../Logic/Domain/Logger";
 
 describe('Authentication tests', () => {
     it('should return a hashed password ', () => {
@@ -194,4 +195,71 @@ describe('User tests', () => {
             expect(logged_user.cart[0].products[0].amount == 50).eq(true)
         }
     });
-});
+    describe('Purchase tests', () => {
+        it('Purchase basket', () => {
+            let reg = RegisterImpl.getInstance();
+            reg.register("liorpev@gmail.com","123456");
+            let log = LoginImpl.getInstance();
+            const user = (log.login("liorpev@gmail.com", "123456"));
+            if(typeof user == "string")
+                assert.fail()
+            else
+            {
+                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+                //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
+                // @ts-ignore
+                shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
+                const logged_user = log.retrieveUser(user);
+                if(typeof logged_user == "string")
+                    assert.fail()
+                expect(typeof (logged_user.addToBasket(shop, 0,15)) !== "string").eq(true);
+                const purchase =logged_user.purchaseBasket(1, "paying");
+                if(typeof purchase == "string"){
+                    assert.fail()
+                }
+                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
+                const history = logged_user.getOrderHistory();
+                if(typeof history == "string")
+                    assert.fail()
+                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+            }
+        });
+    });
+    describe('Purchase cart', () => {
+        it('Purchase cart', () => {
+            let reg = RegisterImpl.getInstance();
+            reg.register("liorpev@gmail.com","123456");
+            let log = LoginImpl.getInstance();
+            const user = (log.login("liorpev@gmail.com", "123456"));
+            if(typeof user == "string")
+                assert.fail()
+            else
+            {
+                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+                //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
+                // @ts-ignore
+                shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
+                let shop2 = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"),"hey","ney");
+                //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
+                // @ts-ignore
+                shop2.addItem("banana","banana", 100,["food"],15,null,null)
+                const logged_user = log.retrieveUser(user);
+                if(typeof logged_user == "string")
+                    assert.fail()
+                expect(typeof (logged_user.addToBasket(shop, 0,15)) !== "string").eq(true);
+                expect(typeof (logged_user.addToBasket(shop2, 1,15)) !== "string").eq(true);
+                const purchase =logged_user.purchaseBasket(1, "paying");
+                const purchase2 =logged_user.purchaseBasket(2, "paying");
+                if(typeof purchase == "string" || typeof  purchase2 == "string"){
+                    assert.fail()
+                }
+                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
+                const history = logged_user.getOrderHistory();
+                if(typeof history == "string")
+                    assert.fail()
+                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+                expect(history[1].includes("banana")).is.eq(true); // cart purchase
+            }
+        });
+    });
+    });

@@ -9,5 +9,13 @@ const config = new LoggerConfigurationBuilder()
     )
     .Build();
 
+const config_system_error = new LoggerConfigurationBuilder()
+    .SetDefaultLogLevel(LogLevel.Trace)
+    .AddWriteMessageHandlers([
+        // { Handler: new ConsoleMessageHandler() },
+        { Handler: new FileMessageHandler("./Logs/SystemLog.log") }]
+    )
+    .Build();
+
 export const logger = new LoggerBuilder(config);
-export const systemLogger = new LoggerBuilder(config);
+export const panicLogger = new LoggerBuilder(config_system_error);
