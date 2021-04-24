@@ -9,6 +9,7 @@ import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
+import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "../Users/UserPurchaseHistory";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -40,7 +41,7 @@ export interface ShopInventory {
     discount_policies: DiscountPolicyHandler
     discount_types: DiscountType[]
     purchase_types: PurchaseType[]
-    orders: Purchase[]
+    purchase_history: UserPurchaseHistory
     bank_info: string
 
     /**
@@ -140,10 +141,11 @@ export class ShopInventoryImpl implements ShopInventory {
     private readonly _discount_policies: DiscountPolicyHandler;
     private readonly _discount_types: DiscountType[];
     private readonly _purchase_types: PurchaseType[]
-    private _orders: Purchase[];
     private readonly _purchase_policies: PurchasePolicyHandler;
     private readonly _shop_id: number;
     private readonly _bank_info: string;
+    private _purchase_history: UserPurchaseHistory;
+
 
     constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string,
                 purchasePolicy: PurchasePolicyHandler = mockPurchasePolicy,
@@ -153,9 +155,9 @@ export class ShopInventoryImpl implements ShopInventory {
         this._discount_types = [];
         this._purchase_types = [];
         this._products = [];
-        this._orders = [];
         this._bank_info = bank_info;
-        this._shop_name = shop_name
+        this._shop_name = shop_name;
+        this._purchase_history = UserPurchaseHistoryImpl.getInstance();
         /*
         TODO policies
          */
@@ -166,7 +168,12 @@ export class ShopInventoryImpl implements ShopInventory {
          */
     }
 
-    private _shop_name: string;
+
+    private readonly _shop_name: string;
+
+    get purchase_history(): UserPurchaseHistory {
+        return this._purchase_history;
+    }
 
     get shop_name(): string {
         return this._shop_name;
@@ -198,10 +205,6 @@ export class ShopInventoryImpl implements ShopInventory {
 
     get discount_types(): DiscountType[] {
         return this._discount_types;
-    }
-
-    get orders(): Purchase[] {
-        return this._orders;
     }
 
     get purchase_policies(): PurchasePolicyHandler {
@@ -250,7 +253,12 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     getShopHistory(): string[] {
-        return this._orders.map(order => order.to_string());
+        const result = this._purchase_history.getShopPurchases(this.shop_id);
+        if (typeof result == "string") {
+            logger.Error(`${this.shop_id} doesn't exist in the shop history manager. Error`);
+            return [];
+        }
+        return result.map(p => p.toString());
     }
 
     purchaseItems(products: ReadonlyArray<ProductPurchase>): string | boolean {
@@ -345,6 +353,8 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     logOrder(order: Purchase): void {
-        this._orders = this.orders.concat(order)
+        //still maintained in order to support further logic expansion.
+        //for now, it shall stay unimplemented
+        return
     }
 }
