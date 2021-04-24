@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect, assert } from 'chai';
-import {PasswordHandler} from "../../../Logic/Domain/Users/PasswordHandler";
+import {Authentication} from "../../../Logic/Domain/Users/Authentication";
 import {RegisterImpl} from "../../../Logic/Domain/Users/Register";
 import {LoginImpl} from "../../../Logic/Domain/Users/Login";
 import {StringPair} from "../../../Logic/Domain/Users/StringPair";
@@ -10,9 +10,9 @@ import {ShopInventoryImpl} from "../../../Logic/Domain/Shop/ShopInventory";
 import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 
-describe('PasswordHandler tests', () => {
+describe('Authentication tests', () => {
     it('should return a hashed password ', () => {
-        let handler = PasswordHandler.getInstance();
+        let handler = Authentication.getInstance();
         expect(handler.hash("password")).to.not.equal("password")
         expect(handler.isHashed(handler.hash("password"))).eq(true)
         expect(handler.isHashed("password")).eq(false)
@@ -20,11 +20,11 @@ describe('PasswordHandler tests', () => {
 
     });
     it('given a hashed password should return true if its hashed or false if its not ', () => {
-        let handler = PasswordHandler.getInstance();
+        let handler = Authentication.getInstance();
         expect(handler.isHashed(handler.hash("password"))).eq(true)
     });
     it('given a password and hashed value verify if hashed value matches the password ', () => {
-        let handler = PasswordHandler.getInstance();
+        let handler = Authentication.getInstance();
         const hashed1 = handler.hash("123456");
         const hashed2 = handler.hash("123456");
         expect(handler.verify("123456",hashed1)).eq(true);
