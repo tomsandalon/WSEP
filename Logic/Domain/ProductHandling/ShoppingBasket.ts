@@ -9,6 +9,8 @@ import {
     ProductNotFound,
     StockLessThanBasket
 } from "./ErrorMessages";
+import {Purchase, PurchaseImpl} from "./Purchase";
+import {DiscountType} from "../PurchaseProperties/DiscountType";
 
 type Entry = {product: Product, amount: number}
 export type ShoppingEntry = {productId: number, amount: number}
@@ -31,7 +33,7 @@ export interface ShoppingBasket {
     /**
      * @Requirement 2.7
      * @param product_id
-     * @param amount to purchase
+     * @param new_amount to purchase
      * @return true iff 0 < amount <= product.amount and product_id exists in the basket
      * @return ProductNotFound iff product not found in store
      * @return AmountNonPositiveValue iff amount <= 0
@@ -40,11 +42,20 @@ export interface ShoppingBasket {
     /**
      * @Requirement 2.7
      * @param product_id
-     * @param amount to purchase
-     * @return true iff 0 < amount <= product.amount and product_id exists in the basket
+     * @return true product_id exists in the basket
      * @return ProductNotExistInBasket otherwise
      */
     removeItem(product_id: number): boolean | string
+
+    /**
+     * @Requirement 2.9
+     * @param payment_info
+     * @param coupons
+     * @return Error if payment method didnt succeed OR
+     *               if delivery TODO
+     * @return Purchase representing items and amount specified in basket
+     */
+    purchase(payment_info: string, coupons: DiscountType[]): string | Purchase
     toStringBasket():string[]
 }
 
@@ -126,5 +137,13 @@ export class ShoppingBasketImpl implements ShoppingBasket{
 
     }
 
-
+    purchase(payment_info: string, coupons: DiscountType[]): string | Purchase {
+        const order = PurchaseImpl.create(new Date(), this,[]);
+        if(typeof order == "string")
+            return order
+        const order_purchase = order.purchase_self(payment_info);
+        if(typeof order_purchase == "string")
+            return order_purchase
+        return order
+    }
 }

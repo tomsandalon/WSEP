@@ -31,7 +31,7 @@ export interface System{
     displayShoppingCart(user_id:number): string | string[][]
     editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):string | void
     purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):string | boolean
-    purchaseCart(user_id: number, payment_info:string):string | boolean
+    purchaseCart(user_id: number, payment_info:string): string | boolean
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info:string): number | string
     userOrderHistory(user_id: number):string | string[]
@@ -142,10 +142,10 @@ export class SystemImpl implements System {
             return user
         }
         else{
-            const purchase_cart = user.purchaseCart(payment_info);
-            if(typeof purchase_cart == "string")
-                return purchase_cart
-            return purchase_cart
+            const result = user.purchaseCart(payment_info);
+            if(typeof result === "boolean")
+                return result
+            return result.toString()
         }
     }
     addProduct(user_id: number, shop_id:  number, name: string, description: string, amount: number, categories: string[],
