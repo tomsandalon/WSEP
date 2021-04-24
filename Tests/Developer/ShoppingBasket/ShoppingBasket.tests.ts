@@ -17,6 +17,7 @@ const createProduct = () => {
 };
 
 describe('Buy product not by policy', () => {
+    ProductImpl.resetIDs();
     const getNewItem = (shop: ShopInventory): number => shop.products.reduce((acc, product) => Math.max(product.product_id, acc), -1);
     it('Buy product by purchase policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons",
@@ -160,7 +161,7 @@ describe('Buy product not by policy', () => {
     });
 });
 
-describe('Product Class Testsuit', () => {
+describe('Product is out of stock', () => {
     it('should return 2', () => {
         Parallel.pool(2,
             async () => {
