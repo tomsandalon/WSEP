@@ -1,6 +1,6 @@
 import {User, UserImpl} from "./User";
 import {RegisterImpl} from "./Register";
-import {PasswordHandler} from "./PasswordHandler";
+import {Authentication} from "./Authentication";
 import {logger} from "../Logger";
 
 export interface Login {
@@ -15,7 +15,7 @@ export class LoginImpl  implements  Login{
     private _logged_guests: number[]
     private _existing_user_guests: UserImpl[]
     private readonly _existing_users: UserImpl[]
-    private _password_handler:PasswordHandler
+    private _password_handler:Authentication
     private _register:RegisterImpl
     private static instance: LoginImpl;
 
@@ -29,7 +29,7 @@ export class LoginImpl  implements  Login{
         this._logged_guests = []
         this._existing_user_guests = []
         this._existing_users = []
-        this._password_handler = PasswordHandler.getInstance();
+        this._password_handler = Authentication.getInstance();
         this._register = RegisterImpl.getInstance(reset);
         this.createAdmin()
     }

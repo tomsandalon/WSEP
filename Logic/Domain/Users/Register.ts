@@ -1,4 +1,4 @@
-import {PasswordHandler} from "./PasswordHandler";
+import {Authentication} from "./Authentication";
 import {StringPair} from "./StringPair";
 import {logger} from "../Logger";
 
@@ -9,12 +9,12 @@ export interface Register {
 }
 
 export class RegisterImpl implements Register{
-    private _password_handler: PasswordHandler
+    private _password_handler: Authentication
     private readonly _registered_users: StringPair[]
     private static instance: RegisterImpl;
 
     private constructor() {
-        this._password_handler = PasswordHandler.getInstance();
+        this._password_handler = Authentication.getInstance();
         this._registered_users = []
     }
 

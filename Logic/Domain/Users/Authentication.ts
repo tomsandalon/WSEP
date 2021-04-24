@@ -3,8 +3,8 @@ import * as password_hash from "password-hash";
 /**
  * Service-Level Requirement number 1 - Privacy.
  */
-export class PasswordHandler{
-    private static instance: PasswordHandler;
+export class Authentication {
+    private static instance: Authentication;
 
     private constructor() {
     }
@@ -12,12 +12,12 @@ export class PasswordHandler{
     /**
      * Singelton design pattern
      */
-    public static getInstance(): PasswordHandler {
-        if(!PasswordHandler.instance)
+    public static getInstance(): Authentication {
+        if(!Authentication.instance)
         {
-            PasswordHandler.instance = new PasswordHandler();
+            Authentication.instance = new Authentication();
         }
-        return PasswordHandler.instance;
+        return Authentication.instance;
     }
 
     /**

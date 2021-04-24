@@ -10,3 +10,4 @@ const config = new LoggerConfigurationBuilder()
     .Build();
 
 export const logger = new LoggerBuilder(config);
+export const systemLogger = new LoggerBuilder(config);
