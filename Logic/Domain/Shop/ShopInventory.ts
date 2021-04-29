@@ -8,10 +8,10 @@ import {Purchase} from "../ProductHandling/Purchase";
 import {ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
-import {ProductPurchase} from "../ProductHandling/ProductPurchase";
+import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
+import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "../Users/UserPurchaseHistory";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
-//TODO check policies
 export enum Filter_Type {
     BelowPrice,
     AbovePrice,
@@ -37,10 +37,11 @@ export interface ShopInventory {
     /**
      * @Requirement correctness requirement 5.a 5.b
      */
-    purchase_policies: PurchasePolicyHandler | undefined
-    discount_policies: DiscountPolicyHandler | undefined
+    purchase_policies: PurchasePolicyHandler
+    discount_policies: DiscountPolicyHandler
     discount_types: DiscountType[]
-    orders: Purchase[]
+    purchase_types: PurchaseType[]
+    purchase_history: UserPurchaseHistory
     bank_info: string
 
     /**
@@ -126,22 +127,37 @@ export interface ShopInventory {
     logOrder(order: Purchase): void
 }
 
+const mockPurchasePolicy: PurchasePolicyHandler = {
+    getInstance(): PurchasePolicyHandler {return this},
+    isAllowed(object: any): boolean {return true},
+}
+
+const mockDiscountPolicy: DiscountPolicyHandler = {
+    getInstance(): DiscountPolicyHandler {return this},
+    isAllowed(object: any): boolean {return true}
+}
+
 export class ShopInventoryImpl implements ShopInventory {
-    private readonly _discount_policies: DiscountPolicyHandler | undefined;
+    private readonly _discount_policies: DiscountPolicyHandler;
     private readonly _discount_types: DiscountType[];
-    private _orders: Purchase[];
-    private readonly _purchase_policies: PurchasePolicyHandler | undefined;
+    private readonly _purchase_types: PurchaseType[]
+    private readonly _purchase_policies: PurchasePolicyHandler;
     private readonly _shop_id: number;
     private readonly _bank_info: string;
+    private _purchase_history: UserPurchaseHistory;
 
-    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string,  purchasePolicy?: PurchasePolicyHandler, discountPolicy?: DiscountPolicyHandler) {
+
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string,
+                purchasePolicy: PurchasePolicyHandler = mockPurchasePolicy,
+                discountPolicy: DiscountPolicyHandler = mockDiscountPolicy) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
         this._discount_types = [];
+        this._purchase_types = [];
         this._products = [];
-        this._orders = [];
         this._bank_info = bank_info;
-        this._shop_name = shop_name
+        this._shop_name = shop_name;
+        this._purchase_history = UserPurchaseHistoryImpl.getInstance();
         /*
         TODO policies
          */
@@ -152,7 +168,12 @@ export class ShopInventoryImpl implements ShopInventory {
          */
     }
 
-    private _shop_name: string;
+
+    private readonly _shop_name: string;
+
+    get purchase_history(): UserPurchaseHistory {
+        return this._purchase_history;
+    }
 
     get shop_name(): string {
         return this._shop_name;
@@ -174,19 +195,19 @@ export class ShopInventoryImpl implements ShopInventory {
         this._shop_management = value;
     }
 
-    get discount_policies(): DiscountPolicyHandler | undefined {
+    get discount_policies(): DiscountPolicyHandler {
         return this._discount_policies;
+    }
+
+    get purchase_types(): PurchaseType[] {
+        return this._purchase_types;
     }
 
     get discount_types(): DiscountType[] {
         return this._discount_types;
     }
 
-    get orders(): Purchase[] {
-        return this._orders;
-    }
-
-    get purchase_policies(): PurchasePolicyHandler | undefined {
+    get purchase_policies(): PurchasePolicyHandler {
         return this._purchase_policies;
     }
 
@@ -232,10 +253,23 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     getShopHistory(): string[] {
-        return this._orders.map(order => order.to_string());
+        const result = this._purchase_history.getShopPurchases(this.shop_id);
+        if (typeof result == "string") {
+            logger.Error(`${this.shop_id} doesn't exist in the shop history manager. Error`);
+            return [];
+        }
+        return result.map(p => p.toString());
     }
 
     purchaseItems(products: ReadonlyArray<ProductPurchase>): string | boolean {
+        if (!this._discount_policies.isAllowed(undefined)) { //Not implemented
+            logger.Error(`Failed to purchase as the discount policy doesn't permit it`)
+            return `Mismatching discount policies`
+        }
+        if (!this._purchase_policies.isAllowed(undefined)) { //Not implemented
+            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
+            return `Mismatching purchase policies`
+        }
         products.forEach(p => {
             const product = this.getItem(p.product_id)
             if (typeof product == "string") {
@@ -319,6 +353,8 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     logOrder(order: Purchase): void {
-        this._orders = this.orders.concat(order)
+        //still maintained in order to support further logic expansion.
+        //for now, it shall stay unimplemented
+        return
     }
 }
