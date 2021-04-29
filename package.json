@@ -7,7 +7,13 @@
   "scripts": {
     "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*",
     "dev-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/*/*",
-    "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/*/*/*"
+    "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/*/*/*",
+    "server": "ts-node Logic/Communication/Server.ts",
+    "client": "ts-node Logic/Communication/Client.ts",
+    "start-web": "npm --prefix Logic/Presentation run start",
+    "build-web": "npm --prefix Logic/Presentation run start",
+    "test-web": "npm --prefix Logic/Presentation run start",
+    "eject-web": "npm --prefix Logic/Presentation run start"
   },
   "keywords": [],
   "author": "",
