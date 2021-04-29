@@ -31,7 +31,8 @@ const wss = new WebSocket.Server({ port: 8080 });
 wss.on('connection', function connection(ws: WebSocket) {
     let id = system.openSession();
     ws.on('message', function incoming(message: Data) {
-        sleep(1000).then(_ => ws.send(`Hey you are client ${id}`))
+        ws.send(`Hey you are client ${id}`)
+        // sleep(1000).then(_ => ws.send(`Hey you are client ${id}`))
         console.log('received: %s', message);
     });
 });
