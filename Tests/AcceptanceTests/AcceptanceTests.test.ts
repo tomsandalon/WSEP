@@ -4,6 +4,8 @@ import {System} from "./System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {SearchTypes} from "../../Logic/Domain/System";
 import {Filter_Type} from "../../Logic/Domain/Shop/ShopInventory";
+import {PaymentHandlerImpl} from "../../Logic/Service/Adapters/PaymentHandler";
+import {DeliveryHandlerImpl} from "../../Logic/Service/Adapters/DeliveryHandler";
 
 describe('Guest:', () => {
     it('2.1: Enter - enter to the system as a guest', () => {
@@ -453,8 +455,45 @@ describe('Admin:', () => {
 });
 
 describe('Services:', () => {
-    it('Payment Handler', () => {
-        //TODO milestone 2
+    it('Payment Handler reject', () => {
+        PaymentHandlerImpl.REJECT_CHARGE = true;
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
+        let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
+        expect(typeof purchase == "string").to.be.true
+        const items = system.getItemsFromShop(shopID)
+        expect(typeof items !== "string").to.be.true
+        let result = false;
+        (items as string[]).forEach((item: string) => {
+            //TODO netanel => check prefix Product id: *** -> *** == pid and amount not changed
+        })
+    });
+    it('Delivery Handler reject', () => {
+        DeliveryHandlerImpl.REJECT_DELIVERY = true;
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
+        let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
+        expect(typeof purchase == "string").to.be.true
+        const items = system.getItemsFromShop(shopID)
+        expect(typeof items !== "string").to.be.true
+        let result = false;
+        (items as string[]).forEach((item: string) => {
+            //TODO netanel => check prefix Product id: *** -> *** == pid and amount not changed
+        })
     });
 
     it('Spell Checker', () => {

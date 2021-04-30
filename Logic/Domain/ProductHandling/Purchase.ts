@@ -6,7 +6,7 @@ import {Product, ProductImpl} from "./Product";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {Shop} from "../Shop/Shop";
-import {DiscountNotExists} from "./ErrorMessages";
+import {DeliveryDenied, DiscountNotExists, PaymentDenied} from "./ErrorMessages";
 
 export interface Purchase {
     order_id: number,
@@ -81,15 +81,15 @@ export class PurchaseImpl implements Purchase{
         this.shop.logOrder(this)
         const total_price =  this.calculatePrice();
         const result_payment = PaymentHandlerImpl.getInstance().charge(payment_info, total_price, this._shop.bank_info);
-        if (typeof result_payment == "string"){
+        if (typeof result_payment == "string" || !result_payment){
             this._shop.returnItems(this._products)
-            return result_payment
+            return PaymentDenied
         }
         const result_delivery = DeliveryHandlerImpl.getInstance().deliver(payment_info, this);
-        if (typeof result_delivery == "string"){
+        if (typeof result_delivery == "string" || !result_delivery){
             PaymentHandlerImpl.getInstance().cancelCharge(payment_info, total_price, this._shop.bank_info);
             this._shop.returnItems(this._products)
-            return result_delivery
+            return DeliveryDenied
         }
         return true;
     }
