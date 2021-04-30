@@ -11,7 +11,7 @@ import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 import {panicLogger} from "../../../Logic/Domain/Logger";
 
-describe('Authentication tests', () => {
+describe('Authentication Tests', () => {
     it('should return a hashed password ', () => {
         let handler = Authentication.getInstance();
         expect(handler.hash("password")).to.not.equal("password")
@@ -34,7 +34,7 @@ describe('Authentication tests', () => {
         expect(handler.verify("12345",hashed2)).eq(false);
     });
 });
-describe('RegisterImpl tests', () => {
+describe('RegisterImpl Tests', () => {
     it('Registering with invalid email format ', () => {
         let value = RegisterImpl.getInstance();
         expect(value.register("liorpev", "123456")).eq(false)
@@ -53,7 +53,7 @@ describe('RegisterImpl tests', () => {
 
 
 
-describe('LoginImpl tests', () => {
+describe('LoginImpl Tests', () => {
     it('Registering and trying to login ', () => {
         let reg = RegisterImpl.getInstance();
         reg.register("liorpev@gmail.com","123456");
@@ -146,7 +146,7 @@ describe('Guest testing', () => {
     });
 });
 
-describe('User tests', () => {
+describe('User Tests', () => {
     it('Registering login and add item to basket ', () => {
         let reg = RegisterImpl.getInstance();
         reg.register("liorpev@gmail.com","123456");

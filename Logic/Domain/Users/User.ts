@@ -5,6 +5,7 @@ import {logger} from "../Logger";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/PaymentHandler";
 import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
+import {BasketDoesntExists} from "../ProductHandling/ErrorMessages";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
@@ -140,8 +141,8 @@ export class UserImpl implements User {
     purchaseBasket(shop_id: number, payment_method: string): string | boolean {
         let shopping_basket = this._cart.filter(element =>element.shop.shop_id == shop_id);
         if(shopping_basket.length == 0){ //trying to purchase a basket that doesnt exist
-            logger.Error("Trying to purchase a shop basket that doesnt exist");
-            return false;
+            logger.Error(BasketDoesntExists);
+            return BasketDoesntExists;
         }
         const order = shopping_basket[0].purchase(payment_method, []);
         if(typeof order === "string")

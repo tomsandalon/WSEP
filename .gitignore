@@ -1,1 +1,23 @@
-node_modules/
+# dependencies
+node_modules/*
+Logic/Presentation/node_modules/*
+Logic/Presentation/node_modules
+Logic/Presentation/.pnp
+Logic/Presentation/.pnp.js
+
+# testing
+Logic/Presentation/coverage
+
+# production
+Logic/Presentation/build
+
+# misc
+Logic/Presentation/.DS_Store
+Logic/Presentation/.env.local
+Logic/Presentation/.env.development.local
+Logic/Presentation/.env.test.local
+Logic/Presentation/.env.production.local
+
+Logic/Presentation/npm-debug.log*
+Logic/Presentation/yarn-debug.log*
+Logic/Presentation/yarn-error.log*
