@@ -225,12 +225,20 @@ export class ShopInventoryImpl implements ShopInventory {
         if (typeof item === "string") {
             return item
         }
-        item.addSupplies(amount)
+        let result = item.addSupplies(amount)
+        if (typeof result == "string") {
+            logger.Error(result)
+            return result
+        }
         categories.forEach(c => {
             const cat = CategoryImpl.create(c)
-            if (typeof cat == "string") return cat
+            if (typeof cat == "string") return result
             item.addCategory(cat)
         })
+        if (typeof result == "string") {
+            logger.Error(result)
+            return result
+        }
         item.addDiscountType(discount_type)
         this._products = this._products.concat([item]);
         return true;
