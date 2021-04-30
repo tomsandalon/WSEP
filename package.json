@@ -5,9 +5,15 @@
   "main": "index.js",
   "module": "CommonJS",
   "scripts": {
-    "test": "ts-mocha -p tsconfig.testing.json Tests/*/*/*",
+    "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*",
+    "dev-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/*/*",
     "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/*/*/*",
-    "acceptance_tests": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*"
+    "server": "ts-node Logic/Communication/Server.ts",
+    "client": "ts-node Logic/Communication/Client.ts",
+    "start-web": "npm --prefix Logic/Presentation run start",
+    "build-web": "npm --prefix Logic/Presentation run start",
+    "test-web": "npm --prefix Logic/Presentation run start",
+    "eject-web": "npm --prefix Logic/Presentation run start"
   },
   "keywords": [],
   "author": "",
@@ -19,12 +25,15 @@
     "@types/chai": "^4.2.16",
     "@types/mocha": "^8.2.2",
     "@types/password-hash": "^1.2.20",
+    "@types/ws": "^7.4.1",
+    "async-parallel": "^1.2.3",
     "chai": "^4.3.4",
     "cross-env": "^7.0.3",
     "mocha": "^8.3.2",
     "password-hash": "^1.2.2",
     "ts-mocha": "^8.0.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "ws": "^7.4.5"
   }
 }

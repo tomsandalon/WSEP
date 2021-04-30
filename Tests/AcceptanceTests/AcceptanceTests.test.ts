@@ -1,9 +1,11 @@
 import {assert, expect} from "chai";
 import {SystemDriver} from "./SystemDriver";
 import {System} from "./System";
-import {Action} from "../../Logic/ShopPersonnel/Permissions";
-import {SearchTypes} from "../../Logic/System";
-import {Filter_Type} from "../../Logic/Shop/ShopInventory";
+import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
+import {SearchTypes} from "../../Logic/Domain/System";
+import {Filter_Type} from "../../Logic/Domain/Shop/ShopInventory";
+import {PaymentHandlerImpl} from "../../Logic/Service/Adapters/PaymentHandler";
+import {DeliveryHandlerImpl} from "../../Logic/Service/Adapters/DeliveryHandler";
 
 
 describe('Acceptance Tests:', () => {
@@ -67,7 +69,7 @@ describe('Acceptance Tests:', () => {
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
 
         it('Happy', () => {
-            expect(system.getShopInfo(0)[0].includes("TV")).to.be.true //good
+            expect(system.getShopInfo(0)[0].includes("TV")).to.be.true
         });
         it('Sad: get info of not existing shop', () => {
             let sad = system.getShopInfo(1000)
@@ -81,9 +83,9 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID1 = system.addShop(originOwner as number, "TestShop 1", "shop for tests", "Beer Sheva", "En li kesef") as number
-        let shopID2 = system.addShop(originOwner as number, "TestShop 2", "shop for tests", "Beer Sheva", "En li kesef") as number
-        let shopID3 = system.addShop(originOwner as number, "TestShop 3", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID1 = system.addShop(originOwner as number, "TestShop 1", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        let shopID2 = system.addShop(originOwner as number, "TestShop 2", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        let shopID3 = system.addShop(originOwner as number, "TestShop 3", "shop for Tests", "Beer Sheva", "En li kesef") as number
 
         system.addProduct(originOwner, shopID1,"TV1", "Best desc", 1110, ["not monitors"],111, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.addProduct(originOwner, shopID2,"TV2", "Best desc", 2202, ["monitors"],222, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
@@ -111,7 +113,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -133,7 +135,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 10000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -158,7 +160,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.performRegister("newUser@test.com", "TESTER");
@@ -324,7 +326,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -349,7 +351,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
         let userID = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         let items = system.getItemsFromShop(shopID) as string[]
         // expect(items.some(p=>p.includes("TV"))).to.be.false
 
@@ -374,7 +376,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
         let userID = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         let res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         let items = system.getItemsFromShop(shopID) as string[]
         // expect(items.some(p=>p.includes("TV"))).to.be.true
@@ -611,7 +613,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -638,7 +640,7 @@ describe('Acceptance Tests:', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number

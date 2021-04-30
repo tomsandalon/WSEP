@@ -1,8 +1,8 @@
-import {Filter, Item_Action} from "../../Logic/Shop/ShopInventory";
-import {DiscountType} from "../../Logic/PurchaseProperties/DiscountType";
-import {PurchaseType} from "../../Logic/PurchaseProperties/PurchaseType";
-import {Action} from "../../Logic/ShopPersonnel/Permissions";
-import {SearchTypes} from "../../Logic/System";
+import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
+import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
+import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
+import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
+import {SearchTypes} from "../../Logic/Domain/System";
 
 export interface System{
     openSession(): number
