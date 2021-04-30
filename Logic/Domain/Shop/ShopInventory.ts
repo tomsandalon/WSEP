@@ -10,6 +10,7 @@ import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "../Users/UserPurchaseHistory";
+import type = Mocha.utils.type;
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -270,28 +271,30 @@ export class ShopInventoryImpl implements ShopInventory {
             logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
             return `Mismatching purchase policies`
         }
+        let result: boolean | string = true
         products.forEach(p => {
             const product = this.getItem(p.product_id)
             if (typeof product == "string") {
                 logger.Error(`Failed to purchase as ${p.product_id} was not found`)
-                return `Product ${p.product_id} was not found`
+                result = `Product ${p.product_id} was not found`
             }
-            if (product.amount < 1) {
+            else if (product.amount < 1) {
                 logger.Error(`Failed to purchase as ${p.product_id} has an amount lower than 1`)
-                return `Product ${p.product_id} has an amount lower than 1`
+                result = `Product ${p.product_id} has an amount lower than 1`
             }
-            if (product.amount < p.amount) {
+            else if (product.amount < p.amount) {
                 logger.Error(`Failed to purchase as ${p.product_id} has ${product.amount} units but requires ${p.amount}`)
-                return `Product ${p.product_id} doesn't have enough in stock for this purchase`
+                result = `Product ${p.product_id} doesn't have enough in stock for this purchase`
             }
         })
+        if (typeof result == "string") return result
         this._products = this._products.map(p => {
             const result = products.find(product_purchase => product_purchase.product_id == p.product_id)
             if (!result) return p
             p.makePurchase(result.amount)
             return p
         })
-        return true
+        return result
     }
 
     removeItem(item_id: number): boolean {
