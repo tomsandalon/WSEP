@@ -127,7 +127,7 @@ describe('Guest:', () => {
         let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
         expect(typeof purchase == "boolean").to.be.true // good
         let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
-        expect(sad_purchase).to.be.false// sad
+        expect(typeof sad_purchase == "string").to.be.true// sad
         let bad_purchase = system.purchaseShoppingBasket(-150, 152, "hello");
         expect(typeof bad_purchase == "string").to.be.true // bad
     });
