@@ -138,13 +138,14 @@ describe('Test Shop', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         let result = shop.appointNewManager("wrong@mail.com", "new@bgu.ac.il")
         expect(typeof result == "string").to.be.true
+        shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner@bgu.ac.il")
         expect(shop.management.managers.some(o => o.user_email == "new@bgu.ac.il")).to.be.false
-        result = shop.appointNewManager("tomsand@post.bgu.ac.il", "new@bgu.ac.il")
+        result = shop.appointNewManager("owner@bgu.ac.il", "new@bgu.ac.il")
         expect(result).to.be.equals(true)
         expect(shop.management.managers.filter(o => o.user_email == "new@bgu.ac.il").length == 1).to.be.true
         result = shop.appointNewManager("tomsand@post.bgu.ac.il", "new@bgu.ac.il")
         expect(typeof result == "string").to.be.true
-        expect(shop.management.managers.filter(o => o.user_email == "new@bgu.ac.il").length == 1).to.be.true
+        expect(shop.management.managers.filter(o => o.user_email == "new@bgu.ac.il").length == 1).to.be.true;
     })
 
     it('Test edit manager permissions - requirement 4.6', () => {
