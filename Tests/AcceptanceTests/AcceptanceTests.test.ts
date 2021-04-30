@@ -160,6 +160,7 @@ describe('Acceptance Tests:', () => {
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
@@ -171,7 +172,14 @@ describe('Acceptance Tests:', () => {
         });
         it('Sad: buy basket from non-existing shop', () => {
             let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
-            expect(sad_purchase).to.be.false  });
+            expect(sad_purchase).to.be.false
+        });
+        it('Sad: try to buy when inventory is empty', () => {
+            // add the 8kTV product with empty inventory to basket
+            let fail = system.addItemToBasket(user, 1, shopID, 1)
+            //FIXME: why i dont get a fail?
+            expect(typeof fail == "string").to.be.true;
+        });
         it('Bad: buy a basket with negative user id', () => {
             let bad_purchase = system.purchaseShoppingBasket(-150, 152, "hello");
             expect(typeof bad_purchase == "string").to.be.true // bad
@@ -654,25 +662,53 @@ describe('Acceptance Tests:', () => {
         });
     });
     describe('Services:Payment Handler', () => {
+        const system: System = SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        let user = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(user, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        let add_to_basket = system.addItemToBasket(user, 0, shopID, 200)
+        expect(typeof add_to_basket == "string").to.be.false
+
         it('Happy', () => {
             //TODO milestone 2
+            let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK was charged successfully")
+            expect(purchase).to.be.true
         });
-        it('Sad', () => {
-            //TODO
+        it('Sad: user dont have enough money', () => {
+            system.addItemToBasket(user, 0, shopID, 200)
+            let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK FAIL not enough money")
+            expect(purchase).to.be.false
+            let notIncluded = system.shopOrderHistory(user,shopID)
+            expect(notIncluded.includes('TV')).to.be.false;
         });
-        it('Bad', () => {
-            //TODO
+        it('Bad: service crash', () => {
+            let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK CRASH server is down")
+            expect(typeof purchase == 'string').to.be.true;
         });
     });
     describe('Services:Spell Checker', () => {
+        const system: System = SystemDriver.getSystem(true);
+
         it('Happy', () => {
             //TODO milestone 2
+            let res = system.spellCheck('FAIEL');
+            if (typeof res !== 'string')
+                expect(res[0]).eq('FAIL')
+            else
+                assert.fail();
         });
-        it('Sad', () => {
-            //TODO
+        it('Sad: input include a word not in english', () => {
+            let res = system.spellCheck('FAEEEL');
+            if (typeof res !== 'string')
+                expect(res[0]).eq('404')
+            else
+                assert.fail();
         });
-        it('Bad', () => {
-            //TODO
+        it('Bad: service crash', () => {
+            let res = system.spellCheck('CRASH')
+            expect(typeof res == 'string').to.be.true
         });
     });
+    // describe('Services: delivery');
 });

@@ -39,6 +39,8 @@ export interface System{
     adminDisplayUserHistory(admin:number, target_id: number): string | string[]
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
     getShopInfo(shop_id: number) : string | string[]
+
+    spellCheck(input : string) : string | string[]
 }
 
 export const TestNotAssociatedWithImplementation = "Test not associated with implementation";
