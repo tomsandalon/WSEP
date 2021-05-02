@@ -132,4 +132,7 @@ export class AdapterSystem implements Tests.System{
         return this.system.removeManager(user_id, shop_id, target)
     }
 
+    spellCheck(input : string) :string | string[]{
+        return ''
+    }
 }

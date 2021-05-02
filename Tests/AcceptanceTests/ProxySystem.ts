@@ -178,6 +178,16 @@ export class ProxySystem implements System{
         if(this.system == undefined){
             return TestNotAssociatedWithImplementation
         }
+        //for payment service mock
+        if(payment_info.includes('MOCK')) {
+            if (payment_info.includes('CRASH'))
+                return "Payment service has been crashed";
+            if (payment_info.includes('FAIL'))
+                return false;
+            return true;
+        }
+        //end mock
+
         return this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 
@@ -221,5 +231,17 @@ export class ProxySystem implements System{
             return TestNotAssociatedWithImplementation
         }
         return this.system.removeManager(user_id, shop_id, target);
+    }
+
+    //mock
+    spellCheck(input : string ): string | string[]{
+        if (input.includes('CRASH'))
+            return "spell checker service has been crashed";
+        else if (input.includes('FAEEEL'))
+            return ['404'];
+        else if (input.includes('FAIEL')){
+            return ['FAIL'];
+        }
+        return 'panic: spell checker';
     }
 }
