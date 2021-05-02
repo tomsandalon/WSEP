@@ -1,10 +1,11 @@
-import {SearchTypes, System} from "../../Logic/Domain/System";
+import {SearchTypes} from "../../Logic/Domain/System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
 import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
 import {TestNotAssociatedWithImplementation} from "./System";
 import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
 import * as Tests from "./System"
+import {System} from "../../Logic/Domain/System";
 
 export class AdapterSystem implements Tests.System{
     private system: System;
