@@ -1,4 +1,4 @@
-import {PurchaseType} from "../PurchaseProperties/PurchaseType";
+// import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {ShopManagement} from "./ShopManagement";
 import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
@@ -30,6 +30,10 @@ export enum Item_Action {
     //add policies
 }
 
+export enum Purchase_Type {
+    Immediate,
+}
+
 export interface ShopInventory {
     shop_id: number
     shop_name: string
@@ -41,7 +45,7 @@ export interface ShopInventory {
     purchase_policies: PurchasePolicyHandler
     discount_policies: DiscountPolicyHandler
     discount_types: DiscountType[]
-    purchase_types: PurchaseType[]
+    purchase_types: Purchase_Type[]
     purchase_history: UserPurchaseHistory
     bank_info: string
 
@@ -83,7 +87,7 @@ export interface ShopInventory {
      * @param purchase_type purchase purchase type available for the product
      * @return true iff the add was successful
      */
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string
 
     /**
      * @Requirement 4.1
@@ -141,7 +145,7 @@ const mockDiscountPolicy: DiscountPolicyHandler = {
 export class ShopInventoryImpl implements ShopInventory {
     private readonly _discount_policies: DiscountPolicyHandler;
     private readonly _discount_types: DiscountType[];
-    private readonly _purchase_types: PurchaseType[]
+    private readonly _purchase_types: Purchase_Type[]
     private readonly _purchase_policies: PurchasePolicyHandler;
     private readonly _shop_id: number;
     private readonly _bank_info: string;
@@ -154,7 +158,7 @@ export class ShopInventoryImpl implements ShopInventory {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
         this._discount_types = [];
-        this._purchase_types = [];
+        this._purchase_types = [Purchase_Type.Immediate];
         this._products = [];
         this._bank_info = bank_info;
         this._shop_name = shop_name;
@@ -200,7 +204,7 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._discount_policies;
     }
 
-    get purchase_types(): PurchaseType[] {
+    get purchase_types(): Purchase_Type[] {
         return this._purchase_types;
     }
 
@@ -220,7 +224,7 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._bank_info
     }
 
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
         const item: Product | string = ProductImpl.create(base_price, description, name, purchase_type);
         if (typeof item === "string") {
             return item
@@ -241,6 +245,7 @@ export class ShopInventoryImpl implements ShopInventory {
         }
         item.addDiscountType(discount_type)
         this._products = this._products.concat([item]);
+        item.purchase_type = purchase_type
         return true;
     }
 

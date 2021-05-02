@@ -1,6 +1,6 @@
 import {Category} from "./Category";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
-import {PurchaseType} from "../PurchaseProperties/PurchaseType";
+// import {Purchase_Type} from "../PurchaseProperties/Purchase_Type";
 import {
     AmountIsLargerThanStock,
     AmountNonPositiveValue,
@@ -10,6 +10,7 @@ import {
     DiscountNotExists,
     ProductNameEmpty
 } from "./ErrorMessages";
+import {Purchase_Type} from "../Shop/ShopInventory";
 
 export interface Product {
     readonly product_id: number
@@ -19,13 +20,13 @@ export interface Product {
     category: Category[]
     base_price: number // >= 0
     discount_types: DiscountType[]
-    purchase_type: PurchaseType
+    purchase_type: Purchase_Type
 
     /**
      * @Requirement - Quality assurance No. 5a
      * @param purchaseType
      */
-    changePurchaseType(purchaseType: PurchaseType): string | boolean
+    changePurchaseType(purchaseType: Purchase_Type): string | boolean
 
     /**
      * @Requirement 2.7
@@ -116,6 +117,9 @@ export interface Product {
 }
 
 export class ProductImpl implements Product{
+    set purchase_type(value: Purchase_Type) {
+        this._purchase_type = value;
+    }
     private static _product_id_specifier: number = 0;
     private readonly _product_id: number;
     private _amount: number;
@@ -124,8 +128,8 @@ export class ProductImpl implements Product{
     private _description: string;
     private _discount_types: DiscountType[];
     private _name: string;
-    private _purchase_type: PurchaseType;
-    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type: PurchaseType) {
+    private _purchase_type: Purchase_Type;
+    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type: Purchase_Type) {
         this._base_price = base_price;
         this._description = description;
         this._name = name;
@@ -139,7 +143,7 @@ export class ProductImpl implements Product{
     static resetIDs = () => ProductImpl._product_id_specifier = 0
 
 
-    public static create(base_price: number, description: string, name: string, purchase_type: PurchaseType): Product | string {
+    public static create(base_price: number, description: string, name: string, purchase_type: Purchase_Type): Product | string {
         const result = ProductImpl.isValid(base_price, description, name);
         if(typeof result === "string"){
             return result;
@@ -250,7 +254,7 @@ export class ProductImpl implements Product{
     get purchase_type(){
         return this._purchase_type;
     }
-    public changePurchaseType(purchaseType: PurchaseType): string | boolean{
+    public changePurchaseType(purchaseType: Purchase_Type): string | boolean{
         //TODO purchasetype.change
         this._purchase_type = purchaseType;
         return true;

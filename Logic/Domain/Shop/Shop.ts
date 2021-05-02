@@ -1,8 +1,8 @@
-import {Filter, Item_Action, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
+import {Filter, Item_Action, Purchase_Type, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
-import {PurchaseType} from "../PurchaseProperties/PurchaseType";
+// import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {logger} from "../Logger";
 import {Action} from "../ShopPersonnel/Permissions";
 import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler";
@@ -66,7 +66,7 @@ export interface Shop {
      */
     addItem(user_email: string, name: string, description: string, amount: number,
             categories: string[], base_price: number,
-            discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
+            discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string
 
     /**
      * @Requirement 4.1
@@ -267,7 +267,7 @@ export class ShopImpl implements Shop {
     }
 
     addItem(user_email: string, name: string, description: string, amount: number, categories: string[], base_price: number,
-            discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+            discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
         const failure_message: string = `${user_email} failed to add product ${name} to shop ${this._shop_id}`
         const success_message: string = `${user_email} successfully added product ${name} to shop ${this._shop_id}`
 

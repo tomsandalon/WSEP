@@ -1,9 +1,9 @@
 import {System, TestNotAssociatedWithImplementation} from "./System";
 import {AdapterSystem} from "./AdapterSystem";
 import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
-import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
+// import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
-import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
+import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
 import {SearchTypes} from "../../Logic/Domain/System";
 
 export class ProxySystem implements System{
@@ -34,11 +34,11 @@ export class ProxySystem implements System{
         return this.system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: any): boolean | string {
         if(this.system == undefined){
             return TestNotAssociatedWithImplementation
         }
-        return this.system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, discount_type, purchase_type)
+        return this.system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, discount_type, Purchase_Type.Immediate)
     }
 
     addShop(user_id: number, name: string, description: string, location: string, bank_info: string): number | string {

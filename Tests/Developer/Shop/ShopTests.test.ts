@@ -3,8 +3,8 @@ import {assert, expect} from 'chai';
 import {Shop, ShopImpl} from "../../../Logic/Domain/Shop/Shop";
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 import {DiscountType} from "../../../Logic/Domain/PurchaseProperties/DiscountType";
-import {PurchaseType} from "../../../Logic/Domain/PurchaseProperties/PurchaseType";
-import {Filter_Type} from "../../../Logic/Domain/Shop/ShopInventory";
+// import {PurchaseType} from "../../../Logic/Domain/PurchaseProperties/PurchaseType";
+import {Filter_Type, Purchase_Type} from "../../../Logic/Domain/Shop/ShopInventory";
 import {Action} from "../../../Logic/Domain/ShopPersonnel/Permissions";
 
 class SimpleDiscountType implements DiscountType {
@@ -25,13 +25,8 @@ class SimpleDiscountType implements DiscountType {
     }
 }
 
-class SimplePurchaseType implements PurchaseType {
-    constructor() {
-    }
-}
-
 const createProduct = () => {
-    const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor", {});
+    const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor", Purchase_Type.Immediate);
     if(typeof temp === "string"){
         assert.fail("Failed to created product")
     }
@@ -61,13 +56,13 @@ describe('Test Shop', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(shop.getAllItems().length).to.be.eq(0)
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(shop.getAllItems().length).to.be.eq(1)
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(shop.getAllItems().length).to.be.eq(2)
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(shop.getAllItems().length).to.be.eq(3)
     })
 
@@ -75,7 +70,7 @@ describe('Test Shop', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(shop.getAllItems().length).to.be.eq(0)
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(shop.getAllItems().length).to.be.eq(1)
         const productId = shop.inventory.products.map(p => p.product_id).reduce((acc, cur) => Math.max(acc, cur), -1)
         expect(typeof shop.removeItem("tomsand@post.bgu.ac.il", productId) == "boolean").to.be.true
@@ -85,11 +80,11 @@ describe('Test Shop', () => {
     it('Test search - requirement 2.6', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 centimeter", "Best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["dinosaurs"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["dinosaurs"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Not the best desc",
-            1000, ["monitors"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         let result = shop.search("centimeter", undefined, undefined)
         expect(result.length).to.be.eq(1)
         expect(result[0].name).to.be.eq("Best 29 centimeter")
@@ -109,11 +104,11 @@ describe('Test Shop', () => {
     it('Test filter - requirement 2.6', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 centimeter", "Best desc",
-            1000, ["monitors"],1500, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],1500, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
-            1000, ["dinosaurs"],1000, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["dinosaurs"],1000, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Not the best desc",
-            1000, ["monitors"],500, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],500, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         let products = shop.getAllItems()
         let result = shop.filter(products, [{filter_type: Filter_Type.AbovePrice, filter_value: "999"}])
         expect(result.length).to.be.eq(2)
@@ -160,7 +155,7 @@ describe('Test Shop', () => {
         result = shop.addPermissions("owner@bgu.ac.il", "anothermanager@bgu.ac.il", [Action.RemoveItem])
         expect(typeof result == "string").to.be.false
         expect(typeof shop.addItem("manager@bgu.ac.il", "Best 29 inch", "Not the best desc",
-            1000, ["monitors"],500, new SimpleDiscountType(), new SimplePurchaseType()) === 'boolean').to.be.true
+            1000, ["monitors"],500, new SimpleDiscountType(), Purchase_Type.Immediate) === 'boolean').to.be.true
         const productId = shop.inventory.products.map(p => p.product_id).reduce((acc, cur) => Math.max(acc, cur), -1)
         expect(typeof shop.removeItem("anothermanager@bgu.ac.il", productId) == "boolean").to.be.true
         expect(shop.getAllItems().length).to.be.eq(0)
