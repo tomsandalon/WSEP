@@ -4,7 +4,7 @@ import {Action} from "../Domain/ShopPersonnel/Permissions";
 import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 import {DiscountType} from "../Domain/PurchaseProperties/DiscountType";
 
-class Service implements System {
+export class Service implements System {
     private _system: System
 
     constructor(reset?: boolean) {
