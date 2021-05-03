@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import './Product.css';
+import FiltersItems from './FiltersItems';
 import ItemOfShop from './ItemOfShop';
+import 'bootstrap/dist/css/bootstrap.min.css';
 class ShopItems extends Component {
     constructor(props) {
         super(props);
@@ -21,37 +22,22 @@ class ShopItems extends Component {
     }
     render() {
         return (
-    
-    <div className="container mb-4">
-        <section className="jumbotron text-center">
-        <div className="container">
-            <h1 className="jumbotron-heading" margin="center">Shop items</h1>
+            
+            <div class="container">
+                    
+                <div class="row">
+                    <div class="col-4">
+                        <FiltersItems/>
+                    </div> 
+                    <div class="col-8">
+                        <div class="row">
+                    {this.state.items.map((item,index) => (
+                        <ItemOfShop name={item.name} available={item.available} amount={item.amount} price={item.price}/>
+                    ))}
+                    </div>   
+                    </div>
+                </div> 
         </div>
-    </section>
-        <div className="row">
-            <div className="col-12">
-                <div className="table-responsive">
-                    <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col"> </th>
-                                <th scope="col">Product</th>
-                                <th scope="col">Available</th>
-                                <th scope="col" className="text-center">Quantity</th>
-                                <th scope="col" className="text-right">Price</th>
-                                <th> </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.items.map((item,index) =>
-                            <ItemOfShop idKey={index} name={item.name} available={item.available} amount={item.amount} price={item.cost} ></ItemOfShop>
-                            )} 
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
         );
     }
 }

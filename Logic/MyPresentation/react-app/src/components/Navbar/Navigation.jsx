@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {MenuItems} from './MenuItems';
+import '../../index.css';
 import './Navbar.css'
 
 class Navigation extends Component {
@@ -13,7 +14,7 @@ handleClick = () =>{
     render(){
         return (
             <nav className="navbarItems">
-                <h1 className="navbar-logo">Navigation<i className="fab fa-react"></i></h1>
+                <h3 className="navbar-logo">Mikasa - Ecommerce<i className="fab fa-react"></i></h3>
                 <div className="menu-icon" onClick={this.handleClick}>
                     <i className={this.state.clicked ? 'fas fa-times' : 'fas fa-bars'}></i>
                 </div>
@@ -26,6 +27,7 @@ handleClick = () =>{
                         </li>
                         );
                     })}
+                    <input type="button" value="Logout" onClick={() => this.props.handleLogout}/>
                 </ul>
             </nav>
         );

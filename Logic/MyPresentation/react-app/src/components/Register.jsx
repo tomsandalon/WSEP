@@ -10,6 +10,9 @@ handleSubmit = (event) =>{
     console.log(this.state);
     event.preventDefault();
 }
+handleGuest = () =>{
+    console.log("guest");
+}
 handleUserEmail = (event) =>{
     this.setState({email:event.target.value});
 }
@@ -26,7 +29,8 @@ handlePassword = (event) =>{
                 <form onSubmit={this.handleSubmit}>
                     <input type="email" id="login" className="fadeIn second" name="login" placeholder="example@example.com" onChange={this.handleUserEmail}/>
                     <input type="password" id="password" className="fadeIn third" name="login" placeholder="Password" onChange={this.handlePassword}/>
-                    <input type="submit" className="fadeIn fourth" value="Register"/>
+                    <input type="button" id="guest" className="fadeIn third" name="guest" value="Guest login" onClick={this.handleGuest}/> 
+                    <input type="submit" className="fadeIn fourth" value="Register" onSubmit={this.handleSubmit}/>
                 </form>
             </div>
         </div>

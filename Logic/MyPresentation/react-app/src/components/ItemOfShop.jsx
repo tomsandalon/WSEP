@@ -1,4 +1,5 @@
 import React, { Component} from 'react';
+import Image from './images/shirt.jpg';
 import './Product.css';
 class ItemOfShop extends Component {
     constructor(props) {
@@ -12,16 +13,20 @@ class ItemOfShop extends Component {
     }
     render() {
         return (
-            <React.Fragment>
-                <tr>
-                    <td>
-                        <img src="https://dummyimage.com/50x50/55595c/fff" /> </td>
-                                        <td>{this.state.name}</td>
-                                        <td>{this.state.available}</td>
-                                        <td>{this.state.amount}</td>
-                                        <td>{this.state.price}</td>
-                </tr>
-            </React.Fragment>
+            <div className="col-md-3">
+                    <figure className="itemside mb-4">
+                        <div className="right-aside"><img src={Image} className="img-sm"/></div>
+                        <figcaption className="info align-self-center">
+                            <h4 classNameName="center">{this.state.name}</h4>
+                            <h4>{this.state.available}</h4>
+                            <h4>{this.state.amount}</h4>
+                            <h4>{this.state.price}</h4>
+                            <button className="btn btn-outline-primary btn-sm"> Add to cart 
+                                <i className="fa fa-shopping-cart"></i> 
+                            </button>
+                        </figcaption>
+                    </figure>
+                </div>
         );
     }
 }
