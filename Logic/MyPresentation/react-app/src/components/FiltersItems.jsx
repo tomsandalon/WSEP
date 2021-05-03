@@ -80,9 +80,11 @@ class FiltersItems extends Component {
 		<header className="card-header">
             <h6 className="title">Filter by rating</h6>
 		</header>
-    <StarRatings starSpacing="25px" starwidth="20px" starheight="30px"
+    <StarRatings
           rating={this.state.rating}
           starRatedColor="blue"
+          starDimension="40px"
+          starSpacing="18px"
           changeRating={this.changeRating}
           numberOfStars={5}
           name='rating'

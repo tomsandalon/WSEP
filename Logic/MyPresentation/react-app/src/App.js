@@ -18,10 +18,8 @@ class App extends Component{
         <div className="app">
           <Navigation handleLogout={this.handleLogout}/>
           <Switch>
-            <Route path="/" exact component={Home}/>
+            <Route path="/" exact component={ShopItems}/>
             <Route path="/login" component={Login} />
-            <Route path="/items" component={ShopItems}/>
-            <Route path="/filter" component={FiltersItems}/>
             <Route path="/register" component={Register} />
           </Switch>
         </div>
