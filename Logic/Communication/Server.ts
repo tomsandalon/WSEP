@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const app = express();
 app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 const host = 'localhost'
 const port = 8000
 const config_path = "./Logic/Communication/Config/";
@@ -51,7 +51,7 @@ app.post('/login', (req: any, res: any) => {
         res.status(404);
         res.send('Bad session id')
     } else {
-        const result = service.performLogin(req.body.user, req.body.password);
+        const result = service.performLogin(req.body.username, req.body.password);
         if (typeof result === 'string') {
             res.status(200);
             res.send(result)
@@ -74,11 +74,11 @@ app.post('/register', (req: any, res: any) => {
     } else {
         const result = service.performRegister(req.body.user, req.body.password);
         res.status(200);
-        if (typeof result === 'string') {
-            res.send(result)
-        } else {
+        if (result) {
             //TODO give html home page
             res.send("Welcome!\n")
+        } else {
+            res.send(result)
         }
     }
 })
