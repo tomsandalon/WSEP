@@ -19,22 +19,41 @@ const options = {
     Cookie: undefined,
     ca: [ fs.readFileSync(config_path + ca_file) ],
 }
-const express = require('express');
-const cookieParser = require('cookie-parser');
-// const app = express();
-// app.use(cookieParser());
+const options_login = {
+    hostname: 'localhost',
+    port: 8000,
+    path: '/login',
+    method: 'POST',
+    key: fs.readFileSync(config_path + key_file, "utf8"),
+    cert: fs.readFileSync(config_path + cert_file, "utf8"),
+    requestCert: true,
+    rejectUnauthorized: true,
+    Cookie: undefined,
+    ca: [ fs.readFileSync(config_path + ca_file) ],
+}
+
 const req = https.request(options);
+const SessionData = {};
+const sid = 'SID';
 req.on('response', function (res) {
     const cookies = getAllCookies(res.rawHeaders);
-    console.log(cookies);
+    SessionData[sid] = cookies.reduce((acc, cookie) => cookie[0] === "SID"? cookie[1]: acc, -1);
     res.on('data', function (chunk) {
         console.log('BODY: ' + chunk);
     });
+    const req = https.request(options_login);
+    req.on('response', function (res) {
+
+    })
+    req.setHeader('set-cookie', SessionData[sid]);
+    req.write(JSON.stringify({
+        username: "Mark",
+        password: "12345"
+    }));
 });
 req.end()
 
 function getAllCookies (cookies){
-    console.log(cookies)
     let result = [];
     for (let i = 0; i < cookies.length; i++) {
         if(cookies[i] === 'Set-Cookie'){

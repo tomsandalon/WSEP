@@ -1,9 +1,10 @@
-import {SearchTypes, SystemImpl} from "../Domain/System";
+import {SearchTypes} from "../Domain/System";
 import {Filter, Item_Action} from "../Domain/Shop/ShopInventory";
 import {Action} from "../Domain/ShopPersonnel/Permissions";
 import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 import {DiscountType} from "../Domain/PurchaseProperties/DiscountType";
 import {System} from "../Domain/System";
+import {SystemImpl} from "../Domain/System.impl";
 
 export class Service implements System {
     private _system: System
