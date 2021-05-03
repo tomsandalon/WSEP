@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {MenuItems} from './MenuItems';
 import './Navbar.css'
-import {Button} from './Button.js';
+
 class Navigation extends Component {
     state ={
         clicked:false
@@ -26,9 +26,7 @@ handleClick = () =>{
                         </li>
                         );
                     })}
-                
                 </ul>
-               
             </nav>
         );
     }

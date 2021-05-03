@@ -1,12 +1,12 @@
 export const MenuItems = [
     {
         title:'Register',
-        url:'#register',
+        url:'register',
         cName:'nav-links'
     },
     {
         title:'Login',
-        url:'#login',
+        url:'login',
         cName:'nav-links'
     }
 ]

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Reactlogo from './images/login.jpg'
+import '../index.css'
 class Login extends Component {
 state = {
     email:'',
@@ -24,8 +25,8 @@ handlePassword = (event) =>{
       <             img src={Reactlogo} id="icon" alt="User Icon" />
                 </div>
                 <form onSubmit={this.handleSubmit}>
-                    <input type="text" id="login" className="fadeIn second" name="login" placeholder="example@example.com" onChange={this.handleUserEmail}/>
-                    <input type="text" id="password" className="fadeIn third" name="login" placeholder="Password" onChange={this.handlePassword}/>
+                    <input type="email" id="login" className="fadeIn second" name="login" placeholder="example@example.com" onChange={this.handleUserEmail}/>
+                    <input type="password" id="password" className="fadeIn third" name="login" placeholder="Password" onChange={this.handlePassword}/>
                     <input type="submit" className="fadeIn fourth" value="Login"/>
                 </form>
             </div>
