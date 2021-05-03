@@ -18,7 +18,7 @@ handlePassword = (event) =>{
 }
     render() {
         return(
-        <div className="wrapper fadeInDown">
+        <div className="wrapper fadeInDown" href="#register">
             <div id="formContent">
                 <div className="fadeIn first">
       <             img src={Reactlogo} id="icon" alt="User Icon" />
