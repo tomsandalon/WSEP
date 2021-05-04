@@ -1,8 +1,5 @@
-import {Data} from "ws";
 const fs = require('fs')
-import WebSocket = require("ws");
 import * as https from 'https';
-const http = require('http');
 import {options, port, service, Session, sid} from "./Config/Config";
 const express = require('express');
 const expressWs = require('express-ws');
@@ -12,7 +9,6 @@ const {
 } = require('worker_threads');
 export const app = express();
 //initialize a https server
-
 const server = https.createServer(options, app);
 //start our server
 server.listen( port,() => {
@@ -26,15 +22,7 @@ app.use('/login', require('./User/Login'));
 app.use('/register', require('./User/Register'));
 app.use('/', require('./Home/Home'));
 
-// var WebSocketServer = require('ws').Server;
-// var wss = new WebSocketServer({server: server});
-// wss.on('connection', function(ws: any) {
-//     console.log('Here')
-//     ws.on('message', function(message: any) {
-//         console.log('received: %s', message);
-//         ws.send("You said: "+ message);
-//     });
-// });
+
 // app.get('/fib/:num', async (req: any, res: any) => {
 //     const session_id = Session.session_id_specifier++;
 //     Session.sessions[session_id] = service.openSession();
