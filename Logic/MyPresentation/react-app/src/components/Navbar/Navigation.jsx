@@ -27,7 +27,12 @@ handleClick = () =>{
                         </li>
                         );
                     })}
-                    <input type="button" value="Logout" onClick={() => this.props.handleLogout}/>
+                    <li><input className="nav-links" type="button" value="Logout" onClick={() => this.props.handleLogout}/></li>
+                    <li ><a className="nav-links cartButton btn btn-sm" href="/my-cart">
+                            MyCart
+                            </a>
+                        </li>
+                      
                 </ul>
             </nav>
         );
