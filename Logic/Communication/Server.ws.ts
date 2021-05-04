@@ -1,42 +1,23 @@
-import {Data} from "ws";
-const fs = require('fs')
-import WebSocket = require("ws");
-import * as https from 'https';
-import {sleep} from "async-parallel";
-import {System} from "../../Tests/AcceptanceTests/System";
-import {SystemDriver} from "../../Tests/AcceptanceTests/SystemDriver";
-import {Service} from "../Service/Service";
-const app = require('express');
-const host = 'localhost'
-const port = 8000
-const config_path = "./Logic/Communication/Config/";
-const key_file = "server_key.pem";
-const cert_file = "server_cert.pem";
-const options = {
-    key: fs.readFileSync(config_path + key_file, "utf8"),
-    cert: fs.readFileSync(config_path + cert_file, "utf8"),
-};
-//initialize a https server
-const server = https.createServer(options, (req, res) =>{
-    res.writeHead(200)
-    res.end("My first server!\n" + req.url + "\n:D")
-});
+import { Worker,  isMainThread, parentPort, workerData  } from "worker_threads";
+import {server} from "./Server";
 
-//initialize the WebSocket server instance
-const wss = new WebSocket.Server({ server });
+// declare module WorkerLoader {
+//     // You need to change `Worker`, if you specified a different value for the `workerType` option
+//     class WebpackWorker extends Worker {
+//         constructor();
+//     }
+//     // Uncomment this if you set the `esModule` option to `false`
+// }
+const fs = require('fs');
+const path = require('path');
+var httpServer = server;
 
-wss.on('connection', (ws: WebSocket) => {
-    //connection is up, let's add a simple simple event
-    ws.on('message', (message: string) => {
-        //log the received message and send it back to the client
+var WebSocketServer = require('ws').Server;
+var wss = new WebSocketServer({server:httpServer});
+wss.on('connection', function(ws: any) {
+    console.log("Connection!!")
+    ws.on('message', function(message: any) {
         console.log('received: %s', message);
-        ws.send(`Hello, you sent -> ${message}`);
+        ws.send("You said: "+ message);
     });
-    //send immediatly a feedback to the incoming connection
-    ws.send('Hi there, I am a WebSocket server');
-});
-
-//start our server
-server.listen( port, host, () => {
-    console.log(`Server is running on http://${host}:${port}`);
 });

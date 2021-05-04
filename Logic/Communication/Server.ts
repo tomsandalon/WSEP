@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const {
     Worker, isMainThread, parentPort, workerData
 } = require('worker_threads');
-const app = express();
+export const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
@@ -16,7 +16,10 @@ app.use('/login', require('./User/Login'));
 app.use('/register', require('./User/Register'));
 app.use('/', require('./Home/Home'));
 //initialize a https server
-const server = https.createServer(options, app);
+export const server = https.createServer(options, app);
+server.on('upgrade', (req, socket, res) => {
+    console.log('upgrade')
+})
 //start our server
 server.listen( port,() => {
     console.log(`Server is running on port ${port}`);
