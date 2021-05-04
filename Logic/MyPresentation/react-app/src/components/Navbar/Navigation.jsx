@@ -14,7 +14,7 @@ handleClick = () =>{
     render(){
         return (
             <nav className="navbarItems">
-                <h3 className="navbar-logo">Mikasa - Ecommerce<i className="fab fa-react"></i></h3>
+                <h3 className="navbar-logo"><a className="fab fa-react" href="/">Mikasa Eccomerce</a></h3>
                 <div className="menu-icon" onClick={this.handleClick}>
                     <i className={this.state.clicked ? 'fas fa-times' : 'fas fa-bars'}></i>
                 </div>

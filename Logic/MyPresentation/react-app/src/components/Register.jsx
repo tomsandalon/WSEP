@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Reactlogo from './images/register-icon-blue1.png'
+import Reactlogo from './images/register.png'
 class Register extends Component {
 state = {
     email:'',

@@ -23,8 +23,7 @@ class ShopItems extends Component {
     render() {
         return (
             
-            <div class="container">
-                    
+            <div class="container">  
                 <div class="row">
                     <div class="col-4">
                         <FiltersItems/>
@@ -34,7 +33,7 @@ class ShopItems extends Component {
                     {this.state.items.map((item,index) => (
                         <ItemOfShop name={item.name} available={item.available} amount={item.amount} price={item.price}/>
                     ))}
-                    </div>   
+                        </div>   
                     </div>
                 </div> 
         </div>

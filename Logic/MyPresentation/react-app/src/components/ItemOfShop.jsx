@@ -26,7 +26,7 @@ class ItemOfShop extends Component {
                             </button>
                         </figcaption>
                     </figure>
-                </div>
+            </div>
         );
     }
 }

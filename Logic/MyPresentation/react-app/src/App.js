@@ -6,7 +6,7 @@ import Home from './components/Home';
 import ShopItems from './components/ShopItems';
 import FiltersItems from './components/FiltersItems';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
-
+import Payment from './components/Payment';
 
 class App extends Component{
   handleLogout = () =>{
@@ -20,6 +20,7 @@ class App extends Component{
           <Switch>
             <Route path="/" exact component={ShopItems}/>
             <Route path="/login" component={Login} />
+            <Route path="/payment" component={Payment}/>
             <Route path="/register" component={Register} />
           </Switch>
         </div>

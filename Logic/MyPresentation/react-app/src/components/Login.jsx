@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Reactlogo from './images/login.jpg'
+import Reactlogo from './images/login.png'
 import '../index.css';
 class Login extends Component {
 state = {
