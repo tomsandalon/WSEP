@@ -4,9 +4,9 @@ import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {
     AmountIsLargerThanStock,
     AmountNonPositiveValue,
-    BasePriceNonPositiveValue, CategoryNotFound,
+    BasePriceNonPositiveValue,
+    CategoryNotFound,
     DescriptionEmpty,
-    DiscountExists,
     DiscountNotExists,
     ProductNameEmpty
 } from "./ErrorMessages";
@@ -19,7 +19,6 @@ export interface Product {
     amount: number // >= 0
     category: Category[]
     base_price: number // >= 0
-    discount_types: DiscountType[]
     purchase_type: Purchase_Type
 
     /**
@@ -68,11 +67,6 @@ export interface Product {
      */
     changePrice(base_price: number): string | boolean
 
-    /**
-     * @Requirement - Quality assurance No. 5b
-     * @param discountType
-     */
-    addDiscountType(discountType: DiscountType): string | boolean
 
     /**
      * @Requirement 4.1
@@ -98,13 +92,6 @@ export interface Product {
      */
     calculatePrice(coupons: DiscountType[]): number | string
 
-    /**
-     * @Requirement - 4.1 and Quality assurance No. 5b
-     * @param discountType
-     * @return true iff this.discount_types.contains(discountType)
-     * @return DiscountNotExists otherwise
-     */
-    removeDiscountType(discountType: DiscountType): string | boolean
 
     /**
      * @Requirement 2.7
@@ -126,16 +113,14 @@ export class ProductImpl implements Product{
     private _base_price: number;
     private readonly _category: Category[];
     private _description: string;
-    private _discount_types: DiscountType[];
     private _name: string;
     private _purchase_type: Purchase_Type;
-    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type: Purchase_Type) {
+    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
         this._base_price = base_price;
         this._description = description;
         this._name = name;
         this._product_id = product_id;
-        this._purchase_type = purchase_type;
-        this._discount_types = [];
+        this._purchase_type = purchase_type ? purchase_type : Purchase_Type.Immediate;
         this._category = [];
         this._amount = 0;
     }
@@ -143,7 +128,7 @@ export class ProductImpl implements Product{
     static resetIDs = () => ProductImpl._product_id_specifier = 0
 
 
-    public static create(base_price: number, description: string, name: string, purchase_type: Purchase_Type): Product | string {
+    public static create(base_price: number, description: string, name: string, purchase_type?: Purchase_Type): Product | string {
         const result = ProductImpl.isValid(base_price, description, name);
         if(typeof result === "string"){
             return result;
@@ -214,23 +199,6 @@ export class ProductImpl implements Product{
         this._category.splice(position,1);
         return true;
     }
-    get discount_types(){
-        return this._discount_types;
-    }
-    public addDiscountType(discountType: DiscountType): string | boolean{
-        if (this._discount_types.indexOf(discountType) < 0) {
-            return DiscountExists
-        }
-        this._discount_types.push(discountType);
-        return true;
-    }
-    public removeDiscountType(discountType: DiscountType): string | boolean{
-        if (this._discount_types.indexOf(discountType) < 0){
-            return DiscountNotExists
-        }
-        this._discount_types.splice(this._discount_types.indexOf(discountType), 1);
-        return true;
-    }
     get description(){
         return this._description;
     }
@@ -259,22 +227,24 @@ export class ProductImpl implements Product{
         this._purchase_type = purchaseType;
         return true;
     }
+
+    //TODO move function to inventory
     public calculatePrice(coupons: DiscountType[]): number | string{
         let price = this._base_price;
         let privateDiscounts: number[] = [];
         for (let coupon of coupons){
-            const position = this._discount_types.indexOf(coupon);
-            if( position < 0){
-                return DiscountNotExists
-            }
-            privateDiscounts.push(position);
-            price = coupon.applyDiscount(price);
+            // const position = this._discount_types.indexOf(coupon);
+            // if( position < 0){
+            //     return DiscountNotExists
+            // }
+            // privateDiscounts.push(position);
+            // price = coupon.applyDiscount(price);
         }
-        this._discount_types.forEach((discount: DiscountType, index: number) => {
-                if(privateDiscounts.indexOf(index) < 0){
-                    price = discount.applyDiscount(price)
-                }
-        });
+        // this._discount_types.forEach((discount: DiscountType, index: number) => {
+        //         if(privateDiscounts.indexOf(index) < 0){
+        //             price = discount.applyDiscount(price)
+        //         }
+        // });
         return price
     }
 

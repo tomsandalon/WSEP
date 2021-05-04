@@ -1,4 +1,4 @@
-import {PurchaseCondition, purchaseEvalData} from "./PurchaseCondition";
+import {PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
 
 export enum ConditionType {
     NotCategory,
@@ -19,20 +19,20 @@ export class SimpleCondition implements PurchaseCondition {
         this.value = value.toString()
     }
 
-    evaluate(pData: purchaseEvalData): Boolean {
+    evaluate(purchase_data: PurchaseEvalData): Boolean {
         switch (this.condition) {
             case ConditionType.NotCategory:
-                return !pData.basket.products.some(e => e.product.category.some(c => c.name == this.value))
+                return !purchase_data.basket.some(e => e.categories.some(c => c.name == this.value))
             case ConditionType.BeforeTime:
                 return !((new Date()).getHours() > (new Date(this.value)).getHours())
             case ConditionType.AfterTime:
                 return !((new Date()).getHours() < (new Date(this.value)).getHours())
             case ConditionType.LowerAmount:
-                return (pData.basket.products.reduce((acc, cur) => acc + cur.amount, 0) < Number(this.value))
+                return purchase_data.basket.reduce((acc, cur) => acc + cur.amount, 0) < Number(this.value)
             case ConditionType.GreaterAmount:
-                return (pData.basket.products.reduce((acc, cur) => acc + cur.amount, 0) > Number(this.value))
+                return purchase_data.basket.reduce((acc, cur) => acc + cur.amount, 0) > Number(this.value)
             case ConditionType.UnderAge:
-                return false //TODO add age to users
+                return !purchase_data.underaged
         }
     }
 }

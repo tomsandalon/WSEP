@@ -1,11 +1,12 @@
 import {User} from "../../Users/User";
 import {ShoppingBasket} from "../../ProductHandling/ShoppingBasket";
+import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 
-export type purchaseEvalData = {
-    user: User,
-    basket: ShoppingBasket
+export type PurchaseEvalData = {
+    underaged: boolean,
+    basket: ReadonlyArray<ProductPurchase>
 }
 
 export interface PurchaseCondition {
-    evaluate(pData: purchaseEvalData): Boolean
+    evaluate(pData: PurchaseEvalData): Boolean
 }

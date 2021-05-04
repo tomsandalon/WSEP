@@ -1,4 +1,4 @@
-import {PurchaseCondition, purchaseEvalData} from "./PurchaseCondition";
+import {PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
 
 export enum Action {
     And,
@@ -15,7 +15,7 @@ export class SimpleCondition implements PurchaseCondition {
     conditions: PurchaseCondition[]
     action: Action
 
-    evaluate(pData: purchaseEvalData): Boolean {
-        return this.action == Action.And ? this.conditions.some(c => c.evaluate(pData)) : this.conditions.every(c => c.evaluate(pData));
+    evaluate(product_data: PurchaseEvalData): Boolean {
+        return this.action == Action.And ? this.conditions.some(c => c.evaluate(product_data)) : this.conditions.every(c => c.evaluate(product_data));
     }
 }

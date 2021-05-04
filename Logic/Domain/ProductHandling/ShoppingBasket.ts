@@ -11,14 +11,18 @@ import {
 } from "./ErrorMessages";
 import {Purchase, PurchaseImpl} from "./Purchase";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
+import {User} from "../Users/User";
 
 type Entry = {product: Product, amount: number}
 export type ShoppingEntry = {productId: number, amount: number}
+export type MinimalUserData = {userId: number, underaged: boolean}
 
 export interface ShoppingBasket {
     basket_id: number
     shop: ShopInventory
     products: Entry[]
+    user_data: MinimalUserData
+
 
     /**
      * @Requirement 2.7
@@ -63,23 +67,30 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     private static _basket_id_specifier: number = 0;
     private _basket_id: number;
     private _products:  Entry[];
+    private _user_data: MinimalUserData;
+
+
     private _shop: ShopInventory;
 
+    get user_data(): MinimalUserData {
+        return this._user_data;
+    }
 
-    private constructor(basket_id: number, shop: ShopInventory, product: Entry) {
+    private constructor(basket_id: number, shop: ShopInventory, product: Entry, user_data: MinimalUserData) {
         this._basket_id = basket_id;
         this._products = [product];
         this._shop = shop;
+        this._user_data = user_data
     }
 
-    public static create(shop: ShopInventory, product: ShoppingEntry): ShoppingBasket | string{
+    public static create(shop: ShopInventory, product: ShoppingEntry, user: User): ShoppingBasket | string{
         const fetched_product = shop.getItem(product.productId);
         if (typeof fetched_product === "string"){
             return fetched_product
         }
         const final_product = {product: fetched_product, amount: product.amount};
         const id = this._basket_id_specifier++;
-        return new ShoppingBasketImpl(id, shop, final_product)
+        return new ShoppingBasketImpl(id, shop, final_product, {userId: user.user_id, underaged: user.underaged})
     }
 
     get products(){
@@ -138,7 +149,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     }
 
     purchase(payment_info: string, coupons: DiscountType[]): string | Purchase {
-        const order = PurchaseImpl.create(new Date(), this,[]);
+        const order = PurchaseImpl.create(new Date(), this,[], this._user_data);
         if(typeof order == "string")
             return order
         const order_purchase = order.purchase_self(payment_info);
