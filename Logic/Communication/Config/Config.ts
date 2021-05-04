@@ -12,3 +12,8 @@ export const options = {
 };
 export const sid = 'SID';
 export const service: Service = new Service();
+
+export class Session {
+    public static sessions: {[session_id: number] : number} = {};
+    public static session_id_specifier = 1;
+}
