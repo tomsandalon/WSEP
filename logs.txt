@@ -1,0 +1,13 @@
+[4/5/2021, 1:59:36 PM] crit: Critical message
+[4/5/2021, 1:59:36 PM] dbug: Debug message
+[4/5/2021, 1:59:36 PM] erro: Error message
+[4/5/2021, 1:59:36 PM] info: Info message
+[4/5/2021, 1:59:36 PM] warn: Warn message
+[4/5/2021, 1:59:36 PM] trce: message with trace 
+    at Object.<anonymous> (C:\Users\liorp\WebstormProjects\WSEP\Logic\System.ts:37:8)
+    at Module._compile (node:internal/modules/cjs/loader:1092:14)
+    at Module.m._compile (C:\Users\liorp\AppData\Roaming\npm\node_modules\ts-node\src\index.ts:837:23)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1121:10)
+    at Object.require.extensions.<computed> [as .ts] (C:\Users\liorp\AppData\Roaming\npm\node_modules\ts-node\src\index.ts:840:12)
+    at Module.load (node:internal/modules/cjs/loader:972:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:813:14)
