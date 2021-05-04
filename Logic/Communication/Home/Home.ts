@@ -1,4 +1,5 @@
 import {service, sid, Session} from "../Config/Config";
+import {app} from "../Server";
 
 const fs = require('fs');
 const path = require('path');
@@ -22,4 +23,10 @@ router.get('/',(request: any, response: any) => {
     // res.status(200);
     // res.cookie(sid, session_id, {})
     // res.send(`My first server!\n${result}\n:D`)
+})
+router.ws('/', function(ws: any, req: any) {
+    console.log("Connection")
+    ws.on('message', function(msg: any) {
+        console.log(`received: ${msg}`);
+    });
 })
