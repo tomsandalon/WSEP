@@ -6,10 +6,11 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 
-router.get('/', async (request: any, response: any) => {
+router.get('/',(request: any, response: any) => {
+    console.log(request.url)
     if(request.url != ''){//request.url is the file being requested by the client
-        const contentType = 'text/html';
-        fs.readFile(path.join(__dirname, 'ws_client.html'), function(error: any, content: any) {
+        var contentType = 'text/html';
+        fs.readFile(path.join(__dirname, 'ws_client.html'), (error: any, content: any) => {
             response.writeHead(200, { 'Content-Type': contentType });
             response.end(content, 'utf-8');
         });
