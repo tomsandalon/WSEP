@@ -21,3 +21,4 @@ Logic/Presentation/.env.production.local
 Logic/Presentation/npm-debug.log*
 Logic/Presentation/yarn-debug.log*
 Logic/Presentation/yarn-error.log*
+Logic/Test/*
