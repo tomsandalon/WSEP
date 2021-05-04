@@ -23,3 +23,5 @@ Logic/Presentation/yarn-debug.log*
 Logic/Presentation/yarn-error.log*
 
 ./package-lock.json
+Logs/*
+.idea/*
