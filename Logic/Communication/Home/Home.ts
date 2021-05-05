@@ -6,13 +6,13 @@ const path = require('path');
 const express = require('express');
 const router = express.Router();
 module.exports = router;
-
+const ws_client = path.join(__dirname, 'ws_client.html');
 router.get('/',(request: any, response: any) => {
     const session_id = Session.session_id_specifier++;
     Session.sessions[session_id] = service.openSession();
     // const result = await promisedFib(req.params.num);
     const contentType = 'text/html';
-    fs.readFile(path.join(__dirname, 'ws_client.html'), (error: any, content: any) => {
+    fs.readFile(path.join(__dirname, 'build', 'index.html'), (error: any, content: any) => {
         response.status(200);
         response.set('Content-Type', contentType);
         response.cookie(sid, session_id, {})

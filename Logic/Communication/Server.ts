@@ -1,6 +1,7 @@
 const fs = require('fs')
 import * as https from 'https';
 import {options, port, service, Session, sid} from "./Config/Config";
+const path = require('path');
 const express = require('express');
 const expressWs = require('express-ws');
 const cookieParser = require('cookie-parser');
@@ -21,7 +22,7 @@ app.use(express.urlencoded({extended: false}));
 app.use('/login', require('./User/Login'));
 app.use('/register', require('./User/Register'));
 app.use('/', require('./Home/Home'));
-
+app.use(express.static(path.join(__dirname, 'Home','build')))
 
 // app.get('/fib/:num', async (req: any, res: any) => {
 //     const session_id = Session.session_id_specifier++;

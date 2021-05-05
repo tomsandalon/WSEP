@@ -31,7 +31,8 @@
     "querystring": "^0.2.1",
     "simplr-logger": "^1.0.1",
     "websocket": "^1.0.34",
-    "worker-loader": "^3.0.8"
+    "worker-loader": "^3.0.8",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@types/chai": "^4.2.16",
