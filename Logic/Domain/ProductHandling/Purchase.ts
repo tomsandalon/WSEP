@@ -26,7 +26,7 @@ export interface Purchase {
      * @return ErrorMessage otherwise
      */
     purchase_self(payment_info: string): boolean | string
-    to_string(): string;
+    toString(): string;
 }
 
 export class PurchaseImpl implements Purchase{
@@ -75,9 +75,9 @@ export class PurchaseImpl implements Purchase{
         return this._products
     }
 
-    private calculatePrice(){
-        return this._products.reduce((sum, product) => sum + product.actual_price, 0);
-    }
+    // private calculatePrice(){
+    //     return this._products.reduce((sum, product) => sum + product.actual_price, 0);
+    // }
 
     public purchase_self(payment_info: string): boolean | string  {
         const result_of_purchase = this._shop.purchaseItems(this._products, this._minimal_user_data);
@@ -85,7 +85,7 @@ export class PurchaseImpl implements Purchase{
             return result_of_purchase
         }
         this.shop.logOrder(this)
-        const total_price =  this.calculatePrice();
+        const total_price =  this.shop.calculatePrice(this.products, this.minimal_user_data);
         const result_payment = PaymentHandlerImpl.getInstance().charge(payment_info, total_price, this._shop.bank_info);
         if (typeof result_payment == "string"){
             this._shop.returnItems(this._products)
@@ -100,13 +100,20 @@ export class PurchaseImpl implements Purchase{
         return true;
     }
 
-    public to_string(): string {
-        return `Order details:\n` +
-            `Purchased in: ${this.shop.shop_name}\n` +
-            `Order number: ${this.order_id}\n` +
-            `Was performed: ${this.date.toString()}\n` +
-            `Products:\n${this.products.reduce((acc: string, product: ProductPurchase) =>
-                acc +`\t${product.name}\t${product.product_id}\t${product.amount}\n`, ``)}`;
+    public toString(): string {
+        return JSON.stringify({
+            order_id: this.order_id,
+            shop: this.shop.shop_id,
+            products: this.products,
+            date: this.date,
+            minimal_user_data: this.minimal_user_data
+        })
+        // return `Order details:\n` +
+        //     `Purchased in: ${this.shop.shop_name}\n` +
+        //     `Order number: ${this.order_id}\n` +
+        //     `Was performed: ${this.date.toString()}\n` +
+        //     `Products:\n${this.products.reduce((acc: string, product: ProductPurchase) =>
+        //         acc +`\t${product.name}\t${product.product_id}\t${product.amount}\n`, ``)}`;
     }
 
     private _minimal_user_data: MinimalUserData;

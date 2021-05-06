@@ -1,4 +1,5 @@
 import {Product} from "../../ProductHandling/Product";
+import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 
 export interface Discount {
     /**
@@ -7,5 +8,7 @@ export interface Discount {
      * @param amount the amount of the product to evaluate
      * @return total percent of discount. 0 for no discount.
      */
-    evaluate(product: Product, amount: number): number
+    evaluate(product: Product | ProductPurchase, amount: number): number
+
+    id: number
 }

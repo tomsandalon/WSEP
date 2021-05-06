@@ -60,7 +60,7 @@ export interface ShoppingBasket {
      * @return Purchase representing items and amount specified in basket
      */
     purchase(payment_info: string, coupons: DiscountType[]): string | Purchase
-    toStringBasket():string[]
+    toString():string[]
 }
 
 export class ShoppingBasketImpl implements ShoppingBasket{
@@ -143,9 +143,14 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         return true
     }
 
-    toStringBasket(): string[]{
-        return this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
-
+    toString(): string[]{
+        return [JSON.stringify({
+            basket_id: this.basket_id,
+            shop: this.shop.toString(),
+            products: this.products,
+            user_data: this.user_data,
+        })]
+        // this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
     }
 
     purchase(payment_info: string, coupons: DiscountType[]): string | Purchase {

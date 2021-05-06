@@ -7,6 +7,9 @@ import {logger} from "../Logger";
 import {Action} from "../ShopPersonnel/Permissions";
 import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler";
 import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
+import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
+import {Discount} from "./DiscountPolicy/Discount";
+// import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
@@ -173,6 +176,20 @@ export interface Shop {
      * @return true if the edit was successful, or a string containing the error message otherwise
      */
     editProduct(user_email: string, product_id: number, action: Item_Action, value: string): string | boolean
+
+    /**
+     * @param user_email
+     * @param discount
+     */
+    addDiscount(user_email: string, discount: Discount): string[] | string
+
+    /**
+     * @param user_email
+     * @param discountId
+     */
+    removeDiscount(user_email: string, discountId: number): string | boolean
+
+    showAllDiscounts(user_email: String): string
 }
 
 export class ShopImpl implements Shop {
@@ -181,7 +198,10 @@ export class ShopImpl implements Shop {
     private readonly _shop_id: number;
     private readonly _is_active: boolean;
 
-    static resetIDs = () => id_counter = 0
+    static resetIDs = () => {
+        id_counter = 0
+        DiscountHandler.discountCounter = 0
+    }
 
     static create(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
         if (bank_info.length == 0) return "Bank info can't be empty"
@@ -197,15 +217,17 @@ export class ShopImpl implements Shop {
      * @param description
      * @param location
      * @param name
+     * @param purchasePolicy
+     * @param discountPolicy
      */
-    constructor(user_email: string, bank_info: string, description: string, location: string, name: string, purchasePolicy?: PurchasePolicyHandler, discountPolicy?: DiscountPolicyHandler) {
+    constructor(user_email: string, bank_info: string, description: string, location: string, name: string) {
         this._shop_id = generateId();
         this._bank_info = bank_info;
         this._description = description;
         this._location = location;
         this._name = name;
         this._management = new ShopManagementImpl(this.shop_id, user_email)
-        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info, purchasePolicy, discountPolicy)
+        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info)
         this._management.shop_inventory = this._inventory;
         this._is_active = true;
     }
@@ -430,12 +452,32 @@ export class ShopImpl implements Shop {
     }
 
     toString(): string {
-        return `Shop name: ${this._name}\t` +
-            `Shop id: ${this._shop_id}\t` +
-            `Description: ${this._description}\t` +
-            `Status: ${this._is_active ? "Active" : "Inactive"}\n` +
-            `${this.management.toString()}\n\n` +
-            `${this.inventory.toString()}\n\n`
+        return JSON.stringify({
+            shop_id: this._shop_id,
+            bank_info: this.bank_info,
+            description: this._description,
+            location: this.location,
+            name: this.name,
+            management: this.management.toString(),
+            inventory: this.inventory.toString(),
+            is_active: this.is_active
+        })
+
+        // this._shop_id = generateId();
+        // this._bank_info = bank_info;
+        // this._description = description;
+        // this._location = location;
+        // this._name = name;
+        // this._management = new ShopManagementImpl(this.shop_id, user_email)
+        // this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info)
+        // this._management.shop_inventory = this._inventory;
+        // this._is_active = true;
+        // return `Shop name: ${this._name}\t` +
+        //     `Shop id: ${this._shop_id}\t` +
+        //     `Description: ${this._description}\t` +
+        //     `Status: ${this._is_active ? "Active" : "Inactive"}\n` +
+        //     `${this.management.toString()}\n\n` +
+        //     `${this.inventory.toString()}\n\n`
     }
 
     editProduct(user_email: string, product_id: number, action: Item_Action, value: string): string | boolean {
@@ -456,5 +498,31 @@ export class ShopImpl implements Shop {
         }
         logger.Info(success_message);
         return ret;
+    }
+
+    addDiscount(user_email: string, discount: Discount): string[] | string {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        this.inventory.addDiscount(discount)
+        logger.Info(`Added discount: ${JSON.stringify(discount)}`)
+        return [];
+    }
+
+    removeDiscount(user_email: string, discountId: number): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.removeDiscount(discountId)
+        if (result) logger.Info(`Discount ${discountId} removed`)
+        else logger.Error(`Discount ${discountId} doesn't exist`)
+        return result;
+    }
+
+    showAllDiscounts(user_email: string): string {
+        logger.Info(user_email + " requested to view all discounts")
+        return this.inventory.getAllDiscounts()
     }
 }

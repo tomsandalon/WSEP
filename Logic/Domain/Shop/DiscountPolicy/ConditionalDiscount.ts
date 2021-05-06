@@ -1,6 +1,8 @@
 import {CompositeDiscount} from "./CompositeDiscount";
 import {Product} from "../../ProductHandling/Product";
 import {Discount} from "./Discount";
+import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
+import {DiscountHandler} from "./DiscountHandler";
 
 export enum Condition {
     Category,
@@ -13,14 +15,16 @@ export class ConditionalDiscount implements Discount {
     condition: Condition
     value: number
     condition_param: string
+    id: number
 
     constructor(condition: Condition, value: number, condition_param: string) {
+        this.id = DiscountHandler.discountCounter++;
         this.condition = condition;
         this.value = value;
         this.condition_param = condition_param;
     }
 
-    evaluate(product: Product, amount: number): number {
+    evaluate(product: Product | ProductPurchase, amount: number): number {
         let shouldApply: Boolean;
         switch (this.condition) {
             case Condition.Amount:
@@ -37,6 +41,9 @@ export class ConditionalDiscount implements Discount {
                 shouldApply = true
                 break
         }
-        return shouldApply ? value : 0
+        return shouldApply ? this.value : 0
+    }
+    toString(): string {
+        return JSON.stringify(this)
     }
 }

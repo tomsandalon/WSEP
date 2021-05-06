@@ -200,7 +200,7 @@ export class UserImpl implements User {
         else{
             let basket = shopping_basket[0];
             logger.Info(`Basket of shop id ${shop_id} was displayed`)
-            return basket.toStringBasket();
+            return basket.toString();
         }
     }
     /**
@@ -214,7 +214,7 @@ export class UserImpl implements User {
         }
         else{
             logger.Info(`Cart of user_id ${this._user_id} was displayed`)
-            return this._cart.map(basket => basket.toStringBasket());
+            return this._cart.map(basket => basket.toString());
         }
     }
 
@@ -227,7 +227,8 @@ export class UserImpl implements User {
         const purchases = this._order_history.getUserPurchases(this._user_id);
         if (typeof purchases === "string")
             return purchases
-        return purchases.map((purchase: Purchase) => purchase.to_string())
+        if (purchases.length == 0) return "Empty order history";
+        return purchases.map((purchase: Purchase) => purchase.toString())
     }
     get user_email(): string {
         return this._user_email;

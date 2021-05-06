@@ -22,7 +22,7 @@ export class SimpleCondition implements PurchaseCondition {
     evaluate(purchase_data: PurchaseEvalData): Boolean {
         switch (this.condition) {
             case ConditionType.NotCategory:
-                return !purchase_data.basket.some(e => e.categories.some(c => c.name == this.value))
+                return !purchase_data.basket.some(e => e.category.some(c => c.name == this.value))
             case ConditionType.BeforeTime:
                 return !((new Date()).getHours() > (new Date(this.value)).getHours())
             case ConditionType.AfterTime:

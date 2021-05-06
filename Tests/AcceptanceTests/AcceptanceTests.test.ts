@@ -225,10 +225,10 @@ describe('Registered:', () => {
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         system.addItemToBasket(user, 0, shopID, 500)
         let result = system.userOrderHistory(user) as string[]
-        expect(result[0]).to.be.eq("Empty order history") //sad
+        expect(result).to.be.eq("Empty order history") //sad
         system.purchaseShoppingBasket(user, shopID, "hello")
         result = system.userOrderHistory(user) as string[]
-        expect(result[0]).to.be.not.eq("Empty order history")
+        expect(result).to.be.not.eq("Empty order history")
         expect(result[0].includes("TV")).to.be.true // good
     });
 });

@@ -257,6 +257,7 @@ export class ProductImpl implements Product{
     }
 
     public toString(){
-        return `Product id: ${this._product_id}\tName: ${this._name}\tAvailableAmount: ${this._amount}\tBase price: ${this._base_price}\nCategories:\n${this.category.reduce((acc, category) => acc + category.name + "\n", "")}`
+        return JSON.stringify(this)
+        // return `Product id: ${this._product_id}\tName: ${this._name}\tAvailableAmount: ${this._amount}\tBase price: ${this._base_price}\nCategories:\n${this.category.reduce((acc, category) => acc + category.name + "\n", "")}`
     }
 }
