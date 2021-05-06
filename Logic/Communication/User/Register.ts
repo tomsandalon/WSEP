@@ -7,18 +7,18 @@ router.get('/register', (req: any, res: any) => {
     res.send("My first server!\n" + req.url + "\n:D")
 })
 router.post('/register', (req: any, res: any) => {
-    let user_id = parseInt(req.cookies[sid]);
-    if (isNaN(user_id)) {
-        res.status(404);
-        res.send('Bad session id')
-    } else {
-        const result = service.performRegister(req.body.user, req.body.password);
-        res.status(200);
-        if (result) {
-            //TODO give html home page
-            res.send("Welcome!\n")
-        } else {
-            res.send(result)
-        }
-    }
+    // let user_id = parseInt(req.cookies[sid]);
+    // if (isNaN(user_id)) {
+    //     res.status(404);
+    //     res.send('Bad session id')
+    // } else {
+    //     const result = service.performRegister(req.body.user, req.body.password);
+    //     res.status(200);
+    //     if (result) {
+    //         //TODO give html home page
+    //         res.send("Welcome!\n")
+    //     } else {
+    //         res.send(result)
+    //     }
+    // }
 })

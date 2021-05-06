@@ -6,13 +6,44 @@ import {DiscountType} from "../Domain/PurchaseProperties/DiscountType";
 import {System} from "../Domain/System";
 import {SystemImpl} from "../Domain/System.impl";
 
-export class Service implements System {
+export class Service {
     private _system: System
 
     constructor(reset?: boolean) {
         this._system = SystemImpl.getInstance(reset);
     }
+    public initData(){
+        const no_to_all: DiscountType = {
+            percent: 0.5, // 0 <= percent <= 1
+            expiration_date: new Date(),
+            can_be_applied: value => true,
+            applyDiscount: value => 0.5
+        }
+        const dummy: PurchaseType = {}
+        this._system.performRegister("Liorpev@gmail.com", "123456")
+        this._system.performRegister("Mark@gmail.com", "123456")
+        this._system.performRegister("TomAndSons@gmail.com", "123456") // Owner
+        this._system.performRegister("Tomer@gmail.com", "123456") // Manager
 
+        const tom_id = this._system.performLogin("TomAndSons@gmail.com", "123456")
+        if (typeof tom_id === "string")
+            return
+        const nvidia_id = this.addShop(tom_id, "INVIDIA", "BEST GPU 4 Ever", 'Taiwan', "Taiwan 4 ever")
+        const zara_id = this.addShop(tom_id, "ZARA", "Best style in UK", 'China', "Budaa 4 ever")
+        if (typeof nvidia_id === "string" || typeof zara_id === "string")
+            return
+        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 1, ["GPU"], 2000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, no_to_all, dummy)
+
+        this.addProduct(tom_id, nvidia_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "Boots", "made in USA", 70, ["Shoes"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, no_to_all, dummy)
+    }
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
         return this._system.addItemToBasket(user_id, product_id, shop_id, amount);
     }

@@ -17,7 +17,7 @@ class App extends Component{
         <div className="app">
           <Navigation handleLogout={this.handleLogout}/>
           <Switch>
-            <Route path="/" exact component={ShopItems}/>
+            <Route path="/home" exact component={ShopItems}/>
             <Route path="/my-cart" component={ShoppingCart}/>
             <Route path="/login" component={Login} />
             <Route path="/payment" component={Payment}/>
