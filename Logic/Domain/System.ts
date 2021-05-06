@@ -3,11 +3,11 @@ import {Shop, ShopImpl} from "./Shop/Shop";
 import {logger} from "./Logger";
 import {LoginImpl} from "./Users/Login";
 import {RegisterImpl} from "./Users/Register";
-import {Filter, Item_Action} from "./Shop/ShopInventory";
+import {Filter, Item_Action, Purchase_Type} from "./Shop/ShopInventory";
 import {Action} from "./ShopPersonnel/Permissions";
 import {Product, ProductImpl} from "./ProductHandling/Product";
 import {DiscountType} from "./PurchaseProperties/DiscountType";
-import {PurchaseType} from "./PurchaseProperties/PurchaseType";
+// import {PurchaseType} from "./PurchaseProperties/PurchaseType";
 import {PurchaseImpl} from "./ProductHandling/Purchase";
 export enum SearchTypes {
     name,
@@ -36,7 +36,7 @@ export interface System{
             location: string, bank_info:string): number | string
     userOrderHistory(user_id: number):string | string[]
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
-               base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
+               base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
     removeManager(user_id: number, shop_id: number, target: string): string | boolean
@@ -149,7 +149,7 @@ export class SystemImpl implements System {
         }
     }
     addProduct(user_id: number, shop_id:  number, name: string, description: string, amount: number, categories: string[],
-               base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+               base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
         const shop = this.getShopById(shop_id)
         if (!shop) return `Shop ${shop_id} not found`
         const user = this.login.retrieveUser(user_id);
@@ -373,3 +373,5 @@ export class SystemImpl implements System {
         return shop.removeManager(user_email, target)
     }
 }
+
+//TODO add toggle underaged

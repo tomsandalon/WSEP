@@ -12,7 +12,7 @@ import {CategoryImpl} from "../../../Logic/Domain/ProductHandling/Category";
 import {DiscountType} from "../../../Logic/Domain/PurchaseProperties/DiscountType";
 
 const createProduct = () => {
-    const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor", {});
+    const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");
     if(typeof temp === "string"){
         assert.fail("Failed to created product")
     }
@@ -23,19 +23,19 @@ describe('ProductImpl Class Test suit', () => {
     ProductImpl.resetIDs();
     describe('Create Product', () => {
         it('Create with negative base price', () => {
-            expect(ProductImpl.create(-1, "29 inch monitor", "LG monitor", {}))
+            expect(ProductImpl.create(-1, "29 inch monitor", "LG monitor"))
                 .equal(Error.BasePriceNonPositiveValue)
         });
         it('Create with zero as base price', () => {
-            expect(ProductImpl.create(0, "29 inch monitor", "LG monitor", {}))
+            expect(ProductImpl.create(0, "29 inch monitor", "LG monitor"))
                 .equal(Error.BasePriceNonPositiveValue)
         });
         it('Create with empty description', () => {
-            expect(ProductImpl.create(1000, "", "LG monitor", {}))
+            expect(ProductImpl.create(1000, "", "LG monitor"))
                 .equal(Error.DescriptionEmpty)
         });
         it('Create with empty name', () => {
-            expect(ProductImpl.create(1000, "29 inch monitor", "", {}))
+            expect(ProductImpl.create(1000, "29 inch monitor", ""))
                 .equal(Error.ProductNameEmpty)
         });
     });

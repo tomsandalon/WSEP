@@ -42,8 +42,9 @@ export class OwnerImpl implements Owner {
     }
 
     toString(): string {
-        return `$Email: ${this.user_email}\t${this._appointer_email ?
-            "Appointer: " + this._appointer_email.concat("\t") : ""}Appointees: ${this.appointees_emails}\nRole: ${
-            this._appointer_email ? "Original owner" : "Owner"}`;
+        return JSON.stringify(this)
+        // return `$Email: ${this.user_email}\t${this._appointer_email ?
+        //     "Appointer: " + this._appointer_email.concat("\t") : ""}Appointees: ${this.appointees_emails}\nRole: ${
+        //     this._appointer_email ? "Original owner" : "Owner"}`;
     }
 }

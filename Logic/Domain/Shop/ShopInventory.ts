@@ -1,16 +1,20 @@
-import {PurchaseType} from "../PurchaseProperties/PurchaseType";
+// import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {ShopManagement} from "./ShopManagement";
 import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler";
 import {Product, ProductImpl} from "../ProductHandling/Product";
 import {Purchase} from "../ProductHandling/Purchase";
-import {ProductNotFound} from "../ProductHandling/ErrorMessages";
+import {DiscountExists, DiscountNotExists, ProductNotFound} from "../ProductHandling/ErrorMessages";
 import {logger} from "../Logger";
 import {CategoryImpl} from "../ProductHandling/Category";
 import {ProductPurchase, ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "../Users/UserPurchaseHistory";
 import type = Mocha.utils.type;
+import {PurchaseCondition, PurchaseEvalData} from "./PurchasePolicy/PurchaseCondition";
+import {MinimalUserData} from "../ProductHandling/ShoppingBasket";
+import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
+import {Discount} from "./DiscountPolicy/Discount";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -30,6 +34,10 @@ export enum Item_Action {
     //add policies
 }
 
+export enum Purchase_Type {
+    Immediate,
+}
+
 export interface ShopInventory {
     shop_id: number
     shop_name: string
@@ -38,10 +46,10 @@ export interface ShopInventory {
     /**
      * @Requirement correctness requirement 5.a 5.b
      */
-    purchase_policies: PurchasePolicyHandler
-    discount_policies: DiscountPolicyHandler
+    purchase_policies: PurchaseCondition[]
+    discount_policies: DiscountHandler
     discount_types: DiscountType[]
-    purchase_types: PurchaseType[]
+    purchase_types: Purchase_Type[]
     purchase_history: UserPurchaseHistory
     bank_info: string
 
@@ -63,9 +71,10 @@ export interface ShopInventory {
     /**
      * @Requirement 2.9
      * @param products The products to purchase (reduce their amount)
+     * @param minimal_user_data The minimal user data required to evaluate the purchase
      * @return true iff the purchase was successful
      */
-    purchaseItems(products: ReadonlyArray<ProductPurchase>): boolean | string
+    purchaseItems(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): boolean | string
 
     /**
      * @param products
@@ -83,7 +92,7 @@ export interface ShopInventory {
      * @param purchase_type purchase purchase type available for the product
      * @return true iff the add was successful
      */
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string
 
     /**
      * @Requirement 4.1
@@ -126,49 +135,49 @@ export interface ShopInventory {
      * @param order the order to log in the shop order history
      */
     logOrder(order: Purchase): void
-}
 
-const mockPurchasePolicy: PurchasePolicyHandler = {
-    getInstance(): PurchasePolicyHandler {return this},
-    isAllowed(object: any): boolean {return true},
-}
+    /**
+     * @param discount the discount to add
+     */
+    addDiscount(discount: Discount): void
 
-const mockDiscountPolicy: DiscountPolicyHandler = {
-    getInstance(): DiscountPolicyHandler {return this},
-    isAllowed(object: any): boolean {return true}
+    removeDiscount(id: number): string | boolean
+
+    getAllDiscounts(): string
+
+    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number
 }
 
 export class ShopInventoryImpl implements ShopInventory {
-    private readonly _discount_policies: DiscountPolicyHandler;
+    private readonly _discount_policies: DiscountHandler;
     private readonly _discount_types: DiscountType[];
-    private readonly _purchase_types: PurchaseType[]
-    private readonly _purchase_policies: PurchasePolicyHandler;
+    private readonly _purchase_types: Purchase_Type[]
+    private readonly _purchase_policies: PurchaseCondition[];
     private readonly _shop_id: number;
     private readonly _bank_info: string;
     private _purchase_history: UserPurchaseHistory;
 
 
-    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string,
-                purchasePolicy: PurchasePolicyHandler = mockPurchasePolicy,
-                discountPolicy: DiscountPolicyHandler = mockDiscountPolicy) {
+    get discount_policies(): DiscountHandler {
+        return this._discount_policies;
+    }
+
+    get purchase_policies(): PurchaseCondition[] {
+        return this._purchase_policies;
+    }
+
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
         this._discount_types = [];
-        this._purchase_types = [];
+        this._purchase_types = [Purchase_Type.Immediate];
         this._products = [];
         this._bank_info = bank_info;
         this._shop_name = shop_name;
         this._purchase_history = UserPurchaseHistoryImpl.getInstance();
-        /*
-        TODO policies
-         */
-        this._discount_policies = discountPolicy;
-        this._purchase_policies = purchasePolicy;
-        /*
-        End
-         */
+        this._discount_policies = new DiscountHandler();
+        this._purchase_policies = Array<PurchaseCondition>();
     }
-
 
     private readonly _shop_name: string;
 
@@ -196,20 +205,12 @@ export class ShopInventoryImpl implements ShopInventory {
         this._shop_management = value;
     }
 
-    get discount_policies(): DiscountPolicyHandler {
-        return this._discount_policies;
-    }
-
-    get purchase_types(): PurchaseType[] {
+    get purchase_types(): Purchase_Type[] {
         return this._purchase_types;
     }
 
     get discount_types(): DiscountType[] {
         return this._discount_types;
-    }
-
-    get purchase_policies(): PurchasePolicyHandler {
-        return this._purchase_policies;
     }
 
     get shop_id(): number {
@@ -220,7 +221,7 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._bank_info
     }
 
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
         const item: Product | string = ProductImpl.create(base_price, description, name, purchase_type);
         if (typeof item === "string") {
             return item
@@ -239,8 +240,9 @@ export class ShopInventoryImpl implements ShopInventory {
             logger.Error(result)
             return result
         }
-        item.addDiscountType(discount_type)
+        // item.addDiscountType(discount_type) //TODO
         this._products = this._products.concat([item]);
+        item.purchase_type = purchase_type
         return true;
     }
 
@@ -270,16 +272,18 @@ export class ShopInventoryImpl implements ShopInventory {
         return result.map(p => p.toString());
     }
 
-    purchaseItems(products: ReadonlyArray<ProductPurchase>): string | boolean {
-        if (!this._discount_policies.isAllowed(undefined)) { //Not implemented
-            logger.Error(`Failed to purchase as the discount policy doesn't permit it`)
-            return `Mismatching discount policies`
-        }
-        if (!this._purchase_policies.isAllowed(undefined)) { //Not implemented
+    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
+        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
+        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
             logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
-            return `Mismatching purchase policies`
+            return `Purchase policy doesn't allow this purchase`
         }
-        let result: boolean | string = true
+        return true
+    }
+
+    purchaseItems(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
+        let result = this.evaluatePurchaseItem(products, minimal_user_data)
+        if (typeof result == "string") return result
         products.forEach(p => {
             const product = this.getItem(p.product_id)
             if (typeof product == "string") {
@@ -359,8 +363,31 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     toString(): string {
-        return this.products.reduce(function(acc, cur) {
-            return acc.concat(cur.amount != 0 ? cur.toString().concat("\n") : "")}, "")
+        return JSON.stringify({
+            shop_id: this.shop_id,
+            discount_types: this.discount_types,
+            purchase_types: this.purchase_types,
+            products: this.products.filter(p => p.amount > 0).map(p => p.toString()),
+            bank_info: this._bank_info,
+            shop_name: this.shop_name,
+            purchase_history: this._purchase_history.toString(),
+            discount_policies: this.discount_policies,
+            purchase_policies: this.purchase_policies
+        })
+        // this._shop_id = shop_id;
+        // this._shop_management = shop_management;
+        // this._discount_types = [];
+        // this._purchase_types = [Purchase_Type.Immediate];
+        // this._products = [];
+        // this._bank_info = bank_info;
+        // this._shop_name = shop_name;
+        // this._purchase_history = UserPurchaseHistoryImpl.getInstance();
+        // this._discount_policies = new DiscountHandler();
+        // this._purchase_policies = Array<PurchaseCondition>();
+        //
+        // return JSON.stringify(this.products.filter(p => p.amount > 0).map(p => p.toString()))
+        // return this.products.reducfunction(acc, cur) {
+        //     return acc.concat(cur.amount != 0 ? cur.toString().concat("\n") : "")}, "")
     }
 
     logOrder(order: Purchase): void {
@@ -368,4 +395,58 @@ export class ShopInventoryImpl implements ShopInventory {
         //for now, it shall stay unimplemented
         return
     }
+
+    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number {
+        return products.reduce((acc, cur) =>
+            acc + (cur.amount * cur.actual_price * (1 - this.discount_policies.evaluateDiscount(cur, cur.amount))), 0)
+    }
+
+    addDiscount(discount: Discount): void {
+        this.discount_policies.addDiscount(discount);
+    }
+
+    removeDiscount(id: number): string | boolean {
+        if (this._discount_policies.removeDiscount(id)) {
+            logger.Info(`Discount ${id} removed`)
+            return true
+        }
+        logger.Error(`Discount ${id} doesn't exist`)
+        return `Discount ${id} doesn't exist`
+    }
+
+    getAllDiscounts(): string {
+        return this.discount_policies.toString();
+    }
+
+    //temp
+
+    // public addDiscountType(discountType: DiscountType): string | boolean{
+    //     if (this._discount_types.indexOf(discountType) < 0) {
+    //         return DiscountExists
+    //     }
+    //     this._discount_types.push(discountType);
+    //     return true;
+    // }
+    // public removeDiscountType(discountType: DiscountType): string | boolean{
+    //     if (this._discount_types.indexOf(discountType) < 0){
+    //         return DiscountNotExists
+    //     }
+    //     this._discount_types.splice(this._discount_types.indexOf(discountType), 1);
+    //     return true;
+    // }
+    //
+    // /**
+    //  * @Requirement - 4.1 and Quality assurance No. 5b
+    //  * @param discountType
+    //  * @return true iff this.discount_types.contains(discountType)
+    //  * @return DiscountNotExists otherwise
+    //  */
+    // removeDiscountType(discountType: DiscountType): string | boolean
+    //
+    //
+    // /**
+    //  * @Requirement - Quality assurance No. 5b
+    //  * @param discountType
+    //  */
+    // addDiscountType(discountType: DiscountType): string | boolean
 }

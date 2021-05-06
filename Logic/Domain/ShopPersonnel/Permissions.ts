@@ -6,6 +6,7 @@ export enum Action {
     RemoveItem,
     ViewShopHistory,
     GetStaffInfo,
+    EditPolicies,
 }
 
 export interface Permissions {
@@ -14,6 +15,7 @@ export interface Permissions {
     remove_item: boolean,
     view_shop_history: boolean,
     get_staff_info: boolean
+    edit_policies: boolean
 
     /**
      * @param action action to perform
@@ -30,17 +32,22 @@ export interface Permissions {
 
 // noinspection RedundantConditionalExpressionJS
 export class ManagerPermissions implements Permissions {
+    get edit_policies(): boolean {
+        return this._edit_policies;
+    }
     /**
      * Get staff info:
      * @Requirement 4.5
      */
     constructor(actions?: boolean[]) {
+
         if (actions == undefined) {
             this._add_item = false;
             this._get_staff_info = true;
             this._manage_policies = false;
             this._remove_item = false;
             this._view_shop_history = false;
+            this._edit_policies = false
         } else {
             //this weird method is necessary to ensure that the boolean array doesnt have "holes"
             this._add_item = (actions[Action.AddItem]) ? true : false;
@@ -48,6 +55,7 @@ export class ManagerPermissions implements Permissions {
             this._manage_policies = actions[Action.ManagePolicies] ? true : false;
             this._remove_item = actions[Action.RemoveItem] ? true : false;
             this._view_shop_history = actions[Action.ViewShopHistory] ? true : false;
+            this._edit_policies = actions[Action.EditPolicies] ? true : false
         }
     }
 
@@ -72,6 +80,10 @@ export class ManagerPermissions implements Permissions {
     }
 
     private _manage_policies: boolean;
+
+    set edit_policies(value: boolean) {
+        this._edit_policies = value;
+    }
 
     get manage_policies(): boolean {
         return this._manage_policies;
@@ -106,17 +118,13 @@ export class ManagerPermissions implements Permissions {
             action == Action.ViewShopHistory ? this.view_shop_history :
                 action == Action.RemoveItem ? this.remove_item :
                     action == Action.ManagePolicies ? this.manage_policies :
-                        action == Action.GetStaffInfo ? this.get_staff_info : false
+                        action == Action.GetStaffInfo ? this.get_staff_info :
+                            action == Action.EditPolicies ? this.edit_policies :
+                                false
     }
 
     toString(): string {
-        const y = "Yes"
-        const n = "No"
-        return `Add items: ${this._add_item ? y : n}\n` +
-            `Manage Policies: ${this._manage_policies ? y : n}\n` +
-            `Remove items: ${this._remove_item ? y : n}\n` +
-            `View shop history: ${this._view_shop_history ? y : n}\n` +
-            `Get staff information: ${this._get_staff_info ? y : n}\n`;
+        return JSON.stringify(this);
     }
 
     editPermission(action: Action, value: boolean): void {
@@ -124,6 +132,10 @@ export class ManagerPermissions implements Permissions {
             action == Action.ViewShopHistory ? this.view_shop_history = value :
                 action == Action.RemoveItem ? this.remove_item = value :
                     action == Action.ManagePolicies ? this.manage_policies = value :
-                        action == Action.GetStaffInfo ? this.get_staff_info = value : null
+                        action == Action.GetStaffInfo ? this.get_staff_info = value :
+                            action == Action.EditPolicies ? this.edit_policies = value :
+                                null
     }
+
+    private _edit_policies: boolean;
 }
