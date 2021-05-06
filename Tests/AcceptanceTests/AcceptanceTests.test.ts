@@ -4,8 +4,7 @@ import {System} from "./System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {SearchTypes} from "../../Logic/Domain/System";
 import {Filter_Type} from "../../Logic/Domain/Shop/ShopInventory";
-import {PaymentHandlerImpl} from "../../Logic/Service/Adapters/PaymentHandler";
-import {DeliveryHandlerImpl} from "../../Logic/Service/Adapters/DeliveryHandler";
+import {BasketDoesntExists} from "../../Logic/Domain/ProductHandling/ErrorMessages";
 
 
 describe('Acceptance Tests:', () => {
@@ -174,7 +173,7 @@ describe('Acceptance Tests:', () => {
         });
         it('Sad: buy basket from non-existing shop', () => {
             let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
-            expect(sad_purchase).to.be.false
+            expect(sad_purchase).to.be.eq(BasketDoesntExists)
         });
         it('Sad: try to buy when inventory is empty', () => {
             // add the 8kTV product with empty inventory to basket
@@ -378,20 +377,21 @@ describe('Acceptance Tests:', () => {
         let userID = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         let res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
-        let items = system.getItemsFromShop(shopID) as string[]
-        // expect(items.some(p=>p.includes("TV"))).to.be.true
 
+        // let items = system.getItemsFromShop(shopID) as string[]
+        // expect(items.some(p=>p.includes("TV"))).to.be.true
         it('Happy', () => {
             system.removeProduct(userID, shopID, 0) //we know that it's 0 as we reset the tests every time
             expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.false
         });
-        it('Sad: ???', () => { //FIXME what is this test?
-            system.performRegister("OvedMetzuyan@post.co.il", "123")
-            let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
-            system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")
-            system.removeProduct(nEmpID, shopID, 1) //we know it's 1
-            expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.true
-        });
+        // it('Sad: Try to remove product while not having proper permissions', () => {
+        //     system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        //     system.performRegister("OvedMetzuyan@post.co.il", "123")
+        //     let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        //     system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")
+        //     system.removeProduct(nEmpID, shopID, 1) //we know it's 1
+        //     expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.true
+        // });
         it('Bad: remove a product with invalid product id', () => {
             system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
             system.removeProduct(userID, shopID, -1)

@@ -1,4 +1,4 @@
-import {PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
+import {generateId, PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
 
 export enum ConditionType {
     NotCategory,
@@ -10,11 +10,13 @@ export enum ConditionType {
 }
 
 export class SimpleCondition implements PurchaseCondition {
+    id: number;
 
     condition: ConditionType
     value: string
 
     constructor(condition: ConditionType, value: any) {
+        this.id = generateId();
         this.condition = condition;
         this.value = value.toString()
     }
@@ -34,5 +36,9 @@ export class SimpleCondition implements PurchaseCondition {
             case ConditionType.UnderAge:
                 return !purchase_data.underaged
         }
+    }
+
+    toString(): string {
+        return JSON.stringify(this)
     }
 }

@@ -1,14 +1,13 @@
-import {User, UserImpl} from "./Users/User";
+import {UserImpl} from "./Users/User";
 import {Shop, ShopImpl} from "./Shop/Shop";
-import {logger} from "./Logger";
 import {LoginImpl} from "./Users/Login";
 import {RegisterImpl} from "./Users/Register";
 import {Filter, Item_Action, Purchase_Type} from "./Shop/ShopInventory";
 import {Action} from "./ShopPersonnel/Permissions";
-import {Product, ProductImpl} from "./ProductHandling/Product";
-import {DiscountType} from "./PurchaseProperties/DiscountType";
+import {ProductImpl} from "./ProductHandling/Product";
 // import {PurchaseType} from "./PurchaseProperties/PurchaseType";
 import {PurchaseImpl} from "./ProductHandling/Purchase";
+
 export enum SearchTypes {
     name,
     category,
@@ -36,7 +35,7 @@ export interface System{
             location: string, bank_info:string): number | string
     userOrderHistory(user_id: number):string | string[]
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
-               base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string
+               base_price: number, purchase_type: Purchase_Type): boolean | string
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
     removeManager(user_id: number, shop_id: number, target: string): string | boolean
@@ -149,14 +148,14 @@ export class SystemImpl implements System {
         }
     }
     addProduct(user_id: number, shop_id:  number, name: string, description: string, amount: number, categories: string[],
-               base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
+               base_price: number, purchase_type: Purchase_Type): boolean | string {
         const shop = this.getShopById(shop_id)
         if (!shop) return `Shop ${shop_id} not found`
         const user = this.login.retrieveUser(user_id);
         if(typeof user == "string")
             return user
         if(!this._register.verifyUserEmail(user.user_email)) return `User id ${user_id} is not registered`
-        return shop.addItem(user.user_email, name, description, amount, categories, base_price, discount_type, purchase_type)
+        return shop.addItem(user.user_email, name, description, amount, categories, base_price, purchase_type)
     }
 
     searchItemFromShops(search_type: SearchTypes, search_term: string): string[] {

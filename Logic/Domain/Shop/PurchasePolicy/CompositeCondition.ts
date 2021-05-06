@@ -1,4 +1,4 @@
-import {PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
+import {generateId, PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
 
 export enum Action {
     And,
@@ -6,8 +6,10 @@ export enum Action {
 }
 
 export class SimpleCondition implements PurchaseCondition {
+    id: number;
 
     constructor(conditions: PurchaseCondition[], action: Action) {
+        this.id = generateId();
         this.conditions = conditions;
         this.action = action;
     }
@@ -17,5 +19,9 @@ export class SimpleCondition implements PurchaseCondition {
 
     evaluate(product_data: PurchaseEvalData): Boolean {
         return this.action == Action.And ? this.conditions.some(c => c.evaluate(product_data)) : this.conditions.every(c => c.evaluate(product_data));
+    }
+
+    toString(): string {
+        return JSON.stringify(this)
     }
 }
