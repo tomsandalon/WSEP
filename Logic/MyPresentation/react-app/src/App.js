@@ -6,16 +6,51 @@ import ShopItems from './components/ShopItems';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import Payment from './components/Payment';
 import ShoppingCart from './components/ShoppingCart';
-import BasketItem from './components/BasketItem';
 class App extends Component{
+  state = {
+    shopsInfo:[]
+  };
+  handleLogout = () =>{
+    console.log("Logged out");
+  }
+  openSession = () =>{
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    };
+    fetch('/home',requestOptions)
+        .then(response => response.json())
+        .then(shops=>{
+          let shopsInfo = [];
+          shops.map(shop =>{
+            const tempShop = JSON.parse(shop);
+            const products_string = JSON.parse(tempShop.products);
+            const products = products_string.map(product => JSON.parse(product));
+            // products.forEach(product => product._category.forEach(cat => console.log(cat._name)))
+            const shopInfo = {id:tempShop.shopID,name:tempShop.name,products:products};
+            shopsInfo.push(shopInfo);
+          })
+          this.setState({shopsInfo:shopsInfo})
+        })
+  }
+  componentDidMount() {
+    this.openSession()
+  }
 
+  handleCategory = (category) => {
+    fetch('/home',)
+    // console.log(this.state);
+    // const st = this.state.shopsInfo.map(shop => 
+    //   shop.products.filter(p => (p._category.map(c => c._name).flat()).includes(category) == true))
+    // console.log(st)
+  }
   render(){
     return (
       <Router>
         <div className="app">
           <Navigation handleLogout={this.handleLogout}/>
           <Switch>
-            <Route path="/home" component={ShopItems}/>
+            <Route path="/home" render={() => (<ShopItems handleCategory={this.handleCategory} shopsInfo={this.state.shopsInfo}/>)}/>
             <Route path="/my-cart" component={ShoppingCart}/>
             <Route path="/login" component={Login} />
             <Route path="/payment" component={Payment}/>

@@ -7,7 +7,16 @@ state = {
 };
 
 handleSubmit = (event) =>{
-    console.log(this.state);
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email:this.state.email, 
+            password:this.state.password
+        })
+      };
+      fetch('/register',requestOptions)
+          .then(response => console.log(response))
     event.preventDefault();
 }
 handleGuest = () =>{

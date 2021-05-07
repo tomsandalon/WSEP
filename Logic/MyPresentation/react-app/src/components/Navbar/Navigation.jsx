@@ -5,7 +5,8 @@ import './Navbar.css'
 
 class Navigation extends Component {
     state ={
-        clicked:false
+        clicked:false,
+        index:MenuItems.length
     }
 
 handleClick = () =>{
@@ -27,8 +28,8 @@ handleClick = () =>{
                         </li>
                         );
                     })}
-                    <li><input className="nav-links" type="button" value="Logout" onClick={() => this.props.handleLogout}/></li>
-                    <li ><a className="nav-links cartButton btn btn-sm" href="/my-cart">
+                    <li key={100}><input className="nav-links" type="button" value="Logout" onClick={() => this.props.handleLogout}/></li>
+                    <li key={101}><a className="nav-links cartButton btn btn-sm" href="/my-cart">
                             MyCart
                             </a>
                         </li>

@@ -8,7 +8,7 @@ class BasketItem extends Component {
 				<div className="row align-items-center">
 					<div className="col-md-5">
 						<figure className="itemside">
-							<div className="aside"><img src={this.props.img} className="photoCart border img-sm"/></div>
+							<div className="aside"><img src={this.props.img} className="photoCart border img-sm" alt=""/></div>
 							<figcaption className="info">
 								<span className="text-muted">{this.props.text}</span>
 							</figcaption>
@@ -28,9 +28,9 @@ class BasketItem extends Component {
 					<div className="col">
 						<div className="price h5">{this.props.price} </div>
 					</div>
-					<div className="col flex-grow-0 text-right">
-						<a href="#" className="btn btn-light"> <i className="fa fa-times"></i> </a>
-					</div>
+					{/*<div className="col flex-grow-0 text-right">*/}
+					{/*	<a href="#" className="btn btn-light"> <i className="fa fa-times"></i> </a>*/}
+					{/*</div>*/}
 				</div>
 			</article>
             </React.Fragment>
