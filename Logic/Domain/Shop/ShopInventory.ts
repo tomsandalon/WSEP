@@ -146,6 +146,8 @@ export interface ShopInventory {
     getAllDiscounts(): string
 
     calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number
+
+    displayItems(): string
 }
 
 export class ShopInventoryImpl implements ShopInventory {
@@ -360,6 +362,12 @@ export class ShopInventoryImpl implements ShopInventory {
             p.returnAmount(result.amount)
             return p
         })
+    }
+
+    displayItems(): string{
+        return JSON.stringify(
+            this.products.filter(p => p.amount > 0).map(p => p.toString()),
+        )
     }
 
     toString(): string {

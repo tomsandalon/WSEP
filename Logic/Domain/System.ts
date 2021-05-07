@@ -202,7 +202,7 @@ export class SystemImpl implements System {
     }
 
     displayShops(): string[] {
-        return this.shops.map(shop => shop.toString())
+        return this.shops.map(shop => shop.displayItems())
     }
 
     private getShopById(shop_id: number): Shop | undefined {

@@ -1,10 +1,8 @@
-import {SearchTypes} from "../Domain/System";
-import {Filter, Item_Action} from "../Domain/Shop/ShopInventory";
+import {SearchTypes, System, SystemImpl} from "../Domain/System";
+import {Filter, Item_Action, Purchase_Type} from "../Domain/Shop/ShopInventory";
 import {Action} from "../Domain/ShopPersonnel/Permissions";
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 import {DiscountType} from "../Domain/PurchaseProperties/DiscountType";
-import {System} from "../Domain/System";
-import {SystemImpl} from "../Domain/System.impl";
 
 export class Service {
     private _system: System
@@ -19,7 +17,7 @@ export class Service {
             can_be_applied: value => true,
             applyDiscount: value => 0.5
         }
-        const dummy: PurchaseType = {}
+        const dummy: Purchase_Type = Purchase_Type.Immediate
         this._system.performRegister("Liorpev@gmail.com", "123456")
         this._system.performRegister("Mark@gmail.com", "123456")
         this._system.performRegister("TomAndSons@gmail.com", "123456") // Owner
@@ -38,11 +36,11 @@ export class Service {
         this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, no_to_all, dummy)
         this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, no_to_all, dummy)
 
-        this.addProduct(tom_id, nvidia_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "Boots", "made in USA", 70, ["Shoes"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, no_to_all, dummy)
     }
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
         return this._system.addItemToBasket(user_id, product_id, shop_id, amount);
@@ -52,7 +50,7 @@ export class Service {
         return this._system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
         return this._system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, discount_type, purchase_type)
     }
 

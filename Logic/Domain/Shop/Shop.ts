@@ -190,6 +190,8 @@ export interface Shop {
     removeDiscount(user_email: string, discountId: number): string | boolean
 
     showAllDiscounts(user_email: String): string
+
+    displayItems(): string
 }
 
 export class ShopImpl implements Shop {
@@ -230,6 +232,14 @@ export class ShopImpl implements Shop {
         this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info)
         this._management.shop_inventory = this._inventory;
         this._is_active = true;
+    }
+
+    displayItems(): string {
+        return JSON.stringify({
+            shopID: this.shop_id,
+            name: this.name,
+            products: this.inventory.displayItems(),
+        })
     }
 
     private _bank_info: string;
