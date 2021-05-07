@@ -22,6 +22,23 @@ app.use(express.urlencoded({extended: false}));
 app.use('/login', require('./User/Login'));
 app.use('/register', require('./User/Register'));
 app.use('/home', require('./Home/Home'));
+app.use('/home/filter', require('./Home/Filter'));
+//
+// app.get('/',(request: any, response: any) => {
+//     response.status(200);
+//     response.setHeader("Content-Type", "text/html");
+//     console.log(request.get("Func"))
+//     response.send("Filter");
+//     response.end();
+//     //`Your session id is ${session_id}, lior result = ${lior_result}`
+//     // const result = await promisedFib(req.params.num);
+//     // fs.readFile(path.join(__dirname, 'build', 'index.html'), (error: any, content: any) => {
+//     //     response.status(200);
+//     //     response.set('Content-Type', contentType);
+//     //     response.cookie(sid, session_id, {})
+//     //     response.end(content, 'utf-8');
+//     // });
+// })
 
 //* For debug TODO delete this
 
