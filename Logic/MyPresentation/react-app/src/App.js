@@ -8,16 +8,14 @@ import Payment from './components/Payment';
 import ShoppingCart from './components/ShoppingCart';
 import BasketItem from './components/BasketItem';
 class App extends Component{
-  handleLogout = () =>{
-    console.log("Logged out");
-  }
-    render(){
+
+  render(){
     return (
       <Router>
         <div className="app">
           <Navigation handleLogout={this.handleLogout}/>
           <Switch>
-            <Route path="/home" exact component={ShopItems}/>
+            <Route path="/home" component={ShopItems}/>
             <Route path="/my-cart" component={ShoppingCart}/>
             <Route path="/login" component={Login} />
             <Route path="/payment" component={Payment}/>

@@ -3,22 +3,35 @@ import FiltersItems from './FiltersItems';
 import ItemOfShop from './ItemOfShop';
 import 'bootstrap/dist/css/bootstrap.min.css';
 class ShopItems extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            items:[
-            {name:'Beer',available:'In Stock' ,cost:12, amount:15},
-            {name:'Cola',available:'In Stock' , cost:25, amount:15},
-            {name:'Vodka',available:'In Stock' , cost:13, amount:15},
-            {name:'Midori', available:'In Stock' ,cost:17, amount:15},
-            {name:'Apple-Juice',available:'In Stock' , cost:12, amount:15},
-            {name:'Mountaindew',available:'In Stock' , cost:12, amount:15},
-            {name:'Rum',available:'In Stock' , cost:12, amount:15},
-            {name:'Whisky', available:'In Stock' ,cost:12, amount:15},
-            {name:'Sprite',available:'In Stock' , cost:12, amount:15},
-            {name:'Fanta',available:'In Stock' , cost:12, amount:15},
-            ]
+    state = {
+        shopsInfo:[]
+    };
+    handleLogout = () =>{
+        console.log("Logged out");
+    }
+    openSession = () =>{
+        console.log(Math.random())
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
         };
+        fetch('/home',requestOptions)
+            .then(response => response.json())
+            .then(shops=>{
+                let shopsInfo = [];
+                shops.map(shop =>{
+                    const tempShop = JSON.parse(shop);
+                    const products_string = JSON.parse(tempShop.products);
+                    const products = products_string.map(product => JSON.parse(product));
+                    // products.forEach(product => product._category.forEach(cat => console.log(cat._name)))
+                    const shopInfo = {id:tempShop.shopID,name:tempShop.name,products:products};
+                    shopsInfo.push(shopInfo)
+                })
+                this.setState({shopsInfo:shopsInfo})
+            })
+    }
+    componentDidMount() {
+        this.openSession()
     }
     render() {
         return (
@@ -30,9 +43,12 @@ class ShopItems extends Component {
                     </div> 
                     <div class="col-8">
                         <div class="row">
-                    {this.state.items.map((item,index) => (
-                        <ItemOfShop name={item.name} available={item.available} amount={item.amount} price={item.price}/>
-                    ))}
+                            {(this.state.shopsInfo.length != 0) &&
+                            (this.state.shopsInfo.map(shop =>
+                                    shop.products.map(item =>
+                                        <ItemOfShop name={item._name} available="Available" amount={item._amount} price={item._base_price}/>
+                                    )
+                            ))}
                         </div>   
                     </div>
                 </div> 
