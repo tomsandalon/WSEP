@@ -58,7 +58,7 @@ export interface ShoppingBasket {
      *               if delivery TODO
      * @return Purchase representing items and amount specified in basket
      */
-    purchase(payment_info: string, coupons: any[]): string | Purchase
+    purchase(payment_info: string, coupons: any  []): string | Purchase
     toString():string[]
 }
 

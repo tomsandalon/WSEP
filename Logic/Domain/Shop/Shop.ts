@@ -7,6 +7,7 @@ import {Action} from "../ShopPersonnel/Permissions";
 import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
 import {Discount} from "./DiscountPolicy/Discount";
 import {PurchaseCondition} from "./PurchasePolicy/PurchaseCondition";
+import {Operator} from "./PurchasePolicy/CompositeCondition";
 // import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 
 let id_counter: number = 0;
@@ -168,14 +169,16 @@ export interface Shop {
     removePolicy(user_email: string, id: number): boolean | string
 
     showAllPolicies(user: string): string
+
+    composePurchasePolicies(user_email: string, id1: number, id2: number, operator: Operator): string | boolean
 }
 
 export class ShopImpl implements Shop {
     private readonly _inventory: ShopInventory;
     private readonly _management: ShopManagement;
+
     private readonly _shop_id: number;
     private readonly _is_active: boolean;
-
     static resetIDs = () => {
         id_counter = 0
         DiscountHandler.discountCounter = 0
@@ -508,5 +511,16 @@ export class ShopImpl implements Shop {
     showAllPolicies(user: string): string {
         logger.Info(user + " requested to view all discounts")
         return this.inventory.getAllPurchasePolicies()
+    }
+
+    composePurchasePolicies(user_email: string, id1: number, id2: number, operator: Operator): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.composePurchasePolicies(id1, id2, operator)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
     }
 }

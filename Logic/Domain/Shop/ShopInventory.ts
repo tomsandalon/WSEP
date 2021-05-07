@@ -11,6 +11,8 @@ import {PurchaseCondition, PurchaseEvalData} from "./PurchasePolicy/PurchaseCond
 import {MinimalUserData} from "../ProductHandling/ShoppingBasket";
 import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
 import {Discount} from "./DiscountPolicy/Discount";
+import {CompositeCondition, Operator} from "./PurchasePolicy/CompositeCondition";
+import {Operation} from "./DiscountPolicy/NumericCompositionDiscount";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -144,6 +146,8 @@ export interface ShopInventory {
     addPurchasePolicy(condition: PurchaseCondition): void
 
     removePurchasePolicy(id: number): boolean | string
+
+    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string
 
     calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number
 }
@@ -425,6 +429,21 @@ export class ShopInventoryImpl implements ShopInventory {
         const length = this._purchase_policies.length
         this._purchase_policies = this._purchase_policies.filter(p => p.id != id);
         return length != this._purchase_policies.length
+    }
+
+    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
+        if (this._purchase_policies.every(p => p.id != id1) ||
+            this._purchase_policies.every(p => p.id != id2)) {
+            logger.Error(`Policies not found`)
+            return "Policies not found"
+        }
+        const new_policy = new CompositeCondition([
+            this._purchase_policies.find(p => p.id == id1) as PurchaseCondition,
+            this._purchase_policies.find(p => p.id == id2) as PurchaseCondition
+        ], operator)
+        this._purchase_policies = this._purchase_policies.filter(p => p.id == id1 || p.id == id2)
+        this._purchase_policies = this._purchase_policies.concat([new_policy])
+        return true
     }
 
     //temp
