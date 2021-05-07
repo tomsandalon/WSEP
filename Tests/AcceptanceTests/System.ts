@@ -1,6 +1,4 @@
-import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
-import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
-// import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
+import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {SearchTypes} from "../../Logic/Domain/System";
 
@@ -25,7 +23,7 @@ export interface System{
             location: string, bank_info:string): number | string
     userOrderHistory(user_id: number):string | string[]
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
-               base_price: number, discount_type: DiscountType, purchase_type: any): boolean | string
+               base_price: number, purchase_type: any): boolean | string
 
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean

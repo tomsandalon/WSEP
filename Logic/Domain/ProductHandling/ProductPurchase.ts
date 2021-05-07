@@ -1,6 +1,5 @@
 import {Category} from "./Category";
 import {Product} from "./Product";
-import {DiscountType} from "../PurchaseProperties/DiscountType";
 
 export interface ProductPurchase {
     readonly product_id: number,
@@ -27,7 +26,7 @@ export class ProductPurchaseImpl implements ProductPurchase{
         this._actual_price = actual_price;
     }
 
-    public static create(product: Product, coupons: DiscountType[], amount: number): ProductPurchase | string{
+    public static create(product: Product, coupons: any[], amount: number): ProductPurchase | string{
         const final_price = product.calculatePrice(coupons);
         if(typeof final_price === "string"){
             return final_price

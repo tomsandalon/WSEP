@@ -10,7 +10,6 @@ import {
     StockLessThanBasket
 } from "./ErrorMessages";
 import {Purchase, PurchaseImpl} from "./Purchase";
-import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {User} from "../Users/User";
 
 type Entry = {product: Product, amount: number}
@@ -59,7 +58,7 @@ export interface ShoppingBasket {
      *               if delivery TODO
      * @return Purchase representing items and amount specified in basket
      */
-    purchase(payment_info: string, coupons: DiscountType[]): string | Purchase
+    purchase(payment_info: string, coupons: any  []): string | Purchase
     toString():string[]
 }
 
@@ -153,7 +152,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         // this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
     }
 
-    purchase(payment_info: string, coupons: DiscountType[]): string | Purchase {
+    purchase(payment_info: string, coupons: any[]): string | Purchase {
         const order = PurchaseImpl.create(new Date(), this,[], this._user_data);
         if(typeof order == "string")
             return order

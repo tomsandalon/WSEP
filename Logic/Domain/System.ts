@@ -1,14 +1,14 @@
-import {User, UserImpl} from "./Users/User";
+import {UserImpl} from "./Users/User";
 import {Shop, ShopImpl} from "./Shop/Shop";
-import {logger} from "./Logger";
 import {LoginImpl} from "./Users/Login";
 import {RegisterImpl} from "./Users/Register";
 import {Filter, Item_Action, Purchase_Type} from "./Shop/ShopInventory";
 import {Action} from "./ShopPersonnel/Permissions";
-import {Product, ProductImpl} from "./ProductHandling/Product";
-import {DiscountType} from "./PurchaseProperties/DiscountType";
+import {ProductImpl} from "./ProductHandling/Product";
 // import {PurchaseType} from "./PurchaseProperties/PurchaseType";
 import {PurchaseImpl} from "./ProductHandling/Purchase";
+import {ConditionType, SimpleCondition} from "./Shop/PurchasePolicy/SimpleCondition";
+
 export enum SearchTypes {
     name,
     category,
@@ -36,11 +36,12 @@ export interface System{
             location: string, bank_info:string): number | string
     userOrderHistory(user_id: number):string | string[]
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
-               base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string
+               base_price: number, purchase_type: Purchase_Type): boolean | string
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
     removeManager(user_id: number, shop_id: number, target: string): string | boolean
     appointOwner(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean
     addPermissions(user_id:number, shop_id:number, target_email:string,action:Action): string | boolean
     editPermissions(user_id:number, shop_id:number, target_email:string,actions:Action[]): string | boolean
     displayStaffInfo(user_id:number,shop_id:number): string[] | string
@@ -50,14 +51,15 @@ export interface System{
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
     getShopInfo(shop_id: number) : string | string[]
 
+    addPurchasePolicy(user_id: number, shop_id: number, condition: ConditionType, value: string): string[] | string
 }
 
 export class SystemImpl implements System {
     private static instance: SystemImpl;
     private _login: LoginImpl;
     private _register: RegisterImpl;
-    private _shops: Shop[];
 
+    private _shops: Shop[];
     private static reset() {
         ShopImpl.resetIDs()
         UserImpl.resetIDs()
@@ -91,6 +93,7 @@ export class SystemImpl implements System {
         else
             return `Email ${user.user_email} is not an admin`;
     }
+
     adminDisplayUserHistory(admin_id: number, target_id: number) {
         const admin = this.login.retrieveUser(admin_id)
         const target = this.login.retrieveUser(target_id)
@@ -99,7 +102,6 @@ export class SystemImpl implements System {
         if (!admin.is_admin) return `${admin.user_email} is not an admin`
         return target.getOrderHistory()
     }
-
     displayShoppingCart(user_id: number): string | string[][] {
         const user = this._login.retrieveUser(user_id);
         if(typeof user == "string"){
@@ -110,6 +112,7 @@ export class SystemImpl implements System {
         }
 
     }
+
     editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number):string | void {
         const user = this._login.retrieveUser(user_id);
         if(typeof user == "string"){
@@ -149,16 +152,15 @@ export class SystemImpl implements System {
         }
     }
     addProduct(user_id: number, shop_id:  number, name: string, description: string, amount: number, categories: string[],
-               base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
+               base_price: number, purchase_type: Purchase_Type): boolean | string {
         const shop = this.getShopById(shop_id)
         if (!shop) return `Shop ${shop_id} not found`
         const user = this.login.retrieveUser(user_id);
         if(typeof user == "string")
             return user
         if(!this._register.verifyUserEmail(user.user_email)) return `User id ${user_id} is not registered`
-        return shop.addItem(user.user_email, name, description, amount, categories, base_price, discount_type, purchase_type)
+        return shop.addItem(user.user_email, name, description, amount, categories, base_price, purchase_type)
     }
-
     searchItemFromShops(search_type: SearchTypes, search_term: string): string[] {
         const search = (shop: Shop) => {
             return (search_type == SearchTypes.name) ? shop.search(search_term, undefined, undefined) :
@@ -197,10 +199,10 @@ export class SystemImpl implements System {
     openSession(): number {
         return this.performGuestLogin();
     }
+
     closeSession(user_id: number): void {
         this.login.exit(user_id)
     }
-
     displayShops(): string[] {
         return this.shops.map(shop => shop.toString())
     }
@@ -250,14 +252,13 @@ export class SystemImpl implements System {
         }
         return logged_user;
     }
+
     performGuestLogin():number{
         return this._login.guestLogin();
     }
-
     performRegister(user_email:string, password: string): boolean {
         return this._register.register(user_email,password)
     }
-
 
     userOrderHistory(user_id: number): string | string[] {
         const user = this._login.retrieveUser(user_id);
@@ -268,6 +269,7 @@ export class SystemImpl implements System {
             return user.getOrderHistory();
         }
     }
+
 
     addPermissions(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
         const result = this.getShopAndUser(user_id, shop_id)
@@ -371,6 +373,32 @@ export class SystemImpl implements System {
         if(!this._register.verifyUserEmail(target))
             return `Target email ${target} doesnt belong to a registered user`
         return shop.removeManager(user_email, target)
+    }
+
+    addPurchasePolicy(user_id: number, shop_id: number, condition: ConditionType, value: string): string[] | string {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        switch (condition){
+            case ConditionType.AfterTime:
+            case ConditionType.BeforeTime:
+                if (isNaN(Date.parse(value))) return `Invalid date ${value}`
+                break;
+            case ConditionType.GreaterAmount:
+            case ConditionType.LowerAmount:
+                if (isNaN(Number(value)) || Number(value) < 0) return `${value} is an invalid amount`
+                break;
+        }
+        return shop.addPolicy(user_email, new SimpleCondition(condition, value))
+    }
+
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(target))
+            return `Target email ${target} doesnt belong to a registered user`
+        return shop.removeOwner(user_email, target)
     }
 }
 

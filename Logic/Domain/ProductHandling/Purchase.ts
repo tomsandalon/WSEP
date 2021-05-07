@@ -3,7 +3,6 @@ import {DeliveryHandler, DeliveryHandlerImpl} from "../../Service/Adapters/Deliv
 import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {MinimalUserData, ShoppingBasket} from "./ShoppingBasket";
 import {Product, ProductImpl} from "./Product";
-import {DiscountType} from "../PurchaseProperties/DiscountType";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {Shop} from "../Shop/Shop";
 import {DeliveryDenied, DiscountNotExists, PaymentDenied} from "./ErrorMessages";
@@ -49,7 +48,7 @@ export class PurchaseImpl implements Purchase{
 
     static resetIDs = () => PurchaseImpl._order_id_specifier = 0
 
-    public static create(date: Date, basket: ShoppingBasket, coupons: DiscountType[], minimal_user_data: MinimalUserData): Purchase | string{
+    public static create(date: Date, basket: ShoppingBasket, coupons: any[], minimal_user_data: MinimalUserData): Purchase | string{
         const products = basket.products.map((product) =>  ProductPurchaseImpl.create(product.product, coupons, product.amount));
         const isBad = products.some((product) => typeof product === "string");
         if(isBad){
