@@ -21,6 +21,12 @@ export interface ShopManagement {
     allowedEditItems(user_email: string): boolean
 
     /**
+     * @param user_email the user to check
+     * @return true iff the user is allowed to edit policies
+     */
+    allowedEditPolicy(user_email: string): boolean
+
+    /**
      * @param user_email email of the user trying to remove items from the shop
      * @return true iff the user representation of user_email is allowed to remove items from the shop
      */
@@ -106,6 +112,10 @@ export class ShopManagementImpl implements ShopManagement {
 
     get owners(): Owner[] {
         return this._owners;
+    }
+
+    allowedEditPolicy(user_email: string): boolean {
+        return this.isAllowed(user_email, Action.EditPolicies);
     }
 
     private _shop_inventory: ShopInventory;
@@ -217,9 +227,15 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     toString(): string {
-        return `Original owner: ${this.original_owner.user_email}\t` +
-            `Owners: ${this.owners.reduce((acc, curr) => acc + ", " + curr.user_email, "")}\t` +
-            `Managers: ${this.managers.reduce((acc, curr) => acc + ", " + curr.user_email, "")}`
+        return JSON.stringify({
+            shop_id: this._shop_id,
+            original_owner: this.original_owner,
+            managers: this.managers,
+            owners: this.owners
+        })
+        // return `Original owner: ${this.original_owner.user_email}\t` +
+        //     `Owners: ${this.owners.reduce((acc, curr) => acc + ", " + curr.user_email, "")}\t` +
+        //     `Managers: ${this.managers.reduce((acc, curr) => acc + ", " + curr.user_email, "")}`
     }
 
     private isOwner(user_email: string) {

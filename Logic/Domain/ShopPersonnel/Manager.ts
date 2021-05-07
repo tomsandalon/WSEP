@@ -44,9 +44,7 @@ export class ManagerImpl implements Manager {
     }
 
     toString(): string {
-        return `Email: ${this._user_email}\tAppointer: ${this._appointer_user_email}\nRole: manager\nPermissions:${
-            this._permissions.toString()
-        }`;
+        return JSON.stringify(this);
     }
 }
 
