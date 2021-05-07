@@ -9,7 +9,7 @@ class ShopItems extends Component {
             <div className="container">  
                 <div className="row">
                     <div className="col-4">
-                        <FiltersItems handleCategory={this.props.handleCategory} shopsInfo={this.props.shopsInfo}/>
+                        <FiltersItems handleFilter={this.props.handleFilter} shopsInfo={this.props.shopsInfo}/>
                     </div> 
                     <div className="col-8">
                         <div className="row">
