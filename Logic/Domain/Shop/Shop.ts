@@ -8,6 +8,9 @@ import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
 import {Discount} from "./DiscountPolicy/Discount";
 import {PurchaseCondition} from "./PurchasePolicy/PurchaseCondition";
 import {Operator} from "./PurchasePolicy/CompositeCondition";
+import {Condition} from "./DiscountPolicy/ConditionalDiscount";
+import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
+import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 // import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 
 let id_counter: number = 0;
@@ -66,7 +69,7 @@ export interface Shop {
      * @return true if the add was successful, or a string containing the error message otherwise
      */
     addItem(user_email: string, name: string, description: string, amount: number,
-            categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string
+            categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string
 
     /**
      * @Requirement 4.1
@@ -154,7 +157,7 @@ export interface Shop {
      * @param user_email
      * @param discount
      */
-    addDiscount(user_email: string, discount: Discount): string[] | string
+    addDiscount(user_email: string, discount: Discount): boolean | string
 
     /**
      * @param user_email
@@ -173,13 +176,23 @@ export interface Shop {
     composePurchasePolicies(user_email: string, id1: number, id2: number, operator: Operator): string | boolean
 
     removeOwner(user_email: string, target: string): string | boolean;
+
+    addConditionToDiscount(user_email: string, discount_id: number, condition: Condition, condition_param: string): string | boolean;
+
+    addNumericCompositionDiscount(user_email: string, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean;
+
+    addLogicCompsoitionDiscount(user_email: string, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean;
+
+    getAllDiscounts(user_id: number): string | string[];
+
+    getAllPurchasePolicies(user_id: number): string | string[];
 }
 
 export class ShopImpl implements Shop {
     private readonly _inventory: ShopInventory;
+    private readonly _shop_id: number;
     private readonly _management: ShopManagement;
 
-    private readonly _shop_id: number;
     private readonly _is_active: boolean;
     static resetIDs = () => {
         id_counter = 0
@@ -192,7 +205,6 @@ export class ShopImpl implements Shop {
         if (name.length == 0) return "Name can't be empty"
         return new ShopImpl(user_email, bank_info, description, location, name)
     }
-
     /**
      * @Requirement 3.2
      * @param user_email
@@ -214,7 +226,6 @@ export class ShopImpl implements Shop {
         this._management.shop_inventory = this._inventory;
         this._is_active = true;
     }
-
     private _bank_info: string;
 
     get bank_info(): string {
@@ -272,7 +283,7 @@ export class ShopImpl implements Shop {
     }
 
     addItem(user_email: string, name: string, description: string, amount: number, categories: string[], base_price: number,
-            purchase_type: Purchase_Type): boolean | string {
+            purchase_type?: Purchase_Type): boolean | string {
         const failure_message: string = `${user_email} failed to add product ${name} to shop ${this._shop_id}`
         const success_message: string = `${user_email} successfully added product ${name} to shop ${this._shop_id}`
 
@@ -484,14 +495,25 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
-    addDiscount(user_email: string, discount: Discount): string[] | string {
+    removeOwner(user_email: string, target: string): string | boolean {
+        const ret = this._management.removeOwner(user_email, target);
+        if (ret) {
+            logger.Info(`${user_email} removed ${target} from management`)
+            return ret
+        }
+        const error = `${user_email} failed to remove ${target} from management`
+        logger.Error(error)
+        return error;
+    }
+
+    addDiscount(user_email: string, discount: Discount): boolean | string {
         if (!this.management.allowedEditPolicy(user_email)) {
             logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
             return `Permission denied. ${user_email} is not allowed to edit policies`
         }
         this.inventory.addDiscount(discount)
         logger.Info(`Added discount: ${JSON.stringify(discount)}`)
-        return [];
+        return true;
     }
 
     removeDiscount(user_email: string, discountId: number): string | boolean {
@@ -526,13 +548,46 @@ export class ShopImpl implements Shop {
         return result;
     }
 
-    removeOwner(user_email: string, target: string): string | boolean {
-        const ret = this._management.removeOwner(user_email, target);
-        if (ret) {
-            logger.Info(`${user_email} removed ${target} from management`)
-            return ret
+    addConditionToDiscount(user_email: string, discount_id: number, condition: Condition, condition_param: string): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
         }
-        const error = `${user_email} failed to remove ${target} from management`
-        logger.Error(error)
-        return error;    }
+        const result = this.inventory.addConditionToDiscount(discount_id, condition, condition_param)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
+    }
+
+    addNumericCompositionDiscount(user_email: string, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.addNumericCompositionDiscount(operation, d_id1, d_id2)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
+    }
+
+    addLogicCompsoitionDiscount(user_email: string, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.addLogicCompositionDiscount(operation, d_id1, d_id2)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
+    }
+
+    getAllDiscounts(user_id: number): string | string[] {
+        logger.Info(`${user_id} requested all discounts`)
+        return [this.inventory.getAllDiscounts()]
+    }
+
+    getAllPurchasePolicies(user_id: number): string | string[] {
+        logger.Info(`${user_id} requested all policies`)
+        return [this.inventory.getAllPurchasePolicies()]
+    }
 }

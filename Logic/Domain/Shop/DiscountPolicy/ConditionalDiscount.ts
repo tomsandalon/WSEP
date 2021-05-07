@@ -13,14 +13,14 @@ export enum Condition {
 
 export class ConditionalDiscount implements Discount {
     condition: Condition
-    value: number
+    discount: Discount
     condition_param: string
     id: number
 
-    constructor(condition: Condition, value: number, condition_param: string) {
+    constructor(condition: Condition, discount: Discount, condition_param: string) {
         this.id = DiscountHandler.discountCounter++;
         this.condition = condition;
-        this.value = value;
+        this.discount = discount;
         this.condition_param = condition_param;
     }
 
@@ -41,7 +41,7 @@ export class ConditionalDiscount implements Discount {
                 shouldApply = true
                 break
         }
-        return shouldApply ? this.value : 0
+        return shouldApply ? this.discount.evaluate(product, amount) : 0
     }
     toString(): string {
         return JSON.stringify(this)
