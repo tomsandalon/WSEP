@@ -23,44 +23,7 @@ app.use('/login', require('./User/Login'));
 app.use('/register', require('./User/Register'));
 app.use('/home', require('./Home/Home'));
 app.use('/home/filter', require('./Home/Filter'));
-//
-// app.get('/',(request: any, response: any) => {
-//     response.status(200);
-//     response.setHeader("Content-Type", "text/html");
-//     console.log(request.get("Func"))
-//     response.send("Filter");
-//     response.end();
-//     //`Your session id is ${session_id}, lior result = ${lior_result}`
-//     // const result = await promisedFib(req.params.num);
-//     // fs.readFile(path.join(__dirname, 'build', 'index.html'), (error: any, content: any) => {
-//     //     response.status(200);
-//     //     response.set('Content-Type', contentType);
-//     //     response.cookie(sid, session_id, {})
-//     //     response.end(content, 'utf-8');
-//     // });
-// })
 
 //* For debug TODO delete this
 
 service.initData();
-
-// app.get('/fib/:num', async (req: any, res: any) => {
-//     const session_id = Session.session_id_specifier++;
-//     Session.sessions[session_id] = service.openSession();
-//     // const result = 10
-//     const result = await promisedFib(req.params.num);
-//     res.status(200);
-//     res.cookie(sid, session_id, {})
-//     res.send(`My first server!\n${result}\n:D`)
-// })
-//
-// function promisedFib(n: number) {
-//     return new Promise((resolve, reject) => {
-//         resolve(fib(n))
-//     })
-// }
-// function fib(n:number): number {
-//     if(n == 0) return 0
-//     else if (n == 1) return 1
-//     else return fib (n-1) + fib(n -2)
-// }

@@ -6,21 +6,21 @@ router.get('/', (req: any, res: any) => {
     //TODO give html to client
     res.send("My first server!\n" + req.url + "\n:D")
 })
-router.post('/', (req: any, res: any) => {
-    console.log("Registering");
+router.post('/', (req: any, response: any) => {
     let user_id = parseInt(req.cookies[sid]);
+    const content_type = "application/json";
     if (isNaN(user_id)) {
-        res.status(404);
-        res.send('Bad session id')
+        response.status(404);
+        response.send('Bad session id')
     } else {
         const result = service.performRegister(req.body.email, req.body.password);
-        console.log(result);
-        res.status(200);
+        console.log(req.body.email, req.body.password)
+        response.setHeader("Content-Type", content_type);
         if (result) {
-            //TODO give html home page
-            res.status(200);
+            response.status(200);
         } else {
-            res.status(401);
+            response.status(400);
         }
+        response.end();
     }
 })

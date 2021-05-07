@@ -35,19 +35,19 @@ router.put('/', (req: any, res: any) => {
 })
 
 router.post('/', (req: any, res: any) => {
-    // let user_id = parseInt(req.cookies[sid]);
-    // if (isNaN(user_id)) {
-    //     res.status(404);
-    //     res.send('Bad session id')
-    // } else {
-    //     const result = service.performLogin(req.body.username, req.body.password);
-    //     if (typeof result === 'string') {
-    //         res.status(200);
-    //         res.send(result)
-    //     } else {
-    //         res.status(200);
-    //         //TODO give html home page
-    //         res.send("Welcome!\n")
-    //     }
-    // }
+    let user_id = parseInt(req.cookies[sid]);
+    if (isNaN(user_id)) {
+        res.status(404);
+        res.send('Bad session id')
+    } else {
+        const result = service.performLogin(req.body.email, req.body.password);
+        res.setHeader("Content-Type", "text/html");
+        if (typeof result === 'string') {
+            res.status(401);
+            res.send(result);
+        } else {
+            res.status(200);
+            res.end();
+        }
+    }
 })
