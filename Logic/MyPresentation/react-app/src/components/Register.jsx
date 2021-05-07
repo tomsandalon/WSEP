@@ -16,7 +16,7 @@ handleSubmit = (event) =>{
         })
       };
       fetch('/register',requestOptions)
-          .then(response => console.log(response))
+          .then(response => console.log(response.status))
     event.preventDefault();
 }
 handleGuest = () =>{

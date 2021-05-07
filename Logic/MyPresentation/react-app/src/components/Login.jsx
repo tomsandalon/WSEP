@@ -8,7 +8,27 @@ state = {
 };
 
 handleSubmit = (event) =>{
-    console.log(this.state);
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email:this.state.email,
+            password:this.state.password
+        })
+    };
+    fetch('/login',requestOptions)
+        .then(async response => {
+            switch (response.status) {
+                case 200: //welcome
+                    break;
+                case 401:
+                    const err_message = await response.text();
+                    console.log(err_message)
+                    break;
+                case 404: //server not found
+                    break;
+            }
+        })
     event.preventDefault();
 }
 handleUserEmail = (event) =>{
