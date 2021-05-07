@@ -171,6 +171,8 @@ export interface Shop {
     showAllPolicies(user: string): string
 
     composePurchasePolicies(user_email: string, id1: number, id2: number, operator: Operator): string | boolean
+
+    removeOwner(user_email: string, target: string): string | boolean;
 }
 
 export class ShopImpl implements Shop {
@@ -523,4 +525,14 @@ export class ShopImpl implements Shop {
         else logger.Error(`Failed to merge discounts`)
         return result;
     }
+
+    removeOwner(user_email: string, target: string): string | boolean {
+        const ret = this._management.removeOwner(user_email, target);
+        if (ret) {
+            logger.Info(`${user_email} removed ${target} from management`)
+            return ret
+        }
+        const error = `${user_email} failed to remove ${target} from management`
+        logger.Error(error)
+        return error;    }
 }

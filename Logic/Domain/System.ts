@@ -41,6 +41,7 @@ export interface System{
     appointManager(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
     removeManager(user_id: number, shop_id: number, target: string): string | boolean
     appointOwner(user_id:number,shop_id:number, appointee_user_email:string): string | boolean
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean
     addPermissions(user_id:number, shop_id:number, target_email:string,action:Action): string | boolean
     editPermissions(user_id:number, shop_id:number, target_email:string,actions:Action[]): string | boolean
     displayStaffInfo(user_id:number,shop_id:number): string[] | string
@@ -389,6 +390,15 @@ export class SystemImpl implements System {
                 break;
         }
         return shop.addPolicy(user_email, new SimpleCondition(condition, value))
+    }
+
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(target))
+            return `Target email ${target} doesnt belong to a registered user`
+        return shop.removeOwner(user_email, target)
     }
 }
 

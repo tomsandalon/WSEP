@@ -315,9 +315,9 @@ export class ShopInventoryImpl implements ShopInventory {
 
     search(name: string | undefined, category: string | undefined, keyword: string | undefined): Product[] {
         return this._products.filter(p => p.amount > 0)
-            .filter(p => (name === undefined) ? true : p.name.toLowerCase().includes(name.toLowerCase()))
-            .filter(p => (category == undefined) ? true : p.category.some(c => c.name.toLowerCase() === category.toLowerCase()))
-            .filter(p => (keyword === undefined) ? true : `${p.description} ${String(p.amount)} ${String(p.product_id)}`
+            .filter(p => (name === undefined || name == "") ? true : p.name.toLowerCase().includes(name.toLowerCase()))
+            .filter(p => (category == undefined || category == "") ? true : p.category.some(c => c.name.toLowerCase() === category.toLowerCase()))
+            .filter(p => (keyword === undefined || keyword == "") ? true : `${p.description} ${String(p.amount)} ${String(p.product_id)}`
                 .toLowerCase().includes(keyword.toLowerCase()))
             ;
     }
@@ -365,7 +365,7 @@ export class ShopInventoryImpl implements ShopInventory {
             shop_id: this.shop_id,
             purchase_types: this.purchase_types,
             products: this.products.filter(p => p.amount > 0).map(p => p.toString()),
-            bank_info: this._bank_info,
+            // bank_info: this._bank_info,
             shop_name: this.shop_name,
             purchase_history: this._purchase_history.toString(),
             discount_policies: this.discount_policies,
