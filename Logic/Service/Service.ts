@@ -1,7 +1,7 @@
 import {SearchTypes, System, SystemImpl} from "../Domain/System";
 import {Filter, Item_Action} from "../Domain/Shop/ShopInventory";
 import {Action} from "../Domain/ShopPersonnel/Permissions";
-import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
+// import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 import {DiscountType} from "../Domain/PurchaseProperties/DiscountType";
 
 class Service implements System {

@@ -21,8 +21,8 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory{
         return this._history;
     }
 
-    public static getInstance(){
-        if (this.instance == undefined)
+    public static getInstance(reset?: boolean){
+        if (this.instance == undefined || reset)
             UserPurchaseHistoryImpl.instance = new UserPurchaseHistoryImpl()
         return this.instance
     }
@@ -46,5 +46,11 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory{
     getShopPurchases(shop_id: number): Purchase[] | string {
         return this._history.reduce((acc: Purchase[], entry: history_entry) =>
             entry.key.shop_id == shop_id ? acc.concat(entry.purchase) : acc, []);
+    }
+
+    toString(): string {
+        return JSON.stringify({
+            history: this._history.map(h => h.toString())
+        })
     }
 }

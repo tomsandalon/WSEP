@@ -17,6 +17,7 @@ export interface User {
     is_admin: boolean
     user_id: number
     is_guest: boolean
+    underaged: boolean
 
     addToBasket(shop: ShopInventory,product_id: number, amount: number): void | string
     editBasketItem(shop: ShopInventory,product_id: number, new_amount: number): void | string
@@ -26,6 +27,7 @@ export interface User {
     removeItemFromBasket(shop: ShopInventory, product_id: number):void
     displayBaskets(): string[][] | string
     getOrderHistory():string[] | string
+    isUnderaged(): boolean;
 }
 
 export class UserImpl implements User {
@@ -57,6 +59,7 @@ export class UserImpl implements User {
         this._order_history = UserPurchaseHistoryImpl.getInstance();
         this._user_id = generateId();
         this._payment_handler = PaymentHandlerImpl.getInstance();
+        this._underaged = false;
     }
 
     /**
@@ -93,7 +96,7 @@ export class UserImpl implements User {
         let shopping_basket = this._cart.filter(element => element.shop.shop_id == shop.shop_id) //basket for provided shop_id exists
         if(shopping_basket.length == 0){ //new shopping basket
             const item: ShoppingEntry = {productId: product_id, amount: amount};
-            let new_basket = ShoppingBasketImpl.create(shop, item);
+            let new_basket = ShoppingBasketImpl.create(shop, item, this);
             if (typeof new_basket === "string"){
                 return new_basket;
             }
@@ -153,6 +156,14 @@ export class UserImpl implements User {
     }
 
 
+    get underaged(): boolean {
+        return this._underaged;
+    }
+
+    set underaged(value: boolean) {
+        this._underaged = value;
+    }
+
     /**
      * Requirement number 2.9
      * @param payment_method
@@ -189,7 +200,7 @@ export class UserImpl implements User {
         else{
             let basket = shopping_basket[0];
             logger.Info(`Basket of shop id ${shop_id} was displayed`)
-            return basket.toStringBasket();
+            return basket.toString();
         }
     }
     /**
@@ -203,7 +214,7 @@ export class UserImpl implements User {
         }
         else{
             logger.Info(`Cart of user_id ${this._user_id} was displayed`)
-            return this._cart.map(basket => basket.toStringBasket());
+            return this._cart.map(basket => basket.toString());
         }
     }
 
@@ -216,7 +227,8 @@ export class UserImpl implements User {
         const purchases = this._order_history.getUserPurchases(this._user_id);
         if (typeof purchases === "string")
             return purchases
-        return purchases.map((purchase: Purchase) => purchase.to_string())
+        if (purchases.length == 0) return "Empty order history";
+        return purchases.map((purchase: Purchase) => purchase.toString())
     }
     get user_email(): string {
         return this._user_email;
@@ -240,6 +252,12 @@ export class UserImpl implements User {
     get is_guest():boolean
     {
         return this._is_guest;
+    }
+
+    private _underaged: boolean;
+
+    isUnderaged(): boolean {
+        return false;
     }
 
 }

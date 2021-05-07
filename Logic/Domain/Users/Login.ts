@@ -2,6 +2,7 @@ import {User, UserImpl} from "./User";
 import {RegisterImpl} from "./Register";
 import {Authentication} from "./Authentication";
 import {logger} from "../Logger";
+import {UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 
 export interface Login {
     login(user_email: string, password: string): number | string
@@ -32,6 +33,7 @@ export class LoginImpl  implements  Login{
         this._password_handler = Authentication.getInstance();
         this._register = RegisterImpl.getInstance(reset);
         this.createAdmin()
+        UserPurchaseHistoryImpl.getInstance(reset)
     }
 
     /**
