@@ -16,7 +16,7 @@ class ShopItems extends Component {
                             {((this.props !== null) && (this.props.shopsInfo.length !== 0)) &&
                             (this.props.shopsInfo.map(shop =>
                                     shop.products.map(item =>
-                                        <ItemOfShop shopID={shop.id} shopName={shop.name} name={item._name} available="Available" amount={item._amount} price={item._base_price}/>
+                                        <ItemOfShop productID={item._product_id} shopID={shop.id} shopName={shop.name} name={item._name} available="Available" amount={item._amount} price={item._base_price}/>
                                     )
                             ))}
                         </div>   

@@ -31,6 +31,8 @@ class App extends Component{
             shopsInfo.push(shopInfo);
           })
           this.setState({shopsInfo:shopsInfo})
+          console.log("hey")
+          console.log(this.state.session)
         })
   }
   componentDidMount() {
@@ -38,11 +40,30 @@ class App extends Component{
   }
 
   handleCategory = (category) => {
-    fetch('/home',)
-    // console.log(this.state);
-    // const st = this.state.shopsInfo.map(shop => 
-    //   shop.products.filter(p => (p._category.map(c => c._name).flat()).includes(category) == true))
-    // console.log(st)
+    // const requestOptions = {
+    //   method: 'GET',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     category_name:category
+    // })
+    // };
+    // fetch('/home/filter',requestOptions)
+    //     .then(response => response.json())
+    //     .then(shops=>{
+    //       let shopsInfo = [];
+    //       shops.map(shop =>{
+    //         const tempShop = JSON.parse(shop);
+    //         const products_string = JSON.parse(tempShop.products);
+    //         const products = products_string.map(product => JSON.parse(product));
+    //         // products.forEach(product => product._category.forEach(cat => console.log(cat._name)))
+    //         const shopInfo = {id:tempShop.shopID,name:tempShop.name,products:products};
+    //         shopsInfo.push(shopInfo);
+    //       })
+    //       this.setState({shopsInfo:shopsInfo})
+    //       console.log("hey")
+    //       console.log(this.state.session)
+    //     })
+    console.log(category)
   }
   render(){
     return (
