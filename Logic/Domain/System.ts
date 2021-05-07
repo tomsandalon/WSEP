@@ -13,6 +13,7 @@ import {SimpleDiscount} from "./Shop/DiscountPolicy/SimpleDiscount";
 import {Condition} from "./Shop/DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "./Shop/DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./Shop/DiscountPolicy/LogicCompositionDiscount";
+import {NotificationAdapter} from "./Notifications/NotificationAdapter";
 
 export enum SearchTypes {
     name,
@@ -82,6 +83,7 @@ export class SystemImpl implements System {
         UserImpl.resetIDs()
         ProductImpl.resetIDs()
         PurchaseImpl.resetIDs()
+        NotificationAdapter.getInstance(true)
     }
 
     private constructor(reset?: boolean) {
