@@ -24,7 +24,7 @@ class ShoppingCart extends Component {
     render() {
         return(
             <div className="row">
-		<main classNameName="col-md-9">
+		<main className="col-md-9">
             {this.state.items.map((item,index) =>(
             <BasketItem img={Image} text={item.name} price={item.price}/>
             ))}
@@ -53,7 +53,6 @@ class ShoppingCart extends Component {
 				</dl>
 				<a href="#" className="btn btn-primary btn-block"> Purchase </a>
 				<p className="small my-3 text-muted">Some extra informative text  can be placed here as dummy text will be replaced</p>
-				<a href="#" className="btn btn-outline-warning btn-block">Installment</a>
 			</div> 
 			</div> 
 		</aside> 

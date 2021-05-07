@@ -159,7 +159,7 @@ export class Service {
     }
 
     userOrderHistory(user_id: number): string | string[] {
-        return this._system.userOrderHistory(user_id)
+        return this.userOrderHistory(user_id)
     }
 
 }
