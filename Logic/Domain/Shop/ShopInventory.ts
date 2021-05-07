@@ -158,6 +158,8 @@ export interface ShopInventory {
     addNumericCompositionDiscount(operation: NumericOperation, d_id1: number, d_id2: number): boolean | string;
 
     addLogicCompositionDiscount(operation: LogicComposition, d_id1: number, d_id2: number): boolean | string;
+
+    notifyOwners(order: Purchase): void;
 }
 
 export class ShopInventoryImpl implements ShopInventory {
@@ -510,5 +512,13 @@ export class ShopInventoryImpl implements ShopInventory {
             return false;
         }
         return true;
+    }
+
+    notifyOwners(order: Purchase): void {
+        this._shop_management.notifyOwners(`New successful order:\n` +
+        `Order number: ${order.order_id}\n` +
+        `Items: ${order.products.reduce(
+            (acc, cur) => acc + "\n" + cur.name, ""
+        )}`)
     }
 }

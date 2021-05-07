@@ -3,6 +3,7 @@ import {Manager, ManagerImpl} from "../ShopPersonnel/Manager";
 import {Owner, OwnerImpl} from "../ShopPersonnel/Owner";
 import {Action, ManagerPermissions, TotalNumberOfPermissions} from "../ShopPersonnel/Permissions";
 import {logger} from "../Logger";
+import {NotificationAdapter} from "../Notifications/NotificationAdapter";
 
 export interface ShopManagement {
     shop_id: number
@@ -88,6 +89,8 @@ export interface ShopManagement {
     allowedToViewShopHistory(user_email: string): boolean
 
     removeOwner(user_email: string, target: string): boolean
+
+    notifyOwners(message: string): void;
 }
 
 
@@ -225,6 +228,9 @@ export class ShopManagementImpl implements ShopManagement {
         if (!manager) return false;
         if (manager.appointer_user_email != appointer_email) return false;
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
+        NotificationAdapter.getInstance().notify(appointee_email,
+            `You have been demoted by ${appointer_email}`
+        )
         return true;
     }
 
@@ -234,7 +240,9 @@ export class ShopManagementImpl implements ShopManagement {
         if (!ownerToRemove) return false;
         if (ownerToRemove.appointer_email != user_email) return false;
         this._owners = this.owners.filter(m => m.user_email != target)
-        this.removeAllSubordinates(target)
+        this.removeAllSubordinates(target, user_email)
+        NotificationAdapter.getInstance().notify(target,
+            `You have been demoted by ${user_email}`)
         return true;
     }
 
@@ -250,12 +258,14 @@ export class ShopManagementImpl implements ShopManagement {
         //     `Managers: ${this.managers.reduce((acc, curr) => acc + ", " + curr.user_email, "")}`
     }
 
-    private removeAllSubordinates(user_email: string) {
+    private removeAllSubordinates(user_email: string, original: string) {
         this._managers = this.managers.filter(m => m.appointer_user_email != user_email)
         const owner_to_remove = this.owners.find(o => o.user_email == user_email)
         if (!owner_to_remove) return
         this._owners = this.owners.filter(o => o.user_email != user_email)
-        owner_to_remove.appointees_emails.forEach(appointee => this.removeAllSubordinates(appointee))
+        NotificationAdapter.getInstance().notify(user_email,
+            `You have been demoted by ${original}`)
+        owner_to_remove.appointees_emails.forEach(appointee => this.removeAllSubordinates(appointee, original))
     }
 
     private isOwner(user_email: string) {
@@ -279,5 +289,11 @@ export class ShopManagementImpl implements ShopManagement {
 
     private isManager(manager_email: string): boolean {
         return this.getManagerByEmail(manager_email) != null
+    }
+
+    notifyOwners(message: string): void {
+        [this.original_owner].concat(this.owners).forEach(
+            o => NotificationAdapter.getInstance().notify(o.user_email, message)
+        )
     }
 }

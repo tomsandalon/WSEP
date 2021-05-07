@@ -11,6 +11,7 @@ import {
 } from "./ErrorMessages";
 import {Purchase, PurchaseImpl} from "./Purchase";
 import {User} from "../Users/User";
+import {NotificationAdapter} from "../Notifications/NotificationAdapter";
 
 type Entry = {product: Product, amount: number}
 export type ShoppingEntry = {productId: number, amount: number}
@@ -159,6 +160,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         const order_purchase = order.purchase_self(payment_info);
         if(typeof order_purchase == "string")
             return order_purchase
+        this.shop.notifyOwners(order)
         return order
     }
 }
