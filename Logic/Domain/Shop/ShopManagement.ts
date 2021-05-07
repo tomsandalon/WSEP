@@ -87,7 +87,7 @@ export interface ShopManagement {
      */
     allowedToViewShopHistory(user_email: string): boolean
 
-    removeOwner(user_email: string, target: string): ;
+    removeOwner(user_email: string, target: string): boolean
 }
 
 
@@ -228,7 +228,7 @@ export class ShopManagementImpl implements ShopManagement {
         return true;
     }
 
-    removeOwner(user_email: string, target: string) {
+    removeOwner(user_email: string, target: string): boolean {
         if (!this.isOwner(user_email) || !this.isOwner(target)) return false;
         const ownerToRemove = this.getOwnerByEmail(target);
         if (!ownerToRemove) return false;

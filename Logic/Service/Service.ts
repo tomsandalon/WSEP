@@ -1,14 +1,49 @@
 import {SearchTypes, System, SystemImpl} from "../Domain/System";
-import {Filter, Item_Action} from "../Domain/Shop/ShopInventory";
+import {Filter, Item_Action, Purchase_Type} from "../Domain/Shop/ShopInventory";
 import {Action} from "../Domain/ShopPersonnel/Permissions";
+import {Condition} from "../Domain/Shop/DiscountPolicy/ConditionalDiscount";
+import {LogicComposition} from "../Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
+import {NumericOperation} from "../Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
+import {ConditionType} from "../Domain/Shop/PurchasePolicy/SimpleCondition";
+import {Operator} from "../Domain/Shop/PurchasePolicy/CompositeCondition";
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
-import {DiscountType} from "../Domain/PurchaseProperties/DiscountType";
 
 class Service implements System {
     private _system: System
 
     constructor(reset?: boolean) {
         this._system = SystemImpl.getInstance(reset);
+    }
+
+    addConditionToDiscount(user_id: number, shop_id: number, id: number, condition: Condition, condition_param: string): string | boolean {
+        return this._system.addConditionToDiscount(user_id, shop_id, id, condition, condition_param);
+    }
+
+    addDiscount(user_id: number, shop_id: number, value: number): string | boolean {
+        return this._system.addDiscount(user_id, shop_id, value)
+    }
+
+    addLogicComposeDiscount(user_id: number, shop_id: number, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean {
+        return this._system.addLogicComposeDiscount(user_id, shop_id, operation, d_id1, d_id2)
+    }
+
+    addNumericComposeDiscount(user_id: number, shop_id: number, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean {
+        return this._system.addNumericComposeDiscount(user_id, shop_id, operation, d_id1, d_id2);
+    }
+
+    addPurchasePolicy(user_id: number, shop_id: number, condition: ConditionType, value: string): string[] | string {
+        return this._system.addPurchasePolicy(user_id, shop_id, condition, value)
+    }
+
+    composePurchasePolicy(user_id: number, shop_id: number, policy_id1: number, policy_id2: number, operator: Operator): boolean | string {
+        return this._system.composePurchasePolicy(user_id, shop_id, policy_id1, policy_id2, operator)
+    }
+
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
+        return this._system.removeOwner(user_id, shop_id, target)
+    }
+    removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
+        return this._system.removePurchasePolicy(user_id, shop_id, policy_id)
     }
 
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
@@ -19,8 +54,8 @@ class Service implements System {
         return this._system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType): boolean | string {
-        return this._system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, discount_type, purchase_type)
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string {
+        return this._system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, purchase_type)
     }
 
     addShop(user_id: number, name: string, description: string, location: string, bank_info: string): number | string {
@@ -129,6 +164,18 @@ class Service implements System {
 
     userOrderHistory(user_id: number): string | string[] {
         return this._system.userOrderHistory(user_id)
+    }
+
+    getAllDiscounts(user_id: number, shop_id: number): string | string[] {
+        return this._system.getAllDiscounts(user_id, shop_id);
+    }
+
+    getAllPurchasePolicies(user_id: number, shop_id: number): string | string[] {
+        return this._system.getAllPurchasePolicies(user_id, shop_id)
+    }
+
+    removeDiscount(user_id: number, shop_id: number, id: number): string | boolean {
+        return this._system.removeDiscount(user_id, shop_id, id)
     }
 
 }

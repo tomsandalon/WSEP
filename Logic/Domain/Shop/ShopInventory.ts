@@ -12,7 +12,9 @@ import {MinimalUserData} from "../ProductHandling/ShoppingBasket";
 import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
 import {Discount} from "./DiscountPolicy/Discount";
 import {CompositeCondition, Operator} from "./PurchasePolicy/CompositeCondition";
-import {Operation} from "./DiscountPolicy/NumericCompositionDiscount";
+import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
+import {Condition} from "./DiscountPolicy/ConditionalDiscount";
+import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -88,7 +90,7 @@ export interface ShopInventory {
      * @param purchase_type purchase purchase type available for the product
      * @return true iff the add was successful
      */
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string
 
     /**
      * @Requirement 4.1
@@ -150,25 +152,30 @@ export interface ShopInventory {
     composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string
 
     calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number
+
+    addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string): string | boolean;
+
+    addNumericCompositionDiscount(operation: NumericOperation, d_id1: number, d_id2: number): boolean | string;
+
+    addLogicCompositionDiscount(operation: LogicComposition, d_id1: number, d_id2: number): boolean | string;
 }
 
 export class ShopInventoryImpl implements ShopInventory {
     private readonly _discount_policies: DiscountHandler;
-    private readonly _purchase_types: Purchase_Type[]
     private _purchase_policies: PurchaseCondition[];
+
+    private readonly _purchase_types: Purchase_Type[]
+
+
     private readonly _shop_id: number;
     private readonly _bank_info: string;
     private _purchase_history: UserPurchaseHistory;
-
-
     get discount_policies(): DiscountHandler {
         return this._discount_policies;
     }
-
     get purchase_policies(): PurchaseCondition[] {
         return this._purchase_policies;
     }
-
     constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
@@ -180,6 +187,7 @@ export class ShopInventoryImpl implements ShopInventory {
         this._discount_policies = new DiscountHandler();
         this._purchase_policies = Array<PurchaseCondition>();
     }
+
 
     private readonly _shop_name: string;
 
@@ -219,7 +227,7 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._bank_info
     }
 
-    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string {
+    addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
         const item: Product | string = ProductImpl.create(base_price, description, name, purchase_type);
         if (typeof item === "string") {
             return item
@@ -240,7 +248,6 @@ export class ShopInventoryImpl implements ShopInventory {
         }
         // item.addDiscountType(discount_type) //TODO
         this._products = this._products.concat([item]);
-        item.purchase_type = purchase_type
         return true;
     }
 
@@ -383,7 +390,7 @@ export class ShopInventoryImpl implements ShopInventory {
         // this._purchase_policies = Array<PurchaseCondition>();
         //
         // return JSON.stringify(this.products.filter(p => p.amount > 0).map(p => p.toString()))
-        // return this.products.reducfunction(acc, cur) {
+        // return this.products.reduce(function(acc, cur) {
         //     return acc.concat(cur.amount != 0 ? cur.toString().concat("\n") : "")}, "")
     }
 
@@ -477,4 +484,31 @@ export class ShopInventoryImpl implements ShopInventory {
     //  * @param discountType
     //  */
     // addDiscountType(discountType: DiscountType): string | boolean
+
+    addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string) {
+        const result = this.discount_policies.addConditionToDiscount(discount_id, condition, condition_param)
+        if (!result) {
+            logger.Error(`Discount ${discount_id} not found`)
+            return false;
+        }
+        return true;
+    }
+
+    addNumericCompositionDiscount(operation: NumericOperation, d_id1: number, d_id2: number): boolean | string {
+        const result = this.discount_policies.addNumericCompositionDiscount(operation, d_id1, d_id2)
+        if (!result) {
+            logger.Error(`Discounts not found`)
+            return false;
+        }
+        return true;
+    }
+
+    addLogicCompositionDiscount(operation: LogicComposition, d_id1: number, d_id2: number): boolean | string {
+        const result = this.discount_policies.addLogicCompositionDiscount(operation, d_id1, d_id2)
+        if (!result) {
+            logger.Error(`Discounts not found`)
+            return false;
+        }
+        return true;
+    }
 }
