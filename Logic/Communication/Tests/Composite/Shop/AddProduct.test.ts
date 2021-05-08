@@ -1,9 +1,12 @@
 import {app} from "../../../Server";
 const expect = require('chai').expect;
-import {chai, cookie_prefix, SessionTest} from "../../Setup";
+import {cookie_prefix, SessionTest} from "../../Setup";
 import {beforeEach} from "mocha";
-import {BadRequest, OK, route_login, route_logout, route_register} from "../../../Config/Config";
-import {Purchase_Type} from "../../../../Domain/Shop/ShopInventory";
+import {
+    BadRequest,
+    OK,
+    route_add_product,
+} from "../../../Config/Config";
 const request = require('supertest');
 
 describe('Add Product to Shop tests', () => {
@@ -11,7 +14,7 @@ describe('Add Product to Shop tests', () => {
         expect(SessionTest.sess_id).not.equal('')
     })
     it('Add Product unsuccessfully - no name',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
@@ -25,7 +28,7 @@ describe('Add Product to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Product unsuccessfully - no description',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
@@ -39,7 +42,7 @@ describe('Add Product to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Product unsuccessfully - amount negative',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
@@ -53,7 +56,7 @@ describe('Add Product to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Product unsuccessfully - amount 0',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
@@ -67,7 +70,7 @@ describe('Add Product to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Product unsuccessfully - negative base price',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
@@ -81,7 +84,7 @@ describe('Add Product to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Product unsuccessfully - base price 0',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
@@ -95,7 +98,7 @@ describe('Add Product to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Product unsuccessfully - bad purchase type',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
@@ -109,7 +112,7 @@ describe('Add Product to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Product successfully',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_add_product)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,

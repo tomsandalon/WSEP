@@ -2,7 +2,7 @@ import {app} from "../../../Server";
 const expect = require('chai').expect;
 import {chai, cookie_prefix, SessionTest} from "../../Setup";
 import {beforeEach} from "mocha";
-import {BadRequest, OK, route_login, route_logout, route_register} from "../../../Config/Config";
+import {BadRequest, OK, route_shop} from "../../../Config/Config";
 const request = require('supertest');
 
 describe('Add Shop tests', () => {
@@ -10,7 +10,7 @@ describe('Add Shop tests', () => {
         expect(SessionTest.sess_id).not.equal('')
     })
     it('Add Shop unsuccessfully - no name',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_shop)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 name: "",
@@ -21,7 +21,7 @@ describe('Add Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Shop unsuccessfully - no description',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_shop)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 name: "NIVIDIA",
@@ -33,7 +33,7 @@ describe('Add Shop tests', () => {
     })
 
     it('Add Shop unsuccessfully - no location',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_shop)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 name: "NIVIDIA",
@@ -44,7 +44,7 @@ describe('Add Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Shop unsuccessfully - no bank info',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_shop)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 name: "NIVIDIA",
@@ -55,7 +55,7 @@ describe('Add Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Shop successfully',  (done) =>{
-        request(app).post(route_register)
+        request(app).post(route_shop)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 name: "NIVIDIA",
