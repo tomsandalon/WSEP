@@ -68,7 +68,7 @@ class BasketItem extends Component {
 						
 					</div>
 					<div className="col-2">
-					<h6>Per item: <span type="text" className="badge badge-pill badge-info">{this.props.price*this.props.amount}</span></h6>
+					<h6>Per item: <span type="text" className="badge badge-pill badge-info">{this.props.price}</span></h6>
 					</div>
 					<div className="col-2">
 					<button className="btn btn-primary btn-sm" onClick={this.handleRemoveItemFromBasket}> Remove </button>
