@@ -15,7 +15,12 @@ const ManagersBlock = (props) => {
           {isPending && <div>Loading...</div>}
           {managers &&
             managers.map((manager) => {
-              return <ManagerCell id={manager.id} name={manager.name} />;
+              return (
+                <ManagerCell
+                  id={manager.id}
+                  managerName={manager.managerName}
+                />
+              );
             })}
         </tbody>
       </table>

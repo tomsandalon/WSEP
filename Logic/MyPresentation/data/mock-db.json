@@ -1,6 +1,24 @@
 {
-  "store_1_managers": [{ "id": 1, "name": "Tomer Nagar" }],
-  "store_2_managers": [{ "id": 2, "name": "Mark Oulitin" }],
+  "store_1_managers": [
+    {
+      "id": 1,
+      "managerName": "Tomer Nagar"
+    },
+    {
+      "managerName": "newmanagaaa",
+      "id": 2
+    },
+    {
+      "managerName": "newmanagaaasds",
+      "id": 3
+    }
+  ],
+  "store_2_managers": [
+    {
+      "id": 2,
+      "managerName": "Mark Oulitin"
+    }
+  ],
   "stores": [
     {
       "id": 1,

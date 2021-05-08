@@ -6,19 +6,19 @@ import EditIcon from "@material-ui/icons/Edit";
 
 const ManagerCell = (props) => {
   const id = props.id;
-  const name = props.name;
+  const managerName = props.managerName;
 
   return (
     <tr tabIndex={-1} key={id}>
       <td>
         <div className="user-profile d-flex flex-row align-items-center">
           <Avatar
-            alt={name}
+            alt={managerName}
             src={"./images/Anon_Avatar.png"}
             className="user-avatar"
           />
           <div className="user-detail ">
-            <h5 className="user-name ">{name} </h5>
+            <h5 className="user-name ">{managerName} </h5>
             {/* <p className="user-description">{userId} </p> */}
           </div>
         </div>
