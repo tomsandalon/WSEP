@@ -146,9 +146,12 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     toString(): string[]{
         return [JSON.stringify({
             basket_id: this.basket_id,
-            shop: this.shop.toString(),
+            shop: {
+                name: this.shop.shop_name,
+                id: this.shop.shop_id,
+            },
             products: this.products,
-            user_data: this.user_data,
+            // user_data: this.user_data,
         })]
         // this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
     }
