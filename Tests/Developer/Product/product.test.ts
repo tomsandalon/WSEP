@@ -1,15 +1,15 @@
 import 'mocha';
-import { expect, assert } from 'chai';
-import {Product, ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
+import {assert, expect} from 'chai';
+import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 import * as Error from "../../../Logic/Domain/ProductHandling/ErrorMessages";
 import {
     AmountIsLargerThanStock,
     AmountNonPositiveValue,
     BasePriceNonPositiveValue,
-    DescriptionEmpty, ProductNameEmpty
+    DescriptionEmpty,
+    ProductNameEmpty
 } from "../../../Logic/Domain/ProductHandling/ErrorMessages";
 import {CategoryImpl} from "../../../Logic/Domain/ProductHandling/Category";
-import {DiscountType} from "../../../Logic/Domain/PurchaseProperties/DiscountType";
 
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");

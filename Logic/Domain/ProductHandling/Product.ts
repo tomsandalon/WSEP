@@ -1,5 +1,4 @@
 import {Category} from "./Category";
-import {DiscountType} from "../PurchaseProperties/DiscountType";
 // import {Purchase_Type} from "../PurchaseProperties/Purchase_Type";
 import {
     AmountIsLargerThanStock,
@@ -90,7 +89,7 @@ export interface Product {
      * @return actual_price considering all discounts applied on this product and coupons that the customer applied
      * @return DiscountNotExists iff the customer entered a coupon that can't be applied on this product
      */
-    calculatePrice(coupons: DiscountType[]): number | string
+    calculatePrice(coupons: any[]): number | string
 
 
     /**
@@ -229,7 +228,7 @@ export class ProductImpl implements Product{
     }
 
     //TODO move function to inventory
-    public calculatePrice(coupons: DiscountType[]): number | string{
+    public calculatePrice(coupons: any[]): number | string{
         let price = this._base_price;
         let privateDiscounts: number[] = [];
         for (let coupon of coupons){

@@ -1,0 +1,131 @@
+{
+  "store_1_managers": [
+    {
+      "id": 1,
+      "managerName": "Tomer Nagar"
+    },
+    {
+      "managerName": "newmanagaaa",
+      "id": 2
+    },
+    {
+      "managerName": "newmanagaaasds",
+      "id": 3
+    }
+  ],
+  "store_2_managers": [
+    {
+      "id": 2,
+      "managerName": "Mark Oulitin"
+    }
+  ],
+  "stores": [
+    {
+      "id": 1,
+      "name": "First shop",
+      "description": "Description1",
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Second shop",
+      "description": "Description2",
+      "active": false
+    }
+  ],
+  "store_1_items": [
+    {
+      "id": 12,
+      "name": "Beer1",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    },
+    {
+      "id": 13,
+      "name": "Cola1",
+      "available": "In Stock",
+      "cost": 25,
+      "amount": 15
+    },
+    {
+      "id": 14,
+      "name": "Vodka1",
+      "available": "In Stock",
+      "cost": 13,
+      "amount": 15
+    },
+    {
+      "id": 15,
+      "name": "Midori1",
+      "available": "In Stock",
+      "cost": 17,
+      "amount": 15
+    },
+    {
+      "id": 16,
+      "name": "Apple-Juice1",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    },
+    {
+      "id": 17,
+      "name": "Mountaindew1",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    },
+    {
+      "id": 18,
+      "name": "Rum1",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    },
+    {
+      "id": 19,
+      "name": "Whisky1",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    },
+    {
+      "id": 110,
+      "name": "Sprite1",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    },
+    {
+      "id": 111,
+      "name": "Fanta1",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    }
+  ],
+  "store_2_items": [
+    {
+      "id": 22,
+      "name": "Beer2",
+      "available": "In Stock",
+      "cost": 12,
+      "amount": 15
+    },
+    {
+      "id": 23,
+      "name": "Cola2",
+      "available": "In Stock",
+      "cost": 25,
+      "amount": 15
+    },
+    {
+      "id": 24,
+      "name": "Vodka2",
+      "available": "In Stock",
+      "cost": 13,
+      "amount": 15
+    }
+  ]
+}

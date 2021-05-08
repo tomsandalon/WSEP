@@ -1,14 +1,11 @@
 import 'mocha';
 import * as Parallel from 'async-parallel';
-import { expect, assert } from 'chai';
+import {assert, expect} from 'chai';
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 import {ShopImpl} from "../../../Logic/Domain/Shop/Shop";
-import {PurchasePolicyHandler} from "../../../Logic/Domain/PurchaseProperties/PurchasePolicyHandler";
-import {DiscountPolicyHandler} from "../../../Logic/Domain/PurchaseProperties/DiscountPolicyHandler";
 import {User, UserImpl} from "../../../Logic/Domain/Users/User";
 import {ShopInventory} from "../../../Logic/Domain/Shop/ShopInventory";
 import {describe} from "mocha";
-import {AmountIsLargerThanStock} from "../../../Logic/Domain/ProductHandling/ErrorMessages";
 
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");
