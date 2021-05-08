@@ -27,6 +27,20 @@ app.use('/cart', require('./User/Cart'));
 app.use('/home', require('./Home/Home'));
 app.use('/home/filter', require('./Home/Filter'));
 
+const second = 1000;
+const minute = 60 * second;
+const hour = 60 * minute;
+const day = 24 * hour;
+app.get('/guest',(request: any, response: any) => {
+    const session_id = Session.session_id_specifier++;
+    Session.sessions[session_id] = service.openSession();
+    response.status(200);
+    response.setHeader("Content-Type", "application/json");
+    response.cookie(sid, session_id, {
+        maxAge: 2 * hour
+    })
+    response.end();
+})
 //* For debug TODO delete this
 
 service.initData();

@@ -18,7 +18,10 @@ class ItemOfShop extends Component {
     handleAddToCart = () => {
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': document.cookie
+            },
             body: JSON.stringify({
                 product_id:this.state.productID,
                 shop_id:this.state.shopID,
