@@ -26,9 +26,13 @@ class ShoppingCart extends Component {
 	}
 	//displayShoppingCart(user_id: number): string | string[][] {
 	componentDidMount() {
+		console.log("cookies",document.cookie);
 		const requestOptions = {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' }
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				cookies:document.cookie
+			})
 		  };
 		  fetch('/cart',requestOptions)
 			  .then(async response => {
