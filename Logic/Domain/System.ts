@@ -68,6 +68,7 @@ export interface System{
     addLogicComposeDiscount(user_id: number, shop_id: number, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean
     removeDiscount(user_id: number, shop_id: number, id: number): string | boolean
     getAllDiscounts(user_id: number, shop_id: number): string | string[]
+    getAllShops(user_id: number): string | string[]
 }
 
 //TODO add toggle underaged
@@ -488,5 +489,22 @@ export class SystemImpl implements System {
         if (typeof result == "string") return result
         const {shop, user_email} = result
         return shop.getAllPurchasePolicies(user_id)
+    }
+
+    getAllShops(user_id: number): string | string[] {
+        const user = this.login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        const user_email = user.user_email;
+        const my_shops_as_owner = this.shops.filter(shop => shop.management.owners.concat([shop.management.original_owner]).some(owner => owner.user_email == user_email))
+        const my_shops_as_manager = this.shops.filter(shop => shop.management.managers.some(manager => manager.user_email == user_email))
+        return JSON.stringify(
+            my_shops_as_manager
+            .concat(my_shops_as_owner)
+            .map(
+            shop => {
+                shop_id: shop.shop_id
+                name: shop.name
+            }))
     }
 }

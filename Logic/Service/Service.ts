@@ -158,7 +158,9 @@ export class Service {
     }
 
     userOrderHistory(user_id: number): string | string[] {
-        return this.userOrderHistory(user_id)
+        return this._system.userOrderHistory(user_id)
     }
-
+    getAllShops(user_id: number): string | string[]{
+        return this._system.getAllShops(user_id)
+    }
 }
