@@ -1,14 +1,15 @@
 import {SearchTypes, System, SystemImpl} from "../Domain/System";
-import {Filter, Item_Action, Purchase_Type} from "../Domain/Shop/ShopInventory";
+import {Filter, Filter_Type, Item_Action, Purchase_Type} from "../Domain/Shop/ShopInventory";
 import {Action} from "../Domain/ShopPersonnel/Permissions";
 import {Condition} from "../Domain/Shop/DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "../Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NumericOperation} from "../Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../Domain/Shop/PurchasePolicy/CompositeCondition";
+
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 
-class Service implements System {
+class Service {
     private _system: System
 
     constructor(reset?: boolean) {
@@ -106,7 +107,28 @@ class Service implements System {
         return this._system.editShoppingCart(user_id, shop_id, product_id, amount)
     }
 
-    filterSearch(search_type: SearchTypes, search_term: string, filters: Filter[]): string[] {
+
+    // [19:52, 5/7/2021] ליאור ניתוצ: //(category_name[]strings, min_price:number,max_price:number,rating:number,search_name_term:string)
+    //     [19:53, 5/7/2021] ליאור ניתוצ: default value for rating,minprice,maxprice is 0 meaning no need to filter by them
+    // [19:53, 5/7/2021] ליאור ניתוצ: default value for search_name is '' meaning no need to filter by it
+    // [19:53, 5/7/2021] ליאור ניתוצ: default value for category [] is empty array meaning no need to filter by it
+    filterSearch(categories: string[], min_price: number, max_price: number,
+                 rating: number, name_search_term: string): string[] {
+        const search_type = SearchTypes.name
+        const search_term = name_search_term
+        let filters: Filter[] = []
+        if (categories.length > 0) {
+            categories.forEach(c => {
+                filters = filters.concat([{filter_type: Filter_Type.Category, filter_value: c}])
+            })
+        }
+        if (min_price > 0) {
+            filters = filters.concat([{filter_type: Filter_Type.AbovePrice, filter_value: min_price.toString()}])
+        }
+        if (max_price > 0) {
+            filters = filters.concat([{filter_type: Filter_Type.AbovePrice, filter_value: max_price.toString()}])
+        }
+        //ignore rating
         return this._system.filterSearch(search_type, search_term, filters)
     }
 
