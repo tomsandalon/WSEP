@@ -2,7 +2,6 @@ import {SearchTypes, System, SystemImpl} from "../Domain/System";
 import {Filter, Item_Action, Purchase_Type} from "../Domain/Shop/ShopInventory";
 import {Action} from "../Domain/ShopPersonnel/Permissions";
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
-import {DiscountType} from "../Domain/PurchaseProperties/DiscountType";
 
 export class Service {
     private _system: System
@@ -11,12 +10,12 @@ export class Service {
         this._system = SystemImpl.getInstance(reset);
     }
     public initData(){
-        const no_to_all: DiscountType = {
-            percent: 0.5, // 0 <= percent <= 1
-            expiration_date: new Date(),
-            can_be_applied: value => true,
-            applyDiscount: value => 0.5
-        }
+        // const no_to_all: DiscountType = {
+        //     percent: 0.5, // 0 <= percent <= 1
+        //     expiration_date: new Date(),
+        //     can_be_applied: value => true,
+        //     applyDiscount: value => 0.5
+        // }
         const dummy: Purchase_Type = Purchase_Type.Immediate
         this._system.performRegister("Liorpev@gmail.com", "123456")
         this._system.performRegister("Mark@gmail.com", "123456")
@@ -30,17 +29,17 @@ export class Service {
         const zara_id = this.addShop(tom_id, "ZARA", "Best style in UK", 'China', "Budaa 4 ever")
         if (typeof nvidia_id === "string" || typeof zara_id === "string")
             return
-        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 1, ["GPU"], 2000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, no_to_all, dummy)
-        this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, no_to_all, dummy)
+        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, dummy)
+        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 1, ["GPU"], 2000, dummy)
+        this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, dummy)
+        this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, dummy)
+        this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, dummy)
 
-        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, no_to_all, dummy)
-        this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, no_to_all, dummy)
+        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, dummy)
     }
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
         return this._system.addItemToBasket(user_id, product_id, shop_id, amount);
@@ -50,8 +49,8 @@ export class Service {
         return this._system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
-        return this._system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, discount_type, purchase_type)
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
+        return this._system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, purchase_type)
     }
 
     addShop(user_id: number, name: string, description: string, location: string, bank_info: string): number | string {

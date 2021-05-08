@@ -4,8 +4,9 @@ import nock from "nock";
 const fs = require('fs')
 const https = require('https');
 const request = require('request');
-const chai = require("chai")
-const chaiHttp = require("chai-http")
+const chai = require('chai');
+const chaiNock = require('chai-nock');
+chai.use(chaiNock);
 describe('', () => {
     it('',  async () =>{
         // nock('https://localhost:8000/')

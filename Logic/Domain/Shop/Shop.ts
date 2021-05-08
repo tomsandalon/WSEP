@@ -1,14 +1,16 @@
 import {Filter, Item_Action, Purchase_Type, ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
-import {DiscountType} from "../PurchaseProperties/DiscountType";
 // import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {logger} from "../Logger";
 import {Action} from "../ShopPersonnel/Permissions";
-import {PurchasePolicyHandler} from "../PurchaseProperties/PurchasePolicyHandler";
-import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
 import {Discount} from "./DiscountPolicy/Discount";
+import {PurchaseCondition} from "./PurchasePolicy/PurchaseCondition";
+import {Operator} from "./PurchasePolicy/CompositeCondition";
+import {Condition} from "./DiscountPolicy/ConditionalDiscount";
+import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
+import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 // import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 
 let id_counter: number = 0;
@@ -63,13 +65,11 @@ export interface Shop {
      * @param amount amount available for selling
      * @param categories categories of the product
      * @param base_price base price for the product
-     * @param discount_type discount type available for the product
      * @param purchase_type purchase purchase type available for the product
      * @return true if the add was successful, or a string containing the error message otherwise
      */
     addItem(user_email: string, name: string, description: string, amount: number,
-            categories: string[], base_price: number,
-            discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string
+            categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string
 
     /**
      * @Requirement 4.1
@@ -78,30 +78,6 @@ export interface Shop {
      * @return true if the removal was successful, or a string containing the error message otherwise
      */
     removeItem(user_email: string, product_id: number): boolean | string
-
-    /**
-     * @Requirement 4.2
-     * @param user_email email of the user trying to add
-     * @param purchase_policy the policy to add
-     * @return true if the add was successful, or a string containing the error message otherwise
-     */
-    addPolicy(user_email: string, purchase_policy: any): boolean | string
-
-    /**
-     * @Requirement 4.2
-     * @param user_email email of the user trying to add
-     * @param purchase_policy the policy to remove
-     * @return true if the removal was successful, or a string containing the error message otherwise
-     */
-    removePolicy(user_email: string, purchase_policy: any): boolean | string
-
-    /**
-     * @Requirement 4.2
-     * @param user_email email of the user trying to edit
-     * @param purchase_policy the policy to edit
-     * @return true if the edit was successful, or a string containing the error message otherwise
-     */
-    editPolicy(user_email: string, purchase_policy: any): boolean | string
 
     /**
      * @Requirement 4.3
@@ -181,7 +157,7 @@ export interface Shop {
      * @param user_email
      * @param discount
      */
-    addDiscount(user_email: string, discount: Discount): string[] | string
+    addDiscount(user_email: string, discount: Discount): boolean | string
 
     /**
      * @param user_email
@@ -192,14 +168,36 @@ export interface Shop {
     showAllDiscounts(user_email: String): string
 
     displayItems(): string
+
+    showAllDiscounts(user_email: string): string
+
+    addPolicy(user_email: string, policy: PurchaseCondition): string[] | string
+
+    removePolicy(user_email: string, id: number): boolean | string
+
+    showAllPolicies(user: string): string
+
+    composePurchasePolicies(user_email: string, id1: number, id2: number, operator: Operator): string | boolean
+
+    removeOwner(user_email: string, target: string): string | boolean;
+
+    addConditionToDiscount(user_email: string, discount_id: number, condition: Condition, condition_param: string): string | boolean;
+
+    addNumericCompositionDiscount(user_email: string, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean;
+
+    addLogicCompsoitionDiscount(user_email: string, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean;
+
+    getAllDiscounts(user_id: number): string | string[];
+
+    getAllPurchasePolicies(user_id: number): string | string[];
 }
 
 export class ShopImpl implements Shop {
     private readonly _inventory: ShopInventory;
-    private readonly _management: ShopManagement;
     private readonly _shop_id: number;
-    private readonly _is_active: boolean;
+    private readonly _management: ShopManagement;
 
+    private readonly _is_active: boolean;
     static resetIDs = () => {
         id_counter = 0
         DiscountHandler.discountCounter = 0
@@ -211,7 +209,6 @@ export class ShopImpl implements Shop {
         if (name.length == 0) return "Name can't be empty"
         return new ShopImpl(user_email, bank_info, description, location, name)
     }
-
     /**
      * @Requirement 3.2
      * @param user_email
@@ -299,7 +296,7 @@ export class ShopImpl implements Shop {
     }
 
     addItem(user_email: string, name: string, description: string, amount: number, categories: string[], base_price: number,
-            discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
+            purchase_type?: Purchase_Type): boolean | string {
         const failure_message: string = `${user_email} failed to add product ${name} to shop ${this._shop_id}`
         const success_message: string = `${user_email} successfully added product ${name} to shop ${this._shop_id}`
 
@@ -308,8 +305,7 @@ export class ShopImpl implements Shop {
             return "Permission denied";
         }
 
-        const ret = this._inventory.addItem(name, description, amount, categories, base_price,
-            discount_type, purchase_type)
+        const ret = this._inventory.addItem(name, description, amount, categories, base_price, purchase_type)
         if (typeof ret === "string") {
             const error = `${failure_message}. ` + ret
             logger.Error(error);
@@ -319,24 +315,26 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
-    /*
-    TODO policies
-     */
-    addPolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We don't have any policies yet :(";
+    addPolicy(user_email: string, policy: PurchaseCondition): string[] | string {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        this.inventory.addPurchasePolicy(policy)
+        logger.Info(`Added purchase policy: ${JSON.stringify(policy)}`)
+        return [];
     }
 
-    editPolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We dont have policies";
+    removePolicy(user_email: string, id: number): boolean | string {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.removePurchasePolicy(id)
+        if (result) logger.Info(`Discount ${id} removed`)
+        else logger.Error(`Discount ${id} doesn't exist`)
+        return result;
     }
-
-    removePolicy(user_email: string, purchase_policy: any): boolean | string {
-        return "We don't have any policies yet :(";
-    }
-
-    /*
-    End
-     */
 
     filter(products: Product[], filters: Filter[]): Product[] {
         const ret = this._inventory.filter(products, filters);
@@ -510,14 +508,25 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
-    addDiscount(user_email: string, discount: Discount): string[] | string {
+    removeOwner(user_email: string, target: string): string | boolean {
+        const ret = this._management.removeOwner(user_email, target);
+        if (ret) {
+            logger.Info(`${user_email} removed ${target} from management`)
+            return ret
+        }
+        const error = `${user_email} failed to remove ${target} from management`
+        logger.Error(error)
+        return error;
+    }
+
+    addDiscount(user_email: string, discount: Discount): boolean | string {
         if (!this.management.allowedEditPolicy(user_email)) {
             logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
             return `Permission denied. ${user_email} is not allowed to edit policies`
         }
         this.inventory.addDiscount(discount)
         logger.Info(`Added discount: ${JSON.stringify(discount)}`)
-        return [];
+        return true;
     }
 
     removeDiscount(user_email: string, discountId: number): string | boolean {
@@ -534,5 +543,64 @@ export class ShopImpl implements Shop {
     showAllDiscounts(user_email: string): string {
         logger.Info(user_email + " requested to view all discounts")
         return this.inventory.getAllDiscounts()
+    }
+
+    showAllPolicies(user: string): string {
+        logger.Info(user + " requested to view all discounts")
+        return this.inventory.getAllPurchasePolicies()
+    }
+
+    composePurchasePolicies(user_email: string, id1: number, id2: number, operator: Operator): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.composePurchasePolicies(id1, id2, operator)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
+    }
+
+    addConditionToDiscount(user_email: string, discount_id: number, condition: Condition, condition_param: string): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.addConditionToDiscount(discount_id, condition, condition_param)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
+    }
+
+    addNumericCompositionDiscount(user_email: string, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.addNumericCompositionDiscount(operation, d_id1, d_id2)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
+    }
+
+    addLogicCompsoitionDiscount(user_email: string, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            logger.Error(`Permission denied. ${user_email} is not allowed to edit policies`)
+            return `Permission denied. ${user_email} is not allowed to edit policies`
+        }
+        const result = this.inventory.addLogicCompositionDiscount(operation, d_id1, d_id2)
+        if (result) logger.Info(`Discounts merged`)
+        else logger.Error(`Failed to merge discounts`)
+        return result;
+    }
+
+    getAllDiscounts(user_id: number): string | string[] {
+        logger.Info(`${user_id} requested all discounts`)
+        return [this.inventory.getAllDiscounts()]
+    }
+
+    getAllPurchasePolicies(user_id: number): string | string[] {
+        logger.Info(`${user_id} requested all policies`)
+        return [this.inventory.getAllPurchasePolicies()]
     }
 }
