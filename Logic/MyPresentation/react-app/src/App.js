@@ -6,6 +6,9 @@ import ShopItems from './components/ShopItems';
 import {BrowserRouter as Router, Switch, Route,Redirect} from 'react-router-dom';
 import Payment from './components/Payment';
 import ShoppingCart from './components/ShoppingCart';
+import Stores from "./pages/Stores";
+import "./App.css";
+import AddManager from "./pages/Add_Manager";
 class App extends Component{
   state = {
     shopsInfo:[]
@@ -98,6 +101,9 @@ class App extends Component{
             <Route path="/login" component={Login} />
             <Route path="/payment" component={Payment}/>
             <Route path="/register" component={Register} />
+            <Route path="/addmanager/:storeID">
+              <AddManager />
+            </Route>
           </Switch>
         </div>
       </Router>

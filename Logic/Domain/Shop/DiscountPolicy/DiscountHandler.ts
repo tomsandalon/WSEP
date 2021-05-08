@@ -1,6 +1,9 @@
 import {Discount} from "./Discount";
 import {Product} from "../../ProductHandling/Product";
 import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
+import {Condition, ConditionalDiscount} from "./ConditionalDiscount";
+import {NumericCompositionDiscount, NumericOperation} from "./NumericCompositionDiscount";
+import {LogicComposition, LogicCompositionDiscount} from "./LogicCompositionDiscount";
 
 
 export class DiscountHandler {
@@ -10,26 +13,52 @@ export class DiscountHandler {
 
     static discountCounter = 0;
 
-    private _discount: Discount[] = Array<Discount>();
+    private _discounts: Discount[] = Array<Discount>();
 
     addDiscount(discount: Discount): void {
-        this._discount = this._discount.concat([discount])
+        this._discounts = this._discounts.concat([discount])
     }
 
     removeDiscount(id: number): boolean {
-        const curLength = this._discount.length
-        this._discount = this._discount.filter(d => d.id != id)
-        return curLength != this._discount.length
+        const curLength = this._discounts.length
+        this._discounts = this._discounts.filter(d => d.id != id)
+        return curLength != this._discounts.length
     }
 
-    get discount() {
-        return this._discount;
+    get discounts() {
+        return this._discounts;
     }
 
     evaluateDiscount(product: Product | ProductPurchase, amount: number): number {
-        return this._discount.reduce((max, cur) => Math.max(cur.evaluate(product, amount), max), 0)
+        return this._discounts.reduce((max, cur) => Math.max(cur.evaluate(product, amount), max), 0)
     }
     toString(): string {
         return JSON.stringify(this)
+    }
+
+    addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string) {
+        const discount = this._discounts.find(d => d.id == discount_id)
+        if (!discount) return false;
+        this._discounts = this._discounts.filter(d => d.id != discount_id).concat([
+            new ConditionalDiscount(condition, discount, condition_param)
+        ])
+    }
+
+    addNumericCompositionDiscount(operation: NumericOperation, d_id1: number, d_id2: number) {
+        const discount1 = this._discounts.find(d => d.id == d_id1)
+        const discount2 = this._discounts.find(d => d.id == d_id2)
+        if (!discount1 || !discount2) return false;
+        this._discounts = this._discounts.filter(d => d.id != d_id1 && d.id != d_id2).concat([
+            new NumericCompositionDiscount(operation, [discount1, discount2])
+        ])
+    }
+
+    addLogicCompositionDiscount(operation: LogicComposition, d_id1: number, d_id2: number) {
+        const discount1 = this._discounts.find(d => d.id == d_id1)
+        const discount2 = this._discounts.find(d => d.id == d_id2)
+        if (!discount1 || !discount2) return false;
+        this._discounts = this._discounts.filter(d => d.id != d_id1 && d.id != d_id2).concat([
+            new LogicCompositionDiscount(operation, discount1, discount2)
+        ])
     }
 }

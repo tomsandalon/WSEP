@@ -1,15 +1,11 @@
 import 'mocha';
-import { expect, assert } from 'chai';
+import {assert, expect} from 'chai';
 import {Authentication} from "../../../Logic/Domain/Users/Authentication";
 import {RegisterImpl} from "../../../Logic/Domain/Users/Register";
 import {LoginImpl} from "../../../Logic/Domain/Users/Login";
-import {StringPair} from "../../../Logic/Domain/Users/StringPair";
-import {UserImpl} from "../../../Logic/Domain/Users/User";
-import type = Mocha.utils.type;
 import {ShopInventoryImpl} from "../../../Logic/Domain/Shop/ShopInventory";
 import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
-import {panicLogger} from "../../../Logic/Domain/Logger";
 
 describe('Authentication Tests', () => {
     it('should return a hashed password ', () => {

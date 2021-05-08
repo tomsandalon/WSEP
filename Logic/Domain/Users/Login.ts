@@ -7,8 +7,9 @@ import {UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 export interface Login {
     login(user_email: string, password: string): number | string
     guestLogin(): number
-    logout(user_email: string) : void
+    logout(user_email: string): void
     exit(user_id:number):void
+    getUserId(user_email: string): number | undefined
 }
 
 export class LoginImpl  implements  Login{
@@ -152,5 +153,13 @@ export class LoginImpl  implements  Login{
     get existing_users(): UserImpl[]{
         return this._existing_users;
     }
+
+    getUserId(user_email: string): number | undefined {
+        const result = this.existing_users.concat(this._existing_user_guests).find(u => u.user_email == user_email)
+        if (!result) return undefined
+        return result.user_id
+    }
+
+
 
 }

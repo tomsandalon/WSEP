@@ -7,6 +7,11 @@ export type PurchaseEvalData = {
     basket: ReadonlyArray<ProductPurchase>
 }
 
+let id_counter: number = 0;
+export const generateId = () => id_counter++;
+
+
 export interface PurchaseCondition {
+    id: number,
     evaluate(pData: PurchaseEvalData): Boolean
 }

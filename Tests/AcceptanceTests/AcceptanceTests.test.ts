@@ -4,8 +4,7 @@ import {System} from "./System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {SearchTypes} from "../../Logic/Domain/System";
 import {Filter_Type} from "../../Logic/Domain/Shop/ShopInventory";
-import {PaymentHandlerImpl} from "../../Logic/Service/Adapters/PaymentHandler";
-import {DeliveryHandlerImpl} from "../../Logic/Service/Adapters/DeliveryHandler";
+import {BasketDoesntExists} from "../../Logic/Domain/ProductHandling/ErrorMessages";
 
 
 describe('Acceptance Tests:', () => {
@@ -66,7 +65,7 @@ describe('Acceptance Tests:', () => {
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
         // expect(system.getShopInfo(0).length == 1).to.be.true
         // expect(system.getShopInfo(0)[0].includes("TestShop")).to.be.true
-        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
 
         it('Happy', () => {
             expect(system.getShopInfo(0)[0].includes("TV")).to.be.true
@@ -87,9 +86,9 @@ describe('Acceptance Tests:', () => {
         let shopID2 = system.addShop(originOwner as number, "TestShop 2", "shop for Tests", "Beer Sheva", "En li kesef") as number
         let shopID3 = system.addShop(originOwner as number, "TestShop 3", "shop for Tests", "Beer Sheva", "En li kesef") as number
 
-        system.addProduct(originOwner, shopID1,"TV1", "Best desc", 1110, ["not monitors"],111, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
-        system.addProduct(originOwner, shopID2,"TV2", "Best desc", 2202, ["monitors"],222, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
-        system.addProduct(originOwner, shopID3,"TV3", "Best desc", 3303, ["monitors"],333, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID1,"TV1", "Best desc", 1110, ["not monitors"],111, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        system.addProduct(originOwner, shopID2,"TV2", "Best desc", 2202, ["monitors"],222, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        system.addProduct(originOwner, shopID3,"TV3", "Best desc", 3303, ["monitors"],333, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
 
         // expect(system.searchItemFromShops(SearchTypes.name, "TV1").length == 1 &&
         //     system.searchItemFromShops(SearchTypes.name, "TV1")[0].includes("TV1")).to.be.true
@@ -114,7 +113,7 @@ describe('Acceptance Tests:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
 
@@ -136,7 +135,7 @@ describe('Acceptance Tests:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(originOwner, shopID,"TV", "Best desc", 10000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 10000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
@@ -161,8 +160,8 @@ describe('Acceptance Tests:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
-        system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
@@ -174,7 +173,7 @@ describe('Acceptance Tests:', () => {
         });
         it('Sad: buy basket from non-existing shop', () => {
             let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
-            expect(sad_purchase).to.be.false
+            expect(sad_purchase).to.be.eq(BasketDoesntExists)
         });
         it('Sad: try to buy when inventory is empty', () => {
             // add the 8kTV product with empty inventory to basket
@@ -327,7 +326,7 @@ describe('Acceptance Tests:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         system.addItemToBasket(user, 0, shopID, 500)
@@ -356,18 +355,18 @@ describe('Acceptance Tests:', () => {
         // expect(items.some(p=>p.includes("TV"))).to.be.false
 
         it('Happy', () => {
-            const res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            const res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             expect(typeof res == "boolean").to.be.true
             items = system.getItemsFromShop(shopID) as string[]
             expect(items.some(p=>p.includes("TV"))).to.be.true
         });
         it('Sad: add a product with empty name ', () => {
-            const sad_res = system.addProduct(userID, shopID,"", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            const sad_res = system.addProduct(userID, shopID,"", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             expect(typeof sad_res == "string").to.be.true
         });
         it('Bad: add a product with a guest user', () => {
             let guest = system.performGuestLogin();
-            const bad_res = system.addProduct(guest, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            const bad_res = system.addProduct(guest, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             expect(typeof bad_res == "string").to.be.true
         });
     });
@@ -377,23 +376,24 @@ describe('Acceptance Tests:', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         let userID = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        let res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
-        let items = system.getItemsFromShop(shopID) as string[]
-        // expect(items.some(p=>p.includes("TV"))).to.be.true
+        let res = system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
 
+        // let items = system.getItemsFromShop(shopID) as string[]
+        // expect(items.some(p=>p.includes("TV"))).to.be.true
         it('Happy', () => {
             system.removeProduct(userID, shopID, 0) //we know that it's 0 as we reset the tests every time
             expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.false
         });
-        it('Sad: ???', () => { //FIXME what is this test?
-            system.performRegister("OvedMetzuyan@post.co.il", "123")
-            let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
-            system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")
-            system.removeProduct(nEmpID, shopID, 1) //we know it's 1
-            expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.true
-        });
+        // it('Sad: Try to remove product while not having proper permissions', () => {
+        //     system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        //     system.performRegister("OvedMetzuyan@post.co.il", "123")
+        //     let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        //     system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")
+        //     system.removeProduct(nEmpID, shopID, 1) //we know it's 1
+        //     expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.true
+        // });
         it('Bad: remove a product with invalid product id', () => {
-            system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             system.removeProduct(userID, shopID, -1)
             expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.true
         });
@@ -477,10 +477,10 @@ describe('Acceptance Tests:', () => {
             //create new employee and appoint him as an owner
             let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
             let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
-            let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             expect(typeof res == "string").to.be.true
             expect(typeof (system.appointOwner(userID, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
-            res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             expect(typeof res == "string").to.be.false
         });
         it('Sad: appoint an already owner user as an owner', () => {
@@ -538,10 +538,10 @@ describe('Acceptance Tests:', () => {
             let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
             let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
             expect(typeof (system.appointManager(originalOwner, shopID,"OvedMetzuyan@post.co.il")) == "boolean").to.be.true
-            let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            let res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             expect(typeof res == "string").to.be.true
             expect(typeof system.addPermissions(originalOwner,shopID,"OvedMetzuyan@post.co.il",Action.AddItem) == "boolean").to.be.true
-            res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+            res = system.addProduct(nEmpID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             expect(typeof res == "string").to.be.false
         });
         it('Sad: add the same permissions', () => {
@@ -614,7 +614,7 @@ describe('Acceptance Tests:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
@@ -641,7 +641,7 @@ describe('Acceptance Tests:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
@@ -668,7 +668,7 @@ describe('Acceptance Tests:', () => {
         system.performRegister("Test@test.com", "TESTER");
         let user = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(user, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } }, {} )
+        system.addProduct(user, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 200)
         expect(typeof add_to_basket == "string").to.be.false
 
