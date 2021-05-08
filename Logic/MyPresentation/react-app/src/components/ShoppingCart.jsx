@@ -28,11 +28,11 @@ class ShoppingCart extends Component {
 	componentDidMount() {
 		console.log("cookies",document.cookie);
 		const requestOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				cookies:document.cookie
-			})
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Cookie': document.cookie
+			},
 		  };
 		  fetch('/cart',requestOptions)
 			  .then(async response => {
