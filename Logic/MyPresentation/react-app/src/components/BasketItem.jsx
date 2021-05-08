@@ -64,7 +64,7 @@ class BasketItem extends Component {
 						</div> 
 					</div> 
 					<div className="col-2">
-						<h6>Total cost: <span type="text" className="badge badge-pill badge-info">{this.props.price*this.props.amount}</span></h6>
+						<h6>Total: <span type="text" className="badge badge-pill badge-info">{this.props.price*this.props.amount}</span></h6>
 						
 					</div>
 					<div className="col-2">

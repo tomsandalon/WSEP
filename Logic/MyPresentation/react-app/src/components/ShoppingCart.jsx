@@ -4,10 +4,10 @@ import BasketItem from './BasketItem';
 
 class ShoppingCart extends Component {
 	state = {
-		cart:[]
+		cart:[],
+		totalPrice:0
 	}
 	componentDidMount() {
-		console.log("cookies",document.cookie);
 		const requestOptions = {
 			method: 'GET',
 			headers: {
@@ -28,11 +28,14 @@ class ShoppingCart extends Component {
 									shop_name:JSON.parse(basket).shop.name,
 									products:JSON.parse(basket).products,
 								}
-								console.log(JSON.parse(basket))
 								return temp;
 								// JSON.parse(basket).products.forEach(product => console.log(product))
 							})
-							this.setState({cart:cart})
+							let price = 0;
+							cart.forEach(basket => 
+								basket.products.forEach(product => price+=(product.amount*product.product._base_price))
+								)
+							this.setState({cart:cart,price:price})
 						}
 						)
 					break;
@@ -47,6 +50,13 @@ class ShoppingCart extends Component {
 				}
 			})
 	  }
+	// calculateTotalPrices() {
+	// 	let price = 0;
+	// 	this.state.cart.forEach(basket => 
+	// 		basket.products.forEach(product => price+=(product.amount*product.product._base_price))
+	// 		)
+	// 	this.setState({price:price})
+	// }
 	toggle(){
 		this.setState({visible:!this.state.visible, errorMsg:''})
 	}
@@ -64,22 +74,22 @@ class ShoppingCart extends Component {
 			<div className="card">
 			<div className="card-body">
 				<div className="input-group mb-3">
-					<input type="text" className="form-control" name="" placeholder="Promo code"/>
+					<input type="text" className="form-control" name="" placeholder="Promo Code"/>
 					<span className="input-group-append"> 
 						<button className="btn btn-primary">Ok</button>
 					</span>
 				</div>
 				<dl className="dlist-align">
 				  <dt>Subtotal:</dt>
-				  <dd className="text-right">$938.50</dd>
+				  <dd className="text-right">{this.state.price}</dd>
 				</dl>
 				<dl className="dlist-align">
 				  <dt>Discount:</dt>
-				  <dd className="text-right text-danger">10%</dd>
+				  <dd className="text-right text-danger">0%</dd>
 				</dl>
 				<dl className="dlist-align">
 				  <dt>Grand Total:</dt>
-				  <dd className="text-right text-dark"><strong>$948.50</strong></dd>
+				  <dd className="text-right text-dark"><strong>{this.state.price}</strong></dd>
 				</dl>
 				<button href="#" className="btn btn-primary btn-block"> Purchase </button>
 				<p className="small my-3 text-muted">Some extra informative text  can be placed here as dummy text will be replaced</p>

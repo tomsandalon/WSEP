@@ -1,9 +1,6 @@
-import { DialogTitle } from "@material-ui/core";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 
 const AddManager = () => {
-  //   const { storeID } = useParams(); TODO: change
   const storeID = 1;
   const [managerName, setManagerName] = useState();
   const [isPending, setIsPending] = useState(false);
