@@ -1,6 +1,6 @@
 import {app} from "../../Server";
 const expect = require('chai').expect;
-import {chai, cookie_prefix, SessionTest} from "../Setup.test";
+import {chai, cookie_prefix, SessionTest} from "../Setup";
 import {beforeEach} from "mocha";
 import {OK, route_login, route_register, Unauthorized} from "../../Config/Config";
 const request = require('supertest');

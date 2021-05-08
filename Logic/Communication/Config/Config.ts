@@ -25,4 +25,5 @@ export const ServerNotFound = 404;
 export const OK = 200;
 export const route_register = "/register"
 export const route_login = "/login"
+export const route_logout = "/logout"
 export const route_shop = "/user/shop"
