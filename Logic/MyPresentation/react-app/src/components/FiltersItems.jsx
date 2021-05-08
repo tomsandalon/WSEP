@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import StarRatings from 'react-star-ratings';
 import './Payment.css';
 class FiltersItems extends Component {
     state = {
@@ -67,7 +66,7 @@ class FiltersItems extends Component {
                         <li key={index}><span className="btn btn-outline-primary btn-sm" type="blob" padding="105">{category}</span></li>
                     ))
                     }
-                    <li key={100}><input type="text" className="form-control" placeHolder="Ex. Drinks,Fruits" onChange={this.handleCategories}/><button className="btn btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button></li>
+                    <li key={100}><input type="text" className="form-control" placeholder="Ex. Drinks,Fruits" onChange={this.handleCategories}/><button className="btn btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button></li>
                 </ul>
 			</div> 
 		</div>
@@ -85,7 +84,7 @@ class FiltersItems extends Component {
 				</div>
 				<div className="form-group text-left col-md-6">
 				  <label>Max</label>
-				  <input className="form-control" placeHolder="Enter price" type="number" onChange={this.setMaxPrice}/>
+				  <input className="form-control" placeholder="Enter price" type="number" onChange={this.setMaxPrice}/>
 				</div>
 				</div> 
 				<button className="btn btn-block btn-primary" onClick={() => this.props.handleFilter(this.state)}>Apply</button>
@@ -96,7 +95,7 @@ class FiltersItems extends Component {
 		<header className="card-header">
             <h6 className="title">Filter by rating</h6>
 		</header>
-        <input type="text" className="btnRating form-control" placeHolder="Rating 1 - 5" onChange={this.handleCategoies}/>
+        <input type="text" className="btnRating form-control" placeholder="Rating 1 - 5" onChange={this.handleCategoies}/>
         <button className="btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button> 
     </article>
 </div> 

@@ -50,6 +50,8 @@ class App extends Component{
                     const err_message = await response.text();
                     console.log(err_message)
                     break;
+                default: 
+                break;
             }
         })
     }

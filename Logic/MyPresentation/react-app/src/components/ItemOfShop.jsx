@@ -16,6 +16,8 @@ class ItemOfShop extends Component {
         }
     }
     handleAddToCart = () => {
+        console.log("pid",this.state.productID);
+        console.log("amount",this.state.desiredAmount);
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -39,6 +41,8 @@ class ItemOfShop extends Component {
                         break;
                     case 404: //server not found
                         break;
+                    default:
+                        break;
                 }
             })
     }
@@ -54,7 +58,7 @@ class ItemOfShop extends Component {
                         <figcaption className="info align-self-center">
                             <h5>Shop ID: {this.state.shopID}</h5>
                             <h5>Shop Name: {this.state.shopName}</h5>
-                            <h6>Product Name: {this.state.name}</h6>
+                            <h6>Product Name: {this.state.name}(ID:{this.state.productID})</h6>
                             <h6>Amount: {this.state.amount}</h6>
                             <h6>Price: {this.state.price}</h6>
                             <h6>{this.state.available}</h6>

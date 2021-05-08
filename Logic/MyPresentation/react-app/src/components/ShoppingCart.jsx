@@ -3,28 +3,9 @@ import Image from './images/cart.png';
 import BasketItem from './BasketItem';
 
 class ShoppingCart extends Component {
-//     state = {items:[
-//         {
-//             name:'Jeanse for hiking Jeanse for hiking ',
-//             price:129
-//         },
-//         {
-//             name:'Vodka for drinking Vodka for drinking',
-//             price:150
-//         },
-//         {
-//             name:'Pizza for eating Pizza for eating',
-//             price:30
-//         },
-//         {
-//             name:'Guns for shooting Guns for shooting',
-//             price:1500
-//         },
-// ]};
 	state = {
-		items:[]
+		cart:[]
 	}
-	//displayShoppingCart(user_id: number): string | string[][] {
 	componentDidMount() {
 		console.log("cookies",document.cookie);
 		const requestOptions = {
@@ -38,7 +19,22 @@ class ShoppingCart extends Component {
 			  .then(async response => {
 				switch(response.status){
 					case 200: //welcome
-					response.json().then(items => console.log(items))
+					response.json().then(
+						baskets => {
+							const cart = baskets.map(basket => {
+								const temp ={
+									basket_id:JSON.parse(basket).basket_id,
+									shop_id:JSON.parse(basket).shop.id,
+									shop_name:JSON.parse(basket).shop.name,
+									products:JSON.parse(basket).products,
+								}
+								console.log(JSON.parse(basket))
+								return temp;
+								// JSON.parse(basket).products.forEach(product => console.log(product))
+							})
+							this.setState({cart:cart})
+						}
+						)
 					break;
 					case 400:
 					const err_message = await response.text();
@@ -46,6 +42,8 @@ class ShoppingCart extends Component {
                     break;
                 	case 404: //server not found
                     break;
+					default:
+					break;
 				}
 			})
 	  }
@@ -54,10 +52,11 @@ class ShoppingCart extends Component {
         return(
             <div className="row">
 		<main className="col-md-9">
-            {this.state.items.map((item,index) =>(
-            <BasketItem img={Image} text={item.name} price={item.price}/>
+            {this.state.cart.map((basket,index) =>(
+			basket.products.map(product => 
+				<BasketItem img={Image} amount={product.amount} basket_id={basket.basket_id} shop_name={basket.shop_name} product_id={product.product._product_id} item_name={product.product._name} price={product.product._base_price}/>
+				)
             ))}
-			
 		</main> 
 		<aside className="col-md-3">
 			<div className="card">
@@ -80,7 +79,7 @@ class ShoppingCart extends Component {
 				  <dt>Grand Total:</dt>
 				  <dd className="text-right text-dark"><strong>$948.50</strong></dd>
 				</dl>
-				<a href="#" className="btn btn-primary btn-block"> Purchase </a>
+				<button href="#" className="btn btn-primary btn-block"> Purchase </button>
 				<p className="small my-3 text-muted">Some extra informative text  can be placed here as dummy text will be replaced</p>
 			</div> 
 			</div> 

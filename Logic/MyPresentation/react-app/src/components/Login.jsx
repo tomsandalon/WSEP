@@ -27,6 +27,8 @@ handleSubmit = (event) =>{
                     break;
                 case 404: //server not found
                     break;
+                default:
+                    break;
             }
         })
     event.preventDefault();

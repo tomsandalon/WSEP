@@ -28,7 +28,7 @@ handleClick = () =>{
                         </li>
                         );
                     })}
-                    <li key={100}><a className="nav-links cartButton btn btn-sm"  value="Logout" onClick={() => this.props.handleLogout}>Logout</a></li>
+                    <li key={100}><button className="nav-links cartButton btn btn-sm"  value="Logout" onClick={() => this.props.handleLogout}>Logout</button></li>
                     <li key={101}><a className="nav-links cartButton btn btn-sm" href="/my-cart">
                             MyCart
                             </a>
