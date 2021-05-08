@@ -1,7 +1,7 @@
 import React from "react";
 import useFetch from "../useFetch";
 
-const ManagerStoreList = (props) => {
+const ManagerStoresList = (props) => {
   const stores = props.stores;
 
   return (
@@ -15,4 +15,4 @@ const ManagerStoreList = (props) => {
   );
 };
 
-export default ManagerStoreList;
+export default ManagerStoresList;

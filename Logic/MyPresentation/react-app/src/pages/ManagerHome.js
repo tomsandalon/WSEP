@@ -1,6 +1,6 @@
 import React from "react";
 
-import ManagerStoreList from "../components/ManagerStoreList";
+import ManagerStoresList from "../components/ManagerStoresList";
 import useFetch from "../useFetch";
 
 const ManagerHome = () => {
@@ -11,7 +11,9 @@ const ManagerHome = () => {
     <div className="shops-user-manages">
       {error && <div> {error}</div>}
       {isPending && <div>Loading...</div>}
-      {stores && <ManagerStoreList stores={stores}></ManagerStoreList>}
+      {stores && <ManagerStoresList stores={stores}></ManagerStoresList>}
     </div>
   );
 };
+
+export default ManagerHome;
