@@ -31,14 +31,6 @@ router.post('/', (request: any, response: any) => {
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
-        console.log(`Display cart user_id ${user_id} session id ${request.cookies['SID']}`)
-        const cart = service.displayShoppingCart(user_id);
-        (cart as string[][]).forEach((basket: any) => {
-            console.log("basket")
-            basket.forEach((product: string) => {
-                console.log(JSON.parse(product))
-            })
-        })
         response.status(200);
         response.end();
     }
