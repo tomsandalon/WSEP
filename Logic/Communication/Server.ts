@@ -1,3 +1,5 @@
+import {request} from "express";
+
 const fs = require('fs')
 import * as https from 'https';
 import {options, port, service, Session, sid} from "./Config/Config";
@@ -21,6 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use('/login', require('./User/Login'));
 app.use('/register', require('./User/Register'));
+app.use('/cart', require('./User/Cart'));
 app.use('/home', require('./Home/Home'));
 app.use('/home/filter', require('./Home/Filter'));
 

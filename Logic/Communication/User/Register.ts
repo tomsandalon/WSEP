@@ -2,9 +2,10 @@ import {service, sid} from "../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
-router.get('/', (req: any, res: any) => {
-    //TODO give html to client
-    res.send("My first server!\n" + req.url + "\n:D")
+router.get('/', (request: any, res: any) => {
+    const sid = request.cookies['SID'];
+    console.log(sid);
+    res.send("My first server!\n" + "\n:D")
 })
 router.post('/', (req: any, response: any) => {
     let user_id = parseInt(req.cookies[sid]);
