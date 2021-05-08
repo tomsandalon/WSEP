@@ -13,7 +13,7 @@ class App extends Component{
   handleLogout = () =>{
     console.log("Logged out");
   }
-  openSession = () =>{
+  displayShops = () =>{
     const requestOptions = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -34,8 +34,29 @@ class App extends Component{
           console.log(this.state.session)
         })
   }
+  openSession = () =>{
+    if(localStorage.getItem('loggedUser') == null){
+      localStorage.setItem('loggedUser','true');
+      const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    };
+    fetch('/guest',requestOptions)
+        .then(async response => {
+            switch (response.status) {
+                case 200: //welcome
+                    break;
+                case 404:
+                    const err_message = await response.text();
+                    console.log(err_message)
+                    break;
+            }
+        })
+    }
+  }
   componentDidMount() {
     this.openSession()
+    this.displayShops()
   }
 
   handleFilter = (filters) => {
