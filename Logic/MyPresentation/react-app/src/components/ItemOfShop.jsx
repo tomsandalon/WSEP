@@ -10,9 +10,39 @@ class ItemOfShop extends Component {
             amount:this.props.amount,
             price:this.props.price,
             shopID:this.props.shopID,
-            shopName:this.props.shopName
+            shopName:this.props.shopName,
+            productID:this.props.productID,
+            desiredAmount:0
         }
     }
+    handleAddToCart = () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                product_id:this.state.productID,
+                shop_id:this.state.shopID,
+                amount:this.state.desiredAmount
+            })
+        };
+        fetch('/cart',requestOptions)
+            .then(async response => {
+                switch (response.status) {
+                    case 200: //welcome
+                        break;
+                    case 400:
+                        const err_message = await response.text();
+                        console.log(err_message)
+                        break;
+                    case 404: //server not found
+                        break;
+                }
+            })
+    }
+    handleAmount = (event) => {
+        this.setState({desiredAmount:event.target.value})
+    }
+    /////(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
     render() {
         return (
             <div className="col-md-3">
@@ -25,7 +55,9 @@ class ItemOfShop extends Component {
                             <h6>Amount: {this.state.amount}</h6>
                             <h6>Price: {this.state.price}</h6>
                             <h6>{this.state.available}</h6>
-                            <button className="btn btn-outline-primary btn-sm"> Add to cart 
+                            <input type="number" className="amount form-control" placeholder="Amount:" onChange={this.handleAmount}/>
+				  
+                            <button className="btn btn-outline-primary btn-sm" onClick={this.handleAddToCart}> Add to cart 
                                 <i className="fa fa-shopping-cart"></i> 
                             </button>
                         </figcaption>

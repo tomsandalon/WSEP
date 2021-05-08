@@ -32,7 +32,9 @@
 *::after {
   box-sizing: border-box;
 }
-
+.categoryBox{
+  width:200px;
+}
 html {
   font-family: sans-serif;
   line-height: 1.15;

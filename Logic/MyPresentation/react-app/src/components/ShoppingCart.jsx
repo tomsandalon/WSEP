@@ -3,24 +3,53 @@ import Image from './images/cart.png';
 import BasketItem from './BasketItem';
 
 class ShoppingCart extends Component {
-    state = {items:[
-        {
-            name:'Jeanse for hiking Jeanse for hiking ',
-            price:129
-        },
-        {
-            name:'Vodka for drinking Vodka for drinking',
-            price:150
-        },
-        {
-            name:'Pizza for eating Pizza for eating',
-            price:30
-        },
-        {
-            name:'Guns for shooting Guns for shooting',
-            price:1500
-        },
-]};
+//     state = {items:[
+//         {
+//             name:'Jeanse for hiking Jeanse for hiking ',
+//             price:129
+//         },
+//         {
+//             name:'Vodka for drinking Vodka for drinking',
+//             price:150
+//         },
+//         {
+//             name:'Pizza for eating Pizza for eating',
+//             price:30
+//         },
+//         {
+//             name:'Guns for shooting Guns for shooting',
+//             price:1500
+//         },
+// ]};
+	state = {
+		items:[]
+	}
+	//displayShoppingCart(user_id: number): string | string[][] {
+	componentDidMount() {
+		console.log("cookies",document.cookie);
+		const requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				cookies:document.cookie
+			})
+		  };
+		  fetch('/cart',requestOptions)
+			  .then(async response => {
+				switch(response.status){
+					case 200: //welcome
+					response.json().then(items => console.log(items))
+					break;
+					case 400:
+					const err_message = await response.text();
+                    console.log(err_message)
+                    break;
+                	case 404: //server not found
+                    break;
+				}
+			})
+	  }
+
     render() {
         return(
             <div className="row">

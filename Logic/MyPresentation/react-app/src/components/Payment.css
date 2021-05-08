@@ -18,7 +18,10 @@ input[type=text] {
     -webkit-border-radius: 5px 5px 5px 5px;
     border-radius: 5px 5px 5px 5px;
   }
-  
+.btnCategory{
+  background-color: #5fbae9;
+  color:#5fbae9;
+}
   input[type=text]:focus {
     background-color: #fff;
     border-bottom: 2px solid #5fbae9;

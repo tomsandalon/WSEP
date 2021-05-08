@@ -1,12 +1,18 @@
 import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import StarRatings from 'react-star-ratings';
+import './Payment.css';
 class FiltersItems extends Component {
     state = {
-        categories:[]
+        categories:[],
+        categoriesFilter:'',
+        minPrice:0,
+        maxPrice:0,
+        rating:0,
+        search:''
     }
-    handlePriceFilter = () =>{
-
+    handleCategories = (event) =>{
+        this.setState({categoriesFilter:event.target.value})
     }
     setMinPrice = (event) =>{
         this.setState({minPrice:event.target.value})
@@ -22,12 +28,11 @@ class FiltersItems extends Component {
             console.log("searching",this.state.search);
         }
     }
-    // handleCategory = (category) => {
-    //     this.props.handleCategory();
-    // }
-    changeRating(newRating, name){
-        console.log(newRating,name);
-    }
+    handleRating(event) {
+        this.setState({
+          rating: event.target.value
+        });
+      }
     componentDidUpdate(prevProps) {
         if ((prevProps.shopsInfo !== this.props.shopsInfo) && this.props.shopsInfo.length > 0) {
            // console.log(this.props.shopsInfo);
@@ -51,7 +56,7 @@ class FiltersItems extends Component {
 				<div className="input-group">
 				  <input type="text" className="form-control" placeholder="Search by product name" onChange={this.handleSearch}/>
 				  <div className="input-group-append">
-				    <button className="btn btn-primary" type="button"><i className="fa fa-search" onClick={this.handleSearchClick}></i></button>
+				    <button className="btn btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button>
 				  </div>
 				</div>
 				</form>
@@ -59,9 +64,10 @@ class FiltersItems extends Component {
                     <h6 className="title">Filter Categories</h6>
                     {((this.props !== null) && (this.props.shopsInfo.length !== 0)) &&
                         this.state.categories.map((category,index) =>(
-                        <li key={index}><button onClick={() => this.props.handleCategory(category)} className="btn btn-outline-primary btn-sm" type="button" padding="105">{category}</button></li>
+                        <li key={index}><span className="btn btn-outline-primary btn-sm" type="blob" padding="105">{category}</span></li>
                     ))
                     }
+                    <li key={100}><input type="text" className="form-control" placeHolder="Ex. Drinks,Fruits" onChange={this.handleCategories}/><button className="btn btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button></li>
                 </ul>
 			</div> 
 		</div>
@@ -79,10 +85,10 @@ class FiltersItems extends Component {
 				</div>
 				<div className="form-group text-left col-md-6">
 				  <label>Max</label>
-				  <input className="form-control" type="number" onChange={this.setMaxPrice}/>
+				  <input className="form-control" placeHolder="Enter price" type="number" onChange={this.setMaxPrice}/>
 				</div>
 				</div> 
-				<button className="btn btn-block btn-primary" onClick={this.handlePriceFilter}>Apply</button>
+				<button className="btn btn-block btn-primary" onClick={() => this.props.handleFilter(this.state)}>Apply</button>
 			</div>
 		</div>
 	</article>
@@ -90,15 +96,9 @@ class FiltersItems extends Component {
 		<header className="card-header">
             <h6 className="title">Filter by rating</h6>
 		</header>
-    <StarRatings
-          rating={this.state.rating}
-          starRatedColor="blue"
-          starDimension="40px"
-          starSpacing="18px"
-          changeRating={this.changeRating}
-          numberOfStars={5}
-          name='rating'
-    /></article>
+        <input type="text" className="btnRating form-control" placeHolder="Rating 1 - 5" onChange={this.handleCategoies}/>
+        <button className="btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button> 
+    </article>
 </div> 
 </output>
 
