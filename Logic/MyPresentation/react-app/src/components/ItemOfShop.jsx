@@ -1,5 +1,6 @@
 import React, { Component} from 'react';
 import Image from './images/shirt.jpg';
+import {Alert} from 'reactstrap';
 import './Product.css';
 class ItemOfShop extends Component {
     constructor(props) {
@@ -12,12 +13,12 @@ class ItemOfShop extends Component {
             shopID:this.props.shopID,
             shopName:this.props.shopName,
             productID:this.props.productID,
-            desiredAmount:0
+            desiredAmount:0,
+            visible:false,
+            errorMsg:''
         }
     }
     handleAddToCart = () => {
-        console.log("pid",this.state.productID);
-        console.log("amount",this.state.desiredAmount);
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -34,10 +35,11 @@ class ItemOfShop extends Component {
             .then(async response => {
                 switch (response.status) {
                     case 200: //welcome
+                        this.setState({errorMsg:"Added to cart!", visible:true,desiredAmount:0})
                         break;
                     case 400:
-                        const err_message = await response.text();
-                        console.log(err_message)
+                        const err_message_fail = await response.text();
+                        this.setState({errorMsg:err_message_fail,visible:true,desiredAmount:0})        
                         break;
                     case 404: //server not found
                         break;
@@ -49,7 +51,9 @@ class ItemOfShop extends Component {
     handleAmount = (event) => {
         this.setState({desiredAmount:event.target.value})
     }
-    /////(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
+    toggle(){
+        this.setState({visible:!this.state.visible, errorMsg:''})
+    }
     render() {
         return (
             <div className="col-md-3">
@@ -63,11 +67,11 @@ class ItemOfShop extends Component {
                             <h6>Price: {this.state.price}</h6>
                             <h6>{this.state.available}</h6>
                             <input type="number" className="amount form-control" placeholder="Amount:" onChange={this.handleAmount}/>
-				  
-                            <button className="btn btn-outline-primary btn-sm" onClick={this.handleAddToCart}> Add to cart 
+                            <button className="btn btn-primary btn-sm" onClick={this.handleAddToCart}> Add to cart 
                                 <i className="fa fa-shopping-cart"></i> 
                             </button>
                         </figcaption>
+                        <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                     </figure>
             </div>
         );

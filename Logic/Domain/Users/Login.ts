@@ -72,8 +72,12 @@ export class LoginImpl  implements  Login{
             logger.Error(`${user_email} already logged in the system.`);
             return `${user_email} already logged in the system.`;
         }
-        logger.Error(`${user_email} isn't a registered in the system.`);
-        return `${user_email} isn't a registered in the system.`;
+        if(user_email == ''){
+            logger.Error(`Email can't be empty!`);
+            return `Email can't be empty!`;
+        }
+        logger.Error(`${user_email} isn't a registered user in the system.`);
+        return `${user_email} isn't a registered user the system.`;
     }
 
     /**

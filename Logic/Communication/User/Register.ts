@@ -19,8 +19,10 @@ router.post('/', (req: any, response: any) => {
         response.setHeader("Content-Type", content_type);
         if (result) {
             response.status(200);
+            response.send('Registration successful')
         } else {
             response.status(400);
+            response.send('Registration failed, try again.')
         }
         response.end();
     }

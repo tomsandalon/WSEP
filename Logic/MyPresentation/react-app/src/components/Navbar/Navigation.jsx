@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {MenuItems} from './MenuItems';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../index.css';
 import './Navbar.css'
 
@@ -15,7 +16,7 @@ handleClick = () =>{
     render(){
         return (
             <nav className="navbarItems">
-                <h3 className="navbar-logo"><a className="fab fa-react" href="/">Mikasa Eccomerce</a></h3>
+                <h3 className="navbar-logo"><a className="fab fa-react" href="/">Eccomerce</a></h3>
                 <div className="menu-icon" onClick={this.handleClick}>
                     <i className={this.state.clicked ? 'fas fa-times' : 'fas fa-bars'}></i>
                 </div>
@@ -28,11 +29,11 @@ handleClick = () =>{
                         </li>
                         );
                     })}
-                    <li key={100}><button className="nav-links cartButton btn btn-sm"  value="Logout" onClick={() => this.props.handleLogout}>Logout</button></li>
-                    <li key={101}><a className="nav-links cartButton btn btn-sm" href="/my-cart">
+                    <li key={101}><a className="nav-links cartButton btn-primary btn-sm" href="/my-cart">
                             MyCart
                             </a>
                         </li>
+                    <li key={100}><a className="nav-links cartButton btn-primary btn-sm" href="/home" onClick={() => this.props.handleLogout}>Logout</a></li>
                       
                 </ul>
             </nav>

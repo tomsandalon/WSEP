@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
 import Reactlogo from './images/login.png'
+import {Alert} from 'reactstrap';
 import '../index.css';
 class Login extends Component {
 state = {
     email:'',
-    password:''
+    password:'',
+    visible:false,
+    errorMsg:''
+    
 };
 
 handleSubmit = (event) =>{
@@ -23,7 +27,7 @@ handleSubmit = (event) =>{
                     break;
                 case 401:
                     const err_message = await response.text();
-                    console.log(err_message)
+                    this.setState({errorMsg:err_message,visible:true})
                     break;
                 case 404: //server not found
                     break;
@@ -39,6 +43,9 @@ handleUserEmail = (event) =>{
 handlePassword = (event) =>{
     this.setState({password:event.target.value});
 }
+toggle(){
+    this.setState({visible:!this.state.visible, errorMsg:''})
+}
     render() {
         return(
         <div className="wrapper fadeInDown">
@@ -49,6 +56,7 @@ handlePassword = (event) =>{
                 <form onSubmit={this.handleSubmit}>
                     <input type="email" id="login" className="fadeIn second" name="login" placeholder="example@example.com" onChange={this.handleUserEmail}/>
                     <input type="password" id="password" className="fadeIn third" name="login" placeholder="Password" onChange={this.handlePassword}/>
+                <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                     <input type="submit" className="fadeIn fourth" value="Login"/>
                 </form>
             </div>

@@ -47,14 +47,16 @@ class ShoppingCart extends Component {
 				}
 			})
 	  }
-
+	toggle(){
+		this.setState({visible:!this.state.visible, errorMsg:''})
+	}
     render() {
         return(
             <div className="row">
 		<main className="col-md-9">
             {this.state.cart.map((basket,index) =>(
 			basket.products.map(product => 
-				<BasketItem img={Image} amount={product.amount} basket_id={basket.basket_id} shop_name={basket.shop_name} product_id={product.product._product_id} item_name={product.product._name} price={product.product._base_price}/>
+				<BasketItem img={Image} shop_id={basket.shop_id} amount={product.amount} basket_id={basket.basket_id} shop_name={basket.shop_name} product_id={product.product._product_id} item_name={product.product._name} price={product.product._base_price}/>
 				)
             ))}
 		</main> 
