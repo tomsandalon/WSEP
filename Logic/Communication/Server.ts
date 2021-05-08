@@ -12,7 +12,7 @@ const {
 } = require('worker_threads');
 export const app = express();
 //initialize a https server
-const server = https.createServer(options, app);
+export const server = https.createServer(options, app);
 //start our server
 server.listen( port,() => {
     console.log(`Server is running on port ${port}`);
@@ -26,6 +26,7 @@ app.use('/register', require('./User/Register'));
 app.use('/cart', require('./User/Cart'));
 app.use('/home', require('./Home/Home'));
 app.use('/home/filter', require('./Home/Filter'));
+app.use('/user/shop/management', require('./User/Management'));
 
 const second = 1000;
 const minute = 60 * second;

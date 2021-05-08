@@ -1,9 +1,7 @@
-import {sleep} from "async-parallel";
 import {app, server} from "../Server";
-import nock from "nock";
 import {sid} from "../Config/Config";
-import {afterEach, before, beforeEach} from "mocha";
-import {SessionTest} from "./Config.test";
+import {afterEach, beforeEach} from "mocha";
+
 const fs = require('fs')
 const https = require('https');
 const request = require('supertest');
@@ -12,9 +10,11 @@ const expect = require('chai').expect;
 const chaiNock = require('chai-nock');
 chai.use(chaiNock);
 export const cookie_prefix = 'SID=';
-before(()=>{
-    console.log("Server API tests")
-})
+
+export class SessionTest {
+    public static sess_id = '';
+}
+
 beforeEach((done) =>{
     request(app).get('/guest')
         .expect(200)
