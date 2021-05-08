@@ -1,39 +1,46 @@
-import {Data} from "ws";
-import WebSocket = require("ws");
-import {sleep} from "async-parallel";
-import {System} from "../../Tests/AcceptanceTests/System";
-import {SystemDriver} from "../../Tests/AcceptanceTests/SystemDriver";
+import {request} from "express";
 
-// const wss = new WebSocket.Server({
-//     port: 8080,
-//     perMessageDeflate: {
-//         zlibDeflateOptions: {
-//             // See zlib defaults.
-//             chunkSize: 1024,
-//             memLevel: 7,
-//             level: 3
-//         },
-//         zlibInflateOptions: {
-//             chunkSize: 10 * 1024
-//         },
-//         // Other options settable:
-//         clientNoContextTakeover: true, // Defaults to negotiated value.
-//         serverNoContextTakeover: true, // Defaults to negotiated value.
-//         serverMaxWindowBits: 10, // Defaults to negotiated value.
-//         // Below options specified as default values.
-//         concurrencyLimit: 10, // Limits zlib concurrency for perf.
-//         threshold: 1024 // Size (in bytes) below which messages
-//         // should not be compressed.
-//     }
-// });
-const system: System = SystemDriver.getSystem(true);
-const wss = new WebSocket.Server({ port: 8080 });
-wss.on('connection', function connection(ws: WebSocket) {
-    let id = system.openSession();
-    ws.on('message', function incoming(message: Data) {
-        ws.send(`Hey you are client ${id}`)
-        // sleep(1000).then(_ => ws.send(`Hey you are client ${id}`))
-        console.log('received: %s', message);
-    });
-});
-console.log("Server successful boot")
+const fs = require('fs')
+import * as https from 'https';
+import {options, port, service, Session, sid} from "./Config/Config";
+const path = require('path');
+const express = require('express');
+const expressWs = require('express-ws');
+const cookieParser = require('cookie-parser');
+const {
+    Worker, isMainThread, parentPort, workerData
+} = require('worker_threads');
+export const app = express();
+//initialize a https server
+const server = https.createServer(options, app);
+//start our server
+server.listen( port,() => {
+    console.log(`Server is running on port ${port}`);
+})
+expressWs(app, server);
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+app.use('/login', require('./User/Login'));
+app.use('/register', require('./User/Register'));
+app.use('/cart', require('./User/Cart'));
+app.use('/home', require('./Home/Home'));
+app.use('/home/filter', require('./Home/Filter'));
+
+const second = 1000;
+const minute = 60 * second;
+const hour = 60 * minute;
+const day = 24 * hour;
+app.get('/guest',(request: any, response: any) => {
+    const session_id = Session.session_id_specifier++;
+    Session.sessions[session_id] = service.openSession();
+    response.status(200);
+    response.setHeader("Content-Type", "application/json");
+    response.cookie(sid, session_id, {
+        maxAge: 2 * hour
+    })
+    response.end();
+})
+//* For debug TODO delete this
+
+service.initData();

@@ -1,8 +1,11 @@
-import {SearchTypes, System} from "../../Logic/Domain/System";
+import {SearchTypes} from "../../Logic/Domain/System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
+import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
 // import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
-import * as Tests from "./System";
+import {TestNotAssociatedWithImplementation} from "./System";
 import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
+import * as Tests from "./System"
+import {System} from "../../Logic/Domain/System";
 
 export class AdapterSystem implements Tests.System{
     private system: System;
@@ -22,8 +25,8 @@ export class AdapterSystem implements Tests.System{
         return this.system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string {
-        return this.system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, purchase_type)
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
+        return this.system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, discount_type, purchase_type)
     }
 
     addShop(user_id: number, name: string, description: string, location: string, bank_info: string): number | string {

@@ -1,0 +1,1 @@
+npm install react-facebook-login --legacy-peer-deps

@@ -222,7 +222,7 @@ export class SystemImpl implements System {
         this.login.exit(user_id)
     }
     displayShops(): string[] {
-        return this.shops.map(shop => shop.toString())
+        return this.shops.map(shop => shop.displayItems())
     }
 
     private getShopById(shop_id: number): Shop | undefined {
