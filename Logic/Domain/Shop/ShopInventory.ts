@@ -254,6 +254,7 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     filter(products: Product[], filters: Filter[]): Product[] {
+        if (filters.length == 0) return products
         const passed_filter = (f: Filter) => (product: Product) => {
             return (f.filter_type == Filter_Type.AbovePrice) ? product.base_price >= Number(f.filter_value) :
                 (f.filter_type == Filter_Type.BelowPrice) ? product.base_price <= Number(f.filter_value) :
