@@ -25,3 +25,4 @@ Logic/Presentation/yarn-error.log*
 ./package-lock.json
 Logs/*
 .idea/*
+/Logic/MyPresentation/react-app/package-lock.json
