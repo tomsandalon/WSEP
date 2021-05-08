@@ -7,6 +7,7 @@ const router = express.Router();
 module.exports = router;
 const ws_client = path.join(__dirname, 'ws_client.html');
 router.get('/',(request: any, response: any) => {
+    console.log("Home")
     response.status(200);
     response.setHeader("Content-Type", "application/json");
     response.json(service.displayShops());

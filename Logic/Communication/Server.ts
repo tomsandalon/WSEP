@@ -32,10 +32,14 @@ const minute = 60 * second;
 const hour = 60 * minute;
 const day = 24 * hour;
 app.get('/guest',(request: any, response: any) => {
-    const session_id = Session.session_id_specifier++;
-    Session.sessions[session_id] = service.openSession();
+    const user_id = Session.sessions[request.cookies[sid]];
+    let session_id = request.cookies[sid];
     response.status(200);
     response.setHeader("Content-Type", "application/json");
+    if (user_id == undefined) {
+        session_id = Session.session_id_specifier++;
+        Session.sessions[session_id] = service.openSession();
+    }
     response.cookie(sid, session_id, {
         maxAge: 2 * hour
     })
