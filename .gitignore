@@ -25,3 +25,5 @@ Logic/Presentation/yarn-error.log*
 ./package-lock.json
 Logs/*
 .idea/*
+
+Logic/Communication/Sandbox
