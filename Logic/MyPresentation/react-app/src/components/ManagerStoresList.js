@@ -1,5 +1,4 @@
 import React from "react";
-import useFetch from "../useFetch";
 import { useParams, Link } from "react-router-dom";
 
 const ManagerStoresList = (props) => {

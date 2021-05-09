@@ -128,7 +128,7 @@ class App extends Component {
             />
             <Route path="/my-cart" component={ShoppingCart} />
             <Route path="/login" component={Login} />
-            <Route path="/managerHome" component={ManagerHome} />
+            <Route path="/managerHome/:managerID" component={ManagerHome} />
             <Route path="/register" component={Register} />
             <Route path="/addmanager/:storeID">
               <AddManager />
