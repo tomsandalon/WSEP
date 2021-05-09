@@ -101,7 +101,7 @@ export class Service {
         return this._system.editShoppingCart(user_id, shop_id, product_id, amount)
     }
 
-    removeItemFromBasket(user_id: number, shop_id: number, product_id: number, amount: number): string | void {
+    removeItemFromBasket(user_id: number, shop_id: number, product_id: number): string | void {
         return this._system.editShoppingCart(user_id, shop_id, product_id, 0)
     }
 

@@ -44,7 +44,7 @@ router.put('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
     }
-    const result = service.editShoppingCart(user_id, request.body.product_id, request.body.shop_id, request.body.amount);
+    const result = service.editShoppingCart(user_id, request.body.shop_id, request.body.product_id, request.body.amount);
     if (typeof result === 'string') {
         response.status(400);
         response.setHeader("Content-Type", "text/html");
@@ -62,7 +62,7 @@ router.delete('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
     }
-    const result = service.removeItemFromBasket(user_id, request.body.product_id, request.body.shop_id, request.body.amount);
+    const result = service.removeItemFromBasket(user_id, request.body.shop_id, request.body.product_id);
     if (typeof result === 'string') {
         response.status(400);
         response.setHeader("Content-Type", "text/html");
