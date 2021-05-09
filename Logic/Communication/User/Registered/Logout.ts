@@ -10,7 +10,11 @@ router.post('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
     }
-    Session.sessions[request.cookies[sid]] = service.logout(user_id);
-    response.status(200);
+    const result = service.logout(user_id);
+    if(typeof result == "string"){
+        response.status(400);
+    }else {
+        Session.sessions[request.cookies[sid]] = result;
+    }
     response.end();
 })
