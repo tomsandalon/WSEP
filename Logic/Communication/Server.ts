@@ -1,6 +1,5 @@
 import * as https from 'https';
 import {
-    hour,
     options,
     port,
     route_cart, route_filter,
@@ -8,8 +7,6 @@ import {
     route_login, route_logout,
     route_register, route_shop_management,
     service,
-    Session,
-    sid
 } from "./Config/Config";
 
 const fs = require('fs')
@@ -17,9 +14,6 @@ const path = require('path');
 const express = require('express');
 const expressWs = require('express-ws');
 const cookieParser = require('cookie-parser');
-const {
-    Worker, isMainThread, parentPort, workerData
-} = require('worker_threads');
 export const app = express();
 //initialize a https server
 export const server = https.createServer(options, app);
