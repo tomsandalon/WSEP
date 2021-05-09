@@ -1,21 +1,26 @@
 import React from "react";
-import useFetch from "../useFetch";
-import { useHistory, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 const ManagerStoresList = (props) => {
   const stores = props.stores;
-  // const history = useHistory();
+  const { managerID } = useParams();
 
   return (
     <div className="center-screen">
       <div className="container">
+        <Link to={`/addstore/${managerID}`}>
+          <button className="btn btn-outline-primary btn-sm ">
+            {" "}
+            Add Store <i className="fa fa-plus"></i>
+          </button>
+        </Link>
         <h3>Stores you manage:</h3>
         <div className="manager-store-list">
           {stores.map((store) => (
             <div className="store-preview" key={store.id}>
               <Link to={`/managersStore/${store.id}`}>
-                <h3>{store.storeName} </h3>
-                <p> Click to edit</p>
+                <h3>{store.name} </h3>
+                <p> {store.description}</p>
               </Link>
             </div>
           ))}

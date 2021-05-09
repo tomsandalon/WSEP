@@ -15,6 +15,10 @@
     {
       "managerName": "Markou",
       "id": 4
+    },
+    {
+      "managerName": "1",
+      "id": 5
     }
   ],
   "store_2_managers": [
@@ -26,13 +30,13 @@
   "stores": [
     {
       "id": 1,
-      "name": "First shop",
+      "name": "First store",
       "description": "Description1",
       "active": true
     },
     {
       "id": 2,
-      "name": "Second shop",
+      "name": "Second store",
       "description": "Description2",
       "active": false
     }

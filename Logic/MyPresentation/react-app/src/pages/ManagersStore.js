@@ -8,7 +8,7 @@ const ManagersStore = () => {
   const { data: storeItems, isPending, error } = useFetch(
     `http://localhost:8000/store_${storeID.toString()}_items`
   );
-
+  console.log("storeid: " + storeID);
   return (
     <div class="row">
       <div className="col-xl-4">

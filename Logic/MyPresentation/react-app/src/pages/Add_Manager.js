@@ -1,12 +1,11 @@
 import { useState } from "react";
-// import { useParams } from "react-router";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 const AddManager = () => {
   const { storeID } = useParams();
-
   const [managerName, setManagerName] = useState();
   const [isPending, setIsPending] = useState(false);
+  const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,6 +18,7 @@ const AddManager = () => {
     }).then(() => {
       console.log("New manager added");
       setIsPending(false);
+      history.push(`/managersStore/${storeID}`);
     });
   };
 
