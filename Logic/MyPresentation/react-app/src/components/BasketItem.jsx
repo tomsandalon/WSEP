@@ -3,13 +3,17 @@ import {Alert} from 'reactstrap';
 class BasketItem extends Component {
 	state ={
 		visible:false,
+		successVisible:false,
     	errorMsg:''
 	}
-
+	onShowAlert = ()=>{
+		this.setState({successVisible:true,errorMsg:"Removed successfully!"},()=>{
+			window.setTimeout(()=>{
+			this.setState({successVisible:false})
+			},1000)
+		});
+	}
 	handleRemoveItemFromBasket = () =>{
-		console.log(this.props.shop_id);
-		console.log(this.props.product_id);
-		console.log(this.props.amount);
 		
 		console.log("cookies",document.cookie);
 		const requestOptions = {
@@ -27,7 +31,8 @@ class BasketItem extends Component {
 			  .then(async response => {
 				switch(response.status){
 					case 200: //welcome
-					this.setState({errorMsg:"Item removed successfully",visible:true})
+					this.onShowAlert();
+					this.props.refreshCart();
 					break;
 					case 400:
 					const err_message_fail = await response.text();
@@ -72,6 +77,7 @@ class BasketItem extends Component {
 					</div>
 					<div className="col-2">
 					<button className="btn btn-primary btn-sm" onClick={this.handleRemoveItemFromBasket}> Remove </button>
+					{/* <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert> */}
 					<Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
 					</div>
 					{/*<div className="col flex-grow-0 text-right">*/}

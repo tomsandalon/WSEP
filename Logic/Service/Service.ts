@@ -118,8 +118,8 @@ export class Service {
         return this._system.getShopInfo(shop_id);
     }
 
-    logout(user_email: string): number {
-        return this._system.logout(user_email)
+    logout(user_id: number): string | boolean {
+        return this._system.logout(user_id);
     }
 
     openSession(): number {

@@ -15,8 +15,16 @@ class ItemOfShop extends Component {
             productID:this.props.productID,
             desiredAmount:0,
             visible:false,
+            successVisible:false,
             errorMsg:''
         }
+    }
+    onShowAlert = ()=>{
+        this.setState({successVisible:true,errorMsg:"Added to cart!",desiredAmount:0},()=>{
+            window.setTimeout(()=>{
+            this.setState({successVisible:false})
+            },1000)
+        });
     }
     handleAddToCart = () => {
         const requestOptions = {
@@ -35,7 +43,7 @@ class ItemOfShop extends Component {
             .then(async response => {
                 switch (response.status) {
                     case 200: //welcome
-                        this.setState({errorMsg:"Added to cart!", visible:true,desiredAmount:0})
+                        this.onShowAlert();
                         break;
                     case 400:
                         const err_message_fail = await response.text();
@@ -50,6 +58,9 @@ class ItemOfShop extends Component {
     }
     handleAmount = (event) => {
         this.setState({desiredAmount:event.target.value})
+    }
+    successToggle(){
+        this.setState({successVisible:!this.state.successVisible, errorMsg:''})
     }
     toggle(){
         this.setState({visible:!this.state.visible, errorMsg:''})
@@ -71,6 +82,7 @@ class ItemOfShop extends Component {
                                 <i className="fa fa-shopping-cart"></i> 
                             </button>
                         </figcaption>
+                        <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                         <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                     </figure>
             </div>

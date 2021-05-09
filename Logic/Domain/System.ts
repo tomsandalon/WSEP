@@ -28,7 +28,7 @@ export interface System{
     performRegister(user_email:string, password: string): boolean
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
-    logout(user_email: string): number
+    logout(user_id: number): string | boolean
     displayShops():string | string[]
     getItemsFromShop(shop_id:number): any
     searchItemFromShops(search_type:SearchTypes, search_term: string):any
@@ -258,9 +258,14 @@ export class SystemImpl implements System {
         this._shops = this._shops.concat(shop)
         return shop.shop_id
     }
-    logout(user_email:string): number {
-        this._login.logout(user_email);
-        return this.openSession()
+    logout(user_id:number): string | boolean {
+        const user = this.login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return "Not a user";
+        if(user.is_guest)
+            return "Guest can't preform a logout"
+        this._login.logout(user.user_email);
+        return true;
     }
 
     performLogin(user_email:string, password: string): string | number {

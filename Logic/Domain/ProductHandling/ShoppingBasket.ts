@@ -61,6 +61,7 @@ export interface ShoppingBasket {
      */
     purchase(payment_info: string, coupons: any  []): string | Purchase
     toString():string[]
+    isEmpty():boolean
 }
 
 export class ShoppingBasketImpl implements ShoppingBasket{
@@ -159,7 +160,9 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         })]
         // this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
     }
-
+    isEmpty():boolean {
+        return this._products.length == 0
+    }
     purchase(payment_info: string, coupons: any[]): string | Purchase {
         const order = PurchaseImpl.create(new Date(), this,[], this._user_data);
         if(typeof order == "string")
