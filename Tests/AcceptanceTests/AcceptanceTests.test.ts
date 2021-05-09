@@ -192,6 +192,7 @@ describe('Acceptance Tests:', () => {
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
         let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        system.addProduct(originOwner, shopID,"4KTV", "Best desc", 1, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.performRegister("newUser@test.com", "TESTER");
         let user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -200,7 +201,19 @@ describe('Acceptance Tests:', () => {
 
         it('Happy', () => {
             let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
-            expect(typeof purchase == "boolean").to.be.true // good
+            expect(typeof purchase == "boolean").to.be.true 
+        });
+        it('Sad: two people buying one product', () => {
+           system.performRegister("oneUser@test.com", "TESTER");
+           system.performRegister("secondUser@test.com", "TESTER");
+           let user_one = system.performLogin("oneUser@test.com", "TESTER") as number
+           system.addItemToBasket(user, 1, shopID, 1)
+           let user_two = system.performLogin("secondUser@test.com", "TESTER") as number
+           system.addItemToBasket(user_two, 1, shopID, 1)
+           let purchase_one = system.purchaseShoppingBasket(user_one, shopID, "hello")
+           let purchase_two = system.purchaseShoppingBasket(user_two, shopID, "hello")
+           expect(typeof purchase_one == "boolean").to.be.true 
+           expect(typeof purchase_two == "string").to.be.true;
         });
         it('Sad: buy basket from non-existing shop', () => {
             let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
@@ -208,7 +221,7 @@ describe('Acceptance Tests:', () => {
         });
         it('Sad: try to buy when inventory is empty', () => {
             // add the 8kTV product with empty inventory to basket
-            let fail = system.addItemToBasket(user, 1, shopID, 1)
+            let fail = system.addItemToBasket(user, 2, shopID, 1)
             expect(typeof fail == "string").to.be.true;
         });
         it('Bad: buy a basket with negative user id', () => {
