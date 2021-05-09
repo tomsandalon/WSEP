@@ -4,148 +4,94 @@ import {cookie_prefix, SessionTest} from "../../Setup";
 import {before, beforeEach} from "mocha";
 import {
     BadRequest,
-    OK, route_guest, route_login, route_register,
+    OK, route_guest, route_login, route_register, route_shop,
     route_shop_management, sid,
 } from "../../../Config/Config";
 const request = require('supertest');
 
 describe('Add Manager to Shop tests', () => {
+    let second_user_sid = '';
+    let my_shop = '';
+    const tomer = "TomerNagar@gmail.com";
+    const tomer_pass = '123456';
     before((done => {
-        request(app).post(route_register)
-            .set('Cookie', cookie_prefix + SessionTest.sess_id)
-            .send({
-                email: "TomerNagar@gmail.com",
-                password: "123456"
-            })
-            .expect(400, done);
-
         request(app).get(route_guest)
             .expect(200)
             .then((res: any) =>{
-                SessionTest.sess_id = res.headers['set-cookie'].find((cookie: any) => cookie.startsWith(sid))
+                second_user_sid = res.headers['set-cookie'].find((cookie: any) => cookie.startsWith(sid))
                     .split(';')[0]
                     .split('=')[1];
-                console.log(SessionTest.sess_id)
                 done();
             })
             .catch((err: any) => done(err));
-
-        request(app).post(route_login)
-            .set('Cookie', cookie_prefix + SessionTest.sess_id)
+        request(app).post(route_register)
+            .set('Cookie', cookie_prefix + second_user_sid)
             .send({
-                email: "TomAndSons@gmail.com",
-                password: "123456"
+                email: tomer,
+                password: tomer_pass
+            })
+            .expect(200, done);
+        request(app).post(route_login)
+            .set('Cookie', cookie_prefix + second_user_sid)
+            .send({
+                email: tomer,
+                password: tomer_pass
             })
             .expect(OK, done);
+        request(app).post(route_shop)
+            .set('Cookie', cookie_prefix + SessionTest.sess_id)
+            .send({
+                name: "ZARA",
+                description: "Best style in UK",
+                location: 'China',
+                bank_info: "Buddha 4 ever"
+            })
+            .expect(OK, done)
+            .then((res: any) => res.text())
+            .then((data: any) => {
+                my_shop = data;
+                done(done)
+            });
     }))
     beforeEach(() =>{
         expect(SessionTest.sess_id).not.equal('')
+        expect(second_user_sid).not.equal('')
+        expect(my_shop).not.equal('')
     })
     it('Add Manager unsuccessfully - no name',  (done) =>{
         request(app).post(route_shop_management)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
-                shop_id: 1,
+                shop_id: my_shop,
                 appointee_user_email: ""
             })
             .expect(BadRequest, done);
     })
-    it('Add Product unsuccessfully - no description',  (done) =>{
+    it('Add Manager unsuccessfully - bad shop id',  (done) =>{
         request(app).post(route_shop_management)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
-                shop_id: 1,
-                name: "GTX 1060",
-                description: "",
-                amount: 50,
-                categories: ["GPU"],
-                base_price: 1000,
-                purchase_type: 0
+                shop_id: -69696,
+                appointee_user_email: tomer
             })
             .expect(BadRequest, done);
     })
-    it('Add Product unsuccessfully - amount negative',  (done) =>{
+    it('Add Manager unsuccessfully - unknown user in the system ',  (done) =>{
         request(app).post(route_shop_management)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
-                shop_id: 1,
-                name: "GTX 1060",
-                description: "6GB RAM",
-                amount: -1,
-                categories: ["GPU"],
-                base_price: 1000,
-                purchase_type: 0
+                shop_id: my_shop,
+                appointee_user_email: "DemonSlayer@blizzard.com"
             })
             .expect(BadRequest, done);
     })
-    it('Add Product unsuccessfully - amount 0',  (done) =>{
+    it('Add Manager successfully',  (done) =>{
         request(app).post(route_shop_management)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
-                shop_id: 1,
-                name: "GTX 1060",
-                description: "6GB RAM",
-                amount: 0,
-                categories: ["GPU"],
-                base_price: 1000,
-                purchase_type: 0
+                shop_id: my_shop,
+                appointee_user_email: tomer
             })
             .expect(BadRequest, done);
-    })
-    it('Add Product unsuccessfully - negative base price',  (done) =>{
-        request(app).post(route_shop_management)
-            .set('Cookie', cookie_prefix + SessionTest.sess_id)
-            .send({
-                shop_id: 1,
-                name: "GTX 1060",
-                description: "6GB RAM",
-                amount: 50,
-                categories: ["GPU"],
-                base_price: -1,
-                purchase_type: 0
-            })
-            .expect(BadRequest, done);
-    })
-    it('Add Product unsuccessfully - base price 0',  (done) =>{
-        request(app).post(route_shop_management)
-            .set('Cookie', cookie_prefix + SessionTest.sess_id)
-            .send({
-                shop_id: 1,
-                name: "GTX 1060",
-                description: "6GB RAM",
-                amount: 50,
-                categories: ["GPU"],
-                base_price: 0,
-                purchase_type: 0
-            })
-            .expect(BadRequest, done);
-    })
-    it('Add Product unsuccessfully - bad purchase type',  (done) =>{
-        request(app).post(route_shop_management)
-            .set('Cookie', cookie_prefix + SessionTest.sess_id)
-            .send({
-                shop_id: 1,
-                name: "GTX 1060",
-                description: "6GB RAM",
-                amount: 50,
-                categories: ["GPU"],
-                base_price: 1000,
-                purchase_type: 111
-            })
-            .expect(BadRequest, done);
-    })
-    it('Add Product successfully',  (done) =>{
-        request(app).post(route_shop_management)
-            .set('Cookie', cookie_prefix + SessionTest.sess_id)
-            .send({
-                shop_id: 1,
-                name: "GTX 1060",
-                description: "6GB RAM",
-                amount: 50,
-                categories: ["GPU"],
-                base_price: 1000,
-                purchase_type: 0
-            })
-            .expect(OK, done);
     })
 })
