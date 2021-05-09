@@ -5,13 +5,21 @@ const useFetch = (url) => {
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
 
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: document.cookie,
+    },
+  };
+
   useEffect(() => {
     const abortCont = new AbortController();
 
-    fetch(url, { signal: abortCont.signal })
+    fetch(url, requestOptions, { signal: abortCont.signal })
       .then((res) => {
         if (!res.ok) {
-          throw Error("Fetching stores failed!");
+          throw Error("Fetching failed!");
         }
         return res.json();
       })
