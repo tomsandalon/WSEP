@@ -9,14 +9,11 @@ router.get('/', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     response.setHeader("Content-Type", "application/json");
     response.send(service.displayShoppingCart(user_id))
     response.end();
-})
-router.put('/', (req: any, res: any) => {
-    //TODO perform logout
-    res.send("My first server!\n" + req.url + "\n:D")
 })
 
 router.post('/', (request: any, response: any) => {
@@ -46,7 +43,6 @@ router.put('/', (request: any, response: any) => {
         response.end()
     }
     const result = service.editShoppingCart(user_id, request.body.shop_id, request.body.product_id, request.body.amount);
-    console.log(result);
     if (typeof result === 'string') {
         response.status(400);
         response.setHeader("Content-Type", "text/html");
@@ -64,8 +60,10 @@ router.delete('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
     }
+    console.log('DATA')
+    console.log(request.body)
     const result = service.removeItemFromBasket(user_id, request.body.shop_id, request.body.product_id);
-    console.log(result);
+    console.log(`In remove item form basket = ${result}`);
     if (typeof result === 'string') {
         response.status(400);
         response.setHeader("Content-Type", "text/html");

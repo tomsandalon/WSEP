@@ -122,8 +122,10 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     }
 
     public editBasketItem(product_id: number, new_amount: number): boolean | string {
-        if (new_amount <= 0) {
+        if (new_amount < 0) {
             return AmountNonPositiveValue
+        } else if (new_amount == 0){
+            return this.removeItem(product_id)
         }
         for (let product of this._products){
             if(product_id == product.product.product_id){
@@ -135,11 +137,13 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     }
 
     public removeItem(product_id: number): boolean | string {
-        const position: number = this._products.reduce((acc: number, product: Entry, index: number) => (product_id == product.product.product_id)? index: acc, -1);
-        if (position < 0){
-            return ProductNotExistInBasket
+        const before = this._products.length;
+        console.log(`remove ${product_id}`)
+        console.log(this.products);
+        this._products = this._products.filter((entry) => entry.product.product_id != product_id)
+        if (this._products.length == before){
+            return ProductNotFound
         }
-        this._products.splice(position, 1);
         return true
     }
 

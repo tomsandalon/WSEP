@@ -17,12 +17,11 @@ class BasketItem extends Component {
 			headers: {
 				'Content-Type': 'application/json',
 				'Cookie': document.cookie,
-				 body: JSON.stringify({
-					shop_id:this.props.shop_id,
-					product_id:this.props.product_id,
-					amount:this.props.amount
-				})
 			},
+			body: JSON.stringify({
+				shop_id:this.props.shop_id,
+				product_id:this.props.product_id
+			})
 		  };
 		  fetch('/cart',requestOptions)
 			  .then(async response => {

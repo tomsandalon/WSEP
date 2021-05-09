@@ -18,12 +18,7 @@ describe('Add Manager to Shop tests', () => {
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: 1,
-                name: "",
-                description: "6GB RAM",
-                amount: 50,
-                categories: ["GPU"],
-                base_price: 1000,
-                purchase_type: 0
+                app: 0
             })
             .expect(BadRequest, done);
     })
