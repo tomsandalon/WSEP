@@ -212,8 +212,8 @@ describe('Acceptance Tests:', () => {
            system.addItemToBasket(user_two, 1, shopID, 1)
            let purchase_one = system.purchaseShoppingBasket(user_one, shopID, "hello")
            let purchase_two = system.purchaseShoppingBasket(user_two, shopID, "hello")
-           expect(typeof purchase_one == "boolean").to.be.true 
-           expect(typeof purchase_two == "string").to.be.true;
+           expect(typeof purchase_one == "string").to.be.true 
+           expect(typeof purchase_two == "boolean").to.be.true;
         });
         it('Sad: buy basket from non-existing shop', () => {
             let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
