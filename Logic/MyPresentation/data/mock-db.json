@@ -15,6 +15,10 @@
     {
       "managerName": "Markou",
       "id": 4
+    },
+    {
+      "managerName": "1",
+      "id": 5
     }
   ],
   "store_2_managers": [
@@ -35,6 +39,18 @@
       "name": "Second shop",
       "description": "Description2",
       "active": false
+    },
+    {
+      "name": "s",
+      "description": "df",
+      "active": true,
+      "id": 3
+    },
+    {
+      "name": "ff",
+      "description": "fdfdf",
+      "active": true,
+      "id": 4
     }
   ],
   "store_1_items": [

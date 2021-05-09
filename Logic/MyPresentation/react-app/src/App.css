@@ -41,21 +41,14 @@
 }
 /* store views / list */
 .user-profile {
-  padding: 12px 0;
-  /* margin: 20px 0; */
-  /* border-bottom: 1px solid #fafafa; */
+  padding: 10px 0;
 }
-/* .user-profile:hover { */
-/* box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.1); */
-/* } */
 .user-profile h2 {
   font-size: 20px;
-  color: #f1356d;
+  color: #359cf1;
   /* margin-bottom: 8px; */
 }
-/* .user-profile {
-  padding: 12px 0;
-} */
+
 /* base styles */
 * {
   margin: 0;
@@ -101,7 +94,7 @@
 }
 .add-manager h2 {
   font-size: 20px;
-  color: #f1356d;
+  color: #3557f1;
   margin-bottom: 30px;
 }
 .add-manager input,
@@ -115,8 +108,8 @@
   display: block;
 }
 .add-manager button {
-  /* background: #f1356d; */
-  /* color: #fff; */
+  background: #3557f1;
+  color: #fff;
   border: 0;
   padding: 8px;
   border-radius: 8px;
@@ -133,7 +126,7 @@
 }
 .store-preview h2 {
   font-size: 20px;
-  /* color: #f1356d; */
+  color: #35acf1;
   margin-bottom: 8px;
 }
 .center-screen {

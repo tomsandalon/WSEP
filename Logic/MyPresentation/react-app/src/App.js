@@ -11,15 +11,17 @@ import {
 } from "react-router-dom";
 import ManagerHome from "./pages/ManagerHome";
 import ShoppingCart from "./components/ShoppingCart";
-import Stores from "./pages/Stores";
 import "./App.css";
 import AddManager from "./pages/Add_Manager";
+import AddStore from "./pages/Add_Store";
 import ManagersStore from "./pages/ManagersStore";
 class App extends Component {
   state = {
     shopsInfo: [],
   };
-  
+  handleLogout = () => {
+    console.log("Logged out");
+  };
   displayShops = () => {
     const requestOptions = {
       method: "GET",
@@ -130,6 +132,9 @@ class App extends Component {
             <Route path="/register" component={Register} />
             <Route path="/addmanager/:storeID">
               <AddManager />
+            </Route>
+            <Route path="/addstore/:managerID">
+              <AddStore />
             </Route>
             <Route path="/managersStore/:storeID">
               <ManagersStore />
