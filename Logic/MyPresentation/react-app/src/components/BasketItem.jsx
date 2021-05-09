@@ -7,13 +7,13 @@ class BasketItem extends Component {
 	}
 
 	handleRemoveItemFromBasket = () =>{
-		// console.log(this.props.shop_id);
-		// console.log(this.props.product_id);
-		// console.log(this.props.amount);
+		console.log(this.props.shop_id);
+		console.log(this.props.product_id);
+		console.log(this.props.amount);
 		
 		console.log("cookies",document.cookie);
 		const requestOptions = {
-			method: 'POST',
+			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
 				'Cookie': document.cookie,
@@ -28,6 +28,7 @@ class BasketItem extends Component {
 			  .then(async response => {
 				switch(response.status){
 					case 200: //welcome
+					this.setState({errorMsg:"Item removed successfully",visible:true})
 					break;
 					case 400:
 					const err_message_fail = await response.text();
@@ -64,7 +65,7 @@ class BasketItem extends Component {
 						</div> 
 					</div> 
 					<div className="col-2">
-						<h6>Total cost: <span type="text" className="badge badge-pill badge-info">{this.props.price*this.props.amount}</span></h6>
+						<h6>Total: <span type="text" className="badge badge-pill badge-info">{this.props.price*this.props.amount}</span></h6>
 						
 					</div>
 					<div className="col-2">

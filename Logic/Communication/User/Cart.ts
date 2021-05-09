@@ -1,4 +1,5 @@
 import {service, Session, sid} from "../Config/Config";
+import {request} from "express";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -24,6 +25,7 @@ router.post('/', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return;
     }
     const result = service.addItemToBasket(user_id, request.body.product_id, request.body.shop_id, request.body.amount);
     if (typeof result === 'string') {
@@ -31,14 +33,44 @@ router.post('/', (request: any, response: any) => {
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
-        console.log(`Display cart user_id ${user_id} session id ${request.cookies['SID']}`)
-        const cart = service.displayShoppingCart(user_id);
-        (cart as string[][]).forEach((basket: any) => {
-            console.log("basket")
-            basket.forEach((product: string) => {
-                console.log(JSON.parse(product))
-            })
-        })
+        response.status(200);
+        response.end();
+    }
+})
+
+router.put('/', (request: any, response: any) => {
+    const user_id = Session.sessions[request.cookies[sid]];
+    if (user_id == undefined) {
+        response.status(404);
+        response.send('Bad session id')
+        response.end()
+    }
+    const result = service.editShoppingCart(user_id, request.body.shop_id, request.body.product_id, request.body.amount);
+    console.log(result);
+    if (typeof result === 'string') {
+        response.status(400);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
+        response.status(200);
+        response.end();
+    }
+})
+
+router.delete('/', (request: any, response: any) => {
+    const user_id = Session.sessions[request.cookies[sid]];
+    if (user_id == undefined) {
+        response.status(404);
+        response.send('Bad session id')
+        response.end()
+    }
+    const result = service.removeItemFromBasket(user_id, request.body.shop_id, request.body.product_id);
+    console.log(result);
+    if (typeof result === 'string') {
+        response.status(400);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
         response.status(200);
         response.end();
     }

@@ -13,7 +13,6 @@ router.post('/', (request: any, response: any) => {
         response.end()
     }
     const result = service.performRegister(request.body.email, request.body.password);
-    console.log(request.body.email, request.body.password)
     response.setHeader("Content-Type", "text/html");
     if (result) {
         response.status(200);
