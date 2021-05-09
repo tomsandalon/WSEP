@@ -11,13 +11,15 @@ class Basket extends Component {
         this.props.selected_basket.products.map(product => price+=(product.amount*product.product._base_price))
         this.state = {price:price}
     }
+
    render() {
        return(
            <React.Fragment>
 			<main className="col-md-8">
-            <h1>Basket ID: {this.props.selected_basket.basket_id}</h1>
+            <h1>Basket of shop: {this.props.selected_basket.shop_name}</h1>
 			{this.props.basket_products.map(product => 
 				<BasketItem img={Image}
+				refreshCart={this.props.refreshCart}
                 shop_id={this.props.selected_basket.shop_id} amount={product.amount} basket_id={this.props.selected_basket.basket_id} 
                 shop_name={this.props.selected_basket.shop_name} product_id={product.product._product_id} item_name={product.product._name} 
                 price={product.product._base_price}></BasketItem>)

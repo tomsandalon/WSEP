@@ -131,6 +131,8 @@ export class UserImpl implements User {
             if (typeof result === "string"){
                 return result;
             }
+            if(shopping_basket[0].isEmpty())
+                this._cart = this._cart.filter(element => element.shop.shop_id != shop.shop_id);
             logger.Info(`Product id ${product_id} was edited successfully for shop_id ${shop.shop_id}`)
         }
     }

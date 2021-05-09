@@ -11,9 +11,21 @@ router.get('/', (request: any, response: any) => {
         response.end()
         return
     }
-    response.setHeader("Content-Type", "application/json");
-    response.send(service.displayShoppingCart(user_id))
-    response.end();
+    const result = service.displayShoppingCart(user_id);
+    if(typeof result == "string") {
+        response.status(400);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+        response.end()
+        return;
+    }
+    else{
+        response.setHeader("Content-Type", "application/json");
+        response.status(200);
+        response.send(service.displayShoppingCart(user_id))
+        response.end();
+        return;
+    }
 })
 
 router.post('/', (request: any, response: any) => {

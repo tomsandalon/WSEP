@@ -9,7 +9,13 @@ class Navigation extends Component {
         clicked:false,
         index:MenuItems.length
     }
-
+handleLogout = () => {
+    if (localStorage.getItem("loggedUser") != null) {
+        console.log("here")
+        localStorage.removeItem("loggedUser")
+        document.cookie.delete("loggedUser")
+    }
+}
 handleClick = () =>{
     this.setState({clicked:!this.state.clicked})
 }
@@ -33,7 +39,7 @@ handleClick = () =>{
                             MyCart
                             </a>
                         </li>
-                    <li key={100}><a className="nav-links cartButton btn-primary btn-sm" href="/home" onClick={() => this.props.handleLogout}>Logout</a></li>
+                    <li key={100}><a className="nav-links cartButton btn-primary btn-sm" href="/home" onClick={this.handleLogout}>Logout</a></li>
                       
                 </ul>
             </nav>

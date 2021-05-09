@@ -19,9 +19,7 @@ class App extends Component {
   state = {
     shopsInfo: [],
   };
-  handleLogout = () => {
-    console.log("Logged out");
-  };
+  
   displayShops = () => {
     const requestOptions = {
       method: "GET",
