@@ -122,3 +122,25 @@
   border-radius: 8px;
   cursor: pointer;
 }
+/* blog previews / list */
+.store-preview {
+  padding: 10px 16px;
+  margin: 20px 0;
+  border-bottom: 1px solid #fafafa;
+}
+.store-preview:hover {
+  box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.1);
+}
+.store-preview h2 {
+  font-size: 20px;
+  /* color: #f1356d; */
+  margin-bottom: 8px;
+}
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+}

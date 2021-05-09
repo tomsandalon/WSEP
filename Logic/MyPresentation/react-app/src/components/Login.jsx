@@ -24,6 +24,7 @@ handleSubmit = (event) =>{
         .then(async response => {
             switch (response.status) {
                 case 200: //welcome
+                    this.setState({errorMsg:"Login sucessfully",visible:true})
                     break;
                 case 401:
                     const err_message = await response.text();

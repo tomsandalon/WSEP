@@ -37,4 +37,5 @@ const StoreList = (props) => {
     </div>
   );
 };
+
 export default StoreList;
