@@ -7,9 +7,9 @@ class BasketItem extends Component {
 	}
 
 	handleRemoveItemFromBasket = () =>{
-		// console.log(this.props.shop_id);
-		// console.log(this.props.product_id);
-		// console.log(this.props.amount);
+		console.log(this.props.shop_id);
+		console.log(this.props.product_id);
+		console.log(this.props.amount);
 		
 		console.log("cookies",document.cookie);
 		const requestOptions = {
