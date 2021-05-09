@@ -8,6 +8,9 @@ import {BasketDoesntExists} from "../../Logic/Domain/ProductHandling/ErrorMessag
 
 
 describe('Acceptance Tests:', () => {
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.ic1nksmh7kgv
+     */
     describe('Guest:2.1: Enter - enter to the system as a guest', () => {
         it('Happy', () => {
             const system: System = SystemDriver.getSystem(true);
@@ -15,6 +18,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.ecerbatgpwk4
+     */
     describe('Guest:2.2: Exit - exit', () => {
         it('Happy', () => {
             const system: System = SystemDriver.getSystem(true);
@@ -23,6 +29,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.s0883svk6c2h
+     */
     describe('Guest:2.3: Registration - Add a new user to the system', () => {
         const system: System = SystemDriver.getSystem(true);
         it('Happy', () => {
@@ -39,6 +48,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.mrtynned3j8i
+     */
     describe('Guest:2.4: Login - User success to login', () => {
         const system: System = SystemDriver.getSystem(true);
         it('Happy', () => {
@@ -57,6 +69,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.vdd0vxovfnxx
+     */
     describe('Guest:2.5: Information - get info about shop and its products', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -78,6 +93,10 @@ describe('Acceptance Tests:', () => {
         });
 
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.k2u60ptuonkv
+     */
     describe('Guest:2.6: Search - search an item by detail and get all the shops that sells it', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -108,6 +127,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.at2ykxq839q3
+     */
     describe('Guest:2.7: Basket - add a product to the basket', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -130,6 +153,10 @@ describe('Acceptance Tests:', () => {
             expect(typeof  bad_add == "string").to.be.true
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.v4lzagr37e31
+     */
     describe('Guest:2.8: Information - get info and edit the shopping basket', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -155,6 +182,10 @@ describe('Acceptance Tests:', () => {
             expect(typeof bad_edit == "string").to.be.true
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.42ad4kghyt0k
+     */
     describe('Guest:2.9.1: Purchase - buy a specific basket', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -178,7 +209,6 @@ describe('Acceptance Tests:', () => {
         it('Sad: try to buy when inventory is empty', () => {
             // add the 8kTV product with empty inventory to basket
             let fail = system.addItemToBasket(user, 1, shopID, 1)
-            //FIXME: why i dont get a fail?
             expect(typeof fail == "string").to.be.true;
         });
         it('Bad: buy a basket with negative user id', () => {
@@ -186,6 +216,10 @@ describe('Acceptance Tests:', () => {
             expect(typeof bad_purchase == "string").to.be.true // bad
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.fmvdxw7c1e2c
+     */
     describe('Guest:2.9.2: Auction - add a bid to an auction', () => {
         it('Happy', () => {
             //TODO Milestone 2
@@ -200,6 +234,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.xt24dfblxfxf
+     */
     describe('Guest:2.9.3: Auction - credit card charged, product added to purchase history', () => {
         it('Happy', () => {
             //TODO Milestone 2
@@ -220,6 +258,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.gm1b34nj0qnb
+     */
     describe('Guest:2.9.4: Offer -  credit card charged, product added to purchase history', () => {
         it('Happy', () => {
             //TODO Milestone 2
@@ -240,6 +282,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.hgiw4joxyqf2
+     */
     describe('Guest:2.9.5: Lottery -  choose random winner, credit card charged, product added to purchase history', () => {
         it('Happy', () => {
             //TODO Milestone 2
@@ -259,6 +305,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.xyyae6ahg1fy
+     */
     describe('Guest:2.9.6: Lottery - credit card charged, product added to purchase history', () => {
         it('Happy', () => {
             //TODO Milestone 2
@@ -271,6 +321,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.f44dar7n7g1d
+     */
     describe('Guest:2.9.7: Discount - price changed by discount policy', () => {
         it('Happy', () => {
             //TODO Milestone 2
@@ -283,6 +337,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.b7k2c1ahkere
+     */
     describe('Registered:3.1: Logout - user success to logout', () => {
         it('Happy', () => {
             const system: System = SystemDriver.getSystem(true);
@@ -300,6 +358,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.i5sb3n24ktz2
+     */
     describe('Registered:3.2: Open shop - add a new shop to the system, add the user as original owner', () => {
         const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
@@ -321,6 +383,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.ae947ro82n2j
+     */
     describe('Registered:3.7: Information - get the purchase history', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -346,6 +411,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.cvl6sukqtukq
+     */
     describe('Owner:4.1.1: Product - add a new product to the shop', () => {
         const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
@@ -371,6 +440,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.qbpk2vkeb2fw
+     */
     describe('Owner:4.1.2: Product - remove a product from the shop', () => {
         const system: System = SystemDriver.getSystem(true);
         let reg = system.performRegister("Test@test.com", "TESTER");
@@ -384,14 +456,6 @@ describe('Acceptance Tests:', () => {
             system.removeProduct(userID, shopID, 0) //we know that it's 0 as we reset the tests every time
             expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.false
         });
-        // it('Sad: Try to remove product while not having proper permissions', () => {
-        //     system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
-        //     system.performRegister("OvedMetzuyan@post.co.il", "123")
-        //     let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
-        //     system.appointManager(userID, shopID,"OvedMetzuyan@post.co.il")
-        //     system.removeProduct(nEmpID, shopID, 1) //we know it's 1
-        //     expect((system.getItemsFromShop(shopID) as string[]).some(p=>p.includes("TV"))).to.be.true
-        // });
         it('Bad: remove a product with invalid product id', () => {
             system.addProduct(userID, shopID,"TV", "Best desc", 1000, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
             system.removeProduct(userID, shopID, -1)
@@ -399,6 +463,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.pjhgqs8jkxha
+     */
     describe('Owner:4.2.1: Purchase policy - add a new purchase policy to the shop', () => {
         it('Happy', () => {
             //TODO
@@ -416,6 +483,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.t7p40iokqml
+     */
     describe('Owner:4.2.2: Discount policy - add a new discount policy to the shop', () => {
         it('Happy', () => {
             //TODO
@@ -433,6 +503,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.bwzt9iy9meym
+     */
     describe('Owner:4.2.3: Purchase type - add a new purchase type to the shop', () => {
         it('Happy', () => {
             //TODO
@@ -450,6 +523,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.4oq7i6nhf3ow
+     */
     describe('Owner:4.2.4: Discount type - add a new discount type to the shop', () => {
         it('Happy', () => {
             //user is an owner
@@ -466,6 +542,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.lo3otnn7xt7k
+     */
     describe('Owner:4.3: Appoint - appoint a new owner to the shop', () => {
         const system: System = SystemDriver.getSystem(true);
         //Original owner
@@ -497,6 +576,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.4fpux52hueow
+     */
     describe('Owner:4.5: Appoint - appoint a new manager to the shop', () => {
         const system: System = SystemDriver.getSystem(true);
         //Original owner
@@ -527,6 +609,10 @@ describe('Acceptance Tests:', () => {
             expect(typeof bad_appoint == "string").to.be.true //bad
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.2wragr7iuuf5
+     */
     describe('Owner:4.6: Manager permissions - modify a manager permission', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -560,6 +646,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.euh2924jrgbs
+     */
     describe('Owner:4.7: Manager - remove a manager from the shop', () => {
         const system: System = SystemDriver.getSystem(true);
         //Original owner
@@ -586,6 +675,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.etex5wv38yvq
+     */
     describe('Owner:4.9: Information - gets every manager and owner in the shop, include their permissions', () => {
         it('Happy', () => {
             //TODO
@@ -598,6 +690,9 @@ describe('Acceptance Tests:', () => {
         });
     });
 
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.r85xeoe2dfkc
+     */
     describe('Owner:4.11: Purchase History - gets a shop purchase history', () => {
         it('Happy', () => {
             //TODO
@@ -609,6 +704,10 @@ describe('Acceptance Tests:', () => {
             //TODO
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.tqiiku4j47bq
+     */
     describe('Admin:6.4.1: Information - gets a purchase history of a given user', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -636,6 +735,10 @@ describe('Acceptance Tests:', () => {
             expect(typeof bad_result == "string").to.be.true
         });
     });
+
+    /**
+     * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.abnn9wn6l8rl
+     */
     describe('Admin:6.4.2: Information - gets a purchase history of a given shop', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
