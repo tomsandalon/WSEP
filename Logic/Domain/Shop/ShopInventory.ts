@@ -151,7 +151,7 @@ export interface ShopInventory {
 
     composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string
 
-    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number
+    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData): number
 
     displayItems(): string
 
@@ -256,9 +256,10 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     filter(products: Product[], filters: Filter[]): Product[] {
+        if (filters.length == 0) return products
         const passed_filter = (f: Filter) => (product: Product) => {
-            return (f.filter_type == Filter_Type.AbovePrice) ? product.base_price >= Number(f.filter_value) :
-                (f.filter_type == Filter_Type.BelowPrice) ? product.base_price <= Number(f.filter_value) :
+            return (f.filter_type == Filter_Type.AbovePrice) ? product.price >= Number(f.filter_value) :
+                (f.filter_type == Filter_Type.BelowPrice) ? product.price <= Number(f.filter_value) :
                     // ((f.filter_type == Filter_Type.Rating) ? true :   // add rating to product
                     (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
                         //can add more
@@ -410,9 +411,9 @@ export class ShopInventoryImpl implements ShopInventory {
         return
     }
 
-    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number {
+    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData): number {
         return products.reduce((acc, cur) =>
-            acc + (cur.amount * cur.actual_price * (1 - this.discount_policies.evaluateDiscount(cur, cur.amount))), 0)
+            acc + (cur.amount * cur.price * (1 - this.discount_policies.evaluateDiscount(cur, cur.amount))), 0)
     }
 
     addDiscount(discount: Discount): void {

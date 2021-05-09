@@ -164,7 +164,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         return this._products.length == 0
     }
     purchase(payment_info: string, coupons: any[]): string | Purchase {
-        const order = PurchaseImpl.create(new Date(), this,[], this._user_data);
+        const order = PurchaseImpl.create(new Date(), this,[], this.shop, this._user_data);
         if(typeof order == "string")
             return order
         const order_purchase = order.purchase_self(payment_info);
