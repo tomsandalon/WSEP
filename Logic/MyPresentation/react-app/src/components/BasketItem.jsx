@@ -13,7 +13,7 @@ class BasketItem extends Component {
 		
 		console.log("cookies",document.cookie);
 		const requestOptions = {
-			method: 'POST',
+			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
 				'Cookie': document.cookie,
@@ -28,6 +28,7 @@ class BasketItem extends Component {
 			  .then(async response => {
 				switch(response.status){
 					case 200: //welcome
+					this.setState({errorMsg:"Item removed successfully",visible:true})
 					break;
 					case 400:
 					const err_message_fail = await response.text();

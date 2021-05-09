@@ -1,16 +1,10 @@
 import { useState } from "react";
-<<<<<<< HEAD
-
-const AddManager = () => {
-  const storeID = 1;
-=======
 // import { useParams } from "react-router";
 import { useParams } from "react-router-dom";
 
 const AddManager = () => {
   const { storeID } = useParams();
 
->>>>>>> 4628ca96dd6217006a6bac8629462a6818d72238
   const [managerName, setManagerName] = useState();
   const [isPending, setIsPending] = useState(false);
 
