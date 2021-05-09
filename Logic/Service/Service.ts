@@ -100,6 +100,11 @@ export class Service {
     editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number): string | void {
         return this._system.editShoppingCart(user_id, shop_id, product_id, amount)
     }
+
+    removeItemFromBasket(user_id: number, shop_id: number, product_id: number, amount: number): string | void {
+        return this._system.editShoppingCart(user_id, shop_id, product_id, 0)
+    }
+
     //(category_name[]strings, min_price:number,max_price:number,rating:number,search_name_term:string)
     filterSearch(search_type: SearchTypes, search_term: string, filters: Filter[]): string[] {
         return this._system.filterSearch(search_type, search_term, filters)
