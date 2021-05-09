@@ -14,6 +14,7 @@ import ShoppingCart from "./components/ShoppingCart";
 import Stores from "./pages/Stores";
 import "./App.css";
 import AddManager from "./pages/Add_Manager";
+import ManagersStore from "./pages/ManagersStore";
 class App extends Component {
   state = {
     shopsInfo: [],
@@ -131,6 +132,9 @@ class App extends Component {
             <Route path="/register" component={Register} />
             <Route path="/addmanager/:storeID">
               <AddManager />
+            </Route>
+            <Route path="/managersStore/:storeID">
+              <ManagersStore />
             </Route>
           </Switch>
         </div>
