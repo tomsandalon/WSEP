@@ -2,7 +2,7 @@ import {app} from "../../Server";
 const expect = require('chai').expect;
 import {chai, cookie_prefix, SessionTest} from "../Setup";
 import {beforeEach} from "mocha";
-import {BadRequest, OK, route_register} from "../../Config/Config";
+import {BadRequest, OK, route_register, Unauthorized} from "../../Config/Config";
 const request = require('supertest');
 
 describe('Registration tests', () => {
@@ -53,5 +53,21 @@ describe('Registration tests', () => {
                 password: "123456"
             })
             .expect(OK, done);
+    })
+    it('Register and register again',  (done) =>{
+        request(app).post(route_register)
+            .set('Cookie', cookie_prefix + SessionTest.sess_id)
+            .send({
+                email: "Menni@gmail.com",
+                password: "123456"
+            })
+            .expect(OK, done);
+        request(app).post(route_register)
+            .set('Cookie', cookie_prefix + SessionTest.sess_id)
+            .send({
+                email: "Menni@gmail.com",
+                password: "123456"
+            })
+            .expect(BadRequest, done);
     })
 })
