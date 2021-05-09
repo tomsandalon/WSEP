@@ -1,14 +1,7 @@
-import {service, Session, sid} from "../Config/Config";
+import {service, Session, sid} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
-router.get('/', (req: any, response: any) => {
-
-})
-router.put('/', (req: any, res: any) => {
-    //TODO perform logout
-    res.send("My first server!\n" + req.url + "\n:D")
-})
 
 router.post('/', (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];

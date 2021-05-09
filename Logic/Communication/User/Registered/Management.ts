@@ -1,4 +1,4 @@
-import {service, Session, sid} from "../Config/Config";
+import {service, Session, sid} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;

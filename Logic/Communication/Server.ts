@@ -1,8 +1,18 @@
-import {request} from "express";
+import * as https from 'https';
+import {
+    hour,
+    options,
+    port,
+    route_cart, route_filter,
+    route_guest, route_home,
+    route_login, route_logout,
+    route_register, route_shop_management,
+    service,
+    Session,
+    sid
+} from "./Config/Config";
 
 const fs = require('fs')
-import * as https from 'https';
-import {options, port, service, Session, sid} from "./Config/Config";
 const path = require('path');
 const express = require('express');
 const expressWs = require('express-ws');
@@ -21,31 +31,15 @@ expressWs(app, server);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
-app.use('/login', require('./User/Login'));
-app.use('/register', require('./User/Register'));
-app.use('/cart', require('./User/Cart'));
-app.use('/home', require('./Home/Home'));
-app.use('/home/filter', require('./Home/Filter'));
-app.use('/user/shop/management', require('./User/Management'));
+app.use(route_guest, require('./User/Guest'))
+app.use(route_login, require('./User/Registered/Login'));
+app.use(route_logout, require('./User/Registered/Logout'))
+app.use(route_register, require('./User/Register'));
+app.use(route_cart, require('./User/Cart'));
+app.use(route_home, require('./Home/Home'));
+app.use(route_filter, require('./Home/Filter'));
+app.use(route_shop_management, require('./User/Registered/Management'));
 
-const second = 1000;
-const minute = 60 * second;
-const hour = 60 * minute;
-const day = 24 * hour;
-app.get('/guest',(request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    let session_id = request.cookies[sid];
-    response.status(200);
-    response.setHeader("Content-Type", "application/json");
-    if (user_id == undefined) {
-        session_id = Session.session_id_specifier++;
-        Session.sessions[session_id] = service.openSession();
-    }
-    response.cookie(sid, session_id, {
-        maxAge: 2 * hour
-    })
-    response.end();
-})
 //* For debug TODO delete this
 
 service.initData();
