@@ -184,6 +184,10 @@ export class ShopManagementImpl implements ShopManagement {
         }
 
         this._managers = this._managers.concat([new ManagerImpl(appointee_email, appointer_email)])
+        const original = this.owners.find(o => o.user_email == appointer_email)
+        if (original && original.appointees_emails.every(mail => mail != appointee_email)) {
+            original.appointees_emails = original.appointees_emails.concat([appointee_email])
+        }
         return true;
     }
 
@@ -198,6 +202,10 @@ export class ShopManagementImpl implements ShopManagement {
         }
         this._owners = this._owners.concat([new OwnerImpl(appointee_email, appointer_email)])
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
+        const original = this.owners.find(o => o.user_email == appointer_email)
+        if (original) {
+            original.appointees_emails = original.appointees_emails.concat([appointee_email])
+        }
         return true;
     }
 
@@ -239,7 +247,7 @@ export class ShopManagementImpl implements ShopManagement {
         const ownerToRemove = this.getOwnerByEmail(target);
         if (!ownerToRemove) return false;
         if (ownerToRemove.appointer_email != user_email) return false;
-        this._owners = this.owners.filter(m => m.user_email != target)
+        // this._owners = this.owners.filter(m => m.user_email != target)
         this.removeAllSubordinates(target, user_email)
         NotificationAdapter.getInstance().notify(target,
             `You have been demoted by ${user_email}`)

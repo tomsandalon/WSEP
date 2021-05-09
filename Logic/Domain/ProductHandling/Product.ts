@@ -17,7 +17,7 @@ export interface Product {
     description: string
     amount: number // >= 0
     category: Category[]
-    base_price: number // >= 0
+    price: number // >= 0
     purchase_type: Purchase_Type
 
     /**
@@ -106,7 +106,7 @@ export class ProductImpl implements Product{
     set purchase_type(value: Purchase_Type) {
         this._purchase_type = value;
     }
-    private static _product_id_specifier: number = 0;
+    static _product_id_specifier: number = 0;
     private readonly _product_id: number;
     private _amount: number;
     private _base_price: number;
@@ -166,7 +166,7 @@ export class ProductImpl implements Product{
         this._amount -= amount;
         return true;
     }
-    get base_price(){
+    get price(){
         return this._base_price;
     }
     public changePrice(base_price: number): string | boolean{

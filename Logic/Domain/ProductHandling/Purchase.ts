@@ -48,8 +48,8 @@ export class PurchaseImpl implements Purchase{
 
     static resetIDs = () => PurchaseImpl._order_id_specifier = 0
 
-    public static create(date: Date, basket: ShoppingBasket, coupons: any[], minimal_user_data: MinimalUserData): Purchase | string{
-        const products = basket.products.map((product) =>  ProductPurchaseImpl.create(product.product, coupons, product.amount));
+    public static create(date: Date, basket: ShoppingBasket, coupons: any[], shop: ShopInventory, minimal_user_data: MinimalUserData): Purchase | string{
+        const products = basket.products.map((product) =>  ProductPurchaseImpl.create(product.product, coupons, product.amount, shop));
         const isBad = products.some((product) => typeof product === "string");
         if(isBad){
             return DiscountNotExists
@@ -79,12 +79,12 @@ export class PurchaseImpl implements Purchase{
     // }
 
     public purchase_self(payment_info: string): boolean | string  {
+        const total_price =  this.shop.calculatePrice(this.products, this.minimal_user_data);
         const result_of_purchase = this._shop.purchaseItems(this._products, this._minimal_user_data);
         if(typeof result_of_purchase === "string"){
             return result_of_purchase
         }
         this.shop.logOrder(this)
-        const total_price =  this.shop.calculatePrice(this.products, this.minimal_user_data);
         const result_payment = PaymentHandlerImpl.getInstance().charge(payment_info, total_price, this._shop.bank_info);
         if (typeof result_payment == "string" || !result_payment){
             this._shop.returnItems(this._products)
