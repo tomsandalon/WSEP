@@ -111,8 +111,8 @@ describe('ProductImpl Class Test suit', () => {
                 const delta = 10;
                 const result = product.changePrice(delta);
                 expect(typeof result).equal("boolean");
-                expect(product.base_price).not.equal(before);
-                expect(product.base_price).equal(delta);
+                expect(product.price).not.equal(before);
+                expect(product.price).equal(delta);
             });
         });
         describe('addCategory', () => {

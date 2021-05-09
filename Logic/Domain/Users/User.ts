@@ -7,7 +7,7 @@ import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/Payment
 import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {BasketDoesntExists} from "../ProductHandling/ErrorMessages";
 
-let id_counter: number = 0;
+export let id_counter: number = 0;
 const generateId = () => id_counter++;
 
 export interface User {

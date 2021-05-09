@@ -6,6 +6,8 @@ import {LoginImpl} from "../../../Logic/Domain/Users/Login";
 import {ShopInventoryImpl} from "../../../Logic/Domain/Shop/ShopInventory";
 import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
+import {SystemImpl} from "../../../Logic/Domain/System";
+import {id_counter} from "../../../Logic/Domain/Users/User";
 
 describe('Authentication Tests', () => {
     it('should return a hashed password ', () => {
@@ -37,12 +39,12 @@ describe('RegisterImpl Tests', () => {
     });
     it('Registering with valid email format ', () => {
         let value = RegisterImpl.getInstance();
-        expect(value.register("liorpev@gmail.com", "123456")).eq(true)
+        expect(value.register("liorpev123456@gmail.com", "123456")).eq(true)
     });
     it('Registering with a user email which is already in use ', () => {
         let value = RegisterImpl.getInstance();
-        expect(value.register("liorpev1@gmail.com", "123456")).eq(true)
-        expect(value.register("liorpev1@gmail.com", "123456")).eq(false)
+        expect(value.register("liorpev1234@gmail.com", "123456")).eq(true)
+        expect(value.register("liorpev1234@gmail.com", "123456")).eq(false)
     });
 });
 
@@ -73,10 +75,10 @@ describe('LoginImpl Tests', () => {
     });
     it('Register then login and try to login again(first time login) ', () => {
         let value = RegisterImpl.getInstance();
-        value.register("liorpev1@gmail.com", "123456");
+        value.register("liorpev1999@gmail.com", "123456");
         let log = LoginImpl.getInstance();
-        log.login("liorpev1@gmail.com", "123456");
-        expect(typeof (log.login("liorpev1@gmail.com", "123456")) == "string").eq(true);
+        log.login("liorpev1999@gmail.com", "123456");
+        expect(typeof (log.login("liorpev1999@gmail.com", "123456")) == "string").eq(true);
     });
     it('Register then login and logout then login again(already existing user) ', () => {
         let value = RegisterImpl.getInstance();
@@ -114,6 +116,7 @@ describe('LoginImpl Tests', () => {
 });
 
 describe('Guest testing', () => {
+    SystemImpl.getInstance(true)
     it('creating 5 guests ', () => {
         let log = LoginImpl.getInstance();
         log.guestLogin();
@@ -122,14 +125,14 @@ describe('Guest testing', () => {
         log.guestLogin();
         log.guestLogin();
         expect(log.logged_guests.length == 5).eq(true)
-        log.exit(1)
-        expect(log.logged_guests.length == 4).eq(true)
+        log.exit(id_counter - 1)
+        expect(log.logged_guests.length).to.be.eq(4)
         expect(log.logged_guests.filter(val => val == 1).length ==0).eq(true)
     });
     it('creating 1 guest and buying stuff ', () => {
         let log = LoginImpl.getInstance();
         log.guestLogin();
-        const user = log.retrieveUser(5);
+        const user = log.retrieveUser(id_counter - 1);
         if(typeof user ==  "string")
             assert.fail()
         expect(user.user_email == "" && user.password == "").eq(true)
@@ -137,17 +140,19 @@ describe('Guest testing', () => {
         //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
         // @ts-ignore
         shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
-        expect(typeof (user.addToBasket(shop, 0,15)) !== "string").eq(true);
+        expect(typeof (user.addToBasket(shop, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
         expect(user.cart[0].products[0].amount == 15).eq(true)
     });
 });
 
 describe('User Tests', () => {
+    SystemImpl.getInstance(true)
+
     it('Registering login and add item to basket ', () => {
         let reg = RegisterImpl.getInstance();
-        reg.register("liorpev@gmail.com","123456");
         let log = LoginImpl.getInstance();
-        const user = (log.login("liorpev@gmail.com", "123456"));
+        reg.register("liorpev1888@gmail.com","123456");
+        const user = (log.login("liorpev1888@gmail.com", "123456"));
         if(typeof user == "string")
             assert.fail()
         else
@@ -159,15 +164,17 @@ describe('User Tests', () => {
             const logged_user = log.retrieveUser(user);
             if(typeof logged_user == "string")
                 assert.fail()
-            expect(typeof (logged_user.addToBasket(shop, 0,15)) !== "string").eq(true);
+            expect(typeof (logged_user.addToBasket(shop, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
         }
     });
+    SystemImpl.getInstance(true)
+
     it('Adding item to cart', () => {
         ProductImpl.resetIDs();
         let reg = RegisterImpl.getInstance();
-        reg.register("liorpev1@gmail.com","123456");
+        reg.register("liorpev2123123123@gmail.com","123456");
         let log = LoginImpl.getInstance();
-        const user = (log.login("liorpev1@gmail.com", "123456"));
+        const user = (log.login("liorpev2123123123@gmail.com", "123456"));
         if(typeof user == "string")
             assert.fail()
         else
@@ -179,7 +186,7 @@ describe('User Tests', () => {
             const logged_user = log.retrieveUser(user);
             if(typeof logged_user == "string")
                 assert.fail()
-            logged_user.addToBasket(shop,0,50);
+            logged_user.addToBasket(shop,ProductImpl._product_id_specifier - 1,50);
             expect(logged_user.cart[0].products[0].product.name === "vodka").eq(true)
             expect(logged_user.cart[0].products[0].amount == 50).eq(true)
             logged_user.editBasketItem(shop,0,15)
@@ -191,12 +198,14 @@ describe('User Tests', () => {
             expect(logged_user.cart[0].products[0].amount == 50).eq(true)
         }
     });
+    SystemImpl.getInstance(true)
+
     describe('Purchase tests', () => {
         it('Purchase basket', () => {
             let reg = RegisterImpl.getInstance();
-            reg.register("liorpev@gmail.com","123456");
+            reg.register("liorpev3@gmail.com","123456");
             let log = LoginImpl.getInstance();
-            const user = (log.login("liorpev@gmail.com", "123456"));
+            const user = (log.login("liorpev3@gmail.com", "123456"));
             if(typeof user == "string")
                 assert.fail()
             else
@@ -208,7 +217,7 @@ describe('User Tests', () => {
                 const logged_user = log.retrieveUser(user);
                 if(typeof logged_user == "string")
                     assert.fail()
-                expect(typeof (logged_user.addToBasket(shop, 0,15)) !== "string").eq(true);
+                expect(typeof (logged_user.addToBasket(shop, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
                 const purchase =logged_user.purchaseBasket(1, "paying");
                 if(typeof purchase == "string"){
                     assert.fail()
@@ -221,12 +230,14 @@ describe('User Tests', () => {
             }
         });
     });
+    SystemImpl.getInstance(true)
+
     describe('Purchase cart', () => {
         it('Purchase cart', () => {
             let reg = RegisterImpl.getInstance();
-            reg.register("liorpev@gmail.com","123456");
+            reg.register("cftvgbuhnjimkolpkmkonijhbu@gmail.com","123456");
             let log = LoginImpl.getInstance();
-            const user = (log.login("liorpev@gmail.com", "123456"));
+            const user = (log.login("cftvgbuhnjimkolpkmkonijhbu@gmail.com", "123456"));
             if(typeof user == "string")
                 assert.fail()
             else
@@ -242,8 +253,8 @@ describe('User Tests', () => {
                 const logged_user = log.retrieveUser(user);
                 if(typeof logged_user == "string")
                     assert.fail()
-                expect(typeof (logged_user.addToBasket(shop, 0,15)) !== "string").eq(true);
-                expect(typeof (logged_user.addToBasket(shop2, 1,15)) !== "string").eq(true);
+                expect(typeof (logged_user.addToBasket(shop, ProductImpl._product_id_specifier - 2,15)) !== "string").eq(true);
+                expect(typeof (logged_user.addToBasket(shop2, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
                 const purchase =logged_user.purchaseBasket(1, "paying");
                 const purchase2 =logged_user.purchaseBasket(2, "paying");
                 if(typeof purchase == "string" || typeof  purchase2 == "string"){

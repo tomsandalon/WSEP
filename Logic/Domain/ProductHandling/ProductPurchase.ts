@@ -1,5 +1,6 @@
 import {Category} from "./Category";
 import {Product} from "./Product";
+import {ShopInventory} from "../Shop/ShopInventory";
 
 export interface ProductPurchase {
     readonly product_id: number,
@@ -7,11 +8,11 @@ export interface ProductPurchase {
     readonly description: string,
     readonly category: ReadonlyArray<Category>
     readonly amount: number,
-    readonly actual_price: number,
+    readonly price: number,
 }
 
 export class ProductPurchaseImpl implements ProductPurchase{
-    private readonly _actual_price: number;
+    private _actual_price: number;
     private readonly _amount: number;
     private readonly _category: ReadonlyArray<Category>;
     private readonly _description: string;
@@ -25,9 +26,8 @@ export class ProductPurchaseImpl implements ProductPurchase{
         this._category = product.category;
         this._actual_price = actual_price;
     }
-
-    public static create(product: Product, coupons: any[], amount: number): ProductPurchase | string{
-        const final_price = product.calculatePrice(coupons);
+    public static create(product: Product, coupons: any[], amount: number, shop: ShopInventory): ProductPurchase | string{
+        const final_price = shop.calculatePrice([product], {userId: -1, underaged: false});
         if(typeof final_price === "string"){
             return final_price
         }
@@ -37,6 +37,7 @@ export class ProductPurchaseImpl implements ProductPurchase{
     get product_id(){
         return this._product_id;
     }
+
     get name(){
         return this._name;
     }
@@ -49,7 +50,10 @@ export class ProductPurchaseImpl implements ProductPurchase{
     get amount(){
         return this._amount;
     }
-    get actual_price(){
+    get price(){
         return this._actual_price;
+    }
+    set price(value: number) {
+        this._actual_price = value;
     }
 }

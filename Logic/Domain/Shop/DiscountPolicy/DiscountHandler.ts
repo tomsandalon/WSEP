@@ -42,6 +42,7 @@ export class DiscountHandler {
         this._discounts = this._discounts.filter(d => d.id != discount_id).concat([
             new ConditionalDiscount(condition, discount, condition_param)
         ])
+        return true
     }
 
     addNumericCompositionDiscount(operation: NumericOperation, d_id1: number, d_id2: number) {
@@ -51,6 +52,7 @@ export class DiscountHandler {
         this._discounts = this._discounts.filter(d => d.id != d_id1 && d.id != d_id2).concat([
             new NumericCompositionDiscount(operation, [discount1, discount2])
         ])
+        return true
     }
 
     addLogicCompositionDiscount(operation: LogicComposition, d_id1: number, d_id2: number) {
@@ -60,5 +62,6 @@ export class DiscountHandler {
         this._discounts = this._discounts.filter(d => d.id != d_id1 && d.id != d_id2).concat([
             new LogicCompositionDiscount(operation, discount1, discount2)
         ])
+        return true
     }
 }

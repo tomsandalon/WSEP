@@ -94,11 +94,11 @@ describe('Test Shop', () => {
         let products = shop.getAllItems()
         let result = shop.filter(products, [{filter_type: Filter_Type.AbovePrice, filter_value: "999"}])
         expect(result.length).to.be.eq(2)
-        expect(result.some(r => r.base_price < 999)).to.be.false
+        expect(result.some(r => r.price < 999)).to.be.false
         products = shop.getAllItems()
         result = shop.filter(products, [{filter_type: Filter_Type.AbovePrice, filter_value: "999"}, {filter_type: Filter_Type.BelowPrice, filter_value: "1001"}])
         expect(result.length).to.be.eq(1)
-        expect(result.some(r => r.base_price != 1000)).to.be.false
+        expect(result.some(r => r.price != 1000)).to.be.false
     })
 
     it('Test add owner - requirement 4.3', () => {
