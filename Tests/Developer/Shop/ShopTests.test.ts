@@ -111,6 +111,23 @@ describe('Test Shop', () => {
         expect(shop.management.owners.filter(o => o.user_email == "new@bgu.ac.il").length == 1).to.be.true
     })
 
+    it('Test remove owner - requirement 4.4', () => {
+        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner1@bgu.ac.il")
+        shop.appointNewOwner("owner1@bgu.ac.il", "owner2@bgu.ac.il")
+        shop.appointNewOwner("owner1@bgu.ac.il", "owner3@bgu.ac.il")
+        shop.appointNewManager("owner3@bgu.ac.il", "owner4@bgu.ac.il")
+        expect(typeof shop.removeOwner("owner2@bgu.ac.il", "owner1@bgu.ac.il") == "string").to.be.true
+        expect(shop.getStaffInfo("tomsand@post.bgu.ac.il").length).to.be.eq(5)
+        expect(typeof shop.removeOwner("tomsand@post.bgu.ac.il", "owner1@bgu.ac.il") != "string").to.be.true
+        expect(shop.getStaffInfo("tomsand@post.bgu.ac.il").length).to.be.eq(1)
+
+        // expect(typeof shop.removeManager("tomsand@post.bgu.ac.il", "anothermanager@bgu.ac.il") == "string").to.be.true
+        // expect(typeof shop.removeManager("owner@bgu.ac.il", "anothermanager@bgu.ac.il") == "string").to.be.false
+        // expect(typeof shop.removeManager("tomsand@post.bgu.ac.il", "manager@bgu.ac.il") == "string").to.be.false
+        // expect(shop.management.managers.length).to.be.eq(number_of_managers - 2)
+    })
+
     it('Test add manager - requirement 4.5', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         let result = shop.appointNewManager("wrong@mail.com", "new@bgu.ac.il")
@@ -158,7 +175,7 @@ describe('Test Shop', () => {
         expect(shop.management.managers.length).to.be.eq(number_of_managers - 2)
     })
 
-    it('Test remove manager - requirement 4.9', () => {
+    it('Test get info - requirement 4.9', () => {
         const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(typeof shop.getStaffInfo("wrong@post.bgu.ac.il") == "string").to.be.true
         expect(typeof shop.getStaffInfo("tomsand@post.bgu.ac.il") == "string").to.be.false
