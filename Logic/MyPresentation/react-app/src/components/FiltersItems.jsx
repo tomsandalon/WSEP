@@ -61,7 +61,7 @@ class FiltersItems extends Component {
 				</form>
                 <ul>
                     <h6 className="title">Filter Categories</h6>
-                    {((this.props !== null) && (this.props.shopsInfo.length !== 0)) &&
+                    {((this.props.shopsInfo !== null) && (this.props.shopsInfo.length !== 0)) &&
                         this.state.categories.map((category,index) =>(
                         <li key={index}><span className="btn btn-outline-primary btn-sm" type="blob" padding="105">{category}</span></li>
                     ))
