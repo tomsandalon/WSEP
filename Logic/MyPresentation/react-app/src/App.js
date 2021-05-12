@@ -15,17 +15,17 @@ import "./App.css";
 import AddManager from "./pages/Add_Manager";
 import AddStore from "./pages/Add_Store";
 import ManagersStore from "./pages/ManagersStore";
+import RoleSelection from "./components/RoleSelection";
 class App extends Component {
-  state = {
-    permissions:{
-      guest:false,
-      loggedUser:false,
-      admin:false
-    }
-  }; 
+  
+  isGuest = () =>{
+    if(this.state.permissions.guest == false && this.state.permissions.admin == false && this.state.permissions.loggedUser == false)
+      return true
+    return false;
+  }
   openSession = () => {
+
     if (localStorage.getItem("loggedUser") == null) {
-      localStorage.setItem("loggedUser", "true");
       const requestOptions = {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -33,6 +33,7 @@ class App extends Component {
       fetch("/guest", requestOptions).then(async (response) => {
         switch (response.status) {
           case 200: //welcome
+            localStorage.setItem("loggedUser","Guest")
             break;
           case 404:
             const err_message = await response.text();
@@ -48,7 +49,9 @@ class App extends Component {
     this.openSession();
   }
 
-
+setLoginPermission = () => {
+  localStorage.setItem("loggedUser","LoggedIn")
+};
   render() {
     return (
       <Router>
@@ -61,8 +64,9 @@ class App extends Component {
             <Route
               path="/home"
               render={() => (<ShopItems/>)}/>
+            <Route path="/roles" component={RoleSelection}/>
             <Route path="/my-cart" component={ShoppingCart} />
-            <Route path="/login" component={Login} />
+            <Route path="/login" render={()=>(<Login  setLoginPermission={this.setLoginPermission}/>)} />
             <Route path="/managerHome/:managerID" component={ManagerHome} />
             <Route path="/register" component={Register} />
             <Route path="/addmanager/:storeID">
