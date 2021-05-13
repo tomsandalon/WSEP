@@ -1,7 +1,7 @@
 import * as https from 'https';
 import {
     options,
-    port,
+    port, route_admin,
     route_cart, route_filter,
     route_guest, route_home,
     route_login, route_logout, route_purchase,
@@ -36,6 +36,7 @@ app.use(route_filter, require('./Home/Filter'));
 app.use(route_shop_management, require('./User/Registered/Management'));
 app.use(route_shop_ownership, require('./User/Registered/Ownership'));
 app.use(route_shop, require('./User/Registered/Shop'));
+app.use(route_admin, require('./User/Registered/Admin'));
 
 //* For debug TODO delete this
 
