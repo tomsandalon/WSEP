@@ -38,6 +38,7 @@ handleLogout = () => {
     //     })
 
     localStorage.removeItem("loggedUser");
+    window.location.reload("/home")
 }
 handleClick = () =>{
     this.setState({clicked:!this.state.clicked})
@@ -78,11 +79,16 @@ displayLogout = () =>{
                             MyCart
                             </a>
                         </li>
-                    {localStorage.getItem('loggedUser') == "LoggedIn" && <li key={100}><a className="nav-links cartButton btn-primary btn-sm" href="/home" onClick={this.handleLogout}>
+                        {localStorage.getItem('loggedUser') == "LoggedIn" && <li key={102}>
+                        <a className="nav-links cartButton btn-primary btn-sm" href="/roles">
+                            Roles</a>
+                        </li>}
+                        {localStorage.getItem('loggedUser') == "LoggedIn" && <li key={100}><a className="nav-links cartButton btn-primary btn-sm" href="/home" onClick={this.handleLogout}>
                         Logout</a>
                         <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                         <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                         </li>}
+                       
                 </ul>
             </nav>
         );

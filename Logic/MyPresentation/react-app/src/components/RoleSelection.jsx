@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Reactlogo from './images/roles.jpg'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../index.css';
+import { Link } from 'react-router-dom';
 class RoleSelection extends Component {
 
     isUser = () => {
@@ -21,9 +22,15 @@ class RoleSelection extends Component {
       <             img src={Reactlogo} id="icon" alt="User Icon" />
                 </div>
                 <form>
-                    {this.isUser() && <div className="row-3"><button className="role btn btn-info btn-lg" onClick={this.handleRemoveItemFromBasket}> User </button></div>}
-                    {this.isManager() && <div className="row-3"><button className="role btn btn-info btn-lg" onClick={this.handleRemoveItemFromBasket}> Manager </button></div>}
-                    {this.isAdmin() && <div className="row-3"><button className="role btn btn-info btn-lg" onClick={this.handleRemoveItemFromBasket}> Admin </button></div>}
+                    <Link to="/home">
+                    {this.isUser() && <div className="row-3"><button className="role btn btn-info btn-lg" > User </button></div>}
+                    </Link>
+                    <Link to="/home">
+                    {this.isManager() && <div className="row-3"><button className="role btn btn-info btn-lg" > Manager </button></div>}
+                    </Link>
+                    <Link to="/home">
+                    {this.isAdmin() && <div className="row-3"><button className="role btn btn-info btn-lg" > Admin </button></div>}
+                    </Link>
                 </form>
             </div>
         </div>

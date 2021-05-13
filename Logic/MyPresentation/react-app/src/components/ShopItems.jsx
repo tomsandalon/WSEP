@@ -40,7 +40,7 @@ class ShopItems extends Component {
             this.setState({ shopsInfo: shopsInfo });
           });
       };
-displayShops = () => {
+    displayShops = () => {
     const requestOptions = {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -66,7 +66,29 @@ displayShops = () => {
         this.setState({ shopsInfo: shopsInfo });
         });
     };
+    openSession = () => {
+    if (localStorage.getItem("loggedUser") == null) {
+        const requestOptions = {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        };
+        fetch("/guest", requestOptions).then(async (response) => {
+        switch (response.status) {
+            case 200: //welcome
+            localStorage.setItem("loggedUser","Guest")
+            break;
+            case 404:
+            const err_message = await response.text();
+            console.log(err_message);
+            break;
+            default:
+            break;
+        }
+        });
+    }
+    };
 componentDidMount(){
+    this.openSession();
     this.displayShops();
 }
     render() {

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Reactlogo from './images/login.png'
 import {Alert} from 'reactstrap';
+import {Redirect} from "react-router-dom";
 import '../index.css';
 class Login extends Component {
     constructor(props) {
@@ -12,9 +13,11 @@ class Login extends Component {
             errorMsg:''
         };
     }
-loggin = () => {
-    this.props.setLoginPermission();
-}
+
+setLoginPermission = () => {
+    localStorage.setItem("loggedUser","LoggedIn")
+};
+
 handleSubmit = (event) =>{
     const requestOptions = {
         method: 'POST',
@@ -29,7 +32,8 @@ handleSubmit = (event) =>{
             switch (response.status) {
                 case 200: //welcome
                     this.setState({errorMsg:"Login sucessfully",visible:true})
-                    this.loggin();
+                    this.setLoginPermission();
+                    window.location.assign("/home")
                     break;
                 case 401:
                     const err_message = await response.text();
