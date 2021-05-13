@@ -1,16 +1,25 @@
 import React, {Component} from 'react';
 import Image from './images/cart.png';
 import BasketItem from './BasketItem';
+import {Link} from 'react-router-dom';
+import Payment from './Payment';
 class Basket extends Component {
     constructor(props) {
         super(props);
         let price = 0;
         this.state={
+			payment:false,
             price:0
         }
         this.props.selected_basket.products.map(product => price+=(product.amount*product.product._base_price))
         this.state = {price:price}
     }
+	handlePay = () =>{
+		this.setState({payment:true});
+	}
+	cancelPayment = () =>{
+		this.setState({payment:false});
+	}
 
    render() {
        return(
@@ -46,12 +55,18 @@ class Basket extends Component {
 				  <dt>Grand Total:</dt>
 				  <dd className="text-right text-dark"><strong>{this.state.price}</strong></dd>
 				</dl>
-				<button href="#" className="btn btn-primary btn-block"> Purchase </button>
+				<button className="btn btn-primary btn-block" onClick={this.handlePay}> Purchase </button>
 				<p className="small my-3 text-muted">Some extra informative text  can be placed here as dummy text will be replaced</p>
 			</div> 
 			</div> 
+			{this.state.payment  && 
+					<div>
+						<Payment shop_id={this.props.selected_basket.shop_id} cancelPayment={this.cancelPayment}/>
+					</div>
+				}
 		</aside> 
         </React.Fragment>
+		
        )
    }
 }

@@ -1,14 +1,21 @@
 import React, {Component} from 'react';
 import Reactlogo from './images/login.png'
 import {Alert} from 'reactstrap';
+import {Redirect} from "react-router-dom";
 import '../index.css';
 class Login extends Component {
-state = {
-    email:'',
-    password:'',
-    visible:false,
-    errorMsg:''
-    
+    constructor(props) {
+        super(props);  
+        this.state = {
+            email:'',
+            password:'',
+            visible:false,
+            errorMsg:''
+        };
+    }
+
+setLoginPermission = () => {
+    localStorage.setItem("loggedUser","LoggedIn")
 };
 
 handleSubmit = (event) =>{
@@ -25,6 +32,8 @@ handleSubmit = (event) =>{
             switch (response.status) {
                 case 200: //welcome
                     this.setState({errorMsg:"Login sucessfully",visible:true})
+                    this.setLoginPermission();
+                    window.location.assign("/home")
                     break;
                 case 401:
                     const err_message = await response.text();
