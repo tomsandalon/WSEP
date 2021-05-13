@@ -22,7 +22,7 @@ router.get('/', (request: any, response: any) => {
     else{
         response.setHeader("Content-Type", "application/json");
         response.status(200);
-        response.send(service.displayShoppingCart(user_id))
+        response.send(result)
         response.end();
         return;
     }
