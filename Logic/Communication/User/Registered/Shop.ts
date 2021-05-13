@@ -9,6 +9,7 @@ router.post('/', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     const result = service.addShop(user_id, request.body.name, request.body.description, request.body.location, request.body.bank_info);
     response.setHeader("Content-Type", "text/html");

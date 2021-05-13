@@ -8,6 +8,7 @@ router.post('/', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     const result = service.performRegister(request.body.email, request.body.password);
     response.setHeader("Content-Type", "text/html");

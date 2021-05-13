@@ -9,6 +9,7 @@ router.post('/assign/owner', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     const result = service.appointOwner(user_id, request.body.shop_id, request.body.email);
     if (typeof result === 'string') {
@@ -27,6 +28,7 @@ router.post('/assign/manager', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     const result = service.appointManager(user_id, request.body.shop_id, request.body.email);
     if (typeof result === 'string') {

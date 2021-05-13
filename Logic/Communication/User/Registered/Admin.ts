@@ -8,6 +8,7 @@ router.get('/history/user', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     response.setHeader("Content-Type", "application/json");
     const result = service.adminDisplayUserHistory(user_id, request.body.user_inspect);
@@ -21,6 +22,7 @@ router.get('/history/shop', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     response.setHeader("Content-Type", "application/json");
     const result = service.adminDisplayShopHistory(user_id, request.body.shop_id);

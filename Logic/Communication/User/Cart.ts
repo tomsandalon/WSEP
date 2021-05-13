@@ -53,6 +53,7 @@ router.put('/', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     const result = service.editShoppingCart(user_id, request.body.shop_id, request.body.product_id, request.body.amount);
     if (typeof result === 'string') {
@@ -71,6 +72,7 @@ router.delete('/', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     console.log('DATA')
     console.log(request.body)

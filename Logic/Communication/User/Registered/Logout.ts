@@ -9,6 +9,7 @@ router.post('/', (request: any, response: any) => {
         response.status(404);
         response.send('Bad session id')
         response.end()
+        return
     }
     const result = service.logout(user_id);
     if(typeof result == "string"){
