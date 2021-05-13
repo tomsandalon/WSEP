@@ -4,7 +4,7 @@ import {
     port,
     route_cart, route_filter,
     route_guest, route_home,
-    route_login, route_logout,
+    route_login, route_logout, route_purchase,
     route_register, route_shop, route_shop_management, route_shop_ownership,
     service,
 } from "./Config/Config";
@@ -30,6 +30,7 @@ app.use(route_login, require('./User/Registered/Login'));
 // app.use(route_logout, require('./User/Registered/Logout'))
 app.use(route_register, require('./User/Register'));
 app.use(route_cart, require('./User/Cart'));
+app.use(route_purchase, require('./User/Purchase'));
 app.use(route_home, require('./Home/Home'));
 app.use(route_filter, require('./Home/Filter'));
 app.use(route_shop_management, require('./User/Registered/Management'));
