@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Reactlogo from './images/login.png'
 import {Alert} from 'reactstrap';
-import {Redirect} from "react-router-dom";
 import '../index.css';
 class Login extends Component {
     constructor(props) {

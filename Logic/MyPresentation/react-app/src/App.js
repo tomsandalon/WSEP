@@ -18,7 +18,7 @@ import ManagersStore from "./pages/ManagersStore";
 import RoleSelection from "./components/RoleSelection";
 import {ProtectedRoute} from './components/ProtectedRoute';
 import Payment from './components/Payment';
-import UserHistory from './components/UserHistory';
+import UserHistory from './components/UserHistory/UserHistory';
 function App () {
 
   

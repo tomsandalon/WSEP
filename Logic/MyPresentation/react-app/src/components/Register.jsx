@@ -7,6 +7,7 @@ state = {
     email:'',
     password:'',
     visible:false,
+    successVisible:false,
     errorMsg:''
 };
 
@@ -24,7 +25,7 @@ handleSubmit = (event) =>{
         switch (response.status) {
             case 200: //welcome
                 const err_message_sucess = await response.text();
-                this.setState({errorMsg:err_message_sucess,visible:true})
+                this.onShowAlert();
                 break;
             case 400:
                 const err_message_fail = await response.text();
@@ -38,6 +39,13 @@ handleSubmit = (event) =>{
       })
       event.preventDefault();
 }  
+onShowAlert = ()=>{
+    this.setState({successVisible:true,errorMsg:"Successfully registered!",desiredAmount:0},()=>{
+        window.setTimeout(()=>{
+        this.setState({successVisible:false})
+        },1000)
+    });
+}
 
 handleUserEmail = (event) =>{
     this.setState({email:event.target.value});
@@ -58,6 +66,7 @@ toggle(){
                 <form onSubmit={this.handleSubmit}>
                     <input type="email" id="login" className="fadeIn second" name="login" placeholder="example@example.com" onChange={this.handleUserEmail}/>
                     <input type="password" id="password" className="fadeIn third" name="login" placeholder="Password" onChange={this.handlePassword}/>
+                    <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                     <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                     <input type="submit" className="fadeIn fourth" value="Register" onSubmit={this.handleSubmit}/>
                 </form>

@@ -103,6 +103,7 @@ export class PurchaseImpl implements Purchase{
         return JSON.stringify({
             order_id: this.order_id,
             shop: this.shop.shop_id,
+            shop_name:this.shop.shop_name,
             products: this.products,
             date: this.date,
             minimal_user_data: this.minimal_user_data

@@ -27,15 +27,15 @@ class Payment extends Component {
                 payment_info:this.state.name+this.state.cardNo+this.state.data
             })
         };
-        fetch('/payment',requestOptions)
+        fetch('/purchase',requestOptions)
             .then(async response => {
                 switch (response.status) {
                     case 200: //welcome
-                        this.onShowAlert();
+                        this.props.refreshCart();
                         break;
                     case 400:
                         const err_message_fail = await response.text();
-                        this.setState({errorMsg:err_message_fail,visible:true,desiredAmount:0})        
+                        console.log("payment error",err_message_fail);        
                         break;
                     case 404: //server not found
                         break;

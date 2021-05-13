@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Image from './images/cart.png';
 import BasketItem from './BasketItem';
-import {Link} from 'react-router-dom';
 import Payment from './Payment';
 class Basket extends Component {
     constructor(props) {
@@ -61,7 +60,7 @@ class Basket extends Component {
 			</div> 
 			{this.state.payment  && 
 					<div>
-						<Payment shop_id={this.props.selected_basket.shop_id} cancelPayment={this.cancelPayment}/>
+						<Payment refreshCart ={this.props.refreshCart} shop_id={this.props.selected_basket.shop_id} cancelPayment={this.cancelPayment}/>
 					</div>
 				}
 		</aside> 

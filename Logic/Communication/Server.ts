@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(route_guest, require('./User/Guest'))
 app.use(route_login, require('./User/Registered/Login'));
-// app.use(route_logout, require('./User/Registered/Logout'))
+app.use(route_logout, require('./User/Registered/Logout'))
 app.use(route_register, require('./User/Register'));
 app.use(route_cart, require('./User/Cart'));
 app.use(route_purchase, require('./User/Purchase'));
