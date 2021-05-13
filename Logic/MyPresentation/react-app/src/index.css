@@ -361,6 +361,12 @@ input[type=email]:placeholder {
   -moz-animation-delay: 0.8s;
   animation-delay: 0.8s;
 }
+.cartButton2{
+  background-color: #56baed;
+  width:140px;
+  height:35px;
+  margin-top:10px;
+}
 .cartButton{
   background-color: #56baed;
   width:100px;

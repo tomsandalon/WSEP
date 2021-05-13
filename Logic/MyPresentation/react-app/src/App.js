@@ -18,6 +18,7 @@ import ManagersStore from "./pages/ManagersStore";
 import RoleSelection from "./components/RoleSelection";
 import {ProtectedRoute} from './components/ProtectedRoute';
 import Payment from './components/Payment';
+import UserHistory from './components/UserHistory';
 function App () {
 
   
@@ -35,6 +36,7 @@ function App () {
             <Route exact path="/"><Redirect to="/home" /></Route>
             <Route path="/home" render={() => (<ShopItems/>)}/>
             <ProtectedRoute path="/roles" component={RoleSelection}/>
+            <ProtectedRoute path="/user-history" component={UserHistory}/>
             <Route path="/my-cart" component={ShoppingCart} />
             <Route path="/login" render={()=>(<Login/>)} />
             <Route path="/managerHome/:managerID" component={ManagerHome} />

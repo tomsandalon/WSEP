@@ -79,6 +79,10 @@ displayLogout = () =>{
                             MyCart
                             </a>
                         </li>
+                        {localStorage.getItem('loggedUser') == "LoggedIn" && <li key={103}>
+                        <a className="nav-links cartButton2 btn-primary btn-sm" href="/user-history">
+                            Purchase History</a>
+                        </li>}    
                         {localStorage.getItem('loggedUser') == "LoggedIn" && <li key={102}>
                         <a className="nav-links cartButton btn-primary btn-sm" href="/roles">
                             Roles</a>
