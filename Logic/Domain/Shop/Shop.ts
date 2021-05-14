@@ -196,6 +196,8 @@ export interface Shop {
     isOwner(user_email: string): boolean;
 
     getPermissions(user_email: string): string | string[];
+
+    getAllCategories(): string | string[];
 }
 
 export class ShopImpl implements Shop {
@@ -623,5 +625,9 @@ export class ShopImpl implements Shop {
     getPermissions(user_email: string): string | string[] {
         logger.Info(`Checked for ${user_email} permissions`)
         return this.management.getPermissions(user_email)
+    }
+
+    getAllCategories(): string | string[] {
+        return this.inventory.getAllItems().flatMap(item => item.category.map(c => c.name))
     }
 }

@@ -412,8 +412,7 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData): number {
-        return products.reduce((acc, cur) =>
-            acc + (cur.amount * cur.price * (1 - this.discount_policies.evaluateDiscount(cur, cur.amount))), 0)
+        return this.discount_policies.calculatePrice(products, user_data)
     }
 
     addDiscount(discount: Discount): void {

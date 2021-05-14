@@ -4,6 +4,7 @@ import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 import {Condition, ConditionalDiscount} from "./ConditionalDiscount";
 import {NumericCompositionDiscount, NumericOperation} from "./NumericCompositionDiscount";
 import {LogicComposition, LogicCompositionDiscount} from "./LogicCompositionDiscount";
+import {MinimalUserData} from "../../ProductHandling/ShoppingBasket";
 
 
 export class DiscountHandler {
@@ -63,5 +64,10 @@ export class DiscountHandler {
             new LogicCompositionDiscount(operation, discount1, discount2)
         ])
         return true
+    }
+
+    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData) {
+        return products.reduce((acc, cur) =>
+            acc + (cur.amount * cur.price * (1 - this.evaluateDiscount(cur, cur.amount))), 0)
     }
 }

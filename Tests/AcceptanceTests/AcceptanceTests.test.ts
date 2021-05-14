@@ -109,6 +109,7 @@ describe('Acceptance Tests:', () => {
         system.addProduct(originOwner, shopID2,"TV2", "Best desc", 2202, ["monitors"],222, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
         system.addProduct(originOwner, shopID3,"TV3", "Best desc", 3303, ["monitors"],333, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
 
+        console.log(system.getAllCategories(originOwner))
         // expect(system.searchItemFromShops(SearchTypes.name, "TV1").length == 1 &&
         //     system.searchItemFromShops(SearchTypes.name, "TV1")[0].includes("TV1")).to.be.true
         // expect(system.searchItemFromShops(SearchTypes.category, "monitors").length == 2 &&
@@ -360,7 +361,7 @@ describe('Acceptance Tests:', () => {
             let reg = system.performRegister("Test@test.com", "TESTER");
             let user = system.performLogin("Test@test.com", "TESTER");
             expect(typeof user == "string").to.be.false
-            system.logout("Test@test.com")//good
+            system.logout(0)//good
             assert(true)
             //TODO expand test when connection handler is implemented
         });

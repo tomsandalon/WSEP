@@ -8,7 +8,7 @@ export interface System{
     performRegister(user_email:string, password: string): boolean
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
-    logout(user_email: string): number
+    logout(user_id: number): string | boolean
     displayShops(): string[]
     getItemsFromShop(shop_id:number): string | string[]
     searchItemFromShops(search_type:SearchTypes, search_term: string): string[]
@@ -43,6 +43,13 @@ export interface System{
     isAdmin(user_id: number): string | boolean
     isManager(user_id: number): string | boolean
     isOwner(user_id: number): string | boolean
+
+    getManagingShops(user_id: number): string | string[]
+    getPermissions(user_id: number, shop_id: number): string | string[]
+    getAllUsers(user_id: number): string | string[]
+    isLoggedIn(user_id: number): string | boolean
+
+    getAllCategories(user_id: number): string | string[];
 }
 
 export const TestNotAssociatedWithImplementation = "Test not associated with implementation";

@@ -260,8 +260,10 @@ export class Service {
     }
 
     isLoggedIn(user_id: number): string | boolean {
-        return this.isLoggedIn(user_id)
+        return this._system.isLoggedIn(user_id)
     }
 
-
+    getAllCategories(user_id: number): string | string [] {
+        return this._system.getAllCategories(user_id)
+    }
 }

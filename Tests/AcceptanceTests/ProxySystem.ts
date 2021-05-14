@@ -151,11 +151,11 @@ export class ProxySystem implements System{
         return this.system.getItemsFromShop(shop_id)
     }
 
-    logout(user_email: string): number {
+    logout(user_id: number): string | boolean {
         if(this.system == undefined){
-            return -1
+            return false
         }
-        return this.system.logout(user_email)
+        return this.system.logout(user_id)
     }
 
     openSession(): number {
@@ -262,5 +262,40 @@ export class ProxySystem implements System{
             return ['FAIL'];
         }
         return 'panic: spell checker';
+    }
+
+    getAllCategories(user_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllCategories(user_id)
+    }
+
+    getAllUsers(user_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllUsers(user_id)
+    }
+
+    getManagingShops(user_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getManagingShops(user_id)
+    }
+
+    getPermissions(user_id: number, shop_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getPermissions(user_id, shop_id)
+    }
+
+    isLoggedIn(user_id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.isLoggedIn(user_id)
     }
 }

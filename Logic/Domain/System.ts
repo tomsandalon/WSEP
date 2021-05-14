@@ -14,6 +14,7 @@ import {Condition} from "./Shop/DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "./Shop/DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NotificationAdapter} from "./Notifications/NotificationAdapter";
+import {logger} from "./Logger";
 
 export enum SearchTypes {
     name,
@@ -78,6 +79,8 @@ export interface System{
     getPermissions(user_id: number, shop_id: number): string | string[]
     getAllUsers(user_id: number): string | string[]
     isLoggedIn(user_id: number): string | boolean
+
+    getAllCategories(user_id: number): string | string[];
 }
 
 //TODO add toggle underaged
@@ -584,4 +587,12 @@ export class SystemImpl implements System {
         return this.login.isLoggedIn(user.user_email)
     }
 
+    getAllCategories(user_id: number): string | string[] {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        logger.Info(`${user.user_email} requested all categories`)
+        const categories = new Set(this.shops.flatMap(shop => shop.getAllCategories()))
+        return Array.from(categories.values())
+    }
 }
