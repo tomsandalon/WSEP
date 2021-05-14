@@ -1,18 +1,18 @@
-import {service, Session, sid} from "../../Config/Config";
+import {OK, ServerNotFound, service, Session, sid} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
-        response.status(404);
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
     response.setHeader("Content-Type", "application/json");
+    response.status(OK)
     const result = service.getAllShops(user_id);
-    console.log(result)
     response.json(result)
     response.end();
 })
