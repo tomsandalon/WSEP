@@ -1,5 +1,5 @@
 import {Product} from "./Product";
-import {ProductPurchase} from "./ProductPurchase";
+import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {Shop} from "../Shop/Shop";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {
@@ -13,7 +13,7 @@ import {Purchase, PurchaseImpl} from "./Purchase";
 import {User} from "../Users/User";
 import {NotificationAdapter} from "../Notifications/NotificationAdapter";
 
-type Entry = {product: Product, amount: number}
+type Entry = {product: Product, amount: number, price_after_discount: number}
 export type ShoppingEntry = {productId: number, amount: number}
 export type MinimalUserData = {userId: number, underaged: boolean}
 
@@ -89,9 +89,11 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         if (typeof fetched_product === "string"){
             return fetched_product
         }
-        const final_product = {product: fetched_product, amount: product.amount};
+        const user_data = {userId: user.user_id, underaged: user.underaged}
+        const final_product = {product: fetched_product, amount: product.amount,
+            price_after_discount: shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], product.amount, shop) as ProductPurchase], user_data)};
         const id = this._basket_id_specifier++;
-        return new ShoppingBasketImpl(id, shop, final_product, {userId: user.user_id, underaged: user.underaged})
+        return new ShoppingBasketImpl(id, shop, final_product, user_data)
     }
 
     get products(){
@@ -117,7 +119,8 @@ export class ShoppingBasketImpl implements ShoppingBasket{
             return fetched_product
         }
         if (fetched_product.amount < amount) return StockLessThanBasket
-        const product = {product: fetched_product, amount: amount};
+        const product = {product: fetched_product, amount: amount,
+            price_after_discount: this.shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], amount, this.shop) as ProductPurchase], this.user_data)};
         this._products.push(product);
         return true
     }
@@ -156,6 +159,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
                 id: this.shop.shop_id,
             },
             products: this.products,
+            total_price_after_discount: this.shop.calculatePrice(this.products.map(p => ProductPurchaseImpl.create(p.product, [], p.amount, this.shop) as ProductPurchase), this.user_data)
             // user_data: this.user_data,
         })]
         // this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
