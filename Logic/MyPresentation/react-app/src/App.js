@@ -19,6 +19,7 @@ import RoleSelection from "./components/RoleSelection";
 import {ProtectedRoute} from './components/ProtectedRoute';
 import Payment from './components/Payment';
 import UserHistory from './components/UserHistory/UserHistory';
+import AdminMenu from './components/Admin/AdminMenu';
 function App () {
 
   
@@ -41,6 +42,7 @@ function App () {
             <Route path="/login" render={()=>(<Login/>)} />
             <Route path="/managerHome/:managerID" component={ManagerHome} />
             <Route path="/register" component={Register} />
+            <Route exact path="/admin-menu" component={AdminMenu}/>
             <Route path="/addmanager/:storeID">
               <AddManager />
             </Route>

@@ -1,0 +1,13 @@
+#stats li
+{
+  align-items: center;
+  display: inline;
+  list-style-type: none;
+  padding-right: 10px;
+  float: left;
+}
+h1{
+    text-align:center;
+    color:rgba(145, 151, 236, 0.582);
+    
+}

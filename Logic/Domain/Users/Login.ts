@@ -164,6 +164,7 @@ export class LoginImpl  implements  Login{
         return result.user_id
     }
 
-
-
+    isLoggedIn(user_email: string): boolean {
+        return this._logged_users.some(u => u == user_email)
+    }
 }

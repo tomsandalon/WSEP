@@ -22,11 +22,6 @@ class FiltersItems extends Component {
     handleSearch = (event) => {
         this.setState({search: event.target.value})
     }
-    handleSearchClick = () => {
-        if(this.state.search !== ''){
-            console.log("searching",this.state.search);
-        }
-    }
     handleRating(event) {
         this.setState({
           rating: event.target.value

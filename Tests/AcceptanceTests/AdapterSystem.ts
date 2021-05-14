@@ -1,13 +1,12 @@
 import {SearchTypes} from "../../Logic/Domain/System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
-import {DiscountType} from "../../Logic/Domain/PurchaseProperties/DiscountType";
 // import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
 import {TestNotAssociatedWithImplementation} from "./System";
 import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
 import * as Tests from "./System"
 import {System} from "../../Logic/Domain/System";
 
-export class AdapterSystem implements Tests.System{
+export class AdapterSystem implements System{
     private system: System;
     public constructor(system: System) {
         this.system = system
@@ -25,8 +24,8 @@ export class AdapterSystem implements Tests.System{
         return this.system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: Purchase_Type): boolean | string {
-        return this.system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, discount_type, purchase_type)
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
+        return this.system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, purchase_type)
     }
 
     addShop(user_id: number, name: string, description: string, location: string, bank_info: string): number | string {
@@ -81,7 +80,7 @@ export class AdapterSystem implements Tests.System{
         return this.system.getItemsFromShop(shop_id)
     }
 
-    logout(user_email: string): number {
+    logout(user_email: string): number { //what happens where?
         return this.system.logout(user_email)
     }
 
@@ -135,5 +134,17 @@ export class AdapterSystem implements Tests.System{
 
     spellCheck(input : string) :string | string[]{
         return ''
+    }
+
+    isAdmin(user_id: number): string | boolean {
+        return this.system.isAdmin(user_id);
+    }
+
+    isManager(user_id: number): string | boolean {
+        return this.system.isManager(user_id);
+    }
+
+    isOwner(user_id: number): string | boolean {
+        return this.system.isOwner(user_id);
     }
 }

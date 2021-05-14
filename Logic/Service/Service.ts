@@ -75,10 +75,10 @@ export class Service {
     removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
         return this._system.removeOwner(user_id, shop_id, target)
     }
+
     removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
         return this._system.removePurchasePolicy(user_id, shop_id, policy_id)
     }
-
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
         return this._system.addItemToBasket(user_id, product_id, shop_id, amount);
     }
@@ -138,15 +138,18 @@ export class Service {
     editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number): string | void {
         return this._system.editShoppingCart(user_id, shop_id, product_id, amount)
     }
+
     removeItemFromBasket(user_id: number, shop_id: number, product_id: number): string | void {
         return this._system.editShoppingCart(user_id, shop_id, product_id, 0)
     }
-    filterSearch(categories: string[], min_price: number, max_price: number,
+
+    filterSearch(category_list: string, min_price: number, max_price: number,
                  rating: number, name_search_term: string): string[] {
         const search_type = SearchTypes.name
         const search_term = name_search_term
+        const categories = category_list.split(",")
         let filters: Filter[] = []
-        if (categories.length > 0) {
+        if (categories.length > 0 && category_list.length > 0) {
             categories.forEach(c => {
                 filters = filters.concat([{filter_type: Filter_Type.Category, filter_value: c}])
             })
@@ -228,7 +231,37 @@ export class Service {
     removeDiscount(user_id: number, shop_id: number, id: number): string | boolean {
         return this._system.removeDiscount(user_id, shop_id, id)
     }
+
     getAllShops(user_id: number): string | string[]{
         return this._system.getAllShops(user_id)
     }
+    isAdmin(user_id: number): string | boolean {
+        return this._system.isAdmin(user_id);
+    }
+
+    isManager(user_id: number): string | boolean {
+        return this._system.isManager(user_id)
+    }
+
+    isOwner(user_id: number): string | boolean {
+        return this._system.isOwner(user_id)
+    }
+
+    getAllUsers(user_id: number): string | string[] {
+        return this._system.getAllUsers(user_id);
+    }
+
+    getManagingShops(user_id: number): string | string[] {
+        return this._system.getManagingShops(user_id)
+    }
+
+    getPermissions(user_id: number, shop_id: number): string | string[] {
+        return this._system.getPermissions(user_id, shop_id)
+    }
+
+    isLoggedIn(user_id: number): string | boolean {
+        return this.isLoggedIn(user_id)
+    }
+
+
 }

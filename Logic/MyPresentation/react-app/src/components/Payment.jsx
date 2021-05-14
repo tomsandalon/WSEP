@@ -7,7 +7,9 @@ class Payment extends Component {
         this.state = {
             name:'',
             cardNo:'',
-            data:''
+            data:'',
+            successVisible:false,
+            errorMsg:''
         }
     }
     //purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string)
@@ -58,7 +60,7 @@ class Payment extends Component {
                     <input type="text" className="pay fadeIn third" placeholder="MM/YY/CVV" onChange={this.handleData}/>
                     <button type="submit" class="pay2 btn btn-primary" onClick={this.handleSubmit}>Pay</button>
                     <button type="submit" class="pay2 btn btn-primary" onClick={() => this.props.cancelPayment}>Cancel</button>
-                </form>
+                  </form>
             </div>
         </div> 
         );
