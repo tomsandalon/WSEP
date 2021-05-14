@@ -6,6 +6,7 @@ import {LogicComposition} from "../Domain/Shop/DiscountPolicy/LogicCompositionDi
 import {NumericOperation} from "../Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../Domain/Shop/PurchasePolicy/CompositeCondition";
+
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 
 export class Service {
@@ -40,6 +41,9 @@ export class Service {
         this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, dummy)
         this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, dummy)
         this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, dummy)
+        this.addDiscount(tom_id, nvidia_id, 0.5)
+        this.addConditionToDiscount(tom_id, nvidia_id, 0, Condition.Amount, "3")
+        this.addDiscount(tom_id, nvidia_id, 0.2)
 
         this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, dummy)
         this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, dummy)
@@ -260,8 +264,10 @@ export class Service {
     }
 
     isLoggedIn(user_id: number): string | boolean {
-        return this.isLoggedIn(user_id)
+        return this._system.isLoggedIn(user_id)
     }
 
-
+    getAllCategories(user_id: number): string | string [] {
+        return this._system.getAllCategories(user_id)
+    }
 }

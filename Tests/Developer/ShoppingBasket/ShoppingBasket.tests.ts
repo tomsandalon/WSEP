@@ -41,7 +41,7 @@ describe('Buy product not by policy', () => {
         shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect((user.getOrderHistory() as string[])[0]).to.include(499500)
+        expect((user.getOrderHistory() as string[])[0]).to.include(10*1000*0.5)
     });
     it('Buy product not by discount policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
@@ -51,7 +51,7 @@ describe('Buy product not by policy', () => {
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTmanyX")
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect((user.getOrderHistory() as string[])[0]).to.include(999000)
+        expect((user.getOrderHistory() as string[])[0]).to.include(1000*50)
    }); })
 describe("Purchase test", () => {
     it('purchase positive amount and more than stock', () => {

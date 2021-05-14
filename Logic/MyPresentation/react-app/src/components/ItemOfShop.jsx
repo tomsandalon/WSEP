@@ -25,8 +25,8 @@ class ItemOfShop extends Component {
                 'Cookie': document.cookie
             },
             body: JSON.stringify({
-                product_id:this.state.productID,
-                shop_id:this.state.shopID,
+                product_id:this.props.productID,
+                shop_id:this.props.shopID,
                 amount:this.state.desiredAmount
             })
         };

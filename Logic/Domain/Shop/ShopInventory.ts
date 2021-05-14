@@ -151,7 +151,7 @@ export interface ShopInventory {
 
     composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string
 
-    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData): number
+    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number
 
     displayItems(): string
 
@@ -411,9 +411,8 @@ export class ShopInventoryImpl implements ShopInventory {
         return
     }
 
-    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData): number {
-        return products.reduce((acc, cur) =>
-            acc + (cur.amount * cur.price * (1 - this.discount_policies.evaluateDiscount(cur, cur.amount))), 0)
+    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number {
+        return this.discount_policies.calculatePrice(products, user_data)
     }
 
     addDiscount(discount: Discount): void {
