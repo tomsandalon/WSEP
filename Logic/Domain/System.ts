@@ -189,7 +189,11 @@ export class SystemImpl implements System {
                 (search_type == SearchTypes.category) ? shop.search(undefined, search_term, undefined) :
                     shop.search(undefined, undefined, search_term)
         }
-        return this._shops.flatMap(shop => search(shop)).map(product => product.toString())
+        return this._shops.map(shop => JSON.stringify({
+            shop_id: shop.shop_id,
+            shop_name: shop.name,
+            products: search(shop)
+        })).filter(result => JSON.parse(result).products.length > 0)
     }
 
     filterSearch(search_type: SearchTypes, search_term: string, filters: Filter[]):string[] {
@@ -199,8 +203,11 @@ export class SystemImpl implements System {
                     (search_type == SearchTypes.keyword) ? shop.filter(shop.search(undefined, undefined, search_term), filters) :
                         [] //should not get here
         }
-        return this._shops.flatMap(shop => search(shop)).map(product => product.toString())
-
+        return this._shops.map(shop => JSON.stringify({
+            shop_id: shop.shop_id,
+            shop_name: shop.name,
+            products: search(shop)
+        })).filter(result => JSON.parse(result).products.length > 0)
     }
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number):string | void{
         const user = this._login.retrieveUser(user_id);
