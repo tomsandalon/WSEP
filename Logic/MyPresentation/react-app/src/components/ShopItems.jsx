@@ -52,6 +52,7 @@ class ShopItems extends Component {
             const products = products_string.map((product) =>
             JSON.parse(product)
             );
+            console.log("products shop",products)
             // products.forEach(product => product._category.forEach(cat => console.log(cat._name)))
             const shopInfo = {
             id: tempShop.shopID,

@@ -19,6 +19,7 @@ class ShoppingCart extends Component {
 					response.json().then(
 						baskets => {
 							let cart =[]
+							console.log(baskets)
 							cart = baskets.map(basket => {
 								const temp ={
 									basket_id:JSON.parse(basket).basket_id,
@@ -59,6 +60,7 @@ class ShoppingCart extends Component {
 					case 200: //welcome
 					response.json().then(
 						baskets => {
+							console.log(baskets);
 							const cart = baskets.map(basket => {
 								const temp ={
 									basket_id:JSON.parse(basket).basket_id,
