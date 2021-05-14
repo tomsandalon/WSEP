@@ -39,6 +39,10 @@ export interface System{
     getShopInfo(shop_id: number) : string | string[]
 
     spellCheck(input : string) : string | string[]
+
+    isAdmin(user_id: number): string | boolean
+    isManager(user_id: number): string | boolean
+    isOwner(user_id: number): string | boolean
 }
 
 export const TestNotAssociatedWithImplementation = "Test not associated with implementation";
