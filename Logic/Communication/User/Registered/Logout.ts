@@ -15,6 +15,7 @@ router.post('/', (request: any, response: any) => {
     if(typeof result == "string"){
         response.status(400);
     }else {
+        response.status(200);
         Session.sessions[request.cookies[sid]] = service.openSession();
     }
     response.end();
