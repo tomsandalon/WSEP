@@ -1,4 +1,12 @@
-import {route_shop, service, Session, shop_purchase_history, sid} from "../../Config/Config";
+import {
+    BadRequest, OK,
+    route_shop,
+    ServerNotFound,
+    service,
+    Session,
+    shop_purchase_history,
+    sid
+} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -25,6 +33,27 @@ router.get('/', (request: any, response: any) => {
         response.end();
         return;
     }
+})
+router.get('/categories', (request: any, response: any) => {
+    const user_id = Session.sessions[request.cookies[sid]];
+    if (user_id == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const result = service.getAllCategories(user_id);
+    if(typeof result == "string") {
+        response.status(BadRequest);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    }
+    else{
+        response.setHeader("Content-Type", "application/json");
+        response.status(OK);
+        response.json(result)
+    }
+    response.end();
 })
 
 router.get(shop_purchase_history, (request: any, response: any) => {

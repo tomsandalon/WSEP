@@ -239,16 +239,16 @@ export class Service {
     getAllShops(user_id: number): string | string[]{
         return this._system.getAllShops(user_id)
     }
-    isAdmin(user_id: number): string | boolean {
-        return this._system.isAdmin(user_id);
+    isAdmin(user_id: number): boolean {
+        return (this._system.isAdmin(user_id) as boolean);
     }
 
-    isManager(user_id: number): string | boolean {
-        return this._system.isManager(user_id)
+    isManager(user_id: number): boolean {
+        return (this._system.isManager(user_id) as boolean)
     }
 
-    isOwner(user_id: number): string | boolean {
-        return this._system.isOwner(user_id)
+    isOwner(user_id: number): boolean {
+        return (this._system.isOwner(user_id) as boolean)
     }
 
     getAllUsers(user_id: number): string | string[] {
@@ -263,8 +263,8 @@ export class Service {
         return this._system.getPermissions(user_id, shop_id)
     }
 
-    isLoggedIn(user_id: number): string | boolean {
-        return this._system.isLoggedIn(user_id)
+    isLoggedIn(user_id: number): boolean {
+        return (this._system.isLoggedIn(user_id) as boolean)
     }
 
     getAllCategories(user_id: number): string | string [] {
