@@ -12,6 +12,26 @@ export class ProxySystem implements System{
         this.system = system;
     }
 
+    isAdmin(user_id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.isAdmin(user_id);
+    }
+
+    isManager(user_id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.isManager(user_id);
+    }
+    isOwner(user_id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.isOwner(user_id);
+    }
+
     userOrderHistory(user_id: number): string | string[] {
         if(this.system == undefined){
             return TestNotAssociatedWithImplementation

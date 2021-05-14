@@ -69,6 +69,15 @@ export interface System{
     removeDiscount(user_id: number, shop_id: number, id: number): string | boolean
     getAllDiscounts(user_id: number, shop_id: number): string | string[]
     getAllShops(user_id: number): string | string[]
+
+    isAdmin(user_id: number): string | boolean
+    isManager(user_id: number): string | boolean
+    isOwner(user_id: number): string | boolean
+
+    getManagingShops(user_id: number): string | string[]
+    getPermissions(user_id: number, shop_id: number): string | string[]
+    getAllUsers(user_id: number): string | string[]
+    isLoggedIn(user_id: number): string | boolean
 }
 
 //TODO add toggle underaged
@@ -93,6 +102,7 @@ export class SystemImpl implements System {
         this._register = RegisterImpl.getInstance();
         this._shops = []
     }
+
     public static getInstance(reset? : boolean): System{
         if(this.instance == undefined || reset){
             this.instance = new SystemImpl(reset);
@@ -519,4 +529,59 @@ export class SystemImpl implements System {
                 name: shop.name
             }))
     }
+
+    isAdmin(user_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string") //can't happen
+            return user
+        return (user.is_admin)
+    }
+
+    isManager(user_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string") //can't happen
+            return user
+        return this.shops.some(shop => shop.isManager(user.user_email))
+    }
+
+    isOwner(user_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string") //can't happen
+            return user
+        return this.shops.some(shop => shop.isOwner(user.user_email))
+    }
+
+    getPermissions(user_id: number, shop_id: number): string | string[] {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.getPermissions(user_email)
+    }
+
+    getManagingShops(user_id: number): string | string[] {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        return this.shops.filter(shop => shop.isOwner(user.user_email) || shop.isManager(user.user_email))
+            .map(shop => JSON.stringify({
+                shop_id: shop.shop_id,
+                shop_name: shop.name
+            }))
+    }
+
+    getAllUsers(user_id: number): string | string[] {
+        if (!this.isAdmin(user_id)) return `${user_id} is not an admin`
+        return this.login.existing_users.map(user => JSON.stringify({
+            user_id: user.user_id,
+            user_email: user.user_email
+        }))
+    }
+
+    isLoggedIn(user_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        return this.login.isLoggedIn(user.user_email)
+    }
+
 }

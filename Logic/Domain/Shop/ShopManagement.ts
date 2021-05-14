@@ -91,6 +91,12 @@ export interface ShopManagement {
     removeOwner(user_email: string, target: string): boolean
 
     notifyOwners(message: string): void;
+
+    isManager(user_email: string): boolean;
+
+    isOwner(user_email: string): boolean;
+
+    getPermissions(user_email: string): string | string[];
 }
 
 
@@ -276,7 +282,7 @@ export class ShopManagementImpl implements ShopManagement {
         owner_to_remove.appointees_emails.forEach(appointee => this.removeAllSubordinates(appointee, original))
     }
 
-    private isOwner(user_email: string) {
+    isOwner(user_email: string) {
         return [this._original_owner].concat(this._owners).some((o: Owner) => o.user_email == user_email)
     }
 
@@ -295,7 +301,7 @@ export class ShopManagementImpl implements ShopManagement {
         return result;
     }
 
-    private isManager(manager_email: string): boolean {
+    isManager(manager_email: string): boolean {
         return this.getManagerByEmail(manager_email) != null
     }
 
@@ -303,5 +309,12 @@ export class ShopManagementImpl implements ShopManagement {
         [this.original_owner].concat(this.owners).forEach(
             o => NotificationAdapter.getInstance().notify(o.user_email, message)
         )
+    }
+
+    getPermissions(user_email: string): string | string[] {
+        if (this.isOwner(user_email)) return [JSON.stringify(new ManagerPermissions([true, true, true, true, true, true]))]
+        const manager = this.getManagerByEmail(user_email)
+        if (manager) return [JSON.stringify(manager.permissions)]
+        return `${user_email} is not in shop ${this.shop_id} management`
     }
 }

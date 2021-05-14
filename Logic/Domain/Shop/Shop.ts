@@ -190,6 +190,12 @@ export interface Shop {
     getAllDiscounts(user_id: number): string | string[];
 
     getAllPurchasePolicies(user_id: number): string | string[];
+
+    isManager(user_email: string): boolean;
+
+    isOwner(user_email: string): boolean;
+
+    getPermissions(user_email: string): string | string[];
 }
 
 export class ShopImpl implements Shop {
@@ -602,5 +608,20 @@ export class ShopImpl implements Shop {
     getAllPurchasePolicies(user_id: number): string | string[] {
         logger.Info(`${user_id} requested all policies`)
         return [this.inventory.getAllPurchasePolicies()]
+    }
+
+    isManager(user_email: string): boolean {
+        logger.Info(`Checked if ${user_email} is manager`)
+        return this.management.isManager(user_email)
+    }
+
+    isOwner(user_email: string): boolean {
+        logger.Info(`Checked if ${user_email} is owner`)
+        return this.management.isOwner(user_email)
+    }
+
+    getPermissions(user_email: string): string | string[] {
+        logger.Info(`Checked for ${user_email} permissions`)
+        return this.management.getPermissions(user_email)
     }
 }
