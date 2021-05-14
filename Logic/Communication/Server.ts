@@ -1,11 +1,24 @@
 import * as https from 'https';
 import {
+    assign_manager,
+    assign_owner,
     options,
-    port, route_admin,
-    route_cart, route_filter,
-    route_guest, route_home,
-    route_login, route_logout, route_purchase,
-    route_register, route_shop, route_shop_manage_product, route_shop_management, route_shop_ownership,
+    permissions,
+    port,
+    route_admin,
+    route_cart,
+    route_filter,
+    route_guest,
+    route_home,
+    route_login,
+    route_logout,
+    route_purchase,
+    route_register,
+    route_shop,
+    route_shop_manage_product,
+    route_shop_management,
+    route_shop_ownership, route_shop_ownership_assign_manager_permissions,
+    route_shop_ownership_assign_owner_permissions,
     service,
 } from "./Config/Config";
 const socket_io = require('socket.io');
@@ -39,7 +52,6 @@ app.use(route_shop_ownership, require('./User/Registered/Ownership'));
 app.use(route_shop_manage_product, require('./User/Registered/Product'))
 app.use(route_shop, require('./User/Registered/Shop'));
 app.use(route_admin, require('./User/Registered/Admin'));
-
 //* For debug TODO delete this
 
 // service.initData();

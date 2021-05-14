@@ -24,6 +24,8 @@ export const Unauthorized = 401;
 export const ServerNotFound = 404;
 export const OK = 200;
 
+export const permissions = '/permissions'
+export const shop_purchase_history = '/purchase_history'
 export const purchase_cart = "/all"
 export const route_notifications = "/"
 export const route_guest = "/guest"
