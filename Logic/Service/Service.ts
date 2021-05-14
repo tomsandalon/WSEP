@@ -141,12 +141,13 @@ export class Service {
     removeItemFromBasket(user_id: number, shop_id: number, product_id: number): string | void {
         return this._system.editShoppingCart(user_id, shop_id, product_id, 0)
     }
-    filterSearch(categories: string[], min_price: number, max_price: number,
+    filterSearch(category_list: string, min_price: number, max_price: number,
                  rating: number, name_search_term: string): string[] {
         const search_type = SearchTypes.name
         const search_term = name_search_term
+        const categories: string[] = category_list.split(",")
         let filters: Filter[] = []
-        if (categories.length > 0) {
+        if (categories.length > 0 && category_list.length > 0) {
             categories.forEach(c => {
                 filters = filters.concat([{filter_type: Filter_Type.Category, filter_value: c}])
             })
@@ -155,7 +156,7 @@ export class Service {
             filters = filters.concat([{filter_type: Filter_Type.AbovePrice, filter_value: min_price.toString()}])
         }
         if (max_price > 0) {
-            filters = filters.concat([{filter_type: Filter_Type.AbovePrice, filter_value: max_price.toString()}])
+            filters = filters.concat([{filter_type: Filter_Type.BelowPrice, filter_value: max_price.toString()}])
         }
         //ignore rating
         return this._system.filterSearch(search_type, search_term, filters)

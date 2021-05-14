@@ -8,7 +8,6 @@ class ShopItems extends Component {
         shopsInfo: null
     }
     handleFilter = (filters) => {
-        console.log(filters)
         const requestOptions = {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -23,24 +22,20 @@ class ShopItems extends Component {
         fetch("/home/filter", requestOptions)
           .then((response) => response.json())
           .then((shops) => {
-              console.log(shops);
-            let shopsInfo = [];
-            // shops.map((shop) => {
-            //   const tempShop = JSON.parse(shop);
-            //   const products_string = JSON.parse(tempShop.products);
-            //   const products = products_string.map((product) =>
-            //     JSON.parse(product)
-            //   );
-              // products.forEach(product => product._category.forEach(cat => console.log(cat._name)))
-            //   const shopInfo = {
-            //     id: tempShop.shopID,
-            //     name: tempShop.name,
-            //     products: products,
-            //   };
-            //   shopsInfo.push(shopInfo);
-            // });
-            // this.setState({ shopsInfo: shopsInfo });
-          });
+                let shopsInfo = [];
+                shops.map((shop) => {
+                 const tempShop = JSON.parse(shop);
+                 const products = tempShop.products;
+                const shopInfo = {
+                id: tempShop.shop_id,
+                name: tempShop.shop_name,
+                products: products,
+                };
+                shopsInfo.push(shopInfo);
+            });
+            this.setState({ shopsInfo: shopsInfo });
+            console.log("aftertase",this.state)
+            });
       };
     displayShops = () => {
     const requestOptions = {
