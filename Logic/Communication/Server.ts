@@ -17,8 +17,7 @@ import {
     route_shop,
     route_shop_manage_product,
     route_shop_management,
-    route_shop_ownership, route_shop_ownership_assign_manager_permissions,
-    route_shop_ownership_assign_owner_permissions,
+    route_shop_ownership, route_user_management,
     service,
 } from "./Config/Config";
 const socket_io = require('socket.io');
@@ -52,6 +51,7 @@ app.use(route_shop_ownership, require('./User/Registered/Ownership'));
 app.use(route_shop_manage_product, require('./User/Registered/Product'))
 app.use(route_shop, require('./User/Registered/Shop'));
 app.use(route_admin, require('./User/Registered/Admin'));
+app.use(route_user_management, require('./User/Registered/User'));
 //* For debug TODO delete this
 
 // service.initData();
