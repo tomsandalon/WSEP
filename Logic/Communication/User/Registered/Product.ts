@@ -4,10 +4,8 @@ const router = express.Router();
 module.exports = router;
 
 router.post('/', (request: any, response: any) => {
-    console.log('Here')
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
-        console.log("Cookie "+ request.cookies[sid])
         response.status(404);
         response.send('Bad session id')
         response.end()

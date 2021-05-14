@@ -8,20 +8,21 @@ import {
     route_register, route_shop, route_shop_manage_product, route_shop_management, route_shop_ownership,
     service,
 } from "./Config/Config";
-
+const socket_io = require('socket.io');
 const fs = require('fs')
 const path = require('path');
 const express = require('express');
-const expressWs = require('express-ws');
+// const expressWs = require('express-ws');
 const cookieParser = require('cookie-parser');
 export const app = express();
 //initialize a https server
 export const server = https.createServer(options, app);
+export const io = socket_io(server);
 //start our server
 server.listen( port,() => {
     console.log(`Server is running on port ${port}`);
 })
-expressWs(app, server);
+// expressWs(app, server);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));

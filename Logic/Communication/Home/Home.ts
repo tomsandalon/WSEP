@@ -1,4 +1,5 @@
 import {service, Session, sid} from "../Config/Config";
+import {io} from "../Server";
 
 const fs = require('fs');
 const path = require('path');
@@ -12,11 +13,7 @@ router.get('/',(request: any, response: any) => {
     response.json(service.displayShops());
     response.end();
 })
-router.ws('/', function(ws: any, req: any) {
-    console.log('connection!!')
-    ws.send('hello')
-    ws.on('message', function(msg: any) {
-        console.log(`received: ${msg}`);
-        ws.send(`echo ${msg}`)
-    });
+io.on('connection', (socket: any) =>{
+    console.log('New web socket connection')
+    socket.emit('Message', 'Welcome')
 })
