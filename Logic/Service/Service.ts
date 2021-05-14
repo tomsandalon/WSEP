@@ -246,4 +246,22 @@ export class Service {
     isOwner(user_id: number): string | boolean {
         return this._system.isOwner(user_id)
     }
+
+    getAllUsers(user_id: number): string | string[] {
+        return this._system.getAllUsers(user_id);
+    }
+
+    getManagingShops(user_id: number): string | string[] {
+        return this._system.getManagingShops(user_id)
+    }
+
+    getPermissions(user_id: number, shop_id: number): string | string[] {
+        return this._system.getPermissions(user_id, shop_id)
+    }
+
+    isLoggedIn(user_id: number): string | boolean {
+        return this.isLoggedIn(user_id)
+    }
+
+
 }
