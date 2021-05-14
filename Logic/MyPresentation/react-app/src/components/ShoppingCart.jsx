@@ -67,6 +67,7 @@ class ShoppingCart extends Component {
 									shop_id:JSON.parse(basket).shop.id,
 									shop_name:JSON.parse(basket).shop.name,
 									products:JSON.parse(basket).products,
+									basket_total_price:JSON.parse(basket).total_price_after_discount
 								}
 								return temp;
 								// JSON.parse(basket).products.forEach(product => console.log(product))

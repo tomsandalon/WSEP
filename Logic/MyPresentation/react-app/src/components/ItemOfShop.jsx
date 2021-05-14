@@ -62,7 +62,7 @@ class ItemOfShop extends Component {
                     <figure className="itemside mb-4">
                         <div className="right-aside"><img src={Image} alt="" className="img-sm"/></div>
                         <figcaption className="info align-self-center">
-                            <h5>Shop ID: {this.props.shopID}</h5>
+                            {/* <h5>Shop ID: {this.props.shopID}</h5> */}
                             <h5>Shop Name: {this.props.shopName}</h5>
                             <h6>Product Name: {this.props.name}(ID:{this.props.productID})</h6>
                             <h6>Amount: {this.props.amount}</h6>
