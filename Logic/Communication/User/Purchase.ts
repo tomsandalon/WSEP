@@ -1,4 +1,4 @@
-import {service, Session, sid} from "../Config/Config";
+import {purchase_cart, service, Session, sid} from "../Config/Config";
 import {request} from "express";
 const express = require('express');
 const router = express.Router();
@@ -48,7 +48,7 @@ router.post('/', (request: any, response: any) => {
     }
 })
 
-router.post('/all', (request: any, response: any) => {
+router.post(purchase_cart, (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
         response.status(404);

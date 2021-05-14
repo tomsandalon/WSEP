@@ -18,6 +18,6 @@ router.post('/', (request: any, response: any) => {
     } else {
         response.status(200);
     }
-    response.send(result);
+    response.send(result.toString());
     response.end();
 })

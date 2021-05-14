@@ -41,4 +41,4 @@ app.use(route_admin, require('./User/Registered/Admin'));
 
 //* For debug TODO delete this
 
-service.initData();
+// service.initData();

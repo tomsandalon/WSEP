@@ -15,6 +15,6 @@ router.get('/',(request: any, response: any) => {
 router.ws('/', function(ws: any, req: any) {
     ws.on('message', function(msg: any) {
         console.log(`received: ${msg}`);
-        ws.send(`You said = ${msg}`)
+        ws.send(`echo ${msg}`)
     });
 })
