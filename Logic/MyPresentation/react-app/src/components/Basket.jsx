@@ -30,7 +30,7 @@ class Basket extends Component {
 				refreshCart={this.props.refreshCart}
                 shop_id={this.props.selected_basket.shop_id} amount={product.amount} basket_id={this.props.selected_basket.basket_id} 
                 shop_name={this.props.selected_basket.shop_name} product_id={product.product._product_id} item_name={product.product._name} 
-                price={product.product._base_price}></BasketItem>)
+                price={product.product._base_price} discount_price={product.price_after_discount}></BasketItem>)
             }
 		</main> 
 		<aside className="col-md-3">
@@ -52,7 +52,7 @@ class Basket extends Component {
 				</dl>
 				<dl className="dlist-align">
 				  <dt>Grand Total:</dt>
-				  <dd className="text-right text-dark"><strong>{this.state.price}</strong></dd>
+				  <dd className="text-right text-dark"><strong>{this.props.selected_basket.basket_total_price}</strong></dd>
 				</dl>
 				<button className="btn btn-primary btn-block" onClick={this.handlePay}> Purchase </button>
 				<p className="small my-3 text-muted">Some extra informative text  can be placed here as dummy text will be replaced</p>

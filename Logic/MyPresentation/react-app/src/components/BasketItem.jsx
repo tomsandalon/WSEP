@@ -53,12 +53,12 @@ class BasketItem extends Component {
             <React.Fragment>
                 <article className="card card-body mb-3">
 				<div className="row align-items-center">
-					<div className="col-md-4">
+					<div className="col-md-2">
 						<figure className="itemside">
 							<div className="aside"><img src={this.props.img} className="photoCart border img-sm" alt=""/></div>
 							<figcaption className="info">
 								<span className="text-muted">{this.props.shop_name} {this.props.item_name}
-								(ID:{this.props.product_id})
+								{/* (ID:{this.props.product_id}) */}
 								</span>
 							</figcaption>
 						</figure> 
@@ -74,6 +74,9 @@ class BasketItem extends Component {
 					</div>
 					<div className="col-2">
 					<h6>Per item: <span type="text" className="badge badge-pill badge-info">{this.props.price}</span></h6>
+					</div>
+					<div className="col-2">
+					<h6>Discount: <span type="text" className="badge badge-pill badge-info">{this.props.discount_price}</span></h6>
 					</div>
 					<div className="col-2">
 					<button className="btn btn-primary btn-sm" onClick={this.handleRemoveItemFromBasket}> Remove </button>
