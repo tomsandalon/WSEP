@@ -5,7 +5,7 @@ import {before, beforeEach} from "mocha";
 import {
     BadRequest,
     OK, route_guest, route_login, route_register, route_shop,
-    route_shop_management, sid,
+    route_shop_management, route_shop_ownership_assign_manager, sid,
 } from "../../../Config/Config";
 const request = require('supertest');
 
@@ -59,7 +59,7 @@ describe('Add Manager to Shop tests', () => {
         expect(my_shop).not.equal('')
     })
     it('Add Manager unsuccessfully - no name',  (done) =>{
-        request(app).post(route_shop_management)
+        request(app).post(route_shop_ownership_assign_manager)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: my_shop,
@@ -68,7 +68,7 @@ describe('Add Manager to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Manager unsuccessfully - bad shop id',  (done) =>{
-        request(app).post(route_shop_management)
+        request(app).post(route_shop_ownership_assign_manager)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: -69696,
@@ -77,7 +77,7 @@ describe('Add Manager to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Manager unsuccessfully - unknown user in the system ',  (done) =>{
-        request(app).post(route_shop_management)
+        request(app).post(route_shop_ownership_assign_manager)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: my_shop,
@@ -86,7 +86,7 @@ describe('Add Manager to Shop tests', () => {
             .expect(BadRequest, done);
     })
     it('Add Manager successfully',  (done) =>{
-        request(app).post(route_shop_management)
+        request(app).post(route_shop_ownership_assign_manager)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({
                 shop_id: my_shop,
