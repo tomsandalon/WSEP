@@ -87,7 +87,7 @@ export class Service {
         return this._system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string {
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
         return this._system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, purchase_type)
     }
 

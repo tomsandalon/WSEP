@@ -77,7 +77,6 @@ before(async () =>{
             amount: product.amount,
             categories: ["GPU"],
             base_price: 1000,
-            purchase_type: 0
         })
     expect(res.status).equal(OK)
     res = await client.get(route_guest)
@@ -85,36 +84,28 @@ before(async () =>{
     NotificationTest.user_two_sess_id = res.headers['set-cookie'].find((cookie: any) => cookie.startsWith(sid))
         .split(';')[0]
         .split('=')[1];
-    console.log(`User 2 ==${NotificationTest.user_two_sess_id}`)
-    /*
-            client.post(route_register)
+    res = await client.post(route_register)
                 .set('Cookie', cookie_prefix + NotificationTest.user_two_sess_id)
                 .send({
                     email: secondUser,
                     password: secondUser_pass
                 })
-                .expect(OK)
-            client.post(route_login)
+    expect(res.status).equal(OK)
+    res = await client.post(route_login)
                 .set('Cookie', cookie_prefix + NotificationTest.user_two_sess_id)
                 .send({
                     email: secondUser,
                     password: secondUser_pass
                 })
-                .expect(OK)
-            next()
-        },
-        (next: any) => {
-            client.post(route_cart)
+    expect(res.status).equal(OK)
+    res = await client.post(route_cart)
                 .set('Cookie', cookie_prefix + NotificationTest.user_two_sess_id)
                 .send({
                     shop_id: NotificationTest.shop_id,
                     product_id: product.id,
                     amount: product.amount / 10
                 })
-                .expect(OK)
-            next()
-        },
-    ])*/
+    expect(res.status).equal(OK)
 })
 
 //* DELETE GUEST INIT
