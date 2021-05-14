@@ -27,7 +27,7 @@ class ItemOfShop extends Component {
             body: JSON.stringify({
                 product_id:this.props.productID,
                 shop_id:this.props.shopID,
-                amount:this.props.desiredAmount
+                amount:this.state.desiredAmount
             })
         };
         fetch('/cart',requestOptions)
