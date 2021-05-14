@@ -2,6 +2,7 @@ import {CompositeDiscount} from "./CompositeDiscount";
 import {Discount} from "./Discount";
 import {Product} from "../../ProductHandling/Product";
 import {DiscountHandler} from "./DiscountHandler";
+import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 
 export enum LogicComposition {
     XOR,
@@ -29,7 +30,7 @@ export class LogicCompositionDiscount implements CompositeDiscount {
         return numbers.reduce((min, cur) => Math.max(min, cur), 1);
     }
 
-    evaluate(product: Product, amount: number): number {
+    evaluate(product: ProductPurchase, amount: number): number {
         const discount_values = [this.firstDiscount, this.secondDiscount].map(d => d.evaluate(product, amount))
         switch (this.logic_composition) {
             case LogicComposition.AND:

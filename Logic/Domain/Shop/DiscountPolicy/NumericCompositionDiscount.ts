@@ -19,7 +19,7 @@ export class NumericCompositionDiscount implements CompositeDiscount {
         this.discounts = discounts;
     }
 
-    evaluate(product: Product | ProductPurchase, amount: number): number {
+    evaluate(product: ProductPurchase, amount: number): number {
         switch (this.operation) {
             case NumericOperation.Add:
                 return Math.min(1, this.discounts.reduce((acc, cur) => acc + cur.evaluate(product, amount), 0))

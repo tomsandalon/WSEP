@@ -107,7 +107,7 @@ describe('ProductImpl Class Test suit', () => {
             });
             it('change to positive price', () => {
                 const product = createProduct();
-                const before = product.base_price;
+                const before = product.price;
                 const delta = 10;
                 const result = product.changePrice(delta);
                 expect(typeof result).equal("boolean");

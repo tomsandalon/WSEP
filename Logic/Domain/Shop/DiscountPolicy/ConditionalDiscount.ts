@@ -24,7 +24,7 @@ export class ConditionalDiscount implements Discount {
         this.condition_param = condition_param;
     }
 
-    evaluate(product: Product | ProductPurchase, amount: number): number {
+    evaluate(product: ProductPurchase, amount: number): number {
         let shouldApply: Boolean;
         switch (this.condition) {
             case Condition.Amount:

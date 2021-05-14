@@ -30,7 +30,7 @@ export class DiscountHandler {
         return this._discounts;
     }
 
-    evaluateDiscount(product: Product | ProductPurchase, amount: number): number {
+    evaluateDiscount(product: ProductPurchase, amount: number): number {
         return this._discounts.reduce((max, cur) => Math.max(cur.evaluate(product, amount), max), 0)
     }
     toString(): string {
@@ -66,8 +66,8 @@ export class DiscountHandler {
         return true
     }
 
-    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData) {
+    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData) {
         return products.reduce((acc, cur) =>
-            acc + (cur.amount * cur.price * (1 - this.evaluateDiscount(cur, cur.amount))), 0)
+            acc + (cur.amount * cur.original_price * (1 - this.evaluateDiscount(cur, cur.amount))), 0)
     }
 }

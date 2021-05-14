@@ -8,7 +8,8 @@ export interface ProductPurchase {
     readonly description: string,
     readonly category: ReadonlyArray<Category>
     readonly amount: number,
-    readonly price: number,
+    original_price: number,
+    actual_price: number,
 }
 
 export class ProductPurchaseImpl implements ProductPurchase{
@@ -18,20 +19,42 @@ export class ProductPurchaseImpl implements ProductPurchase{
     private readonly _description: string;
     private readonly _name: string;
     private readonly _product_id: number;
-    private constructor(product: Product, actual_price: number, amount: number) {
+    private _original_price: number
+
+
+    private constructor(product: Product, original_price: number, amount: number, actual_price: number) {
         this._product_id = product.product_id;
         this._name = product.name;
         this._description = product.description;
         this._amount = amount;
         this._category = product.category;
+        this._original_price = original_price
         this._actual_price = actual_price;
     }
-    public static create(product: Product, coupons: any[], amount: number, shop: ShopInventory): ProductPurchase | string{
-        const final_price = shop.calculatePrice([product], {userId: -1, underaged: false});
-        if(typeof final_price === "string"){
-            return final_price
+
+    public static create(product: Product, coupons: any[], amount: number, shop: ShopInventory, actual_price?: number): ProductPurchase | string{
+        const ret = new ProductPurchaseImpl(product, product.price, amount, 0)
+        if (!actual_price) {
+            const final_price = shop.calculatePrice([ret], {userId: -1, underaged: false});
+            if (typeof final_price === "string") {
+                return final_price
+            }
+            ret.actual_price = final_price
         }
-        return new ProductPurchaseImpl(product, final_price, amount)
+        else ret.actual_price = actual_price
+        return ret
+    }
+
+    set actual_price(value: number) {
+        this._actual_price = value;
+    }
+
+    get actual_price(): number {
+        return this._actual_price;
+    }
+
+    get original_price(): number {
+        return this._original_price;
     }
 
     get product_id(){
