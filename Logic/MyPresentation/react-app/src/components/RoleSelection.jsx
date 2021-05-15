@@ -25,7 +25,7 @@ class RoleSelection extends Component {
                     <Link to="/home">
                     {this.isUser() && <div className="row-3"><button className="role btn btn-info btn-lg" > User </button></div>}
                     </Link>
-                    <Link to="/home">
+                    <Link to="/managerHome">
                     {this.isManager() && <div className="row-3"><button className="role btn btn-info btn-lg" > Manager </button></div>}
                     </Link>
                     <Link to="/home">
