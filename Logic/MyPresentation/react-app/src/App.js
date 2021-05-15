@@ -16,46 +16,46 @@ import AddManager from "./pages/Add_Manager";
 import AddStore from "./pages/Add_Store";
 import ManagersStore from "./pages/ManagersStore";
 import RoleSelection from "./components/RoleSelection";
-import {ProtectedRoute} from './components/ProtectedRoute';
-import Payment from './components/Payment';
-import UserHistory from './components/UserHistory/UserHistory';
-import AdminMenu from './components/Admin/AdminMenu';
-function App () {
-
-  
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import Payment from "./components/Payment";
+import UserHistory from "./components/UserHistory/UserHistory";
+import AdminMenu from "./components/Admin/AdminMenu";
+function App() {
   // isGuest = () =>{
   //   if(this.state.permissions.guest === false && this.state.permissions.admin === false && this.state.permissions.loggedUser === false)
   //     return true
   //   return false;
   // }
 
-    return (
-      <Router>
-        <div className="app">
-          <Navigation/>
-          <Switch>
-            <Route exact path="/"><Redirect to="/home" /></Route>
-            <Route path="/home" render={() => (<ShopItems/>)}/>
-            <ProtectedRoute path="/roles" component={RoleSelection}/>
-            <ProtectedRoute path="/user-history" component={UserHistory}/>
-            <Route path="/my-cart" component={ShoppingCart} />
-            <Route path="/login" render={()=>(<Login/>)} />
-            <Route path="/managerHome/:managerID" component={ManagerHome} />
-            <Route path="/register" component={Register} />
-            <Route exact path="/admin-menu" component={AdminMenu}/>
-            <Route path="/addmanager/:storeID">
-              <AddManager />
-            </Route>
-            <Route path="/payment" component={Payment}/>
-            <Route path="/addstore/:managerID">
-              <AddStore />
-            </Route>
-            <Route path="/managersStore/:storeID">
-              <ManagersStore />
-            </Route>
-          </Switch>
-        </div>
-      </Router>
-    );
-  }
+  return (
+    <Router>
+      <div className="app">
+        <Navigation />
+        <Switch>
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+          <Route path="/home" render={() => <ShopItems />} />
+          <ProtectedRoute path="/roles" component={RoleSelection} />
+          <ProtectedRoute path="/user-history" component={UserHistory} />
+          <Route path="/my-cart" component={ShoppingCart} />
+          <Route path="/login" render={() => <Login />} />
+          <Route path="/managerHome" component={ManagerHome} />
+          <Route path="/register" component={Register} />
+          <Route exact path="/admin-menu" component={AdminMenu} />
+          <Route path="/addmanager/:storeID">
+            <AddManager />
+          </Route>
+          <Route path="/payment" component={Payment} />
+          <Route path="/addstore/:managerID">
+            <AddStore />
+          </Route>
+          <Route path="/managersStore/:storeID">
+            <ManagersStore />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
+}
 export default App;

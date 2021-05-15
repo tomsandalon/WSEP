@@ -16,14 +16,17 @@ const ManagerStoresList = (props) => {
         </Link>
         <h3>Stores you manage:</h3>
         <div className="manager-store-list">
-          {stores.map((store) => (
-            <div className="store-preview" key={store.id}>
-              <Link to={`/managersStore/${store.id}`}>
-                <h3>{store.name} </h3>
-                <p> {store.description}</p>
-              </Link>
-            </div>
-          ))}
+          {stores.map((store) => {
+            const parsedStore = JSON.parse(store);
+            return (
+              <div className="store-preview" key={parsedStore.shop_id}>
+                <Link to={`/managersStore/${parsedStore.shop_id}`}>
+                  <h3>{parsedStore.shop_name} </h3>
+                  {/* <p> {store.description}</p> */}
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

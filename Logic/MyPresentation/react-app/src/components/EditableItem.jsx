@@ -16,7 +16,7 @@ class EditableItem extends Component {
       <div className="col-md-3">
         <figure className="itemside mb-4">
           <div className="right-aside">
-            <img src={Image} className="img-sm" />
+            <img src={Image} alt="E" className="img-sm" />
           </div>
           <figcaption className="info align-self-center">
             <h4 classNameName="center">{this.state.name}</h4>
