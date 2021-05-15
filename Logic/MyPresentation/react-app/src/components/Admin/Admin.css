@@ -3,7 +3,9 @@
   align-items: center;
   display: inline;
   list-style-type: none;
-  padding-right: 10px;
+  padding-right: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   float: left;
 }
 h1{
@@ -11,3 +13,14 @@ h1{
     color:rgba(145, 151, 236, 0.582);
     
 }
+h3{
+  text-align:center;
+  color:rgba(145, 151, 236, 0.582);
+}
+
+h4{
+  text-align:center;
+  color:rgba(28, 28, 29, 0.582);
+  
+}
+
