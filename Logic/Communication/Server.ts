@@ -14,10 +14,10 @@ import {
     route_logout,
     route_purchase,
     route_register,
-    route_shop,
+    route_shop, route_shop_discount,
     route_shop_manage_product,
     route_shop_management,
-    route_shop_ownership, route_user_management,
+    route_shop_ownership, route_shop_policy, route_user_management,
     service,
 } from "./Config/Config";
 const socket_io = require('socket.io');
@@ -52,6 +52,8 @@ app.use(route_shop_manage_product, require('./User/Registered/Product'))
 app.use(route_shop, require('./User/Registered/Shop'));
 app.use(route_admin, require('./User/Registered/Admin'));
 app.use(route_user_management, require('./User/Registered/User'));
+app.use(route_shop_policy, require('./User/Registered/Policy'));
+app.use(route_shop_discount, require('./User/Registered/Discount'));
 //* For debug TODO delete this
 
 // service.initData();
