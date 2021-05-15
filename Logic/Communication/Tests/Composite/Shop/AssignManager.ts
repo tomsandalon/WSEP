@@ -4,9 +4,15 @@ import {cookie_prefix, SessionTest} from "../../Setup";
 import {before, beforeEach} from "mocha";
 import {
     BadRequest,
-    OK, route_guest, route_login, route_register, route_shop,
-    route_shop_management, route_shop_ownership_assign_manager, sid,
+    OK, sid,
 } from "../../../Config/Config";
+import {
+    route_guest,
+    route_login, route_register,
+    route_shop,
+    route_shop_management,
+    route_shop_ownership_assign_manager
+} from "../../../Routes";
 const request = require('supertest');
 
 describe('Add Manager to Shop tests', () => {

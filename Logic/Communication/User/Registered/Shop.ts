@@ -1,26 +1,26 @@
 import {
-    BadRequest, OK,
-    route_shop,
+    BadRequest, categories, OK,
     ServerNotFound,
     service,
     Session,
     shop_purchase_history,
     sid
 } from "../../Config/Config";
+import {route_shop} from "../../Routes";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
-        response.status(404);
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
     const result = service.getItemsFromShop(request.body.shop_id);
     if(typeof result == "string") {
-        response.status(400);
+        response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
         response.end()
@@ -28,13 +28,33 @@ router.get('/', (request: any, response: any) => {
     }
     else{
         response.setHeader("Content-Type", "application/json");
-        response.status(200);
-        response.send(result)
+        response.status(OK);
+        response.json(result)
         response.end();
         return;
     }
 })
-router.get('/categories', (request: any, response: any) => {
+
+router.post('/', (request: any, response: any) => {
+    const user_id = Session.sessions[request.cookies[sid]];
+    if (user_id == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const result = service.addShop(user_id, request.body.name, request.body.description, request.body.location, request.body.bank_info);
+    response.setHeader("Content-Type", "text/html");
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+    } else {
+        response.status(OK);
+    }
+    response.send(result.toString());
+    response.end();
+})
+
+router.get(categories, (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
         response.status(ServerNotFound);
@@ -55,47 +75,24 @@ router.get('/categories', (request: any, response: any) => {
     }
     response.end();
 })
-
 router.get(shop_purchase_history, (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
-        response.status(404);
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
     const result = service.shopOrderHistory(user_id, request.body.shop_id);
     if(typeof result == "string") {
-        response.status(400);
+        response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
-        response.end()
-        return;
     }
     else{
         response.setHeader("Content-Type", "application/json");
-        response.status(200);
-        response.send(result)
-        response.end();
-        return;
+        response.status(OK);
+        response.json(result)
     }
-})
-
-router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
-        response.status(404);
-        response.send('Bad session id')
-        response.end()
-        return
-    }
-    const result = service.addShop(user_id, request.body.name, request.body.description, request.body.location, request.body.bank_info);
-    response.setHeader("Content-Type", "text/html");
-    if (typeof result === 'string') {
-        response.status(400);
-    } else {
-        response.status(200);
-    }
-    response.send(result.toString());
     response.end();
 })

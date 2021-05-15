@@ -5,8 +5,9 @@ import {beforeEach} from "mocha";
 import {
     BadRequest,
     OK,
-    route_shop_manage_product,
+
 } from "../../../Config/Config";
+import {route_shop_manage_product} from "../../../Routes";
 const request = require('supertest');
 
 describe('Add Product to Shop tests', () => {

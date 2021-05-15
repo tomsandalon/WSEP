@@ -1,4 +1,5 @@
-import {assign_manager, assign_owner, route_shop_manage_product, service, Session, sid} from "../../Config/Config";
+import {assign_manager, assign_owner, service, Session, sid} from "../../Config/Config";
+import {route_shop_manage_product} from "../../Routes";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
