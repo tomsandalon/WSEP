@@ -10,13 +10,19 @@ class RoleSelection extends Component {
         this.state = {
             isLoggedUser:false,
             isManager:false,
-            isAdmin: false,
-        }
+            isAdmin: false
+        };
     }
     componentDidMount() {
         this.isUser();
         this.isManager();
         this.isAdmin();
+        // const user = this.isUser();
+        // console.log("mountuser->",user)
+        // const manager = this.isManager();
+        // const admin = this.isAdmin();
+        // this.setState({isLoggedUser:user, isManager:manager, isAdmin:admin})
+        // console.log("state->>>",this.state)
     }
     isUser = () => {
         const requestOptions = {
@@ -28,12 +34,14 @@ class RoleSelection extends Component {
             .then(async response => {
                 switch(response.status){
                     case 200:
-                        const value = await response.text();
-                        console.log("loggeduser>>>>>",value)
+                        let value = await response.text();
+                        value = value === "true" ? true : false;
                         this.setState({isLoggedUser:value})
+                        // return value;
                         break;
                     default:
                         this.setState({isLoggedUser:false})
+                        // return false;
                         break;       
                 }
             });
@@ -48,12 +56,14 @@ class RoleSelection extends Component {
             .then(async response => {
                 switch(response.status){
                     case 200:
-                        const value = await response.text();
-                        console.log("manager>>>>",value);
-                        this.setState({isManager:false})
+                        let value = await response.text();
+                        value = value === "true" ? true : false;
+                        this.setState({isManager:value})
+                        // return value;
                         break;
                     default:
                         this.setState({isManger:false})
+                        // return false;
                         break;
                 }
             });
@@ -68,13 +78,15 @@ class RoleSelection extends Component {
             .then(async response => {
                 switch(response.status){
                     case 200:
-                        const value = await response.text();
-                        console.log("admin>>>>>",value)
+                        let value = await response.text();
+                        value = value === "true" ? true : false;
                         this.setState({isAdmin:value})
+                        // return value;
                         break;
                     default:
                         this.setState({isAdmin:false})
-                        break;       
+                        // return false;
+                        break;
                 }
             });
     }
@@ -95,7 +107,7 @@ class RoleSelection extends Component {
                     <Link to="/managerHome">
                     <div className="row-3"><button className="role btn btn-info btn-lg" > Manager </button></div>
                     </Link>}
-                    {this.state.isAdmin && 
+                    {this.state.isAdmin &&
                     <Link to="/admin-menu">
                     <div className="row-3"><button className="role btn btn-info btn-lg" > Admin </button></div>
                     </Link>}

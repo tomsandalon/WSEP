@@ -59,6 +59,7 @@ router.get('/is/loggedin', (request: any, response: any) => {
 router.get('/is/admin', (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
+        response.setHeader("Content-Type", "text/html");
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
