@@ -84,8 +84,6 @@ router.post('/', (request: any, response: any) => {
         response.send(result.toString());
     } else {
         response.status(OK);
-        response.setHeader("Content-Type", "application/json");
-        response.json(result);
     }
     response.end();
 })
