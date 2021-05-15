@@ -5,7 +5,9 @@ class RadioUser extends Component {
     render() {
         return(
             <li key={this.props.id}>
-                <button type="button" class="test btn btn-info" onClick={() => this.props.handleUser(this.props.user)} >{this.props.user}</button>
+                <button type="button" class="test btn btn-info" onClick={() => this.props.handleUser(this.props.user)}>
+                    ID:{this.props.user_id}   {this.props.user_email}
+                    </button>
             </li>
         )
     }
