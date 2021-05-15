@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const useFetch = (url) => {
+const useFetch = (url, body) => {
   const [data, setData] = useState(null);
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
@@ -9,8 +9,9 @@ const useFetch = (url) => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Cookie: document.cookie,
+      "Cookie": document.cookie,
     },
+    body: body,
   };
 
   useEffect(() => {

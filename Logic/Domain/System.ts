@@ -565,11 +565,12 @@ export class SystemImpl implements System {
         const user = this._login.retrieveUser(user_id);
         if(typeof user == "string")
             return user
-        return this.shops.filter(shop => shop.isOwner(user.user_email) || shop.isManager(user.user_email))
-            .map(shop => JSON.stringify({
-                shop_id: shop.shop_id,
-                shop_name: shop.name
-            }))
+        const result: Shop[] = (this.isAdmin(user_id)) ? this.shops :
+            this.shops.filter(shop => shop.isOwner(user.user_email) || shop.isManager(user.user_email))
+        return result.map(shop => JSON.stringify({
+            shop_id: shop.shop_id,
+            shop_name: shop.name
+        }))
     }
 
     getAllUsers(user_id: number): string | string[] {

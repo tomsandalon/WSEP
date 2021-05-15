@@ -17,7 +17,7 @@ const ManagerCell = (props) => {
             src={"./images/Anon_Avatar.png"}
             className="user-avatar"
           />
-          <div className="user-detail ">
+          <div className="user-detail">
             <h5 className="user-name ">{managerName} </h5>
             {/* <p className="user-description">{userId} </p> */}
           </div>

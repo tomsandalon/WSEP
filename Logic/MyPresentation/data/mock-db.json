@@ -19,6 +19,10 @@
     {
       "managerName": "1",
       "id": 5
+    },
+    {
+      "managerName": "Nadav",
+      "id": 6
     }
   ],
   "store_2_managers": [
@@ -39,6 +43,12 @@
       "name": "Second store",
       "description": "Description2",
       "active": false
+    },
+    {
+      "name": "Store 3 wadup",
+      "description": "store 33333",
+      "active": true,
+      "id": 3
     }
   ],
   "store_1_items": [
