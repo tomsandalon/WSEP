@@ -1,15 +1,17 @@
 import {app, server} from "../../Server";
 import {
-    OK, route_cart,
+    OK, sid
+} from "../../Config/Config";
+import {afterEach, before, beforeEach} from "mocha";
+import {SessionTest} from "../Setup";
+import {
+    route_cart,
     route_guest,
     route_login,
     route_register,
     route_shop,
-    route_shop_manage_product,
-    sid
-} from "../../Config/Config";
-import {afterEach, before, beforeEach} from "mocha";
-import {SessionTest} from "../Setup";
+    route_shop_manage_product
+} from "../../Routes";
 const async = require('async')
 const fs = require('fs')
 const https = require('https');

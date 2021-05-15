@@ -5,21 +5,25 @@ import {
     options,
     permissions,
     port,
+    service,
+} from "./Config/Config";
+import {
     route_admin,
     route_cart,
-    route_filter,
-    route_guest,
+    route_filter, route_guest,
     route_home,
     route_login,
     route_logout,
     route_purchase,
     route_register,
-    route_shop, route_shop_discount,
+    route_shop,
+    route_shop_discount,
     route_shop_manage_product,
     route_shop_management,
-    route_shop_ownership, route_shop_policy, route_user_management,
-    service,
-} from "./Config/Config";
+    route_shop_ownership,
+    route_shop_policy,
+    route_user_management
+} from "./Routes";
 const socket_io = require('socket.io');
 const fs = require('fs')
 const path = require('path');

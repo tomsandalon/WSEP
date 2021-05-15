@@ -4,10 +4,10 @@ import {cookie_prefix, SessionTest} from "../../Setup";
 import {before, beforeEach} from "mocha";
 import {
     BadRequest,
-    OK, route_guest, route_login, route_register,
-    route_shop_management, sid, Unauthorized,
+    OK, sid, Unauthorized,
 } from "../../../Config/Config";
 import {mainUser, mainUser_pass} from "../Setup";
+import {route_guest, route_login, route_register, route_shop_management} from "../../../Routes";
 const request = require('supertest');
 let second_user_sid = '';
 describe('Add Manager to Shop tests', () =>{

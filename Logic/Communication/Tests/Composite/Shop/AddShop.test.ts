@@ -2,7 +2,8 @@ import {app} from "../../../Server";
 const expect = require('chai').expect;
 import {chai, cookie_prefix, SessionTest} from "../../Setup";
 import {beforeEach} from "mocha";
-import {BadRequest, OK, route_shop} from "../../../Config/Config";
+import {BadRequest, OK} from "../../../Config/Config";
+import {route_shop} from "../../../Routes";
 const request = require('supertest');
 
 describe('Add Shop tests', () => {

@@ -4,9 +4,16 @@ import {cookie_prefix, SessionTest} from "../../Setup";
 import {before, beforeEach} from "mocha";
 import {
     BadRequest,
-    OK, route_guest, route_login, route_register, route_shop,
-    route_shop_management, route_shop_ownership, route_shop_ownership_assign_owner, sid,
+    OK, sid,
 } from "../../../Config/Config";
+import {
+    route_guest,
+    route_login, route_register,
+    route_shop,
+    route_shop_management,
+    route_shop_ownership,
+    route_shop_ownership_assign_owner
+} from "../../../Routes";
 const request = require('supertest');
 
 describe('Add Owner to Shop tests', () => {

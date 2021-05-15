@@ -6,12 +6,9 @@ import {beforeEach} from "mocha";
 import {
     localhost,
     OK, options, port,
-    route_login,
-    route_notifications,
-    route_purchase,
-    route_register,
     Unauthorized
 } from "../../../Config/Config";
+import {route_login, route_notifications, route_purchase, route_register} from "../../../Routes";
 const async = require('async');
 const request = require('supertest');
 const fs = require('fs');
