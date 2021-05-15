@@ -14,7 +14,9 @@ class AdminMenu extends Component {
             userInfo:[],
             shopInfo:[],
             successVisible:false,
-            errorMsg:''  
+            errorMsg:'' ,
+            successVisibleShop:false,
+            errorMsgShop:''  
         }
         this.fetchUsers();
         this.fetchShops();
@@ -23,6 +25,13 @@ class AdminMenu extends Component {
         this.setState({successVisible:true,errorMsg:"No inormation available"},()=>{
             window.setTimeout(()=>{
             this.setState({successVisible:false})
+            },2000)
+        });
+    }
+    onShowAlertShop = ()=>{
+        this.setState({successVisibleShop:true,errorMsgShop:"No inormation available"},()=>{
+            window.setTimeout(()=>{
+            this.setState({successVisibleShop:false})
             },2000)
         });
     }
@@ -83,6 +92,9 @@ class AdminMenu extends Component {
                 switch(response.status){
                     case 200:
                         response.json().then((histories)=>{
+                            if(histories.length == 0){
+                                this.onShowAlertShop();
+                            }
                             let shopInfo = [];
                             histories.map((history) => {
                                 const tempHistory = JSON.parse(history);
@@ -104,7 +116,8 @@ class AdminMenu extends Component {
                         })
                     break;
                     case 401:
-                        this.onShowAlert();
+                        console.log("alert")
+                        this.onShowAlertShop();
                         // window.location.reload("/home");
                     break;
                     case 404:
@@ -213,7 +226,7 @@ class AdminMenu extends Component {
                                 <UserHistory history={history}/>
                             )
                             }
-                            <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
+                            <Alert color="success" isOpen={this.state.successVisibleShop}>{this.state.errorMsgShop}</Alert>
                         </div>
                 </div>
             </div>              
