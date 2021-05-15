@@ -10,7 +10,7 @@ router.get('/', (request: any, response: any) => {
         response.end()
         return
     }
-    const result = service.getAllShops(user_id);
+    const result = service.getManagingShops(user_id);
     if (typeof result == 'string'){
         response.status(Unauthorized)
         response.setHeader("Content-Type", "text/html");
