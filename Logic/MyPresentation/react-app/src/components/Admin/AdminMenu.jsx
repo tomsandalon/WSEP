@@ -218,7 +218,7 @@ class AdminMenu extends Component {
                                 <UserHistory history={history}/>
                             )
                             }
-                            <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
+                            <Alert color="danger" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                         </div>
                         <div className="col-6">
                             {this.state.shopInfo.length > 0 && 
@@ -226,7 +226,7 @@ class AdminMenu extends Component {
                                 <UserHistory history={history}/>
                             )
                             }
-                            <Alert color="success" isOpen={this.state.successVisibleShop}>{this.state.errorMsgShop}</Alert>
+                            <Alert color="danger" isOpen={this.state.successVisibleShop}>{this.state.errorMsgShop}</Alert>
                         </div>
                 </div>
             </div>              
