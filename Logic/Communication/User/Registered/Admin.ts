@@ -11,7 +11,7 @@ router.get('/history/user', (request: any, response: any) => {
         return
     }
     response.setHeader("Content-Type", "application/json");
-    const result = service.adminDisplayUserHistory(user_id, request.body.user_inspect);
+    const result = service.adminDisplayUserHistory(user_id, request.query.user_inspect);
     console.log(result)
     response.json(result)
     response.end();
@@ -25,7 +25,7 @@ router.get('/history/shop', (request: any, response: any) => {
         return
     }
     response.setHeader("Content-Type", "application/json");
-    const result = service.adminDisplayShopHistory(user_id, request.body.shop_id);
+    const result = service.adminDisplayShopHistory(user_id, request.query.shop_id);
     console.log(result)
     response.json(result)
     response.end();
