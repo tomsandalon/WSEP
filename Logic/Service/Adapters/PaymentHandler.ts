@@ -10,6 +10,7 @@ export class PaymentHandlerImpl implements PaymentHandler {
     }
 
     charge(payment_method: string, amount: number, bank_info: string): boolean | string {
+        if (payment_method.includes("fail")) return false;
         return !PaymentHandlerImpl.REJECT_CHARGE
     }
 
