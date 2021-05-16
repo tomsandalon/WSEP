@@ -97,6 +97,8 @@ export interface ShopManagement {
     isOwner(user_email: string): boolean;
 
     getPermissions(user_email: string): string | string[];
+
+    removePermission(appointer_email: string, appointee_email: string, permission: Action): string | boolean;
 }
 
 
@@ -156,6 +158,18 @@ export class ShopManagementImpl implements ShopManagement {
         if (manager.appointer_user_email != appointer_email)
             return `${appointer_email} is not the appointer of ${appointee_email}`
         permissions.forEach(p => manager.permissions.editPermission(p, true))
+        return true;
+    }
+
+    removePermission(appointer_email: string, appointee_email: string, permission: Action) {
+        if (!this.isOwner(appointer_email))
+            return `${appointer_email} is not an owner`;
+        if (!this.isManager(appointee_email))
+            return `${appointee_email} is not a manager`
+        const manager = this.getManagerByEmail(appointee_email) as Manager
+        if (manager.appointer_user_email != appointer_email)
+            return `${appointer_email} is not the appointer of ${appointee_email}`
+        manager.permissions.editPermission(permission, false)
         return true;
     }
 

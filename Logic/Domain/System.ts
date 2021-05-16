@@ -51,6 +51,7 @@ export interface System{
     removeOwner(user_id: number, shop_id: number, target: string): string | boolean
     addPermissions(user_id:number, shop_id:number, target_email:string,action:Action): string | boolean
     editPermissions(user_id:number, shop_id:number, target_email:string,actions:Action[]): string | boolean
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean
     displayStaffInfo(user_id:number,shop_id:number): string[] | string
     shopOrderHistory(user_id:number,shop_id:number): string | string[]
     adminDisplayShopHistory(admin:number, shop_id: number): string | string[]
@@ -81,6 +82,8 @@ export interface System{
     isLoggedIn(user_id: number): string | boolean
 
     getAllCategories(user_id: number): string | string[];
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean
 }
 
 //TODO add toggle underaged
@@ -321,6 +324,15 @@ export class SystemImpl implements System {
         if(!this._register.verifyUserEmail(target_email))
             return `Target email ${target_email} doesnt belong to a registered user`
         return shop.addPermissions(user_email, target_email, [action])
+    }
+
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        if(!this._register.verifyUserEmail(target_email))
+            return `Target email ${target_email} doesnt belong to a registered user`
+        return shop.removePermission(user_email, target_email, action)
     }
 
     appointManager(user_id: number, shop_id: number, appointee_user_email: string): string | boolean {
@@ -595,5 +607,12 @@ export class SystemImpl implements System {
         logger.Info(`${user.user_email} requested all categories`)
         const categories = new Set(this.shops.flatMap(shop => shop.getAllCategories()))
         return Array.from(categories.values())
+    }
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.rateProduct(user_email, product_id, rating)
     }
 }

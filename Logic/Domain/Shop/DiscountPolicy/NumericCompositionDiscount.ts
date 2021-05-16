@@ -1,6 +1,5 @@
 import {CompositeDiscount} from "./CompositeDiscount";
 import {Discount} from "./Discount";
-import {Product} from "../../ProductHandling/Product";
 import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 import {DiscountHandler} from "./DiscountHandler";
 

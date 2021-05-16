@@ -21,7 +21,7 @@ export enum Filter_Type {
     BelowPrice,
     AbovePrice,
     Category,
-    // Rating
+    Rating
 }
 
 export enum Item_Action {
@@ -162,6 +162,8 @@ export interface ShopInventory {
     addLogicCompositionDiscount(operation: LogicComposition, d_id1: number, d_id2: number): boolean | string;
 
     notifyOwners(order: Purchase): void;
+
+    rateProduct(product_id: number, rating: number): void;
 }
 
 export class ShopInventoryImpl implements ShopInventory {
@@ -260,7 +262,7 @@ export class ShopInventoryImpl implements ShopInventory {
         const passed_filter = (f: Filter) => (product: Product) => {
             return (f.filter_type == Filter_Type.AbovePrice) ? product.price >= Number(f.filter_value) :
                 (f.filter_type == Filter_Type.BelowPrice) ? product.price <= Number(f.filter_value) :
-                    // ((f.filter_type == Filter_Type.Rating) ? true :   // add rating to product
+                    (f.filter_type == Filter_Type.Rating) ? product.rating.get_rating() == Number(f.filter_value) :
                     (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
                         //can add more
                         false;
@@ -529,4 +531,11 @@ export class ShopInventoryImpl implements ShopInventory {
             (acc, cur) => acc + "\n" + cur.name, ""
         )}`)
     }
+
+    rateProduct(product_id: number, rating: number): void {
+        const product = this._products.find(p => product_id == p.product_id)
+        if (product == undefined) return
+        product.rate(rating)
+    }
+
 }
