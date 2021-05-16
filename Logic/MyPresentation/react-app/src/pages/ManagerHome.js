@@ -3,8 +3,8 @@ import ManagerStoresList from "../components/ManagerStoresList";
 import useFetch from "../useFetch";
 
 const ManagerHome = () => {
-  const { data: stores, isPending, error } = useFetch("/user", null);
-  console.log(stores);
+  const { data: stores, isPending, error } = useFetch("/user");
+
   return (
     <div className="shops-user-manages">
       {error && <div> {error}</div>}

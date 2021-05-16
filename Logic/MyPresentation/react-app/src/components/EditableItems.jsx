@@ -1,6 +1,4 @@
-import React, { Component } from "react";
-import FiltersItems from "./FiltersItems";
-import ItemOfShop from "./ItemOfShop";
+import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import EditableItem from "./EditableItem";
 
@@ -11,7 +9,7 @@ const EditableItems = (props) => {
       <div className="jr-card">
         {/* <div className="jr-card-header d-flex align-items-center"></div> */}
         <div class="row">
-          {items.map((item, index) => (
+          {items.map((item, _) => (
             <EditableItem
               name={item.name}
               available={item.available}

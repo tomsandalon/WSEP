@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const useFetch = (url, body) => {
+const useFetch = (url) => {
   const [data, setData] = useState(null);
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
@@ -11,15 +11,14 @@ const useFetch = (url, body) => {
       "Content-Type": "application/json",
       "Cookie": document.cookie,
     },
-    body: body,
   };
 
   useEffect(() => {
     const abortCont = new AbortController();
-
     fetch(url, requestOptions, { signal: abortCont.signal })
       .then((res) => {
         if (!res.ok) {
+          console.log("Fetch FAILURE!");
           throw Error("Fetching failed!");
         }
         return res.json();

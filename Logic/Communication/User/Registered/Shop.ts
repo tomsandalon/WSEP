@@ -11,6 +11,7 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
+    console.log("in shop");
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
         response.status(ServerNotFound);

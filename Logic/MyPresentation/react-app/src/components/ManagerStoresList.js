@@ -8,7 +8,7 @@ const ManagerStoresList = (props) => {
   return (
     <div className="center-screen">
       <div className="container">
-        <Link to={`/addstore/${managerID}`}>
+        <Link to={`/addstore/${managerID}`}> 
           <button className="btn btn-outline-primary btn-sm ">
             {" "}
             Add Store <i className="fa fa-plus"></i>
