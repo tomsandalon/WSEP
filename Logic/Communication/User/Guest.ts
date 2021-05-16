@@ -12,8 +12,6 @@ router.get('/',(request: any, response: any) => {
         session_id = Session.session_id_specifier++;
         Session.sessions[session_id] = service.openSession();
     }
-    response.cookie(sid, session_id, {
-        maxAge: 2 * hour
-    })
+    response.cookie(sid, session_id, {})
     response.end();
 })
