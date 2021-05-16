@@ -271,4 +271,12 @@ export class Service {
     getAllCategories(user_id: number): string | string [] {
         return this._system.getAllCategories(user_id)
     }
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean {
+        return this._system.rateProduct(user_id, shop_id, product_id, rating)
+    }
+
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        return this._system.removePermission(user_id, shop_id, target_email, action)
+    }
 }

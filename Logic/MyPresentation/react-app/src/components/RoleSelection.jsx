@@ -10,12 +10,14 @@ class RoleSelection extends Component {
         this.state = {
             isLoggedUser:false,
             isManager:false,
-            isAdmin: false
+            isAdmin: false,
+            isOwner: false
         };
     }
     componentDidMount() {
         this.isUser();
         this.isManager();
+        this.isOwner();
         this.isAdmin();
         // const user = this.isUser();
         // console.log("mountuser->",user)
@@ -41,6 +43,28 @@ class RoleSelection extends Component {
                         break;
                     default:
                         this.setState({isLoggedUser:false})
+                        // return false;
+                        break;       
+                }
+            });
+    }
+    isOwner = () => {
+        const requestOptions = {
+            method: "GET",
+            headers: { "Content-Type": "application/json",
+                        'Cookie': document.cookie},
+        };
+        fetch("/user/is/owner", requestOptions)
+            .then(async response => {
+                switch(response.status){
+                    case 200:
+                        let value = await response.text();
+                        value = value === "true" ? true : false;
+                        this.setState({isOwner:value})
+                        // return value;
+                        break;
+                    default:
+                        this.setState({isOwner:false})
                         // return false;
                         break;       
                 }
@@ -103,7 +127,7 @@ class RoleSelection extends Component {
                     <Link to="/home">
                     <div className="row-3"><button className="role btn btn-info btn-lg" > User </button></div>
                     </Link>}
-                    {this.state.isManager && 
+                    {(this.state.isManager || this.state.isOwner) &&
                     <Link to="/managerHome">
                     <div className="row-3"><button className="role btn btn-info btn-lg" > Manager </button></div>
                     </Link>}

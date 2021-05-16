@@ -14,7 +14,7 @@ class Login extends Component {
     }
 
 setLoginPermission = () => {
-    localStorage.setItem("loggedUser","LoggedIn")
+    sessionStorage.setItem("loggedUser","LoggedIn")
 };
 
 handleSubmit = (event) =>{
