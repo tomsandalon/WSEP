@@ -18,7 +18,7 @@ router.get('/', (request: any, response: any) => {
         response.end()
         return
     }
-    const result = service.getItemsFromShop(request.body.shop_id);
+    const result = service.getItemsFromShop(request.query.shop_id);
     if(typeof result == "string") {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
