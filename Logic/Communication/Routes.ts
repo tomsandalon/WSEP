@@ -51,7 +51,7 @@ export const route_shop_ownership_assign_owner = route_shop_ownership + assign_o
  * @method GET
  * @function shopOrderHistory
  * @params user_id, shop_id
- * @location body
+ * @location query
  * @return 404 -> error -> server not found mssg
  * @return 400 -> error -> text
  * @return 200 -> json

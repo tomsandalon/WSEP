@@ -10,6 +10,9 @@ import {
     ProductNameEmpty
 } from "./ErrorMessages";
 import {Purchase_Type} from "../Shop/ShopInventory";
+import {Rating} from "./Rating";
+
+
 
 export interface Product {
     readonly product_id: number
@@ -19,6 +22,7 @@ export interface Product {
     category: Category[]
     price: number // >= 0
     purchase_type: Purchase_Type
+    rating: Rating
 
     /**
      * @Requirement - Quality assurance No. 5a
@@ -100,6 +104,8 @@ export interface Product {
      * @return AmountNonPositiveValue otherwise
      */
     returnAmount(amount: number): string | boolean;
+
+    rate(rating: number): void
 }
 
 export class ProductImpl implements Product{
@@ -114,6 +120,8 @@ export class ProductImpl implements Product{
     private _description: string;
     private _name: string;
     private _purchase_type: Purchase_Type;
+    private _rating = new Rating();
+
     private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
         this._base_price = base_price;
         this._description = description;
@@ -255,8 +263,17 @@ export class ProductImpl implements Product{
         return true;
     }
 
+
+    get rating(): Rating {
+        return this._rating;
+    }
+
+    rate(rating: number): void {
+        if (0 <= rating && rating <= 5) this.rating.add_rating(rating)
+    }
+
     public toString(){
         return JSON.stringify(this)
-        // return `Product id: ${this._product_id}\tName: ${this._name}\tAvailableAmount: ${this._amount}\tBase price: ${this._base_price}\nCategories:\n${this.category.reduce((acc, category) => acc + category.name + "\n", "")}`
+
     }
 }

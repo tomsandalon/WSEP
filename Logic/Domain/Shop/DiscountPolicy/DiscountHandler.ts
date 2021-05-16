@@ -66,8 +66,13 @@ export class DiscountHandler {
         return true
     }
 
+    private static roundHalf(num: number) {
+        return Math.round(num*2)/2;
+    }
+
     calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData) {
-        return products.reduce((acc, cur) =>
+        const result = products.reduce((acc, cur) =>
             acc + (cur.amount * cur.original_price * (1 - this.evaluateDiscount(cur, cur.amount))), 0)
+        return DiscountHandler.roundHalf(result)
     }
 }

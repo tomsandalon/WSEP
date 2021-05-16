@@ -198,6 +198,10 @@ export interface Shop {
     getPermissions(user_email: string): string | string[];
 
     getAllCategories(): string | string[];
+
+    removePermission(user_email: string, target_email: string, action: Action): string | boolean;
+
+    rateProduct(user_email: string, product_id: number, rating: number): string | boolean;
 }
 
 export class ShopImpl implements Shop {
@@ -396,6 +400,17 @@ export class ShopImpl implements Shop {
             return ret
         }
         const error = `Failed to grant ${permissions.map(p => Action[p])} to ${appointee_email} by ${appointer_email}. ${ret}`
+        logger.Error(error)
+        return error;
+    }
+
+    removePermission(appointer_email: string, appointee_email: string, permission: Action): string | boolean {
+        const ret = this._management.removePermission(appointer_email, appointee_email, permission);
+        if (typeof ret == "boolean") {
+            logger.Info(`Permissions ${permission} removed from ${appointee_email} by ${appointer_email}`)
+            return ret
+        }
+        const error = `Failed to remove permission ${permission} from ${appointee_email} by ${appointer_email}. ${ret}`
         logger.Error(error)
         return error;
     }
@@ -629,5 +644,14 @@ export class ShopImpl implements Shop {
 
     getAllCategories(): string | string[] {
         return this.inventory.getAllItems().flatMap(item => item.category.map(c => c.name))
+    }
+
+    rateProduct(user_email: string, product_id: number, rating: number): string | boolean {
+        if (!this.inventory.getAllItems().some(p => p.product_id == product_id)) {
+            logger.Error(`${user_email} attempted to rate a non existing product ${product_id}`)
+            return `${user_email} attempted to rate a non existing product ${product_id}`
+        }
+        this.inventory.rateProduct(product_id, rating)
+        return true;
     }
 }
