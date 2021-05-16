@@ -12,6 +12,7 @@ class Navigation extends Component {
         errorMsg:'',
         visible:false,
         successVisible:false,
+        loggedUser:false,
     }
 handleLogout = () => {
     const requestOptions = {
@@ -24,7 +25,7 @@ handleLogout = () => {
             switch (response.status) {
                 case 200: //welcome
                     console.log("logout suc", response.status);
-                    localStorage.removeItem("loggedUser");
+                    sessionStorage.removeItem("loggedUser");
                     //this.setState({errorMsg:"Logged out sucessfully",visible:true})
                     //this.onShowAlert();
                     window.location.reload("/home")
@@ -32,7 +33,7 @@ handleLogout = () => {
                 case 400:
                     const err_message = await response.text();
                     //this.setState({errorMsg:err_message,visible:true})
-                    localStorage.removeItem("loggedUser");
+                    sessionStorage.removeItem("loggedUser");
                     console.log("errorMsg");
                     window.location.reload("/home")
                     break;
@@ -43,6 +44,31 @@ handleLogout = () => {
             }
         }
     )
+}
+isUser = () => {
+    const requestOptions = {
+        method: "GET",
+        headers: { "Content-Type": "application/json",
+                    'Cookie': document.cookie},
+    };
+    fetch("/user/is/loggedin", requestOptions)
+        .then(async response => {
+            switch(response.status){
+                case 200:
+                    let value = await response.text();
+                    value = value === "true" ? true : false;
+                    this.setState({loggedUser:value})
+                    // return value;
+                    break;
+                default:
+                    this.setState({loggedUser:false})
+                    // return false;
+                    break;       
+            }
+        });
+}
+componentDidMount() {
+    this.isUser();
 }
 handleClick = () =>{
     this.setState({clicked:!this.state.clicked})
@@ -65,7 +91,7 @@ toggle(){
                     <i className={this.state.clicked ? 'fas fa-times' : 'fas fa-bars'}></i>
                 </div>
                 <ul className={this.state.clicked ? 'nav-menu active':'nav-menu'}>
-                    {localStorage.getItem('loggedUser') === "Guest" && MenuItems.map((item,index) => {
+                    {!this.state.loggedUser && MenuItems.map((item,index) => {
                         return(
                         <li key={index}><a className={item.cName} href={item.url}>
                             {item.title}
@@ -77,15 +103,15 @@ toggle(){
                             MyCart
                             </a>
                         </li>
-                        {localStorage.getItem('loggedUser') === "LoggedIn" && <li key={103}>
+                        {this.state.loggedUser && <li key={103}>
                         <a className="nav-links cartButton2 btn-primary btn-sm" href="/user-history">
                             Purchase History</a>
                         </li>}    
-                        {localStorage.getItem('loggedUser') === "LoggedIn" && <li key={102}>
+                        {this.state.loggedUser && <li key={102}>
                         <a className="nav-links cartButton btn-primary btn-sm" href="/roles">
                             Roles</a>
                         </li>}
-                        {localStorage.getItem('loggedUser') === "LoggedIn" && <li key={100}><a className="nav-links cartButton btn-primary btn-sm" onClick={this.handleLogout}>
+                        {this.state.loggedUser && <li key={100}><a className="nav-links cartButton btn-primary btn-sm" onClick={this.handleLogout}>
                         Logout</a>
                         <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                         <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>

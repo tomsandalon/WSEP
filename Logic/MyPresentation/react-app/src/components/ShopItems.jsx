@@ -65,7 +65,7 @@ class ShopItems extends Component {
         });
     };
     openSession = () => {
-    if (localStorage.getItem("loggedUser") == null) {
+    if (sessionStorage.getItem("loggedUser") == null) {
         const requestOptions = {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -73,7 +73,7 @@ class ShopItems extends Component {
         fetch("/guest", requestOptions).then(async (response) => {
         switch (response.status) {
             case 200: //welcome
-            localStorage.setItem("loggedUser","Guest")
+            sessionStorage.setItem("loggedUser","Guest")
             break;
             case 404:
             const err_message = await response.text();
