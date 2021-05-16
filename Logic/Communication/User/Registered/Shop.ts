@@ -83,7 +83,7 @@ router.get(shop_purchase_history, (request: any, response: any) => {
         response.end()
         return
     }
-    const result = service.shopOrderHistory(user_id, request.body.shop_id);
+    const result = service.shopOrderHistory(user_id, request.query.shop_id);
     if(typeof result == "string") {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
