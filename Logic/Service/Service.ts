@@ -28,6 +28,8 @@ export class Service {
         this._system.performRegister("Mark@gmail.com", "123456")
         this._system.performRegister("TomAndSons@gmail.com", "123456") // Owner
         this._system.performRegister("Tomer@gmail.com", "123456") // Manager
+        this._system.performRegister("a@gmail.com", "123456")
+        this._system.performRegister("b@gmail.com", "123456")
 
         const tom_id = this._system.performLogin("TomAndSons@gmail.com", "123456")
         if (typeof tom_id === "string")

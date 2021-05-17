@@ -3,9 +3,9 @@ const postFetch = (url, toStringify, thenFunc) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Cookie": document.cookie,
-      body: JSON.stringify(toStringify),
+      'Cookie': document.cookie,
     },
+    body: JSON.stringify(toStringify),
   };
   fetch(url, requestOptions).then((response) => thenFunc(response));
 };

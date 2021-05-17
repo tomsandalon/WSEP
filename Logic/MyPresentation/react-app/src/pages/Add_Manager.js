@@ -10,7 +10,6 @@ const AddManager = () => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-  console.log(storeID);
 
   const success = () => {
     setError("Manager Added Successfully");
@@ -29,11 +28,8 @@ const AddManager = () => {
     e.preventDefault();
     const newManager = { shop_id: storeID, email: newManagerEmail };
     setIsPending(true);
-    postFetch(
-      "/user/shop/ownership/assign/manager",
-      { email: newManager.email, shop_id: storeID },
-      thenFunc
-    );
+    console.log(newManager);
+    postFetch("/user/shop/ownership/assign/manager", newManager, thenFunc);
   };
   const thenFunc = async (response) => {
     setIsPending(false);
