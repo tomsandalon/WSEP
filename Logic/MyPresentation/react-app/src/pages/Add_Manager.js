@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
 import postFetch from "../postFetch.js";
+import { Alert } from "reactstrap";
 
 const AddManager = () => {
   const { storeID } = useParams();
@@ -11,6 +12,7 @@ const AddManager = () => {
   const [visible, setVisible] = useState(false);
   const history = useHistory();
 
+  const onDismiss = () => setVisible(false);
   const success = () => {
     setError("Manager Added Successfully");
     setVisible(true);
@@ -18,7 +20,6 @@ const AddManager = () => {
     history.push(`/managersStore/${storeID}`);
   };
   const failure401 = (err_message) => {
-    console.log(err_message);
     setError(err_message);
     setVisible(true);
     setIsPending(false);
@@ -54,9 +55,13 @@ const AddManager = () => {
           <option value="Permission1"> Permission1 </option>
           <option value="Permission2">Permission2</option>
         </select> */}
-        {!isPending && <button>Add Manager</button>}
+        {/* {!isPending && <button>Add Manager</button>} */}
+        {!isPending && <input type="submit" value="Add Manager"/>}
         {isPending && <button diabled>Adding manager...</button>}
       </form>
+      <Alert color="danger" isOpen={visible} toggle={onDismiss}>
+        {error}
+      </Alert>
     </div>
   );
 };

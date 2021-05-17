@@ -9,7 +9,6 @@ const serverResponse = async (response, success, failure401) => {
       break;
     case 404:
       return "404";
-      break;
     default:
       break;
   }

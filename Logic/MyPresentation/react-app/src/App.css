@@ -92,6 +92,15 @@
   text-align: left;
   display: block;
 }
+/* .default-table{
+  background-color: #ddd;
+}
+.table-sm{
+  background-color: #ddd;
+}
+.full-table{
+  background-color: #ddd;
+} */
 .add-manager h2 {
   font-size: 20px;
   color: #3557f1;
@@ -108,8 +117,8 @@
   display: block;
 }
 .add-manager button {
-  background: #3557f1;
-  color: #fff;
+  /* background: #3557f1;
+  color: #fff; */
   border: 0;
   padding: 8px;
   border-radius: 8px;
@@ -135,5 +144,5 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }

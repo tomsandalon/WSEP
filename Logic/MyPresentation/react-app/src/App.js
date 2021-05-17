@@ -47,10 +47,10 @@ function App() {
             <AddManager />
           </Route>
           <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={false} path="/payment" component={Payment} />
-          <Route path="/addstore/:managerID">
+          <Route path="/addstore">
             <AddStore />
           </Route>
-          <Route path="/managersStore/:storeID">
+          <Route path="/managersStore/:storeID/:name">
             <ManagersStore />
           </Route>
         </Switch>

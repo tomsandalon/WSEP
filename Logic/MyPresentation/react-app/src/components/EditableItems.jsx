@@ -4,6 +4,7 @@ import EditableItem from "./EditableItem";
 
 const EditableItems = (props) => {
   const items = props.items;
+  console.log(items); //TODO access item fields!
   return (
     <div class="container">
       <div className="jr-card">
