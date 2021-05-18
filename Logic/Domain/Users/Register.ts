@@ -1,16 +1,16 @@
 import {Authentication} from "./Authentication";
-import {StringPair} from "./StringPair";
+import {UserInfoTrio} from "./UserInfoTrio";
 import {logger} from "../Logger";
 
 export interface Register {
-    registered_users: StringPair[]
-    register(user_email: string, password: string): boolean
+    registered_users: UserInfoTrio[]
+    register(user_email: string, password: string, age?: number): boolean
     loginVerification(user_email:string, hashed_password:string):boolean
 }
 
 export class RegisterImpl implements Register{
     private _password_handler: Authentication
-    private readonly _registered_users: StringPair[]
+    private readonly _registered_users: UserInfoTrio[]
     private static instance: RegisterImpl;
 
     private constructor() {
@@ -48,13 +48,14 @@ export class RegisterImpl implements Register{
      * Saves the newly registered user in the registered user's list.
      * @param user_email
      * @param password
+     * @param age
      * @return true if the user's email password is unique and valid.
      */
-    register(user_email: string, password: string): boolean {
+    register(user_email: string, password: string, age?: number): boolean {
         if(this.validateEmail(user_email))
         {
             const hashed_password = this._password_handler.hash(password);
-            this._registered_users.push(new StringPair(user_email, hashed_password))
+            this._registered_users.push(new UserInfoTrio(user_email, hashed_password, age))
             return true;
         }
         return false;
@@ -88,7 +89,7 @@ export class RegisterImpl implements Register{
         return this.alreadyExists(user_email);
     }
 
-    get registered_users(): StringPair[]{
+    get registered_users(): UserInfoTrio[]{
         return this._registered_users
     }
 

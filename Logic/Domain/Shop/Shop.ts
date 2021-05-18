@@ -201,7 +201,7 @@ export interface Shop {
 
     removePermission(user_email: string, target_email: string, action: Action): string | boolean;
 
-    rateProduct(user_email: string, product_id: number, rating: number): string | boolean;
+    rateProduct(user_email: string, user_id: number, product_id: number, rating: number): string | boolean;
 }
 
 export class ShopImpl implements Shop {
@@ -646,12 +646,20 @@ export class ShopImpl implements Shop {
         return this.inventory.getAllItems(true).flatMap(item => item.category.map(c => c.name))
     }
 
-    rateProduct(user_email: string, product_id: number, rating: number): string | boolean {
+    rateProduct(user_email: string, user_id: number, product_id: number, rating: number): string | boolean {
         if (!this.inventory.getAllItems(true).some(p => p.product_id == product_id)) {
             logger.Error(`${user_email} attempted to rate a non existing product ${product_id}`)
             return `${user_email} attempted to rate a non existing product ${product_id}`
         }
-        this.inventory.rateProduct(product_id, rating)
+        if (!this.inventory.hasPurchased(user_id, product_id)) {
+            logger.Error(`${user_email} attempted to rate product ${product_id} which it never purchased`)
+            return `${user_email} attempted to rate product ${product_id} which it never purchased`
+        }
+        if (this.inventory.alreadyRated(product_id, user_email)) {
+            logger.Error(`${user_email} already rated product ${product_id}`)
+            return `${user_email} already rated product ${product_id}`
+        }
+        this.inventory.rateProduct(product_id, rating, user_email)
         return true;
     }
 }

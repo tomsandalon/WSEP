@@ -6,7 +6,7 @@ import {ShopInventory} from "../Shop/ShopInventory";
 import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/PaymentHandler";
 import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {BasketDoesntExists} from "../ProductHandling/ErrorMessages";
-
+const LEGAL_DRINKING_AGE = 18
 export let id_counter: number = 0;
 const generateId = () => id_counter++;
 
@@ -42,7 +42,7 @@ export class UserImpl implements User {
 
     static resetIDs = () => id_counter = 0
 
-    constructor(user_email?:string, password?:string, is_admin?:boolean) {
+    constructor(user_email?:string, password?:string, is_admin?:boolean, age?: number) {
         if(user_email != undefined && password != undefined && is_admin != undefined) {
             this._user_email = user_email;
             this._password = password;
@@ -59,7 +59,7 @@ export class UserImpl implements User {
         this._order_history = UserPurchaseHistoryImpl.getInstance();
         this._user_id = generateId();
         this._payment_handler = PaymentHandlerImpl.getInstance();
-        this._underaged = false;
+        this._underaged = (age) ? age < LEGAL_DRINKING_AGE : false;
     }
 
     /**

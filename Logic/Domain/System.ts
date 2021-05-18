@@ -26,7 +26,7 @@ export interface System{
 
     openSession(): number
     closeSession(user_id: number): void
-    performRegister(user_email:string, password: string): boolean
+    performRegister(user_email:string, password: string, age?: number): boolean
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
     logout(user_id: number): string | boolean
@@ -303,8 +303,8 @@ export class SystemImpl implements System {
         return this._login.guestLogin();
     }
 
-    performRegister(user_email:string, password: string): boolean {
-        return this._register.register(user_email,password)
+    performRegister(user_email:string, password: string, age?: number): boolean {
+        return this._register.register(user_email,password, age)
     }
 
     userOrderHistory(user_id: number): string | string[] {
@@ -613,6 +613,6 @@ export class SystemImpl implements System {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
-        return shop.rateProduct(user_email, product_id, rating)
+        return shop.rateProduct(user_email, user_id, product_id, rating)
     }
 }
