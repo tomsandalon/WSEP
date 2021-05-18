@@ -8,6 +8,7 @@ class OrderHistory extends Component {
 			<main className="col-md-8">
             <h1>Order ID: {this.props.order_id}</h1>
 			{this.props.products.map(product => 
+            // console.log("product>>>",product)
 				<OrderItem img={Image}
                 shop_id={this.props.shop_id}
                 shop_name={this.props.shop_name}
@@ -15,7 +16,10 @@ class OrderHistory extends Component {
                 product_id={product._product_id}
                 item_name={product._name}
                 item_desc={product._description} 
-                price={product._actual_price}/>
+                price={product._actual_price}
+                rating={1}
+                refreshHistory={this.props.refreshHistory}
+                />
             )
             }
 		</main> 

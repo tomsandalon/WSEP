@@ -32,16 +32,6 @@ class UserHistory extends Component {
 								}
 								return temp;
 							});
-							// cart = baskets.map(basket => {
-							// 	const temp ={
-							// 		basket_id:JSON.parse(basket).basket_id,
-							// 		shop_id:JSON.parse(basket).shop.id,
-							// 		shop_name:JSON.parse(basket).shop.name,
-							// 		products:JSON.parse(basket).products,
-							// 	}
-							// 	return temp;
-							// 	// JSON.parse(basket).products.forEach(product => console.log(product))
-							// })
 							this.setState({userHistory:userHistory})
 						}
 						)
@@ -65,7 +55,7 @@ class UserHistory extends Component {
             <div className="row">
 					{this.state.userHistory.length === 0 ? <div className="col-4"><h1>Shopping history is empty!</h1></div> : 
 					this.state.userHistory.map(purchase => 
-					<OrderUser order_id={purchase.order_id} shop_name={purchase.shop_name} shop_id={purchase.shop_id} products={purchase.products}/>
+					<OrderUser refreshHistory={this.refreshHistory} order_id={purchase.order_id} shop_name={purchase.shop_name} shop_id={purchase.shop_id} products={purchase.products}/>
 					)}
 				</div>
         )

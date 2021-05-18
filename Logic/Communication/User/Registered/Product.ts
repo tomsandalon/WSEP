@@ -1,4 +1,14 @@
-import {assign_manager, assign_owner, service, Session, sid} from "../../Config/Config";
+import {
+    assign_manager,
+    assign_owner,
+    BadRequest,
+    OK,
+    rate,
+    ServerNotFound,
+    service,
+    Session,
+    sid
+} from "../../Config/Config";
 import {route_shop_manage_product} from "../../Routes";
 const express = require('express');
 const router = express.Router();
@@ -7,7 +17,7 @@ module.exports = router;
 router.delete('/', (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
-        response.status(404);
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
@@ -18,7 +28,7 @@ router.delete('/', (request: any, response: any) => {
         response.status(400);
         response.send(result.toString());
     } else {
-        response.status(200);
+        response.status(OK);
     }
     response.end();
 })
@@ -26,7 +36,7 @@ router.delete('/', (request: any, response: any) => {
 router.put('/', (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
-        response.status(404);
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
@@ -40,10 +50,34 @@ router.put('/', (request: any, response: any) => {
     );
     response.setHeader("Content-Type", "text/html");
     if (typeof result === 'string') {
-        response.status(400);
+        response.status(BadRequest);
         response.send(result.toString());
     } else {
-        response.status(200);
+        response.status(OK);
+    }
+    response.end();
+})
+
+router.put(rate, (request: any, response: any) => {
+    const user_id = Session.sessions[request.cookies[sid]];
+    if (user_id == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const result = service.rateProduct(
+        user_id,
+        request.body.shop_id,
+        request.body.product_id,
+        request.body.rating,
+    );
+    response.setHeader("Content-Type", "text/html");
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+        response.send(result.toString());
+    } else {
+        response.status(OK);
     }
     response.end();
 })
@@ -51,7 +85,7 @@ router.put('/', (request: any, response: any) => {
 router.post('/', (request: any, response: any) => {
     const user_id = Session.sessions[request.cookies[sid]];
     if (user_id == undefined) {
-        response.status(404);
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
@@ -66,11 +100,11 @@ router.post('/', (request: any, response: any) => {
         request.body.base_price,
         );
     if (typeof result === 'string') {
-        response.status(400);
+        response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
-        response.status(200);
+        response.status(OK);
         response.end();
     }
 })

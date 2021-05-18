@@ -110,8 +110,8 @@ toggle(){
                         <a className="nav-links cartButton btn-primary btn-sm" href="/roles">
                             Roles</a>
                         </li>}
-                        {this.state.loggedUser && <li key={100}><a className="nav-links cartButton btn-primary btn-sm" onClick={this.handleLogout}>
-                        Logout</a>
+                        {this.state.loggedUser && <li key={100}><button className="nav-links cartButton btn-dark btn-sm" onClick={this.handleLogout}>
+                        Logout</button>
                         <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                         <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                         </li>}

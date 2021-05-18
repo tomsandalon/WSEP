@@ -52,7 +52,7 @@ class ShopItems extends Component {
             const products = products_string.map((product) =>
             JSON.parse(product)
             );
-            // console.log("products shop",products)
+            console.log("products shop",products)
             // products.forEach(product => product._category.forEach(cat => console.log(cat._name)))
             const shopInfo = {
             id: tempShop.shopID,
@@ -101,7 +101,7 @@ componentDidMount(){
                             {((this.state.shopsInfo !== null) && (this.state.shopsInfo.length !== 0)) &&
                             (this.state.shopsInfo.map(shop =>
                                     shop.products.map(item =>
-                                        <ItemOfShop productID={item._product_id} shopID={shop.id} shopName={shop.name} name={item._name} available="Available" amount={item._amount} price={item._base_price}/>
+                                        <ItemOfShop rating={item._rating.number_of_rating} productID={item._product_id} shopID={shop.id} shopName={shop.name} name={item._name} available="Available" amount={item._amount} price={item._base_price}/>
                                     )
                             ))}
                         </div>   

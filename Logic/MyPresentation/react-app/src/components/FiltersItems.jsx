@@ -91,7 +91,7 @@ class FiltersItems extends Component {
             <h6 className="title">Filter by rating</h6>
 		</header>
         <input type="text" className="btnRating form-control" placeholder="Rating 1 - 5" onChange={this.handleCategoies}/>
-        <button className="btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button> 
+        <button className="btn-primary" type="button"><i className="fas fa-star" onClick={() => this.props.handleFilter(this.state)}></i></button> 
     </article>
 </div> 
 </output>

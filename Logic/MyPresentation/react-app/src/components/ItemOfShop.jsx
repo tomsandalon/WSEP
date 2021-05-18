@@ -2,6 +2,7 @@ import React, { Component} from 'react';
 import Image from './images/shirt.jpg';
 import {Alert} from 'reactstrap';
 import './Product.css';
+import Rating from 'react-rating';
 class ItemOfShop extends Component {
 
     state = {
@@ -67,7 +68,7 @@ class ItemOfShop extends Component {
                             <h6>Product Name: {this.props.name}(ID:{this.props.productID})</h6>
                             <h6>Amount: {this.props.amount}</h6>
                             <h6>Price: {this.props.price}</h6>
-                            <h6>{this.props.available}</h6>
+                            <Rating readonly={true} placeholderRating={this.props.rating}></Rating>
                             <input type="number" className="amount form-control" placeholder="Amount:" onChange={this.handleAmount}/>
                             <button className="btn btn-primary btn-sm" onClick={this.handleAddToCart}> Add to cart 
                                 <i className="fa fa-shopping-cart"></i> 

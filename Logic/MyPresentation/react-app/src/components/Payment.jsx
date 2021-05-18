@@ -11,7 +11,8 @@ class Payment extends Component {
             successVisible:false,
             errorMsg:''
         };
-    };
+    }
+
     //purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string)
     handleName = (event) => {this.setState({name:event.target.value})};
     handleCard = (event) => {this.setState({cardNo:event.target.value});}
@@ -34,12 +35,12 @@ class Payment extends Component {
             .then(async response => {
                 switch (response.status) {
                     case 200: //welcome
-                        console.log("sucesss>>>")
-                        // this.props.refreshCart();
+                        // console.log("sucesss>>>")
+                        this.props.refreshCart();
                         break;
                     case 400:
                         const err_message_fail = await response.text();
-                        console.log("payment error>>>>>>>>",err_message_fail);        
+                        this.props.handleFailedPayment(err_message_fail);
                         break;
                     case 404: //server not found
                         break;
@@ -59,8 +60,8 @@ class Payment extends Component {
                     <input type="text" className="pay fadeIn second" placeholder="Ex. John Smith" onChange={this.handleName}/>
                     <input type="text" className="pay fadeIn third" placeholder="Card No." onChange={this.handleCard}/>
                     <input type="text" className="pay fadeIn third" placeholder="MM/YY/CVV" onChange={this.handleData}/>
-                    <button type="submit" class="pay2 btn btn-primary" onClick={this.handleSubmit}>Pay</button>
-                    <button type="submit" class="pay2 btn btn-primary" onClick={() => this.props.cancelPayment}>Cancel</button>
+                    <button type="button" class="pay2 btn btn-primary" onClick={this.handleSubmit}>Pay</button>
+                    <button type="button" class="pay2 btn btn-primary" onClick={() => this.props.cancelPayment()}>Cancel</button>
                   </form>
             </div>
         </div> 

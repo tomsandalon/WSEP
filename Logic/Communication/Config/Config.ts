@@ -24,6 +24,7 @@ export const Unauthorized = 401;
 export const ServerNotFound = 404;
 export const OK = 200;
 
+export const rate = '/rate'
 export const categories = '/categories'
 export const assign_manager = '/assign/manager'
 export const assign_owner = '/assign/owner'

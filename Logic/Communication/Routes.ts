@@ -1,4 +1,4 @@
-import {assign_manager, assign_owner, categories, purchase_cart, shop_purchase_history} from "./Config/Config";
+import {assign_manager, assign_owner, categories, purchase_cart, rate, shop_purchase_history} from "./Config/Config";
 
 export const route_notifications = "/"
 export const route_guest = "/guest"
@@ -57,3 +57,14 @@ export const route_shop_ownership_assign_owner = route_shop_ownership + assign_o
  * @return 200 -> json
  */
 export const route_shop_purchase_history = route_shop + shop_purchase_history
+
+/**
+ * @method PUT
+ * @function rateProduct
+ * @params user_id, shop_id, product_id, rating
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> OK
+ */
+export const route_shop_manage_product_rating = route_shop_manage_product + rate;
