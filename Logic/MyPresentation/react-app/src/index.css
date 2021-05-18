@@ -287,7 +287,9 @@ input[type=email]:placeholder {
   margin-top: 10px;
 }
 /* ANIMATIONS */
-
+.edit{
+  padding-bottom: 200px;
+}
 /* Simple CSS3 Fade-in-down Animation */
 .fadeInDown {
   -webkit-animation-name: fadeInDown;

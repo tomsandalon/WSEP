@@ -1,5 +1,5 @@
 import {purchase_cart, service, Session, sid} from "../Config/Config";
-import {request} from "express";
+import {request, response} from "express";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -42,6 +42,7 @@ router.post('/', (request: any, response: any) => {
         response.status(400);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
+        response.end()
     } else {
         response.status(200);
         response.end();
