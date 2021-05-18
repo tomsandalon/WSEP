@@ -195,8 +195,8 @@ export class Service {
         return this._system.performLogin(user_email, password)
     }
 
-    performRegister(user_email: string, password: string): boolean {
-        return this._system.performRegister(user_email, password)
+    performRegister(user_email: string, password: string, age: string): boolean {
+        return this._system.performRegister(user_email, password, age.length == 0 || isNaN(Number(age))? undefined : Number(age))
     }
 
     purchaseCart(user_id: number, payment_info: string): string | boolean {

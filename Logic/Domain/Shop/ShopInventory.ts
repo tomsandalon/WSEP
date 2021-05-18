@@ -56,7 +56,7 @@ export interface ShopInventory {
      * @Requirement 2.5
      * @return product list of the items currently sold in the store
      */
-    getAllItems(): Product[]
+    getAllItems(all?: boolean): Product[]
 
     /**
      * @Requirement 2.6
@@ -163,7 +163,11 @@ export interface ShopInventory {
 
     notifyOwners(order: Purchase): void;
 
-    rateProduct(product_id: number, rating: number): void;
+    rateProduct(product_id: number, rating: number, rater: string): void;
+
+    alreadyRated(product_id: number, user_email: string): Boolean;
+
+    hasPurchased(user_id: number, product_id: number): Boolean;
 }
 
 export class ShopInventoryImpl implements ShopInventory {
@@ -271,8 +275,8 @@ export class ShopInventoryImpl implements ShopInventory {
             this.filter(products.filter(passed_filter(filters[0])), filters.slice(1));
     }
 
-    getAllItems(): Product[] {
-        return this.products.filter(p => p.amount > 0);
+    getAllItems(all?: boolean): Product[] {
+        return (all) ? this.products : this.products.filter(p => p.amount > 0);
     }
 
     getShopHistory(): string[] {
@@ -532,10 +536,20 @@ export class ShopInventoryImpl implements ShopInventory {
         )}`)
     }
 
-    rateProduct(product_id: number, rating: number): void {
+    rateProduct(product_id: number, rating: number, rater: string): void {
         const product = this._products.find(p => product_id == p.product_id)
         if (product == undefined) return
-        product.rate(rating)
+        product.rate(rating, rater)
     }
 
+    alreadyRated(product_id: number, user_email: string): Boolean {
+        const product = this._products.find(p => product_id == p.product_id)
+        if (product == undefined) return true
+        return product.alreadyRated(user_email)
+    }
+
+    hasPurchased(user_id: number, product_id: number): Boolean {
+        return (this.purchase_history.getShopPurchases(this.shop_id) as Purchase[]).some(
+            purchase => purchase.products.some(product => product.product_id == product_id) && purchase.minimal_user_data.userId == user_id)
+    }
 }

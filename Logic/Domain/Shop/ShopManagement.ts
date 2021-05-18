@@ -205,8 +205,8 @@ export class ShopManagementImpl implements ShopManagement {
 
         this._managers = this._managers.concat([new ManagerImpl(appointee_email, appointer_email)])
         const original = this.owners.find(o => o.user_email == appointer_email)
-        if (original && original.appointees_emails.every(mail => mail != appointee_email)) {
-            original.appointees_emails = original.appointees_emails.concat([appointee_email])
+        if (original && original.appointees_emails().every(mail => mail != appointee_email)) {
+            original.appointed_managers = original.appointed_managers.concat([appointee_email])
         }
         return true;
     }
@@ -224,7 +224,7 @@ export class ShopManagementImpl implements ShopManagement {
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
         const original = this.owners.find(o => o.user_email == appointer_email)
         if (original) {
-            original.appointees_emails = original.appointees_emails.concat([appointee_email])
+            original.appointed_owners = original.appointed_owners.concat([appointee_email])
         }
         return true;
     }
@@ -248,7 +248,12 @@ export class ShopManagementImpl implements ShopManagement {
         const managers = !(staff_id) ? this._managers :
             this._managers
                 .filter((m) => staff_id.some(id => id == m.user_email));
-        return owners.map(o => o.toString()).concat(managers.map(m => m.toString()))
+        return [
+            JSON.stringify({
+                owners: owners.map(o => o.toString()),
+                managers: managers.map(m => m.toString())
+            })
+        ]
     }
 
     removeManager(appointer_email: string, appointee_email: string): boolean {
@@ -293,7 +298,7 @@ export class ShopManagementImpl implements ShopManagement {
         this._owners = this.owners.filter(o => o.user_email != user_email)
         NotificationAdapter.getInstance().notify(user_email,
             `You have been demoted by ${original}`)
-        owner_to_remove.appointees_emails.forEach(appointee => this.removeAllSubordinates(appointee, original))
+        owner_to_remove.appointees_emails().forEach(appointee => this.removeAllSubordinates(appointee, original))
     }
 
     isOwner(user_email: string) {

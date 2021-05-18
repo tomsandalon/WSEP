@@ -43,8 +43,13 @@ function App() {
           <Route path="/login" render={() => <Login />} />
           <Route path="/managerHome" component={ManagerHome} />
           <Route path="/register" component={Register} />
+<<<<<<< HEAD
           <Route path="/admin-menu" component={AdminMenu} />
           <Route path="/addmanager/:storeID">
+=======
+          <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={true} exact path="/admin-menu" component={AdminMenu} />
+          <Route path="/addmanager/:storeID/:managerOwner/:storeName">
+>>>>>>> 37f3c9f5a0852fb90c420a89a4840cd5dfa5eec9
             <AddManager />
           </Route>
           <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={false} path="/payment" component={Payment} />
