@@ -29,7 +29,7 @@ const AddStore = () => {
   };
   const thenFunc = async (response) => {
     setIsPending(false);
-    const answer = serverResponse(response, success, failure401);
+    serverResponse(response, success, failure401);
   };
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -34,7 +34,7 @@ const AddManager = () => {
   };
   const thenFunc = async (response) => {
     setIsPending(false);
-    const answer = serverResponse(response, success, failure401);
+    serverResponse(response, success, failure401);
   };
   return (
     <div className="add-manager">
@@ -56,7 +56,7 @@ const AddManager = () => {
           <option value="Permission2">Permission2</option>
         </select> */}
         {/* {!isPending && <button>Add Manager</button>} */}
-        {!isPending && <input type="submit" value="Add Manager"/>}
+        {!isPending && <input type="submit" value="Add Manager" />}
         {isPending && <button diabled>Adding manager...</button>}
       </form>
       <Alert color="danger" isOpen={visible} toggle={onDismiss}>

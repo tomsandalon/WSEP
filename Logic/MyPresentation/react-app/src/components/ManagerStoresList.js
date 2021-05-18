@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const ManagerStoresList = (props) => {
   const stores = props.stores;
@@ -13,7 +13,9 @@ const ManagerStoresList = (props) => {
             const parsedStore = JSON.parse(store);
             return (
               <div className="store-preview" key={parsedStore.shop_id}>
-                <Link to={`/managersStore/${parsedStore.shop_id}/${parsedStore.shop_name}`}>
+                <Link
+                  to={`/managersStore/${parsedStore.shop_id}/${parsedStore.shop_name}`}
+                >
                   <h3>{parsedStore.shop_name} </h3>
                   {/* <p> {store.description}</p> */}
                 </Link>

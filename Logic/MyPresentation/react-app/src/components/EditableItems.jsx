@@ -10,14 +10,17 @@ const EditableItems = (props) => {
       <div className="jr-card">
         {/* <div className="jr-card-header d-flex align-items-center"></div> */}
         <div class="row">
-          {items.map((item, _) => (
-            <EditableItem
-              name={item.name}
-              available={item.available}
-              amount={item.amount}
-              price={item.price}
-            />
-          ))}
+          {items.map((item, _) => {
+            const parsedItem = JSON.parse(item);
+            return (
+              <EditableItem
+                name={parsedItem.name}
+                available={parsedItem.available}
+                amount={parsedItem.amount}
+                price={parsedItem.price}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

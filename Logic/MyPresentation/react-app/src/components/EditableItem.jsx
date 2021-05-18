@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Image from "./images/shirt.jpg";
 import "./Product.css";
 const EditableItem = (props) => {
