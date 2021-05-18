@@ -15,7 +15,7 @@ const router = express.Router();
 module.exports = router;
 
 router.delete('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -34,7 +34,7 @@ router.delete('/', (request: any, response: any) => {
 })
 
 router.put('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -59,7 +59,7 @@ router.put('/', (request: any, response: any) => {
 })
 
 router.put(rate, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -83,7 +83,7 @@ router.put(rate, (request: any, response: any) => {
 })
 
 router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')

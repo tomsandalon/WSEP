@@ -1,5 +1,4 @@
 import {service, Session, sid} from "../Config/Config";
-import {io} from "../Server";
 
 const fs = require('fs');
 const path = require('path');
@@ -12,8 +11,4 @@ router.get('/',(request: any, response: any) => {
     response.setHeader("Content-Type", "application/json");
     response.json(service.displayShops());
     response.end();
-})
-io.on('connection', (socket: any) =>{
-    console.log('New web socket connection')
-    socket.emit('Message', 'Welcome')
 })

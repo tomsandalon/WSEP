@@ -1,6 +1,6 @@
 import {Notification} from "./Notification";
 
-export interface NotificationPool {
+export interface Publisher {
     notify(user_id: number, notification: Notification): void;
     notifyAll(user_id: number, notifications: Notification[]): void;
     notifyThem(collection: {[userid: number]: Notification}): void;

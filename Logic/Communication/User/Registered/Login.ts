@@ -4,7 +4,7 @@ const router = express.Router();
 module.exports = router;
 
 router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')
@@ -18,7 +18,7 @@ router.post('/', (request: any, response: any) => {
         response.send(user_id_new);
         return;
     } else {
-        Session.sessions[request.cookies[sid]] = user_id_new;
+        Session.sessions[request.cookies[sid]].user_id = user_id_new;
         response.status(200);
         response.end();
     }

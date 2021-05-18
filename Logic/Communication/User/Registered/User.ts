@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -23,7 +23,7 @@ router.get('/', (request: any, response: any) => {
     response.end();
 })
 router.get('/permissions', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -43,7 +43,7 @@ router.get('/permissions', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/loggedin', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -57,7 +57,7 @@ router.get('/is/loggedin', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/admin', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.setHeader("Content-Type", "text/html");
         response.status(ServerNotFound);
@@ -72,7 +72,7 @@ router.get('/is/admin', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/owner', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -86,7 +86,7 @@ router.get('/is/owner', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/manager', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')

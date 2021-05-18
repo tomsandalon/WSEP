@@ -1,19 +1,18 @@
 import { Notification } from "./Notification";
-import {NotificationPool} from "./NotificationPool";
-
-export class NotificationPoolImpl implements NotificationPool{
-    private static instance: NotificationPoolImpl;
+import {Publisher} from "./Publisher";
+import * as P from  '../../Service/Publisher';
+export class PublisherImpl implements Publisher{
+    private static instance: PublisherImpl;
     private readonly notificationQueue: {[user_id: number]: Notification[]};
-
     private constructor() {
         this.notificationQueue = {};
     }
 
-    public static getInstance(): NotificationPoolImpl{
-        if(NotificationPoolImpl.instance == undefined){
-            NotificationPoolImpl.instance = new NotificationPoolImpl();
+    public static getInstance(): PublisherImpl{
+        if(PublisherImpl.instance == undefined){
+            PublisherImpl.instance = new PublisherImpl();
         }
-        return NotificationPoolImpl.instance;
+        return PublisherImpl.instance;
     }
 
     fetchNotifications(user_id: number): Notification[] {
@@ -28,6 +27,7 @@ export class NotificationPoolImpl implements NotificationPool{
         } else {
             this.notificationQueue[user_id] = [notification]
         }
+        P.Publisher.getInstance().notify(user_id)
     }
 
     getNotifications(user_id: number): Notification[]{

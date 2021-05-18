@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/history/user', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -24,7 +24,7 @@ router.get('/history/user', (request: any, response: any) => {
     response.end();
 })
 router.get('/history/shop', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -45,7 +45,7 @@ router.get('/history/shop', (request: any, response: any) => {
     response.end();
 })
 router.get('/users', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')

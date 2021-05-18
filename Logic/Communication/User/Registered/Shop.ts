@@ -12,7 +12,7 @@ const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
     console.log("in shop");
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -37,7 +37,7 @@ router.get('/', (request: any, response: any) => {
 })
 
 router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -56,7 +56,7 @@ router.post('/', (request: any, response: any) => {
 })
 
 router.get(categories, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
@@ -77,7 +77,7 @@ router.get(categories, (request: any, response: any) => {
     response.end();
 })
 router.get(shop_purchase_history, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')

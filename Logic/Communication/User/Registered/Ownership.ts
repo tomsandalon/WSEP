@@ -4,7 +4,7 @@ const router = express.Router();
 module.exports = router;
 
 router.post(assign_manager, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')
@@ -23,7 +23,7 @@ router.post(assign_manager, (request: any, response: any) => {
 })
 
 router.post(assign_owner, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')
@@ -42,7 +42,7 @@ router.post(assign_owner, (request: any, response: any) => {
 })
 
 router.delete(assign_manager, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')
@@ -61,7 +61,7 @@ router.delete(assign_manager, (request: any, response: any) => {
 })
 
 router.delete(assign_owner, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')
@@ -80,7 +80,7 @@ router.delete(assign_owner, (request: any, response: any) => {
 })
 
 router.post(assign_manager + permissions, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')
@@ -99,7 +99,7 @@ router.post(assign_manager + permissions, (request: any, response: any) => {
 })
 
 router.put(assign_manager + permissions, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')
@@ -119,7 +119,7 @@ router.put(assign_manager + permissions, (request: any, response: any) => {
 
 
 router.delete(assign_manager + permissions, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
+    const user_id = Session.sessions[request.cookies[sid]].user_id;
     if (user_id == undefined) {
         response.status(404);
         response.send('Bad session id')

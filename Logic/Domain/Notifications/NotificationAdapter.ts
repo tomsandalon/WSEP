@@ -1,11 +1,11 @@
-import {NotificationPool} from "./NotificationPool";
-import {NotificationPoolImpl} from "./NotificationPoolImpl";
+import {Publisher} from "./Publisher";
+import {PublisherImpl} from "./PublisherImpl";
 import {Notification} from "./Notification";
 import {Login, LoginImpl} from "../Users/Login";
 import {pool} from "async-parallel";
 
 export class NotificationAdapter {
-    notificationPool: NotificationPool
+    notificationPool: Publisher
     login: Login
     private static instance: NotificationAdapter
 
@@ -18,7 +18,7 @@ export class NotificationAdapter {
 
     private constructor(reset?: boolean) {
         this.login = LoginImpl.getInstance()
-        this.notificationPool = NotificationPoolImpl.getInstance()
+        this.notificationPool = PublisherImpl.getInstance()
     }
 
     notify(user_email: string, notification: string): void {
