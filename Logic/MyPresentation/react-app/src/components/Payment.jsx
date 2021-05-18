@@ -10,14 +10,15 @@ class Payment extends Component {
             data:'',
             successVisible:false,
             errorMsg:''
-        }
-    }
+        };
+    };
     //purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string)
-    handleName = (event) => {this.setState({name:event.target.value});} 
+    handleName = (event) => {this.setState({name:event.target.value})};
     handleCard = (event) => {this.setState({cardNo:event.target.value});}
-    handleData = (event) => {this.setState({data:event.target.value});}
-    handleSubmit = (event) => 
-    {
+    handleData = (event) => {this.setState({data:event.target.value});
+    console.log(this.state.name+this.state.cardNo +this.state.data);
+}
+    handleSubmit = (event) => {
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -26,27 +27,27 @@ class Payment extends Component {
             },
             body: JSON.stringify({
                 shop_id:this.props.shop_id,
-                payment_info:this.state.name+this.state.cardNo+this.state.data
+                payment:this.state.name+this.state.cardNo +this.state.data
             })
         };
         fetch('/purchase',requestOptions)
             .then(async response => {
                 switch (response.status) {
                     case 200: //welcome
-                        this.props.refreshCart();
+                        console.log("sucesss>>>")
+                        // this.props.refreshCart();
                         break;
                     case 400:
                         const err_message_fail = await response.text();
-                        console.log("payment error",err_message_fail);        
+                        console.log("payment error>>>>>>>>",err_message_fail);        
                         break;
                     case 404: //server not found
                         break;
                     default:
                         break;
                 }
-            })
+            });
     }    
-    on
     render() {
         return (
             <div className="wrapper fadeInDown" href="#register">

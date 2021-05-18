@@ -31,10 +31,9 @@ handleLogout = () => {
                     window.location.reload("/home")
                     break;
                 case 400:
-                    const err_message = await response.text();
+                    // const err_message = await response.text();
                     //this.setState({errorMsg:err_message,visible:true})
                     sessionStorage.removeItem("loggedUser");
-                    console.log("errorMsg");
                     window.location.reload("/home")
                     break;
                 case 404: //server not found

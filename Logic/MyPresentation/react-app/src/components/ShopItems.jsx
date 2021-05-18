@@ -23,7 +23,7 @@ class ShopItems extends Component {
           .then((response) => response.json())
           .then((shops) => {
                 let shopsInfo = [];
-                shops.map((shop) => {
+                shops.forEach((shop) => {
                  const tempShop = JSON.parse(shop);
                  const products = tempShop.products;
                 const shopInfo = {
@@ -46,13 +46,13 @@ class ShopItems extends Component {
         .then((response) => response.json())
         .then((shops) => {
         let shopsInfo = [];
-        shops.map((shop) => {
+        shops.forEach((shop) => {
             const tempShop = JSON.parse(shop);
             const products_string = JSON.parse(tempShop.products);
             const products = products_string.map((product) =>
             JSON.parse(product)
             );
-            console.log("products shop",products)
+            // console.log("products shop",products)
             // products.forEach(product => product._category.forEach(cat => console.log(cat._name)))
             const shopInfo = {
             id: tempShop.shopID,

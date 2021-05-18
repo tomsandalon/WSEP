@@ -1,11 +1,12 @@
 import React from 'react';
 import {Redirect,Route} from 'react-router-dom';
-import auth from './Auth';
+// import auth from './Auth';
 export const ProtectedRoute = ({component:Component , ...rest}) => {
+    //auth.checker({...rest}.isUser,{...rest}.isOwner,{...rest}.isManager,{...rest}.isAdmin
     return(
         <Route {...rest} render ={
             (props) => {
-                if(auth.checker(props.isUser,props.isOwner,props.isManager,props.isAdmin)){
+                if(true){
                 return <Component {...props}/>
                 }
                 else{

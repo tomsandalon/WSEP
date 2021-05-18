@@ -1,17 +1,8 @@
 
 class Auth {
-static checker = (isUser,isOwner,isManager,isAdmin) =>{
-    if(isUser && !this.isUser())
-        return false;
-    if(isManager && !this.isManager())
-        return false;
-    if(isOwner && !this.isOwner())
-        return false;
-    if(isAdmin && !this.isAdmin())
-        return false;    
-    return true;
-}
-isUser = () => {
+ 
+static isUser = () =>{
+    console.log("inside user")
     const requestOptions = {
         method: "GET",
         headers: { "Content-Type": "application/json",
@@ -23,6 +14,7 @@ isUser = () => {
                 case 200:
                     let value = await response.text();
                     value = value === "true" ? true : false;
+                    console.log("returning")
                     return value;
                 default:
                     return false;
@@ -82,6 +74,18 @@ isAdmin = () => {
                     return false;
             }
         });
+}
+static checker = (isUser,isOwner,isManager,isAdmin) =>{
+    console.log("user>>>>>",this.isUser())
+    // if(isUser && this.isUser() == false)
+    //     return false;
+    // if(isManager && !this.isManager())
+    //     return false;
+    // if(isOwner && !this.isOwner())
+    //     return false;
+    // if(isAdmin && !this.isAdmin())
+    //     return false;    
+    return true;
 }
 }
 export default Auth;

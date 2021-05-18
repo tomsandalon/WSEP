@@ -48,7 +48,7 @@ class AdminMenu extends Component {
                     case 200:
                         response.json().then((histories)=>{
                             let userInfo = [];
-                            histories.map((history) => {
+                            histories.forEach((history) => {
                                 const tempHistory = JSON.parse(history);
                                 const products = tempHistory.products;
                                 // const products = products_string.map((product) =>
@@ -92,11 +92,11 @@ class AdminMenu extends Component {
                 switch(response.status){
                     case 200:
                         response.json().then((histories)=>{
-                            if(histories.length == 0){
+                            if(histories.length === 0){
                                 this.onShowAlertShop();
                             }
                             let shopInfo = [];
-                            histories.map((history) => {
+                            histories.forEach((history) => {
                                 const tempHistory = JSON.parse(history);
                                 const products = tempHistory.products;
                                 // const products = products_string.map((product) =>

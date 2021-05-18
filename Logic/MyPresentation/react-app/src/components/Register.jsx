@@ -24,7 +24,7 @@ handleSubmit = (event) =>{
       .then(async response => {
         switch (response.status) {
             case 200: //welcome
-                const err_message_sucess = await response.text();
+                // const err_message_sucess = await response.text();
                 this.onShowAlert();
                 break;
             case 400:
