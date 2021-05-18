@@ -56,7 +56,7 @@ export interface ShopInventory {
      * @Requirement 2.5
      * @return product list of the items currently sold in the store
      */
-    getAllItems(): Product[]
+    getAllItems(all?: boolean): Product[]
 
     /**
      * @Requirement 2.6
@@ -271,8 +271,8 @@ export class ShopInventoryImpl implements ShopInventory {
             this.filter(products.filter(passed_filter(filters[0])), filters.slice(1));
     }
 
-    getAllItems(): Product[] {
-        return this.products.filter(p => p.amount > 0);
+    getAllItems(all?: boolean): Product[] {
+        return (all) ? this.products : this.products.filter(p => p.amount > 0);
     }
 
     getShopHistory(): string[] {

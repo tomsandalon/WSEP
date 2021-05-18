@@ -643,11 +643,11 @@ export class ShopImpl implements Shop {
     }
 
     getAllCategories(): string | string[] {
-        return this.inventory.getAllItems().flatMap(item => item.category.map(c => c.name))
+        return this.inventory.getAllItems(true).flatMap(item => item.category.map(c => c.name))
     }
 
     rateProduct(user_email: string, product_id: number, rating: number): string | boolean {
-        if (!this.inventory.getAllItems().some(p => p.product_id == product_id)) {
+        if (!this.inventory.getAllItems(true).some(p => p.product_id == product_id)) {
             logger.Error(`${user_email} attempted to rate a non existing product ${product_id}`)
             return `${user_email} attempted to rate a non existing product ${product_id}`
         }

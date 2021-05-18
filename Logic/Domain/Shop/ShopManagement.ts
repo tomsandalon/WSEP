@@ -248,7 +248,12 @@ export class ShopManagementImpl implements ShopManagement {
         const managers = !(staff_id) ? this._managers :
             this._managers
                 .filter((m) => staff_id.some(id => id == m.user_email));
-        return owners.map(o => o.toString()).concat(managers.map(m => m.toString()))
+        return [
+            JSON.stringify({
+                owners: owners.map(o => o.toString()),
+                managers: managers.map(m => m.toString())
+            })
+        ]
     }
 
     removeManager(appointer_email: string, appointee_email: string): boolean {
