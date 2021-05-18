@@ -1,25 +1,22 @@
 
 class Auth {
  
-static isUser = () =>{
-    console.log("inside user")
+static isUser = async () =>{
     const requestOptions = {
         method: "GET",
         headers: { "Content-Type": "application/json",
                     'Cookie': document.cookie},
     };
-    fetch("/user/is/loggedin", requestOptions)
-        .then(async response => {
-            switch(response.status){
-                case 200:
-                    let value = await response.text();
-                    value = value === "true" ? true : false;
-                    console.log("returning")
-                    return value;
-                default:
-                    return false;
-            }
-        });
+    let response = await fetch("/user/is/loggedin", requestOptions);
+    switch (response.status){
+        case 200:
+            let value = await response.text();
+            value = value === "true" ? true:false;
+            // console.log("returning true ==== userloggedin",value)
+            return value;
+        default:
+            return false;
+    }
 }
 isOwner = () => {
     const requestOptions = {

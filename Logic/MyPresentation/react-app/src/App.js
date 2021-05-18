@@ -20,13 +20,13 @@ import {ProtectedRoute} from "./components/ProtectedRoute";
 import Payment from "./components/Payment";
 import UserHistory from "./components/UserHistory/UserHistory";
 import AdminMenu from "./components/Admin/AdminMenu";
+import Notifications from "./components/Notifications/Notifications";
 function App() {
   // isGuest = () =>{
   //   if(this.state.permissions.guest === false && this.state.permissions.admin === false && this.state.permissions.loggedUser === false)
   //     return true
   //   return false;
   // }
-
   return (
     <Router>
       <div className="app">
@@ -36,13 +36,14 @@ function App() {
             <Redirect to="/home" />
           </Route>
           <Route path="/home" render={() => <ShopItems />} />
-          <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={false} path="/roles" component={RoleSelection} />
-          <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={false} path="/user-history" component={UserHistory} />
+          <Route path="/notifications" component={Notifications}/>
+          <Route role={"logged-user"} path="/roles" component={RoleSelection} />
+          <Route path="/user-history" component={UserHistory} />
           <Route path="/my-cart" component={ShoppingCart} />
           <Route path="/login" render={() => <Login />} />
           <Route path="/managerHome" component={ManagerHome} />
           <Route path="/register" component={Register} />
-          <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={true} exact path="/admin-menu" component={AdminMenu} />
+          <Route path="/admin-menu" component={AdminMenu} />
           <Route path="/addmanager/:storeID">
             <AddManager />
           </Route>

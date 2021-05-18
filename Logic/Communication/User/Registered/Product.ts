@@ -66,12 +66,14 @@ router.put(rate, (request: any, response: any) => {
         response.end()
         return
     }
+    console.log("before rate",user_id,request.body.shop_id,request.body.product_id,request.body.rating);
     const result = service.rateProduct(
         user_id,
         request.body.shop_id,
         request.body.product_id,
         request.body.rating,
     );
+    console.log("response",result);
     response.setHeader("Content-Type", "text/html");
     if (typeof result === 'string') {
         response.status(BadRequest);

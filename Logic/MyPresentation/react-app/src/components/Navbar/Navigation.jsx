@@ -85,11 +85,15 @@ toggle(){
     render(){
         return (
             <nav className="navbarItems">
-                <h3 className="navbar-logo"><a className="fab fa-react" href="/">Eccomerce</a></h3>
+                <h3 className="navbar-logo"><a className="fab fa-react" href="/">E-commerce</a></h3>
                 <div className="menu-icon" onClick={this.handleClick}>
                     <i className={this.state.clicked ? 'fas fa-times' : 'fas fa-bars'}></i>
                 </div>
                 <ul className={this.state.clicked ? 'nav-menu active':'nav-menu'}>
+                 {this.state.loggedUser && <li key={104}><a className="nav-links cartButton3 btn-primary btn-sm" href="/notifications">
+                            Notifications<i className="icon3 far fa-bell"></i>
+                            </a>
+                        </li>}
                     {!this.state.loggedUser && MenuItems.map((item,index) => {
                         return(
                         <li key={index}><a className={item.cName} href={item.url}>

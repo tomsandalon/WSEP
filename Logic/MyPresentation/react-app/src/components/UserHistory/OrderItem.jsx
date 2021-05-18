@@ -4,7 +4,7 @@ class OrderItem extends Component {
  
 	handleClick = (value) => {
 		const requestOptions = {
-			method: "POST",
+			method: "PUT",
 			headers: { "Content-Type": "application/json",
 			'Cookie': document.cookie },
 			body: JSON.stringify({
@@ -13,7 +13,7 @@ class OrderItem extends Component {
 			  rating: value,
 			}),
 		  };
-		  fetch("/", requestOptions)
+		  fetch("/user/shop/product/rate", requestOptions)
 		  .then(async response => {
 			switch(response.status){
 				case 200:
