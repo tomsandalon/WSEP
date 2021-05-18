@@ -43,7 +43,7 @@ function App() {
           <Route path="/managerHome" component={ManagerHome} />
           <Route path="/register" component={Register} />
           <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={true} exact path="/admin-menu" component={AdminMenu} />
-          <Route path="/addmanager/:storeID">
+          <Route path="/addmanager/:storeID/:managerOwner/:storeName">
             <AddManager />
           </Route>
           <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={false} path="/payment" component={Payment} />
