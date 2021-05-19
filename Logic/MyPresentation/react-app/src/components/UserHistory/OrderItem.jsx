@@ -49,10 +49,11 @@ class OrderItem extends Component {
 						<h6>Price: <span type="number" className="badge badge-pill badge-info">{this.props.price}</span></h6>	
 					</div>
 					<div className="col-4">
-					{false ? <h5>My rating</h5> : <h5>Rate product:</h5>}
-					{false ? 
-					<Rating readonly={true} placeholderRating={this.props.rating}></Rating>:
-							 <Rating placeholderRating={this.props.rating} onClick={this.handleClick}></Rating>
+					{this.props.rating !== -1 ? <h5>My rating</h5> : <h5>Rate product:</h5>}
+					{this.props.rating !== -1 ? 
+					<Rating readonly={true} placeholderRating={this.props.rating}></Rating>
+					:
+					<Rating placeholderRating={this.props.rating} onClick={this.handleClick}></Rating>
 					}
 						</div>
 				</div>

@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component} from 'react';
 
-class Unatohrized extends Component{
-    render(){
+class Unatho extends Component {
+    render() {
         return(
             <React.Fragment>
             <div className="gandalf">
@@ -18,11 +18,16 @@ class Unatohrized extends Component{
             </div>
             </div>
             <div className="message">
-            <h1>403 - You Shall Not Pass</h1>
-            <p>Uh oh, Gandalf is blocking the way!<br/>Maybe you have a typo in the url? Or you meant to go to a different location? Like...Hobbiton?</p>
+            <h3>403 - You Shall Not Pass</h3>
+            <h4>Uh oh, Gandalf is blocking the way!<br/>Maybe you have a typo in the url? Or you meant to go to a different location? Like...Hobbiton?</h4>
+            <h1>
+                <a className="nav-links cartButton2 btn-primary btn-sm" href="/home">
+                            Go Home
+                </a>
+            </h1>
             </div>
-    </React.Fragment>
+            </React.Fragment>
         )
     }
 }
-export default Unatohrized;
+export default Unatho;

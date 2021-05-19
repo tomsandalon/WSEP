@@ -21,7 +21,7 @@ import Payment from "./components/Payment";
 import UserHistory from "./components/UserHistory/UserHistory";
 import AdminMenu from "./components/Admin/AdminMenu";
 import Notifications from "./components/Notifications/Notifications";
-
+import Unatho from "./components/Unatho";
 function App() {
   // isGuest = () =>{
   //   if(this.state.permissions.guest === false && this.state.permissions.admin === false && this.state.permissions.loggedUser === false)
@@ -45,6 +45,7 @@ function App() {
           <Route path="/managerHome" component={ManagerHome} />
           <Route path="/register" component={Register} />
           <Route path="/admin-menu" component={AdminMenu} />
+          <Route path="/unatohrized" component={Unatho}/>
           <Route path="/addmanager/:storeID">
             <AddManager />
           </Route>
