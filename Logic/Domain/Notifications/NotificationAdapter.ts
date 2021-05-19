@@ -3,6 +3,7 @@ import {PublisherImpl} from "./PublisherImpl";
 import {Notification} from "./Notification";
 import {Login, LoginImpl} from "../Users/Login";
 import {pool} from "async-parallel";
+import {logger} from "../Logger";
 
 export class NotificationAdapter {
     notificationPool: Publisher
@@ -24,6 +25,9 @@ export class NotificationAdapter {
     notify(user_email: string, notification: string): void {
         const new_notification = new Notification(notification)
         const user_id = this.login.getUserId(user_email);
-        if (user_id != undefined) this.notificationPool.notify(user_id, new_notification)
+        if (user_id != undefined) {
+            this.notificationPool.notify(user_id, new_notification)
+        }
+        else logger.Error(`Failed to send message ${notification} to ${user_email}`)
     }
 }

@@ -19,9 +19,9 @@ export class Publisher {
     public fetch(user_id: number): string{
         if (this._publisher_domain == null)
             return ''
-        if (user_id == 4) return '["message for 4"]'
-        if (user_id == 6) return '["message for 6"]'
-        return ''// return JSON.stringify(this._publisher_domain.fetchNotifications(user_id))
+        // if (user_id == 4) return '["message for 4"]'
+        // if (user_id == 6) return '["message for 6"]'
+        return JSON.stringify(this._publisher_domain.fetchNotifications(user_id))
     }
     public notify(user_id: number){
         notify(user_id)
@@ -31,7 +31,7 @@ export class Publisher {
         if (this._publisher_domain == null){
             return false
         }
-        return user_id == 4 || user_id == 6
-        // return this._publisher_domain.hasNotifications(user_id);
+        // return user_id == 4 || user_id == 6
+        return this._publisher_domain.hasNotifications(user_id);
     }
 }
