@@ -1,23 +1,23 @@
-import {service, Session, sid} from "../Config/Config";
+import {BadRequest, OK, ServerNotFound, service, Session, sid} from "../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
-        response.status(404);
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
-    const result = service.performRegister(request.body.email, request.body.password);
+    const result = service.performRegister(request.body.email, request.body.password, request.body.age);
     response.setHeader("Content-Type", "text/html");
     if (result) {
-        response.status(200);
-        response.send("Registeration sucessful")
+        response.status(OK);
+        response.send("Registration successful")
     } else {
-        response.status(400);
-        response.send("Registeration failed, try again.")
+        response.status(BadRequest);
+        response.send("Registration failed, try again.")
     }
     response.end();
 })

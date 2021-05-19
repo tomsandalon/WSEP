@@ -9,6 +9,7 @@ class UserHistory extends Component {
         })
     }
     refreshHistory = () =>{
+		console.log("Refreshing")
 		const requestOptions = {
 			method: 'GET',
 			headers: {

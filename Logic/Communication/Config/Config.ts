@@ -1,4 +1,5 @@
 import {Service} from "../../Service/Service";
+import {Publisher} from "../../Service/Publisher";
 
 const path = require('path')
 const fs = require('fs')
@@ -12,10 +13,17 @@ export const options = {
     cert: fs.readFileSync(path.join(__dirname, cert_file), "utf8"),
 };
 export const sid = 'SID';
+export const sid_regex = /^SID=\d*$/;
 export const service: Service = new Service();
 
 export class Session {
-    public static sessions: {[session_id: number] : number} = {};
+    public static publisher = Publisher.getInstance()
+    public static sessions: {
+        [session_id: number] : {
+            user_id: number,
+            socket: any
+        }
+    } = {};
     public static session_id_specifier = 1;
 }
 

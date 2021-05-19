@@ -11,9 +11,8 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
-    console.log("in shop");
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
@@ -37,13 +36,14 @@ router.get('/', (request: any, response: any) => {
 })
 
 router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.addShop(user_id, request.body.name, request.body.description, request.body.location, request.body.bank_info);
     response.setHeader("Content-Type", "text/html");
     if (typeof result === 'string') {
@@ -56,13 +56,14 @@ router.post('/', (request: any, response: any) => {
 })
 
 router.get(categories, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.getAllCategories(user_id);
     if(typeof result == "string") {
         response.status(BadRequest);
@@ -77,13 +78,14 @@ router.get(categories, (request: any, response: any) => {
     response.end();
 })
 router.get(shop_purchase_history, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.shopOrderHistory(user_id, request.query.shop_id);
     if(typeof result == "string") {
         response.status(BadRequest);

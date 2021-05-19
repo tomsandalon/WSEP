@@ -11,13 +11,14 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.getAllDiscounts(user_id, request.query.shop_id)
     if (typeof result === 'string') {
         response.status(Unauthorized);
@@ -31,13 +32,14 @@ router.get('/', (request: any, response: any) => {
     response.end();
 })
 router.delete('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.removeDiscount(user_id, request.body.shop_id, request.body.id);
     response.setHeader("Content-Type", "text/html");
     if (typeof result === 'string') {
@@ -50,13 +52,14 @@ router.delete('/', (request: any, response: any) => {
 })
 
 router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     let result;
     switch (request.body.request){
         case 1:

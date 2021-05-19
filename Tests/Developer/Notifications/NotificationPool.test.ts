@@ -1,12 +1,12 @@
 import {expect} from "chai";
-import {NotificationPool} from "../../../Logic/Domain/Notifications/NotificationPool";
-import {NotificationPoolImpl} from "../../../Logic/Domain/Notifications/NotificationPoolImpl";
+import {Publisher} from "../../../Logic/Domain/Notifications/Publisher";
+import {PublisherImpl} from "../../../Logic/Domain/Notifications/PublisherImpl";
 import {Notification} from "../../../Logic/Domain/Notifications/Notification";
 describe('Notification Pool testsuite', () => {
     describe('Single element', () => {
         const user_id = 1;
         const notification = new Notification('Do your work');
-        const pool: NotificationPoolImpl = NotificationPoolImpl.getInstance();
+        const pool: PublisherImpl = PublisherImpl.getInstance();
         it('Add notification', () => {
             expect(pool.getNotifications(user_id).length).equal(0)
             pool.notify(1, notification);
@@ -28,7 +28,7 @@ describe('Notification Pool testsuite', () => {
         const notification2 = new Notification('Back to work');
         const notification3 = new Notification('Love your work');
         const collection = [notification, notification2, notification3];
-        const pool: NotificationPoolImpl = NotificationPoolImpl.getInstance();
+        const pool: PublisherImpl = PublisherImpl.getInstance();
         it('Add notifications', () => {
             expect(pool.getNotifications(user_id).length).equal(0)
             pool.notify(1, notification);
