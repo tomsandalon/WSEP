@@ -40,10 +40,13 @@ export class NotificationTest {
 
 export const mainUser = "TomAndSons@gmail.com";
 export const mainUser_pass = "123456";
+export const mainUser_age = '26';
 export const secondUser = "liorpev@gmail.com";
 export const secondUser_pass = "123456";
+export const secondUser_age = '25';
 export const thirdUser = "Sossana@gmail.com";
 export const thirdUser_pass = "123456";
+export const thirdUser_age = '16';
 export const product = {
     id: 0,
     amount: 100,
@@ -70,7 +73,8 @@ export const setupUsers = async () =>{
         .set('Cookie', cookie_prefix + NotificationTest.user_one_sess_id)
         .send({
             email: mainUser,
-            password: mainUser_pass
+            password: mainUser_pass,
+            age: mainUser_age,
         })
     expect(res.status, res.text).equal(OK)
     res = await client.post(route_login)
@@ -111,7 +115,8 @@ export const setupUsers = async () =>{
                 .set('Cookie', cookie_prefix + NotificationTest.user_two_sess_id)
                 .send({
                     email: secondUser,
-                    password: secondUser_pass
+                    password: secondUser_pass,
+                    age: secondUser_age,
                 })
     expect(res.status).equal(OK)
     res = await client.post(route_login)
@@ -131,14 +136,15 @@ export const setupUsers = async () =>{
         .set('Cookie', cookie_prefix + NotificationTest.user_three_sess_id)
         .send({
             email: thirdUser,
-            password: thirdUser_pass
+            password: thirdUser_pass,
+            age: thirdUser_age,
         })
     expect(res.status).equal(OK)
     res = await client.post(route_login)
         .set('Cookie', cookie_prefix + NotificationTest.user_three_sess_id)
         .send({
             email: thirdUser,
-            password: thirdUser_pass
+            password: thirdUser_pass,
         })
     expect(res.status).equal(OK)
 }

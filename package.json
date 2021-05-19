@@ -28,6 +28,8 @@
     "express-ws": "^4.0.0",
     "http": "*",
     "https": "^1.0.0",
+    "knex": "^0.95.6",
+    "mysql": "^2.18.1",
     "react-random-image": "^1.0.3",
     "react-router-dom": "^5.2.0",
     "simplr-logger": "^1.0.1",
