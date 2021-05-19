@@ -5,7 +5,7 @@ export function ProtectedRoute ({component:Component , ...rest}) {
     // const [token, setToken] = useState('');
     const history = useHistory();
     const handleHistory = () => {
-        history.push("/unatohrized");
+        history.push("/unauthorized");
     }
   useEffect(() => {
     if({...rest}.role === "owner")
@@ -86,7 +86,7 @@ export function ProtectedRoute ({component:Component , ...rest}) {
                 }
                 else{
                     console.log("hihi");
-                    return <Redirect to="/unatohrized"/> 
+                    return <Redirect to="/unauthorized"/> 
                 }
             }
         }

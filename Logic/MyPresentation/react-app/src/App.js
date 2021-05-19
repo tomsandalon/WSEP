@@ -37,7 +37,7 @@ function App() {
           <Route path="/managerHome" component={ManagerHome} />
           <Route path="/register" component={Register} />
           <ProtectedRoute role={"admin"} path="/admin-menu" component={AdminMenu} />
-          <Route path="/unatohrized" component={Unatho}/>
+          <Route path="/unauthorized" component={Unatho}/>
           <Route path="/addmanager/:storeID"><AddManager/></Route>
           <Route path="/addstore"><AddStore/></Route>
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
