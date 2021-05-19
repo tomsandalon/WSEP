@@ -3,13 +3,14 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/history/user', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     response.setHeader("Content-Type", "application/json");
     const result = service.adminDisplayUserHistory(user_id, request.query.user_inspect);
     if (typeof result === 'string') {
@@ -24,13 +25,14 @@ router.get('/history/user', (request: any, response: any) => {
     response.end();
 })
 router.get('/history/shop', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     response.setHeader("Content-Type", "application/json");
     const result = service.adminDisplayShopHistory(user_id, request.query.shop_id);
     if (typeof result === 'string') {
@@ -45,13 +47,14 @@ router.get('/history/shop', (request: any, response: any) => {
     response.end();
 })
 router.get('/users', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.getAllUsers(user_id)
     if (typeof result === 'string') {
         response.status(Unauthorized);

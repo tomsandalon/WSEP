@@ -7,4 +7,5 @@ export interface Publisher {
     notifyThemAll(collection: {[userid: number]: Notification[]}): void;
     fetchNotifications(user_id: number): Notification[];
     fetchAllNotifications(): {user_id: number, notifications: Notification[]}[]
+    hasNotifications(user_id: number): boolean
 }

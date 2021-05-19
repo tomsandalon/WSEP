@@ -3,13 +3,14 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.getManagingShops(user_id);
     if (typeof result == 'string'){
         response.status(Unauthorized)
@@ -23,13 +24,14 @@ router.get('/', (request: any, response: any) => {
     response.end();
 })
 router.get('/permissions', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.getPermissions(user_id, request.query.shop_id);
     if (typeof result == 'string'){
         response.status(Unauthorized)
@@ -43,13 +45,14 @@ router.get('/permissions', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/loggedin', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.isLoggedIn(user_id);
     response.setHeader("Content-Type", "text/html");
     response.status(OK)
@@ -57,14 +60,14 @@ router.get('/is/loggedin', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/admin', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
-        response.setHeader("Content-Type", "text/html");
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.isAdmin(user_id);
     response.setHeader("Content-Type", "text/html");
     response.status(OK)
@@ -72,13 +75,14 @@ router.get('/is/admin', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/owner', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.isOwner(user_id);
     response.setHeader("Content-Type", "text/html");
     response.status(OK)
@@ -86,13 +90,14 @@ router.get('/is/owner', (request: any, response: any) => {
     response.end();
 })
 router.get('/is/manager', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.isManager(user_id);
     response.setHeader("Content-Type", "text/html");
     response.status(OK)

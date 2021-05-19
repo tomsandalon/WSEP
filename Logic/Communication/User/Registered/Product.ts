@@ -15,13 +15,14 @@ const router = express.Router();
 module.exports = router;
 
 router.delete('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.removeProduct(user_id, request.body.shop_id, request.body.product_id);
     response.setHeader("Content-Type", "text/html");
     if (typeof result === 'string') {
@@ -34,13 +35,14 @@ router.delete('/', (request: any, response: any) => {
 })
 
 router.put('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.editProduct(
         user_id,
         request.body.shop_id,
@@ -59,13 +61,14 @@ router.put('/', (request: any, response: any) => {
 })
 
 router.put(rate, (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.rateProduct(
         user_id,
         request.body.shop_id,
@@ -83,13 +86,14 @@ router.put(rate, (request: any, response: any) => {
 })
 
 router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]].user_id;
-    if (user_id == undefined) {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
         response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
         return
     }
+    const user_id = session_data.user_id;
     const result = service.addProduct(
         user_id,
         request.body.shop_id,

@@ -24,6 +24,7 @@ import {
     route_shop_policy,
     route_user_management
 } from "./Routes";
+import {configWebSocket} from "./User/Notification";
 const socket_io = require('socket.io');
 const fs = require('fs')
 const path = require('path');
@@ -34,6 +35,7 @@ export const app = express();
 //initialize a https server
 export const server = https.createServer(options, app);
 export const io = socket_io(server);
+configWebSocket(io)
 //start our server
 server.listen( port,() => {
     console.log(`Server is running on port ${port}`);
@@ -60,4 +62,4 @@ app.use(route_shop_policy, require('./User/Registered/Policy'));
 app.use(route_shop_discount, require('./User/Registered/Discount'));
 //* For debug TODO delete this
 
-service.initData();
+// service.initData();

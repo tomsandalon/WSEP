@@ -1,6 +1,6 @@
-import {notify} from "../Communication/User/Guest";
 import * as P from "../Domain/Notifications/Publisher";
 import {PublisherImpl} from "../Domain/Notifications/PublisherImpl";
+import {notify} from "../Communication/User/Notification";
 
 export class Publisher {
     private static instance: Publisher
@@ -23,5 +23,12 @@ export class Publisher {
     }
     public notify(user_id: number){
         notify(user_id)
+    }
+
+    public hasNotifications(user_id: number): boolean {
+        if (this._publisher_domain == null){
+            return false
+        }
+        return this._publisher_domain.hasNotifications(user_id);
     }
 }

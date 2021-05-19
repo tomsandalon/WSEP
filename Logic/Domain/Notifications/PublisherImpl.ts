@@ -58,4 +58,9 @@ export class PublisherImpl implements Publisher{
 
     notifyThemAll(collection: { [p: number]: Notification[] }): void {
     }
+
+    hasNotifications(user_id: number): boolean {
+        const entry = this.notificationQueue[user_id];
+        return entry !== undefined && entry.length !== 0;
+    }
 }

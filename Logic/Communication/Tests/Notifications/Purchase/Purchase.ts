@@ -9,14 +9,16 @@ import {
     Unauthorized
 } from "../../../Config/Config";
 import {route_login, route_notifications, route_purchase, route_register} from "../../../Routes";
+import {acknowledge_for_notifications, get_notifications} from "../../../WSEvents";
 const async = require('async');
 const request = require('supertest');
 const fs = require('fs');
 describe('Purchase Notifications Tests', function () {
-    let socket: any = undefined;
     beforeEach(() =>{
         expect(NotificationTest.user_one_sess_id).not.equal('')
         expect(NotificationTest.user_two_sess_id).not.equal('')
+        expect(NotificationTest.user_one_socket).not.equal(undefined)
+        expect(NotificationTest.user_two_socket).not.equal(undefined)
         // const socket = io.connect('https://localhost:8000/',
         //         {
         //         'reconnection delay' : 0
@@ -33,10 +35,6 @@ describe('Purchase Notifications Tests', function () {
         // })
     })
     after(() => {
-        if (socket !== undefined){
-            console.log('Closing')
-            socket.close();
-        }
     })
     it('Purchase successful - Notification for owner', (done) =>{
         client.post(route_purchase)
@@ -47,10 +45,9 @@ describe('Purchase Notifications Tests', function () {
             })
             .expect(OK)
             .end(() =>{
-                const io = require('socket.io-client');
-                socket = io(localhost, { rejectUnauthorized: false });
-                socket.on('Message', (data: any) => {
-                    console.log('Successful')
+                // @ts-ignore
+                NotificationTest.user_one_socket.on(get_notifications, (data: any) => {
+                    expect(JSON.parse(data).length).greaterThan(0)
                     done()
                 })
             })
