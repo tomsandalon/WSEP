@@ -23,6 +23,7 @@ class UserHistory extends Component {
 					response.json().then(
 						history => {
 							let userHistory =[]
+							console.log("History>>>",history);
 							userHistory = history.map(order => {
 								const temp = {
 								order_id:(JSON.parse(order).order_id),
