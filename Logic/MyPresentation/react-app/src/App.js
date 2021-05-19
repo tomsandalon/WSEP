@@ -17,46 +17,30 @@ import AddStore from "./pages/Add_Store";
 import ManagersStore from "./pages/ManagersStore";
 import RoleSelection from "./components/RoleSelection";
 import {ProtectedRoute} from "./components/ProtectedRoute";
-import Payment from "./components/Payment";
 import UserHistory from "./components/UserHistory/UserHistory";
 import AdminMenu from "./components/Admin/AdminMenu";
 import Notifications from "./components/Notifications/Notifications";
 import Unatho from "./components/Unatho";
 function App() {
-  // isGuest = () =>{
-  //   if(this.state.permissions.guest === false && this.state.permissions.admin === false && this.state.permissions.loggedUser === false)
-  //     return true
-  //   return false;
-  // }
   return (
     <Router>
       <div className="app">
         <Navigation />
         <Switch>
-          <Route exact path="/">
-            <Redirect to="/home" />
-          </Route>
+          <Route exact path="/"><Redirect to="/home" /></Route>
           <Route path="/home" render={() => <ShopItems />} />
-          <Route path="/notifications" component={Notifications}/>
-          <Route role={"logged-user"} path="/roles" component={RoleSelection} />
-          <Route path="/user-history" component={UserHistory} />
+          <ProtectedRoute path="/notifications" component={Notifications}/>
+          <ProtectedRoute path="/roles" component={RoleSelection} />
+          <ProtectedRoute path="/user-history" component={UserHistory} />
           <Route path="/my-cart" component={ShoppingCart} />
           <Route path="/login" render={() => <Login />} />
           <Route path="/managerHome" component={ManagerHome} />
           <Route path="/register" component={Register} />
-          <Route path="/admin-menu" component={AdminMenu} />
+          <ProtectedRoute role={"admin"} path="/admin-menu" component={AdminMenu} />
           <Route path="/unatohrized" component={Unatho}/>
-          <Route path="/addmanager/:storeID">
-            <AddManager />
-          </Route>
-          <ProtectedRoute isUser={true} isOwner={false} isManager={false} isAdmin={false} path="/payment" component={Payment} />
-          <Route path="/addstore">
-            <AddStore />
-          </Route>
-          {/* <Route path="/unatohrized" component={Unatohrized}></Route> */}
-          <Route path="/managersStore/:storeID/:name">
-            <ManagersStore />
-          </Route>
+          <Route path="/addmanager/:storeID"><AddManager/></Route>
+          <Route path="/addstore"><AddStore/></Route>
+          <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
         </Switch>
       </div>
     </Router>
