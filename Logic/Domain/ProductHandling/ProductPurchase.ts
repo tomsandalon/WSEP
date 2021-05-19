@@ -1,6 +1,7 @@
 import {Category} from "./Category";
 import {Product} from "./Product";
 import {ShopInventory} from "../Shop/ShopInventory";
+import {Rating} from "./Rating";
 
 export interface ProductPurchase {
     readonly product_id: number,
@@ -10,6 +11,7 @@ export interface ProductPurchase {
     readonly amount: number,
     original_price: number,
     actual_price: number,
+    rating: number
 }
 
 export class ProductPurchaseImpl implements ProductPurchase{
@@ -20,6 +22,7 @@ export class ProductPurchaseImpl implements ProductPurchase{
     private readonly _name: string;
     private readonly _product_id: number;
     private _original_price: number
+    private _rating: number = -1;
 
 
     private constructor(product: Product, original_price: number, amount: number, actual_price: number) {
@@ -78,5 +81,14 @@ export class ProductPurchaseImpl implements ProductPurchase{
     }
     set price(value: number) {
         this._actual_price = value;
+    }
+
+
+    get rating(): number {
+        return this._rating;
+    }
+
+    set rating(value: number) {
+        this._rating = value;
     }
 }

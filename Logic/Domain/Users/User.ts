@@ -27,7 +27,6 @@ export interface User {
     removeItemFromBasket(shop: ShopInventory, product_id: number):void
     displayBaskets(): string[][] | string
     getOrderHistory():string[] | string
-    isUnderaged(): boolean;
 }
 
 export class UserImpl implements User {
@@ -258,9 +257,15 @@ export class UserImpl implements User {
 
     private _underaged: boolean;
 
-    isUnderaged(): boolean {
-        return false;
-    }
 
+    logRating(product_id: number, shop_id: number, rating: number) {
+        const purchases = (this._order_history.getUserPurchases(this.user_id) as Purchase[]).filter(p => p.shop.shop_id == shop_id && p.products.some(p => p.product_id == product_id))
+        purchases.forEach(
+            purchase => {
+                const product_purchase = purchase.products.find(p => p.product_id == product_id) as ProductPurchase
+                product_purchase.rating = rating
+            }
+        )
+    }
 }
 

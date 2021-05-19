@@ -15,6 +15,7 @@ import {NumericOperation} from "./Shop/DiscountPolicy/NumericCompositionDiscount
 import {LogicComposition} from "./Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NotificationAdapter} from "./Notifications/NotificationAdapter";
 import {logger} from "./Logger";
+import type = Mocha.utils.type;
 
 export enum SearchTypes {
     name,
@@ -613,6 +614,12 @@ export class SystemImpl implements System {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
-        return shop.rateProduct(user_email, user_id, product_id, rating)
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        const ret = shop.rateProduct(user_email, user_id, product_id, rating)
+        if (typeof ret == "string") return ret
+        user.logRating(product_id, shop_id, rating)
+        return true
     }
 }
