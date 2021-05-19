@@ -15,7 +15,7 @@
     "test-web": "npm --prefix Logic/Presentation run start",
     "eject-web": "npm --prefix Logic/Presentation run start",
     "server-tests": "ts-mocha 'Logic/Communication/Tests/**/*.ts' --recursive",
-    "server-notification-tests": "ts-mocha 'Logic/Communication/Tests/Notifications/**/*.ts' --recursive"
+    "server-notification-tests": "ts-mocha 'Logic/Communication/Tests/Notifications/Appointee/*.ts' --exit"
   },
   "keywords": [],
   "author": "",

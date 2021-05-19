@@ -29,6 +29,7 @@ export const notify = (user_id: number) => {
     for (let sid in Session.sessions) {
         const entry = Session.sessions[sid]
         if (entry !== undefined && entry.user_id == user_id) {
+            // console.log(`Notify UID = ${user_id}`)
             entry.socket.emit(acknowledge_for_notifications, true)
         }
     }

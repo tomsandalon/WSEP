@@ -14,6 +14,7 @@ import {
     route_shop_manage_product
 } from "../../Routes";
 import {acknowledge_for_notifications, get_notifications, hello, send_notifications} from "../../WSEvents";
+import lookup from "socket.io-client";
 const async = require('async')
 const fs = require('fs')
 const https = require('https');
@@ -33,12 +34,16 @@ export class NotificationTest {
     public static shop_id = '';
     public static user_one_socket = undefined
     public static user_two_socket = undefined
+    public static user_three_sess_id = '';
+    public static user_three_socket = undefined
 }
 
 export const mainUser = "TomAndSons@gmail.com";
 export const mainUser_pass = "123456";
 export const secondUser = "liorpev@gmail.com";
 export const secondUser_pass = "123456";
+export const thirdUser = "Sossana@gmail.com";
+export const thirdUser_pass = "123456";
 export const product = {
     id: 0,
     amount: 100,
@@ -53,7 +58,7 @@ const openWSConnection = (sess_id: string): any => {
     socket.emit(hello, cookie);
     return socket;
 }
-before(async () =>{
+export const setupUsers = async () =>{
 //* DELETE GUEST INIT
     let res = await client.get(route_guest)
     expect(res.status).equal(OK)
@@ -116,27 +121,41 @@ before(async () =>{
                     password: secondUser_pass
                 })
     expect(res.status).equal(OK)
-    res = await client.post(route_cart)
-                .set('Cookie', cookie_prefix + NotificationTest.user_two_sess_id)
-                .send({
-                    shop_id: NotificationTest.shop_id,
-                    product_id: product.id,
-                    amount: product.amount / 10
-                })
+    res = await client.get(route_guest)
     expect(res.status).equal(OK)
-})
+    NotificationTest.user_three_sess_id = res.headers['set-cookie'].find((cookie: any) => cookie.startsWith(sid))
+        .split(';')[0]
+        .split('=')[1];
+    NotificationTest.user_three_socket = openWSConnection(NotificationTest.user_three_sess_id);
+    res = await client.post(route_register)
+        .set('Cookie', cookie_prefix + NotificationTest.user_three_sess_id)
+        .send({
+            email: thirdUser,
+            password: thirdUser_pass
+        })
+    expect(res.status).equal(OK)
+    res = await client.post(route_login)
+        .set('Cookie', cookie_prefix + NotificationTest.user_three_sess_id)
+        .send({
+            email: thirdUser,
+            password: thirdUser_pass
+        })
+    expect(res.status).equal(OK)
+}
 
 //* DELETE GUEST INIT
-after((done) => {
+export const cleanUsers = async () => {
     if (NotificationTest.user_one_socket != undefined){
         // @ts-ignore
-        NotificationTest.user_one_socket.close();
+        await NotificationTest.user_one_socket.close();
     }
     if (NotificationTest.user_two_socket != undefined){
         // @ts-ignore
-        NotificationTest.user_two_socket.close();
+        await NotificationTest.user_two_socket.close();
     }
-    server.close();
-    done();
-})
+    if (NotificationTest.user_three_sess_id != undefined){
+        // @ts-ignore
+        await NotificationTest.user_three_socket.close();
+    }
+}
 //* DELETE GUEST INIT
