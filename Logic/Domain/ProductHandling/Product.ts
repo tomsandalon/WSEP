@@ -105,7 +105,9 @@ export interface Product {
      */
     returnAmount(amount: number): string | boolean;
 
-    rate(rating: number): void
+    rate(rating: number, rater: string): void
+
+    alreadyRated(user_email: string): Boolean;
 }
 
 export class ProductImpl implements Product{
@@ -268,12 +270,16 @@ export class ProductImpl implements Product{
         return this._rating;
     }
 
-    rate(rating: number): void {
-        if (0 <= rating && rating <= 5) this.rating.add_rating(rating)
+    rate(rating: number, rater: string): void {
+        if (0 <= rating && rating <= 5) this.rating.add_rating(rating, rater)
     }
 
     public toString(){
         return JSON.stringify(this)
 
+    }
+
+    alreadyRated(user_email: string): Boolean {
+        return this.rating.raters_email.some(past_rater => past_rater == user_email)
     }
 }

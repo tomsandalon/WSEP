@@ -6,7 +6,7 @@ import {ShopInventory} from "../Shop/ShopInventory";
 import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/PaymentHandler";
 import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {BasketDoesntExists} from "../ProductHandling/ErrorMessages";
-
+const LEGAL_DRINKING_AGE = 18
 export let id_counter: number = 0;
 const generateId = () => id_counter++;
 
@@ -27,7 +27,6 @@ export interface User {
     removeItemFromBasket(shop: ShopInventory, product_id: number):void
     displayBaskets(): string[][] | string
     getOrderHistory():string[] | string
-    isUnderaged(): boolean;
 }
 
 export class UserImpl implements User {
@@ -42,7 +41,7 @@ export class UserImpl implements User {
 
     static resetIDs = () => id_counter = 0
 
-    constructor(user_email?:string, password?:string, is_admin?:boolean) {
+    constructor(user_email?:string, password?:string, is_admin?:boolean, age?: number) {
         if(user_email != undefined && password != undefined && is_admin != undefined) {
             this._user_email = user_email;
             this._password = password;
@@ -59,7 +58,7 @@ export class UserImpl implements User {
         this._order_history = UserPurchaseHistoryImpl.getInstance();
         this._user_id = generateId();
         this._payment_handler = PaymentHandlerImpl.getInstance();
-        this._underaged = false;
+        this._underaged = (age) ? age < LEGAL_DRINKING_AGE : false;
     }
 
     /**
@@ -258,9 +257,15 @@ export class UserImpl implements User {
 
     private _underaged: boolean;
 
-    isUnderaged(): boolean {
-        return false;
-    }
 
+    logRating(product_id: number, shop_id: number, rating: number) {
+        const purchases = (this._order_history.getUserPurchases(this.user_id) as Purchase[]).filter(p => p.shop.shop_id == shop_id && p.products.some(p => p.product_id == product_id))
+        purchases.forEach(
+            purchase => {
+                const product_purchase = purchase.products.find(p => p.product_id == product_id) as ProductPurchase
+                product_purchase.rating = rating
+            }
+        )
+    }
 }
 

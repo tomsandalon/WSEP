@@ -15,6 +15,7 @@ import {NumericOperation} from "./Shop/DiscountPolicy/NumericCompositionDiscount
 import {LogicComposition} from "./Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NotificationAdapter} from "./Notifications/NotificationAdapter";
 import {logger} from "./Logger";
+import type = Mocha.utils.type;
 
 export enum SearchTypes {
     name,
@@ -26,7 +27,7 @@ export interface System{
 
     openSession(): number
     closeSession(user_id: number): void
-    performRegister(user_email:string, password: string): boolean
+    performRegister(user_email:string, password: string, age?: number): boolean
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
     logout(user_id: number): string | boolean
@@ -303,8 +304,8 @@ export class SystemImpl implements System {
         return this._login.guestLogin();
     }
 
-    performRegister(user_email:string, password: string): boolean {
-        return this._register.register(user_email,password)
+    performRegister(user_email:string, password: string, age?: number): boolean {
+        return this._register.register(user_email,password, age)
     }
 
     userOrderHistory(user_id: number): string | string[] {
@@ -613,6 +614,12 @@ export class SystemImpl implements System {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
-        return shop.rateProduct(user_email, product_id, rating)
+        const user = this._login.retrieveUser(user_id);
+        if(typeof user == "string")
+            return user
+        const ret = shop.rateProduct(user_email, user_id, product_id, rating)
+        if (typeof ret == "string") return ret
+        user.logRating(product_id, shop_id, rating)
+        return true
     }
 }

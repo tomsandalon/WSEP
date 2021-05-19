@@ -17,7 +17,7 @@ class OrderHistory extends Component {
                 item_name={product._name}
                 item_desc={product._description} 
                 price={product._actual_price}
-                rating={1}
+                rating={product._rating}
                 refreshHistory={this.props.refreshHistory}
                 />
             )

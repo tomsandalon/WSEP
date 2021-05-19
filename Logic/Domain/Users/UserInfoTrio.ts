@@ -1,16 +1,29 @@
-export class StringPair{
+export class UserInfoTrio {
     private _user_email:string;
     private _hashed_password:string;
+    private _underaged: number | undefined
 
     /**
      * Represents a string pair consisting of the user email and its hashed password.
      * @param user_email
      * @param hashed_password
+     * @param underaged
      */
-    constructor(user_email:string, hashed_password:string) {
+    constructor(user_email:string, hashed_password:string, underaged?: number) {
         this._user_email = user_email;
         this._hashed_password = hashed_password;
+        this._underaged = underaged
     }
+
+
+    get underaged(): number | undefined {
+        return this._underaged;
+    }
+
+    set underaged(value: number | undefined) {
+        this._underaged = value;
+    }
+
     get user_email():string {
         return this._user_email;
     }

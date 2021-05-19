@@ -118,7 +118,8 @@ describe('Test Shop', () => {
         shop.appointNewOwner("owner1@bgu.ac.il", "owner3@bgu.ac.il")
         shop.appointNewManager("owner3@bgu.ac.il", "owner4@bgu.ac.il")
         expect(typeof shop.removeOwner("owner2@bgu.ac.il", "owner1@bgu.ac.il") == "string").to.be.true
-        expect(shop.getStaffInfo("tomsand@post.bgu.ac.il").length).to.be.eq(5)
+        let result = JSON.parse(shop.getStaffInfo("tomsand@post.bgu.ac.il")[0])
+        expect(result.managers.length + result.owners.length).to.be.eq(5)
         expect(typeof shop.removeOwner("tomsand@post.bgu.ac.il", "owner1@bgu.ac.il") != "string").to.be.true
         expect(shop.getStaffInfo("tomsand@post.bgu.ac.il").length).to.be.eq(1)
 
