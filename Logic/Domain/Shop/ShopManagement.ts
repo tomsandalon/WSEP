@@ -273,10 +273,28 @@ export class ShopManagementImpl implements ShopManagement {
         if (!ownerToRemove) return false;
         if (ownerToRemove.appointer_email != user_email) return false;
         // this._owners = this.owners.filter(m => m.user_email != target)
+        NotificationAdapter.getInstance().notify(target,
+            `You have been demoted by ${user_email}`)
+        this.removeAllSubordinates(target, user_email)
+        return true;
+    }
+
+    removeManagerByRecursion(user_email: string, target: string) {
+        const manager = this.getManagerByEmail(target);
+        if (!manager) return
+        this._managers = this._managers.filter(m => m.user_email != target)
+        NotificationAdapter.getInstance().notify(target,
+            `You have been demoted by ${user_email}`
+        )
+    }
+
+    removeOwnerByRecursion(user_email: string, target: string) {
+        const ownerToRemove = this.getOwnerByEmail(target);
+        if (!ownerToRemove) return;
+        this._owners = this.owners.filter(o => o.user_email != target)
         this.removeAllSubordinates(target, user_email)
         NotificationAdapter.getInstance().notify(target,
             `You have been demoted by ${user_email}`)
-        return true;
     }
 
     toString(): string {
@@ -292,13 +310,10 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     private removeAllSubordinates(user_email: string, original: string) {
-        this._managers = this.managers.filter(m => m.appointer_user_email != user_email)
-        const owner_to_remove = this.owners.find(o => o.user_email == user_email)
-        if (!owner_to_remove) return
-        this._owners = this.owners.filter(o => o.user_email != user_email)
-        NotificationAdapter.getInstance().notify(user_email,
-            `You have been demoted by ${original}`)
-        owner_to_remove.appointees_emails().forEach(appointee => this.removeAllSubordinates(appointee, original))
+        this.managers.filter(m => m.appointer_user_email == user_email)
+            .forEach(m => this.removeManagerByRecursion(m.user_email, original))
+        this.owners.filter(o => o.appointer_email == user_email)
+            .forEach(o => this.removeOwnerByRecursion(o.user_email, original))
     }
 
     isOwner(user_email: string) {

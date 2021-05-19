@@ -1,43 +1,92 @@
-import React  ,{ useEffect, useState } from 'react';
-import {Redirect,Route} from 'react-router-dom';
-import auth from './Auth';
+import React  ,{ useEffect } from 'react';
+import {Redirect,Route, useHistory} from 'react-router-dom';
 export function ProtectedRoute ({component:Component , ...rest}) {
     //auth.checker({...rest}.isUser,{...rest}.isOwner,{...rest}.isManager,{...rest}.isAdmin
-    const [token, setToken] = useState('');
-
-  useEffect(() => {
-    // You need to restrict it at some point
-    // This is just dummy code and should be replaced by actual
-    if (!token) {
-        getToken();
+    // const [token, setToken] = useState('');
+    const history = useHistory();
+    const handleHistory = () => {
+        history.push("/unauthorized");
     }
+  useEffect(() => {
+    if({...rest}.role === "owner")
+        isOwner();
+    if({...rest}.role === "manager")
+        isManager();
+    if({...rest}.role === "admin")
+        isAdmin(); 
   }, []);
 
-  const getToken = async () => {
-    // const headers = {
-    //   Authorization: authProps.idToken // using Cognito authorizer
-    // };
-    // const response = await axios.post(
-    //   "https://MY_ENDPOINT.execute-api.us-east-1.amazonaws.com/v1/",
-    //   API_GATEWAY_POST_PAYLOAD_TEMPLATE,
-    //   { headers }
-    // );
-    // const data = await response.json();
-    let response = await auth.isUser();
-    console.log("response>>>>",response)
-    setToken(response);
+  const isManager = async () => {
+    const requestOptions = {
+        method: "GET",
+        headers: { "Content-Type": "application/json",
+                    'Cookie': document.cookie},
+    };
+    let response = await fetch("/user/is/manager", requestOptions);
+    switch (response.status){
+        case 200:
+            let value = await response.text();
+            value = value === "true" ? true:false;
+            if(value)
+                break;
+            handleHistory();
+            break;
+        default:
+            handleHistory();
+            break;
+    }
+  };
+  const isOwner = async () => {
+    const requestOptions = {
+        method: "GET",
+        headers: { "Content-Type": "application/json",
+                    'Cookie': document.cookie},
+    };
+    let response = await fetch("/user/is/owner", requestOptions);
+    switch (response.status){
+        case 200:
+            let value = await response.text();
+            value = value === "true" ? true:false;
+            if(value)
+                break;
+            handleHistory();
+            break;
+        default:
+            handleHistory();
+            break;
+    }
+  };
+  const isAdmin = async () => {
+    const requestOptions = {
+        method: "GET",
+        headers: { "Content-Type": "application/json",
+                    'Cookie': document.cookie},
+    };
+    let response = await fetch("/user/is/admin", requestOptions);
+    switch (response.status){
+        case 200:
+            let value = await response.text();
+            value = value === "true" ? true:false;
+            if(value)
+                break;
+            handleHistory();
+            break;
+        default:
+            handleHistory();
+            break;
+    }
   };
 
     return(
         <Route {...rest} render ={
             (props) => {
-                if(token){
-                    console.log("inside true",token);
-                return <Component {...props}/>
+                // sessionStorage.setItem("loggedUser","LoggedIn")
+                if(sessionStorage.getItem("loggedUser") === "LoggedIn"){   
+                    return <Component {...props}/>
                 }
                 else{
-                    console.log("inside false",token);
-                    return <Redirect to="/home"/> 
+                    console.log("hihi");
+                    return <Redirect to="/unauthorized"/> 
                 }
             }
         }
