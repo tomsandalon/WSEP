@@ -1,6 +1,10 @@
 import { Notification } from "./Notification";
 import {Publisher} from "./Publisher";
-import * as P from  '../../Service/Publisher';
+import {logger} from "../Logger";
+
+// let P: any
+import * as P from "../../Service/Publisher"
+
 export class PublisherImpl implements Publisher{
     private static instance: PublisherImpl;
     private readonly notificationQueue: {[user_id: number]: Notification[]};
@@ -27,7 +31,8 @@ export class PublisherImpl implements Publisher{
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        P.Publisher.getInstance().notify(user_id)
+        if (P != undefined) P.Publisher.getInstance().notify(user_id)
+        else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
     }
 
     getNotifications(user_id: number): Notification[]{
