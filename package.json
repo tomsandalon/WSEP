@@ -29,6 +29,7 @@
     "http": "*",
     "https": "^1.0.0",
     "knex": "^0.95.6",
+    "knex-db-manager": "^0.7.0",
     "mysql": "^2.18.1",
     "react-random-image": "^1.0.3",
     "react-router-dom": "^5.2.0",
