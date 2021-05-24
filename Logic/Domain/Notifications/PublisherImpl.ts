@@ -4,6 +4,7 @@ import {logger} from "../Logger";
 
 // let P: any
 import * as P from "../../Service/Publisher"
+import {LoginImpl} from "../Users/Login";
 
 export class PublisherImpl implements Publisher{
     private static instance: PublisherImpl;
@@ -31,7 +32,15 @@ export class PublisherImpl implements Publisher{
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        if (P != undefined) P.Publisher.getInstance().notify(user_id)
+        if (P != undefined) {
+            if (LoginImpl.getInstance().isLoggedIn(user_id)) {
+            console.log(`${user_id} is logged in and received ${notification.message}`)
+            P.Publisher.getInstance().notify(user_id)
+            }
+            else {
+                console.log(`${user_id} is not logged in`)
+            }
+        }
         else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
     }
 
