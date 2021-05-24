@@ -32,7 +32,7 @@ export class PublisherImpl implements Publisher{
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        if (P != undefined) {
+        if (P != undefined) { //TODO remove prints
             if (LoginImpl.getInstance().isLoggedIn(user_id)) {
             console.log(`${user_id} is logged in and received ${notification.message}`)
             P.Publisher.getInstance().notify(user_id)
