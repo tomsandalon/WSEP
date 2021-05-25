@@ -10,6 +10,9 @@ import {SimpleDiscount} from "../../../Logic/Domain/Shop/DiscountPolicy/SimpleDi
 import {Condition} from "../../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
 import {DiscountHandler} from "../../../Logic/Domain/Shop/DiscountPolicy/DiscountHandler";
 import {NumericOperation} from "../../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
+import {id_counter} from "../../../Logic/Domain/Shop/PurchasePolicy/PurchaseCondition";
+import {Operator} from "../../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
+
 
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");
@@ -23,17 +26,6 @@ const getNewItem = (shop: ShopInventory): number => shop.products.reduce((acc, p
 
 describe('Buy product by policies', () => {
     ProductImpl.resetIDs();
-    it('Buy product by purchase policy', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
-        const user: User = new UserImpl();
-        shop.addPolicy("Tom@gmail.com", new SimpleCondition(ConditionType.NotCategory, "GPU"))
-        let result: any = shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
-        expect(typeof result !== "string").to.be.true;
-        result = user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
-        expect(typeof result !== "string").to.be.true;
-        result = user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli");
-        expect(typeof result === "string").to.be.true;
-    });
     it('Buy product by conditional discount policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
         const user: User = new UserImpl();
@@ -55,6 +47,28 @@ describe('Buy product by policies', () => {
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
         expect((user.getOrderHistory() as string[])[0]).to.include(50*1000*0.2)
+    });
+    it('Buy product by simple purchase policy', () => {
+        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
+        const user: User = new UserImpl();
+        shop.addPolicy("Tom@gmail.com", new SimpleCondition(ConditionType.NotCategory, "GPU"))
+        let result: any = shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
+        expect(typeof result !== "string").to.be.true;
+        result = user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
+        expect(typeof result !== "string").to.be.true;
+        result = user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli");
+        expect(typeof result === "string").to.be.true;
+    });
+    it('Buy product by composite purchase policy', () => {
+        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
+        const user: User = new UserImpl();
+        shop.addPolicy("Tom@gmail.com", new SimpleCondition(ConditionType.NotCategory, "GPU"))
+        shop.addPolicy("Tom@gmail.com", new SimpleCondition(ConditionType.LowerAmount, 2))
+        shop.composePurchasePolicies("Tom@gmail.com", id_counter - 1, id_counter - 2, Operator.And)
+        shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
+        user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
+        let result = user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli");
+        expect(typeof result === "string").to.be.true;
     });
     it('Buy product not by discount policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");

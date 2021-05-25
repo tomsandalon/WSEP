@@ -1,4 +1,5 @@
 import {OK, ServerNotFound, service, Session, sid, Unauthorized} from "../../Config/Config";
+import {acknowledge_for_notifications} from "../../WSEvents";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -21,5 +22,8 @@ router.post('/', (request: any, response: any) => {
         Session.sessions[request.cookies[sid]].user_id = user_id_new;
         response.status(OK);
         response.end();
+        if (session_data.socket != undefined && Session.publisher.hasNotifications(user_id_new)) {
+            session_data.socket.emit(acknowledge_for_notifications, true)
+        }
     }
 })

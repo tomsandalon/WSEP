@@ -164,7 +164,15 @@ export class LoginImpl  implements  Login{
         return result.user_id
     }
 
-    isLoggedIn(user_email: string): boolean {
-        return this._logged_users.some(u => u == user_email)
+    isLoggedIn(user: string | number): boolean {
+        let email = ""
+        if (typeof user == 'string')
+            email = user
+        else {
+            const result = this.retrieveUser(user)
+            if (typeof result == 'string') return false
+            email = result.user_email
+        }
+        return this._logged_users.some(u => u == email)
     }
 }
