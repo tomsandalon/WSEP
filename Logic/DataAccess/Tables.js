@@ -95,7 +95,7 @@ const owns = {
     build: () => builder.createTable(owns.name, (table) => {
         table.integer(user.pk).references(user.pk).inTable(user.name).unsigned();
         table.integer(shop.pk).references(shop.pk).inTable(shop.name).unsigned();
-        table.integer('appointee_id').unsigned().notNullable().references(user.pk).inTable(user.name);
+        table.integer('appointer_id').unsigned().notNullable().references(user.pk).inTable(user.name);
         table.primary([user.pk, shop.pk]);
     })
 };
@@ -106,7 +106,7 @@ const manages = {
         table.integer(user.pk).references(user.pk).inTable(user.name).unsigned();
         table.integer(shop.pk).references(shop.pk).inTable(shop.name).unsigned();
         table.integer(permission.pk).unsigned().references(permission.pk).inTable(permission.name);
-        table.integer('appointee_id').unsigned().notNullable().references(user.pk).inTable(user.name);
+        table.integer('appointer_id').unsigned().notNullable().references(user.pk).inTable(user.name);
         table.primary([user.pk, shop.pk, permission.pk]);
     })
 };

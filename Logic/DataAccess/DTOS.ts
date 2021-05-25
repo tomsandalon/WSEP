@@ -21,7 +21,7 @@ export type Shop = {
 export type Product = {
     product_id: number,
     shop_id: number,
-    purchase_type: number,
+    purchase_type_id: number,
     name: string,
     amount: number,
     base_price: number,

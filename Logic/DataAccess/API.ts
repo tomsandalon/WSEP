@@ -46,118 +46,179 @@ const {
 } = require("./Tables");
 
 const success = (_: any) => true;
-const failure = (_: any) => false;
-const RegisterUser = (data: User) => new Promise(success)
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(user.name)
-    //         .then(success).catch(failure))
+const failure = (err: any) => {
+    console.log(err)
+    return false;
+}
+export const AddPermission = (perm: Permission) =>
+    db.transaction((trx: any) =>
+        trx.insert({permission_id: perm}).into(permission.name)
+            .then(success).catch(failure))
 
-const AddShop = (data: Shop) => new Promise(success)
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(shop.name)
-    //         .then(success).catch(failure))
+export const AddPurchaseConditionOperator = (operator: number) =>
+    db.transaction((trx: any) =>
+        trx.insert({operator_id: operator}).into(purchase_condition_operator.name)
+            .then(success).catch(failure))
 
-const AddItemToBasket = (data: Basket) => new Promise(success)
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(basket.name)
-    //         .then(success).catch(failure))
+export const AddPurchaseConditionType = (type: number) =>
+    db.transaction((trx: any) =>
+        trx.insert({type_id: type}).into(purchase_condition_operator.name)
+            .then(success).catch(failure))
 
-const UpdateItemInBasket = (data: Basket) => new Promise(success)
-    // // TODO IMPL =- UPDATE
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(basket.name)
-    //         .then(success).catch(failure))
+export const AddDiscountOperator = (operator: number) =>
+    db.transaction((trx: any) =>
+        trx.insert({operator_id: operator}).into(discount_operator.name)
+            .then(success).catch(failure))
 
-const DeleteItemInBasket = (data: Basket) => new Promise(success)
-    // // TODO IMPL -- DELETE
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(basket.name)
-    //         .then(success).catch(failure))
+export const AddDiscountConditionType = (type: number) =>
+    db.transaction((trx: any) =>
+        trx.insert({type_id: type}).into(discount_condition_type.name)
+            .then(success).catch(failure))
 
-const AddProduct = (data: Product) => new Promise(success)
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const AddPurchaseType = (type: number) =>
+    db.transaction((trx: any) =>
+        trx.insert({purchase_type_id: type}).into(purchase_type.name)
+            .then(success).catch(failure))
+export const RegisterUser = (data: User) =>
+    db.transaction((trx: any) =>
+        trx.insert(data).into(user.name)
+            .then(success).catch(failure))
 
-const UpdateProduct = (data: Product) => new Promise(success)
-    // // TODO IMPL -- UPDATE
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const AddShop = (data: Shop) =>
+    db.transaction((trx: any) =>
+        trx.insert(data).into(shop.name)
+            .then(success).catch(failure))
 
-const RemoveProduct = (data: Product) => new Promise(success)
-    // // TODO IMPL -- DELETE
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const AddItemToBasket = (data: Basket) =>
+    db.transaction((trx: any) =>
+        trx.insert(data).into(basket.name)
+            .then(success).catch(failure))
 
-const AppointManager = (target_email: string, appointer_email: string, shop_id: number, permissions: Permission[]) => new Promise(success)
+export const UpdateItemInBasket = (data: Basket) =>
+    db(basket.name)
+        .where({
+            shop_id: data.shop_id,
+            user_id: data.user_id,
+            product_id: data.product_id,
+        })
+        .update({
+            amount: data.amount
+        })
+        .then(success)
+        .catch(failure)
+
+export const DeleteItemInBasket = (data: Basket) =>
+    db(basket.name)
+        .where({
+            shop_id: data.shop_id,
+            user_id: data.user_id,
+            product_id: data.product_id,
+        })
+        .del()
+        .then(success)
+        .catch(failure)
+
+export const AddProduct = (data: Product) =>
+    db.transaction((trx: any) =>
+        trx.insert(data).into(product.name)
+            .then(success).catch(failure))
+
+export const UpdateProduct = (data: Product) =>
+    db(product.name)
+        .where({
+            shop_id: data.product_id,
+        })
+        .update({
+            purchase_type_id: data.purchase_type_id,
+            name: data.name,
+            amount: data.amount,
+            base_price: data.base_price,
+            description: data.description,
+            categories: data.categories,
+        })
+        .then(success)
+        .catch(failure)
+
+export const RemoveProduct = (product_id: number) =>
+    db(product.name)
+        .where({
+            product_id: product_id,
+        })
+        .del()
+        .then(success)
+        .catch(failure)
+
+export const AppointManager = (target_email: string, appointer_email: string, shop_id: number, permissions: Permission[]) =>
+    db.transaction((trx: any) =>
+        Promise.all(permissions.map((perm) =>
+            trx(manages.name).insert({
+                shop_id: shop_id,
+                permission_id: perm,
+                user_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [target_email]),
+                appointer_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [appointer_email])
+            }))))
+
+export const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) =>
+    db.transaction((trx: any) =>
+        trx.raw('INSERT INTO owns (user_id, shop_id, appointer_id)' +
+            ' SELECT user_id, ? as shop_id, ? as permission_id, appointer_id FROM' +
+            ' (SELECT user_id FROM user WHERE email = ?) as appointee, (SELECT user_id as appointer_id FROM user WHERE email = ?) as appointer',
+            [shop_id, target_email, appointer_email]))
+
+export const RemoveManager = (target_email: string, shop_id: number) =>
+    db.transaction((trx: any) =>
+        trx(manages.name)
+            .raw('SELECT user_id, ? as shop_id FROM manages WHERE user_id = ?', [shop_id, target_email])
+            .del())
+export const RemainingManagement = (management_emails: string[], shop_id: number) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) => new Promise(success)
+export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const RemoveManager = (target_email: string, shop_id: number) => new Promise(success)
+export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const RemainingManagement = (management_emails: string[], shop_id: number) => new Promise(success)
+export const AddDiscount = (shop_id: number, discount_id: number, discount: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
-
-const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
-
-const AddDiscount = (shop_id: number, discount_id: number, discount: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
-
-const removeDiscount = (shop_id: number, discount_id: number,) => new Promise(success)
+export const removeDiscount = (shop_id: number, discount_id: number,) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const removePurchasePolicy = (shop_id: number, policy_id: number) => new Promise(success)
+export const removePurchasePolicy = (shop_id: number, policy_id: number) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const RateProduct = (rate: Rate) => new Promise(success)
+export const RateProduct = (rate: Rate) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const Notify = (notifications: Notification[]) => new Promise(success)
+export const Notify = (notifications: Notification[]) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const ClearNotifications = (user_id: number) => new Promise(success)
+export const ClearNotifications = (user_id: number) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
@@ -177,11 +238,4 @@ payment: string
 amount actual price
  */
 
-const PurchaseBasket = (user_id: number, shop_id: number, payment: string, purchase: Purchase[]) => new Promise(success)
-
-// AddUser({
-//     user_id: 5,
-//     email: 'fff@gmail.com',
-//     password: "1234",
-//     age: 3
-// }).then((result: any) => console.log(`Finish ${result}`))
+export const PurchaseBasket = (user_id: number, shop_id: number, payment: string, purchase: Purchase[]) => new Promise(success)
