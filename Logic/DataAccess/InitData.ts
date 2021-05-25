@@ -1,5 +1,14 @@
 import {db} from './DB.config';
-import {AddPermission, AddProduct, AddPurchaseType, AddShop, AppointManager, AppointOwner, RegisterUser} from "./API";
+import {
+    AddPermission,
+    AddProduct,
+    AddPurchaseType,
+    AddShop,
+    AppointManager,
+    AppointOwner,
+    RegisterUser,
+    RemoveManager
+} from "./API";
 const first_purchase_type = 1;
 const first_perm = 1;
 const second_perm = 2;
@@ -55,10 +64,10 @@ export const initData = () =>
         .then((_: any) =>
             AddShop(first_shop))
         .then((_: any) => AddProduct(first_product))
-        // .then((_: any) => AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm]))
+        .then((_: any) => AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm]))
         // .then((_: any) => AppointOwner(third_user.email, first_user.email, first_shop.shop_id,))
 
-AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
-.then((result: any) => console.log(`Finish ${JSON.stringify(result)}`))
+RemoveManager(second_user.email, first_shop.shop_id)
+    .then((result: any) => console.log(`Finish ${JSON.stringify(result)}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

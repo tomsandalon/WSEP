@@ -160,16 +160,21 @@ export const AppointManager = (target_email: string, appointer_email: string, sh
 
 export const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) =>
     db.transaction((trx: any) =>
-        trx.raw('INSERT INTO owns (user_id, shop_id, appointer_id)' +
-            ' SELECT user_id, ? as shop_id, ? as permission_id, appointer_id FROM' +
-            ' (SELECT user_id FROM user WHERE email = ?) as appointee, (SELECT user_id as appointer_id FROM user WHERE email = ?) as appointer',
-            [shop_id, target_email, appointer_email]))
+        trx(owns.name).insert({
+            shop_id: shop_id,
+            user_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [target_email]),
+            appointer_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [appointer_email])
+        }))
 
 export const RemoveManager = (target_email: string, shop_id: number) =>
     db.transaction((trx: any) =>
         trx(manages.name)
-            .raw('SELECT user_id, ? as shop_id FROM manages WHERE user_id = ?', [shop_id, target_email])
+            .where({
+                shop_id: shop_id,
+                user_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [target_email])
+            })
             .del())
+
 export const RemainingManagement = (management_emails: string[], shop_id: number) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
