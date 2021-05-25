@@ -78,7 +78,7 @@ describe('Purchase Notifications Tests', function () {
                 payment: 'Banana'
             })
             .expect(OK)
-            .end(() =>{
+            .then(() =>{
                 client.post(route_login)
                     .set('Cookie', cookie_prefix + NotificationTest.user_one_sess_id)
                     .send({
@@ -86,7 +86,7 @@ describe('Purchase Notifications Tests', function () {
                         password: mainUser_pass
                     })
                     .expect(OK)
-                    .end(() =>{
+                    .then(() =>{
                         isLogin = true;
                     })
             })
@@ -95,7 +95,7 @@ describe('Purchase Notifications Tests', function () {
             if(isLogin){
                 expect(JSON.parse(data).length).greaterThan(0)
             } else {
-                expect(JSON.parse(data).length).equal(0)
+                done('Should not get notification')
             }
             done()
         })

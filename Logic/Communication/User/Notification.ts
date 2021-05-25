@@ -7,9 +7,6 @@ export const configWebSocket = (io: any) =>
             if (sid_regex.test(hello_message)) {
                 const sid = parseInt(hello_message.split('=')[1]);
                 Session.sessions[sid].socket = socket;
-                if (Session.publisher.hasNotifications(Session.sessions[sid].user_id)) {
-                    socket.emit(acknowledge_for_notifications, true)
-                }
             } else {
                 socket.close()
             }
