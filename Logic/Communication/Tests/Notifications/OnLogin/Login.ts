@@ -69,7 +69,7 @@ describe('Purchase Notifications Tests', function () {
     after( () => {
         cleanUsers();
     })
-    it('Purchase successful - Notification for owner', (done) =>{
+    it('Purchase successful - Notification for not logged in owner', (done) =>{
         let isLogin = false;
         client.post(route_purchase)
             .set('Cookie', cookie_prefix + NotificationTest.user_two_sess_id)

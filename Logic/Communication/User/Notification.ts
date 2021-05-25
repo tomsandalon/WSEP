@@ -1,4 +1,4 @@
-import {Session, sid_regex} from "../Config/Config";
+import {service, Session, sid_regex} from "../Config/Config";
 import {acknowledge_for_notifications, get_notifications, hello, send_notifications} from "../WSEvents";
 
 export const configWebSocket = (io: any) =>
@@ -7,6 +7,10 @@ export const configWebSocket = (io: any) =>
             if (sid_regex.test(hello_message)) {
                 const sid = parseInt(hello_message.split('=')[1]);
                 Session.sessions[sid].socket = socket;
+                const user_id = Session.sessions[sid].user_id;
+                if (service.isLoggedIn(user_id) && Session.publisher.hasNotifications(user_id)) {
+                    socket.emit(acknowledge_for_notifications, true)
+                }
             } else {
                 socket.close()
             }
@@ -26,8 +30,8 @@ export const notify = (user_id: number) => {
     for (let sid in Session.sessions) {
         const entry = Session.sessions[sid]
         if (entry !== undefined && entry.user_id == user_id) {
-            // console.log(`Notify UID = ${user_id}`)
             entry.socket.emit(acknowledge_for_notifications, true)
+            return;
         }
     }
 }
