@@ -22,7 +22,7 @@ router.post('/', (request: any, response: any) => {
         Session.sessions[request.cookies[sid]].user_id = user_id_new;
         response.status(OK);
         response.end();
-        if (Session.publisher.hasNotifications(user_id_new)) {
+        if (session_data.socket != undefined && Session.publisher.hasNotifications(user_id_new)) {
             session_data.socket.emit(acknowledge_for_notifications, true)
         }
     }
