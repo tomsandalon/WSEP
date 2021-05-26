@@ -369,19 +369,20 @@ export const RateProduct = (rate: Rate) =>
         trx.insert(rate).into(rates.name)
             .then(success).catch(failure))
 
-// export const Notify = (notifications: Notification[]) =>
-//     db.transaction((trx: any) =>
-//         Promise.all(
-//             notifications.map((message: Notification) =>
-//                 trx(notification.name)
-//                     .insert({
-//                         user_id: message.user_id,
-//                         notification: message.notification,
-//                     }))))
-//
-// export const ClearNotifications = (user_id: number) =>
-//     db.transaction((trx: any) =>
-//         trx(notification.name).where(user.pk, user_id).del())
+export const Notify = (notifications: Notification[]) =>
+    db.transaction((trx: any) =>
+        Promise.all(
+            notifications.map((message: Notification) =>
+                trx(notification.name)
+                    .insert({
+                        user_id: message.user_id,
+                        notification_id: message.notification_id,
+                        notification: message.notification,
+                    }))))
+
+export const ClearNotifications = (user_id: number) =>
+    db.transaction((trx: any) =>
+        trx(notification.name).where(user.pk, user_id).del())
 
 /*
 TODO add these fields to purchase table

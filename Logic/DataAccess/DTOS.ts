@@ -52,6 +52,7 @@ export type Offer = {
 
 export type Notification = {
     user_id: number,
+    notification_id: number,
     notification: string,
 }
 

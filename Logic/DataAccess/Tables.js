@@ -86,7 +86,9 @@ const notification = {
     name: 'notification',
     build: () => builder.createTable(notification.name, (table) => {
         table.integer(user.pk).references(user.pk).inTable(user.name).unsigned();
+        table.integer('notification_id').unsigned();
         table.text('notification').notNullable();
+        table.primary(['notification_id', user.pk]);
     })
 };
 exports.notification = notification;
