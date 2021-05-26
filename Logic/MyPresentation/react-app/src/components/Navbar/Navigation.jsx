@@ -6,13 +6,18 @@ import '../../index.css';
 import './Navbar.css'
 
 class Navigation extends Component {
-    state ={
-        clicked:false,
-        index:MenuItems.length,
-        errorMsg:'',
-        visible:false,
-        successVisible:false,
-        loggedUser:false,
+    constructor(props) {
+        super(props);
+        this.state ={
+            clicked:false,
+            index:MenuItems.length,
+            errorMsg:'',
+            visible:false,
+            successVisible:false,
+            loggedUser:false,
+            socket:props.socket,
+            notifications:0
+        };
     }
 handleLogout = () => {
     const requestOptions = {
@@ -66,8 +71,27 @@ isUser = () => {
             }
         });
 }
+socketFunc = () => {
+    // this.state.socket.emit("Hello", document.cookie);
+    this.state.socket.emit("Send Notifications",document.cookie);
+    this.state.socket.on("Get Notifications", (message) => {
+        console.log("Here>>>",message);
+        // if(message.length > 2){
+        //     setNotifications({alerts:[message,...notifications.alerts]});
+        // }
+    });
+}
 componentDidMount() {
     this.isUser();
+    console.log("this,state,", this.state);
+    this.interval = setInterval(() => this.socketFunc(), 3000);
+    // setInterval(() => 
+    // console.log("hi")
+        // this.socketFunc()
+    // , 5000);
+}
+componentWillUnmount() {
+    clearInterval(this.interval);
 }
 handleClick = () =>{
     this.setState({clicked:!this.state.clicked})
@@ -115,7 +139,7 @@ toggle(){
                             Roles</a>
                         </li>}
                         {this.state.loggedUser && <li key={100}><button className="nav-links cartButton btn-dark btn-sm" onClick={this.handleLogout}>
-                        Logout</button>
+                        Logout({this.state.random})</button>
                         <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                         <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                         </li>}

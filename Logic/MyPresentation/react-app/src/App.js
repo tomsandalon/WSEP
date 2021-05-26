@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState,useEffect} from "react";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Navigation from "./components/Navbar/Navigation";
@@ -21,19 +21,30 @@ import UserHistory from "./components/UserHistory/UserHistory";
 import AdminMenu from "./components/Admin/AdminMenu";
 import Notifications from "./components/Notifications/Notifications";
 import Unatho from "./components/Unatho";
+import SocketIO from 'socket.io-client';
+
 function App() {
+  const [counter,setCounter] = useState(0);
+  const cookie = document.cookie;
+  const port = 8000;
+  const localhost = 'https://localhost:' + port;
+  const [socket, setSocket] = useState(SocketIO(localhost));
+  useEffect(() => {
+    console.log("Hello react",counter);
+    setCounter(counter + 1);
+  },[]);
   return (
     <Router>
       <div className="app">
-        <Navigation />
+        <Navigation socket={socket} />
         <Switch>
           <Route exact path="/"><Redirect to="/home" /></Route>
           <Route path="/home" render={() => <ShopItems />} />
-          <ProtectedRoute path="/notifications" component={Notifications}/>
+          <ProtectedRoute path="/notifications"><Notifications socket={socket}/></ProtectedRoute>
           <ProtectedRoute path="/roles" component={RoleSelection} />
           <ProtectedRoute path="/user-history" component={UserHistory} />
           <Route path="/my-cart" component={ShoppingCart} />
-          <Route path="/login" render={() => <Login />} />
+          <Route path="/login" render={() => <Login socket={socket}/>} />
           <Route path="/managerHome" component={ManagerHome} />
           <Route path="/register" component={Register} />
           <ProtectedRoute role={"admin"} path="/admin-menu" component={AdminMenu} />

@@ -8,7 +8,7 @@ export const configWebSocket = (io: any) =>
                 const sid = parseInt(hello_message.split('=')[1]);
                 Session.sessions[sid].socket = socket;
                 const user_id = Session.sessions[sid].user_id;
-                // console.log("FirstTime connection",hello);
+                console.log("FirstTime connection",hello);
                 if (service.isLoggedIn(user_id) && Session.publisher.hasNotifications(user_id)) {
                     // console.log("Sending first time acknowledge_for_notifications");
                     socket.emit(acknowledge_for_notifications, true)

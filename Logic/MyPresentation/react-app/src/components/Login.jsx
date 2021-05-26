@@ -32,7 +32,7 @@ handleSubmit = (event) =>{
             switch (response.status) {
                 case 200: //welcome
                     this.setState({errorMsg:"Login sucessfully",successVisible:true})
-                    this.setLoginPermission();
+                    this.props.socket.emit("Hello", document.cookie);
                     window.location.assign("/home")
                     break;
                 case 401:

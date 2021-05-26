@@ -2,36 +2,31 @@ import React, { useEffect,useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Noti.css';
 import SocketIO from 'socket.io-client';
-import Helper from './Helper';
 
-function Notifications(){
+function Notifications(props){
+    // console.log(props);
     const cookie = document.cookie;
-    const port = 8000;
-    const localhost = 'https://localhost:' + port;
+    // const port = 8000;
+    // const localhost = 'https://localhost:' + port;
     const [notifications, setNotifications] = useState({ 
     alerts:[]
     });
-    const [socket, setSocket] = useState(SocketIO(localhost));
-    socket.emit("Hello", cookie);
+    // const [socket, setSocket] = useState(SocketIO(localhost));
     // socket.emit("Send Notifications",cookie);
-    socket.on("Get Notifications", (message) => {
+    props.socket.emit("Hello", cookie);
+    props.socket.on("Get Notifications", (message) => {
         if(message.length > 2){
             setNotifications({alerts:[message,...notifications.alerts]});
         }
     });
-    socket.on("Pending Notifications", () => {
-        socket.emit("Send Notifications",cookie);
+    props.socket.on("Pending Notifications", () => {
+        props.socket.emit("Send Notifications",cookie);
     });
     
-    // useEffect(() => {
-    //     socket.emit("Hello", cookie);
-    //     // socket.emit("Send Notifications",cookie);
-    //   }, []);
         return(
             <div className="wrapper2 fadeInDown">
             <div id="form2">
                 <div className="fadeIn first">
-      {/* <             img src={Reactlogo} id="icon" alt="User Icon" /> */}
                     <h1>Notifications</h1>
                 </div>
                 <form>
