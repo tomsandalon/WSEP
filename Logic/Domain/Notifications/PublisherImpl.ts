@@ -32,7 +32,14 @@ export class PublisherImpl implements Publisher{
                 P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
             }
         }
-        else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
+        else logger.Error(`Failed to send notifications to ${user_id} as the publisher is not defined`)
+    }
+
+    getAmountOfNotifications(user_id: number): number {
+        if (user_id in this.notificationQueue) {
+            return this.notificationQueue[user_id].length
+        }
+        else return -1;
     }
 
     notify(user_id: number, notification: Notification): void {
