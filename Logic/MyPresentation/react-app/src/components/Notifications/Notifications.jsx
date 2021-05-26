@@ -1,28 +1,24 @@
-import React, { useEffect,useState} from 'react';
+import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Noti.css';
-import SocketIO from 'socket.io-client';
 
 function Notifications(props){
-    // console.log(props);
     const cookie = document.cookie;
-    // const port = 8000;
-    // const localhost = 'https://localhost:' + port;
     const [notifications, setNotifications] = useState({ 
     alerts:[]
     });
-    // const [socket, setSocket] = useState(SocketIO(localhost));
     props.socket.emit("Hello", cookie);
     props.socket.emit("Send Notifications",cookie);
     props.socket.on("Get Notifications", (message) => {
-        if(message.length > 2){
-            setNotifications({alerts:[message,...notifications.alerts]});
+        const alerts = message.map(val => JSON.stringify(val));
+        console.log("alerts",alerts);
+        if(alerts.length > 0){
+            setNotifications({alerts:alerts});
         }
     });
-    // props.socket.on("Pending Notifications", (amount) => {
-    //     console.log("amountnofiti",amount);
-    //     props.socket.emit("Send Notifications",cookie);
-    // });
+    props.socket.on("Pending Notifications", (amount) => {
+        props.socket.emit("Send Notifications",cookie);
+    });
     
         return(
             <div className="wrapper2 fadeInDown">
