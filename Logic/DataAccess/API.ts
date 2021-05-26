@@ -338,33 +338,31 @@ export const removeDiscount = (shop_id: number, discount_id: number,) =>{
     })
 }
 
-/*
-SELECT * FROM (SELECT first, second FROM
-                (SELECT discount_composite_id as discount_id FROM discount_composite WHERE discount_composite_id = 9) as Com INNER JOIN discount_comprised_composite
-                on discount_comprised_composite.discount_composite_id = Com.discount_id) as A UNION
-        (SELECT discount_id as first, -1 as second FROM
-            (SELECT discount_conditional_id FROM discount_conditional WHERE discount_conditional_id = 9) as Com INNER JOIN discount_comprised_conditional
-            on discount_comprised_conditional.discount_conditional_id = Com.discount_conditional_id) as B
-
-(SELECT discount_id as first, -1 as second FROM discount_simple where discount_id = 9)
-union
+export const removePurchasePolicy = (shop_id: number, policy_id: number) => {
+    let ids: any[] = []
+    let pending: number[] = []
+    return db.transaction( async (trx: any) =>{
+        const query = (id: number) => trx.raw(`(SELECT simple_id as first, -1 as second FROM purchase_simple_condition where simple_id = ${id}) union
             (SELECT first, second FROM
-                (SELECT discount_composite_id as discount_id FROM discount_composite WHERE discount_composite_id = 9) as Com INNER JOIN discount_comprised_composite
-                on discount_comprised_composite.discount_composite_id = Com.discount_id) UNION
-        (SELECT discount_id as first, -1 as second FROM
-            (SELECT discount_conditional_id FROM discount_conditional WHERE discount_conditional_id = 9) as Com INNER JOIN discount_comprised_conditional
-            on discount_comprised_conditional.discount_conditional_id = Com.discount_conditional_id)
-
- */
-        // trx(discount_conditional.name).select(trx.ref(discount_conditional.pk).as(discount.pk)).where(discount_conditional.pk, discount_id)]))
-        // trx.from(discount.name).innerJoin(discount_simple.name, `${discount.name}.${discount.pk}`, `${discount_simple.name}.${discount.pk}`))
-        // trx(discount.name).where({discount_id: discount_id}).del()
-        //     .then(success).catch(failure))
-
-export const removePurchasePolicy = (shop_id: number, policy_id: number) =>
-    db.transaction((trx: any) =>
-        trx(purchase_condition.name).where({p_condition_id: policy_id}).del()
-            .then(success).catch(failure))
+                (SELECT composite_id as p_condition_id FROM purchase_composite_condition WHERE composite_id = ${id}) as Com INNER JOIN purchase_comprised
+                on purchase_comprised.composite_id = Com.p_condition_id)`)
+        ids.push(policy_id);
+        let res = (await query(policy_id))[0];
+        while (res.length != 0 || pending.length != 0){
+            if(res[0].first >= 0 && res[0].second >= 0){
+                pending.push(res[0].first, res[0].second)
+            } else if(res[0].second == -2){
+                pending.push(res[0].first)
+            }
+            if(pending.length == 0) break;
+            let [next, ...temp] = pending;
+            ids.push(next);
+            pending = temp;
+            res = (await query(next))[0];
+        }
+        return trx(purchase_condition.name).whereIn(purchase_condition.pk, ids).del();
+    })
+}
 
 export const RateProduct = (rate: Rate) =>
     db.transaction((trx: any) =>

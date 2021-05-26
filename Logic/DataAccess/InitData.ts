@@ -134,6 +134,10 @@ export const initData = () =>
             second_policy: 7,
             operator: first_purchase_condition_operator,
         }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 10, {
+            value: "1010",
+            purchase_condition: first_purchase_condition_type
+        }))
         .then((_: any) => AddDiscount(first_shop.shop_id, 1, 111))
         .then((_: any) => AddDiscount(first_shop.shop_id, 2, 222))
         .then((_: any) => AddDiscount(first_shop.shop_id, 3, 333))
@@ -162,7 +166,9 @@ export const initData = () =>
 // RemoveManager(second_user.email, first_shop.shop_id)
 // AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
 
-removeDiscount(first_shop.shop_id, 9)
+// removeDiscount(first_shop.shop_id, 9)
+
+removePurchasePolicy(first_shop.shop_id, 9)
     .then((result: any) => console.log(`Finish ${JSON.stringify(result[0])}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))
