@@ -1,6 +1,7 @@
 import * as P from "../Domain/Notifications/Publisher";
 import {PublisherImpl} from "../Domain/Notifications/PublisherImpl";
 import {notify} from "../Communication/User/Notification";
+import {Notification} from "../Domain/Notifications/Notification";
 
 export class Publisher {
     private static instance: Publisher
@@ -16,12 +17,8 @@ export class Publisher {
         return this.instance
     }
 
-    public fetch(user_id: number): string{
-        if (this._publisher_domain == null)
-            return ''
-        // if (user_id == 4) return '["message for 4"]'
-        // if (user_id == 6) return '["message for 6"]'
-        return JSON.stringify(this._publisher_domain.fetchNotifications(user_id))
+    public fetch(user_id: number): string[]{
+        return this._publisher_domain == null ? [''] : this._publisher_domain.fetchNotifications(user_id).map((notification: Notification) => notification.message);
     }
     public notify(user_id: number, amount: number){
         notify(user_id, amount)
