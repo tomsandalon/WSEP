@@ -60,7 +60,7 @@ export type Permission = number
 export type Rate = {
     user_id: number,
     product_id: number,
-    rate: string,
+    rate: number,
 }
 
 export type PurchaseSimpleCondition = {

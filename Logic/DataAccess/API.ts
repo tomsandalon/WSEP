@@ -3,7 +3,7 @@ import {
     Basket,
     DiscountCompositeCondition,
     DiscountConditionalCondition,
-    DiscountSimpleCondition,
+    DiscountSimpleCondition, isDiscountCompositeCondition,
     isDiscountSimpleCondition, isPurchaseCompositeCondition, isPurchaseSimpleCondition,
     Notification,
     Permission,
@@ -180,11 +180,13 @@ export const RemoveManager = (target_email: string, shop_id: number) =>
             })
             .del())
 
-export const RemainingManagement = (management_emails: string[], shop_id: number) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const RemainingManagement = (management_emails: string[], shop_id: number) =>
+    db.transaction((trx: any) =>
+        trx(owns.name)
+            .where({shop_id: shop_id})
+            .whereNotIn(user.pk,
+                trx(user.name).select(user.pk).whereIn('email', management_emails))
+            .del())
 
 export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) =>
     db.transaction((trx: any) =>
@@ -241,41 +243,100 @@ export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition:
                                 query.where(purchase_condition.pk, condition.first_policy).orWhere(purchase_condition.pk, condition.second_policy))
                             .del()))
 
-export const AddDiscount = (shop_id: number, discount_id: number, discount: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const AddDiscount = (shop_id: number, discount_id: number, discount_to_add: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) =>
+    isDiscountSimpleCondition(discount_to_add)?
+        db.transaction((trx: any) =>
+            trx.insert({discount_id: discount_id}).into(discount.name)
+                .then((_: any) =>
+                    trx.insert({
+                        discount_id: discount_id,
+                        value: discount_to_add
+                    }).into(discount_simple.name))
+                .then((_: any) =>
+                    trx(discount_allowed_in.name).insert({
+                        shop_id: shop_id,
+                        discount_id: discount_id
+                    }))):
+    isDiscountCompositeCondition(discount_to_add)?
+        db.transaction((trx: any) =>
+            trx.insert({discount_id: discount_id}).into(discount.name)
+                .then((_: any) => trx.insert({discount_composite_id: discount_id}).into(discount_composite.name))
+                .then((_: any) =>
+                    trx(discount_comprised_composite.name).insert({
+                        discount_operator_id: discount_to_add.operator,
+                        discount_composite_id: discount_id,
+                        first: discount_to_add.first_policy,
+                        second: discount_to_add.second_policy,
+                    }))
+                .then((_: any) => trx.insert({shop_id: shop_id, discount_id: discount_id}).into(discount_allowed_in.name))
+                .then((_: any) =>
+                    trx(discount_allowed_in.name)
+                        .where({
+                            shop_id: shop_id,
+                        })
+                        .andWhere((query: any) =>
+                            query.where(discount.pk, discount_to_add.first_policy).orWhere(discount.pk, discount_to_add.second_policy))
+                        .del())):
+            db.transaction((trx: any) =>
+                trx.insert({discount_id: discount_id}).into(discount.name)
+                    .then((_: any) => trx(discount_conditional.name).insert({
+                        discount_conditional_id: discount_id,
+                        discount_param: discount_to_add.discount_param,
+                    }))
+                    .then((_: any) =>
+                        trx.insert({
+                            discount_conditional_id: discount_id,
+                            discount_id: discount_to_add.operand_discount,
+                        }).into(discount_comprised_conditional.name))
+                    .then((_: any) =>
+                        trx(discount_conditional_type_of.name)
+                            .insert({
+                                discount_conditional_id: discount_id,
+                                discount_condition_type_id: discount_to_add.discount_condition
+                            }))
+                    .then((_: any) =>
+                        trx(discount_allowed_in.name)
+                            .insert({
+                                discount_id: discount_id,
+                                shop_id: shop_id
+                            }))
+                    .then((_: any) =>
+                        trx(discount_allowed_in.name)
+                            .where({
+                                shop_id: shop_id,
+                                discount_id: discount_to_add.operand_discount,
+                            })
+                            .del()))
 
-export const removeDiscount = (shop_id: number, discount_id: number,) => new Promise(success)
-    // // TODO IMPL -- Cascading
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
 
-export const removePurchasePolicy = (shop_id: number, policy_id: number) => new Promise(success)
-    // // TODO IMPL -- Cascading
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+// export const removeDiscount = (shop_id: number, discount_id: number,) =>
+//     db.transaction((trx: any) =>
+//         trx(discount.name).where({discount_id: discount_id}).del()
+//             .then(success).catch(failure))
+//
+// export const removePurchasePolicy = (shop_id: number, policy_id: number) =>
+//     db.transaction((trx: any) =>
+//         trx(purchase_condition.name).where({p_condition_id: policy_id}).del()
+//             .then(success).catch(failure))
 
-export const RateProduct = (rate: Rate) => new Promise(success)
-    // // TODO IMPL -- Cascading
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const RateProduct = (rate: Rate) =>
+    db.transaction((trx: any) =>
+        trx.insert(rate).into(rates.name)
+            .then(success).catch(failure))
 
-export const Notify = (notifications: Notification[]) => new Promise(success)
-    // // TODO IMPL -- Cascading
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
-
-export const ClearNotifications = (user_id: number) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+// export const Notify = (notifications: Notification[]) =>
+//     db.transaction((trx: any) =>
+//         Promise.all(
+//             notifications.map((message: Notification) =>
+//                 trx(notification.name)
+//                     .insert({
+//                         user_id: message.user_id,
+//                         notification: message.notification,
+//                     }))))
+//
+// export const ClearNotifications = (user_id: number) =>
+//     db.transaction((trx: any) =>
+//         trx(notification.name).where(user.pk, user_id).del())
 
 /*
 TODO add these fields to purchase table

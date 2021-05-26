@@ -6,9 +6,9 @@ import {
     AddPurchaseType,
     AddShop,
     AppointManager,
-    AppointOwner,
-    RegisterUser,
-    RemoveManager, UpdatePermissions
+    AppointOwner, RateProduct,
+    RegisterUser, RemainingManagement, removeDiscount,
+    RemoveManager, removePurchasePolicy, UpdatePermissions
 } from "./API";
 const first_purchase_type = 1;
 const first_purchase_condition_type = 1;
@@ -36,6 +36,18 @@ const third_user = {
     password: "1234",
     age: 25,
 };
+const four_user = {
+    user_id: 4,
+    email: "lior@gmail.com",
+    password: "1234",
+    age: 25,
+};
+const five_user = {
+    user_id: 5,
+    email: "nicol@gmail.com",
+    password: "1234",
+    age: 18,
+};
 const first_shop = {
     shop_id: 1,
     user_id: first_user.user_id,
@@ -61,6 +73,10 @@ export const initData = () =>
             RegisterUser(second_user))
         .then((_: any) =>
             RegisterUser(third_user))
+        .then((_: any) =>
+            RegisterUser(four_user))
+        .then((_: any) =>
+            RegisterUser(five_user))
         .then((_: any) =>
             AddPurchaseType(first_purchase_type))
         .then((_: any) =>
@@ -91,19 +107,62 @@ export const initData = () =>
             purchase_condition: first_purchase_condition_type
         }))
         .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 4, {
+            value: "444",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 5, {
+            value: "555",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 6, {
             first_policy: 1,
             second_policy: 2,
             operator: first_purchase_condition_operator,
         }))
-        // .then((_: any) => AppointOwner(third_user.email, first_user.email, first_shop.shop_id,))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 7, {
+            first_policy: 3,
+            second_policy: 6,
+            operator: first_purchase_condition_operator,
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 8, {
+            first_policy: 4,
+            second_policy: 5,
+            operator: first_purchase_condition_operator,
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 9, {
+            first_policy: 8,
+            second_policy: 7,
+            operator: first_purchase_condition_operator,
+        }))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 1, 111))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 2, 222))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 3, 333))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 4, 444))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 5, 555))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 6, 666))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 7, {
+                    first_policy: 1,
+                    second_policy: 2,
+                    operator: first_discount_operator
+                }))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 8, {
+                discount_param: "banana",
+                discount_condition: first_discount_condition_type,
+                operand_discount: 3,
+            }))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 9, {
+            first_policy: 8,
+            second_policy: 7,
+            operator: first_discount_operator
+        }))
+        .then((_: any) => AppointOwner(third_user.email, first_user.email, first_shop.shop_id,))
+        .then((_: any) => AppointOwner(four_user.email, first_user.email, first_shop.shop_id,))
+        .then((_: any) => AppointOwner(five_user.email, first_user.email, first_shop.shop_id,))
 
 // RemoveManager(second_user.email, first_shop.shop_id)
 // AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
-// AddPurchasePolicy(first_shop.shop_id, 4, {
-//     first_policy: 1,
-//     second_policy: 2,
-//     operator: first_purchase_condition_operator,
-// })
+
+// removeDiscount(first_shop.shop_id, 9)
 //     .then((result: any) => console.log(`Finish ${JSON.stringify(result)}`))
 
 initData().then((result: any) => console.log(`Finish ${result}`))

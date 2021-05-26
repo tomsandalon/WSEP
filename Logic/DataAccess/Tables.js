@@ -85,7 +85,7 @@ exports.offer = offer;
 const notification = {
     name: 'notification',
     build: () => builder.createTable(notification.name, (table) => {
-        table.integer(user.pk).references(user.pk).inTable(user.name).unsigned().primary();
+        table.integer(user.pk).references(user.pk).inTable(user.name).unsigned();
         table.text('notification').notNullable();
     })
 };
@@ -220,7 +220,7 @@ const discount_conditional = {
     name: 'discount_conditional',
     pk: 'discount_conditional_id',
     build: () => builder.createTable(discount_conditional.name, (table) => {
-        table.integer(discount_conditional.pk).references(discount.pk).inTable(discount.name).unsigned().primary();
+        table.integer(discount_conditional.pk).references(discount.pk).inTable(discount.name).unsigned().onDelete('CASCADE').primary();
         table.string('discount_param').notNullable();
     })
 };
@@ -229,14 +229,14 @@ const discount_composite = {
     name: 'discount_composite',
     pk: 'discount_composite_id',
     build: () => builder.createTable(discount_composite.name, (table) => {
-        table.integer(discount_composite.pk).references(discount.pk).inTable(discount.name).unsigned().primary();
+        table.integer(discount_composite.pk).references(discount.pk).inTable(discount.name).unsigned().onDelete('CASCADE').primary();
     })
 };
 exports.discount_composite = discount_composite;
 const discount_simple = {
     name: 'discount_simple',
     build: () => builder.createTable(discount_simple.name, (table) => {
-        table.integer(discount.pk).references(discount.pk).inTable(discount.name).unsigned().primary();
+        table.integer(discount.pk).references(discount.pk).inTable(discount.name).unsigned().onDelete('CASCADE').primary();
         table.float('value').unsigned().notNullable();
     })
 };
@@ -254,13 +254,14 @@ const discount = {
     pk: 'discount_id',
     build: () => builder.createTable(discount.name, (table) => {
         table.integer(discount.pk).unsigned().primary();
+        table.integer('parent').unsigned().references();
     })
 };
 exports.discount = discount;
 const discount_allowed_in = {
     name: 'discount_allowed_in',
     build: () => builder.createTable(discount_allowed_in.name, (table) => {
-        table.integer(discount.pk).references(discount.pk).inTable(discount.name).unsigned();
+        table.integer(discount.pk).references(discount.pk).inTable(discount.name).unsigned().onDelete('CASCADE');
         table.integer(shop.pk).references(shop.pk).inTable(shop.name).unsigned();
         table.primary([discount.pk, shop.pk]);
     })
@@ -269,18 +270,19 @@ exports.discount_allowed_in = discount_allowed_in;
 const discount_comprised_composite = {
     name: 'discount_comprised_composite',
     build: () => builder.createTable(discount_comprised_composite.name, (table) => {
-        table.integer(discount.pk).references(discount.pk).inTable(discount.name).unsigned();
-        table.integer(discount_composite.pk).references(discount_composite.pk).inTable(discount_composite.name).unsigned();
+        table.integer('first').references(discount.pk).inTable(discount.name).unsigned();
+        table.integer('second').references(discount.pk).inTable(discount.name).unsigned();
+        table.integer(discount_composite.pk).references(discount_composite.pk).inTable(discount_composite.name).unsigned().onDelete('CASCADE');
         table.integer(discount_operator.pk).references(discount_operator.pk).inTable(discount_operator.name).unsigned();
-        table.primary([discount.pk, discount_composite.pk, discount_operator.pk]);
+        table.primary([discount_composite.pk, discount_operator.pk]);
     })
 };
 exports.discount_comprised_composite = discount_comprised_composite;
 const discount_comprised_conditional = {
     name: 'discount_comprised_conditional',
     build: () => builder.createTable(discount_comprised_conditional.name, (table) => {
-        table.integer(discount.pk).references(discount.pk).inTable(discount.name).unsigned();
-        table.integer(discount_conditional.pk).references(discount_conditional.pk).inTable(discount_conditional.name).unsigned();
+        table.integer(discount.pk).references(discount.pk).inTable(discount.name).unsigned().onDelete('CASCADE');
+        table.integer(discount_conditional.pk).references(discount_conditional.pk).inTable(discount_conditional.name).unsigned().onDelete('CASCADE');
         table.primary([discount.pk, discount_conditional.pk]);
     })
 };
@@ -288,7 +290,7 @@ exports.discount_comprised_conditional = discount_comprised_conditional;
 const discount_conditional_type_of = {
     name: 'discount_conditional_type_of',
     build: () => builder.createTable(discount_conditional_type_of.name, (table) => {
-        table.integer(discount_conditional.pk).references(discount_conditional.pk).inTable(discount_conditional.name).unsigned();
+        table.integer(discount_conditional.pk).references(discount_conditional.pk).inTable(discount_conditional.name).unsigned().onDelete('CASCADE');
         table.integer(discount_condition_type.pk).references(discount_condition_type.pk).inTable(discount_condition_type.name).unsigned();
         table.primary([discount_conditional.pk, discount_condition_type.pk]);
     })
