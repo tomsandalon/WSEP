@@ -16,9 +16,9 @@ export interface System{
     addItemToBasket(user_id:number, product_id: number, shop_id:number, amount:number):string | void
     displayShoppingCart(user_id:number): string | string[][]
     editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):string | void
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):string | boolean
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string): Promise<string | boolean>
     removeManager(user_id: number, shop_id: number, target: string): string | boolean
-    purchaseCart(user_id: number, payment_info:string):string | boolean
+    purchaseCart(user_id: number, payment_info:string):Promise<string | boolean>
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info:string): number | string
     userOrderHistory(user_id: number):string | string[]

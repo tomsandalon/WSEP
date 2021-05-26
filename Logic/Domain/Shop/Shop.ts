@@ -3,7 +3,7 @@ import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
 // import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {logger} from "../Logger";
-import {Action} from "../ShopPersonnel/Permissions";
+import {Action, Permissions} from "../ShopPersonnel/Permissions";
 import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
 import {Discount} from "./DiscountPolicy/Discount";
 import {PurchaseCondition} from "./PurchasePolicy/PurchaseCondition";
@@ -202,6 +202,10 @@ export interface Shop {
     removePermission(user_email: string, target_email: string, action: Action): string | boolean;
 
     rateProduct(user_email: string, user_id: number, product_id: number, rating: number): string | boolean;
+
+    getAllManagementEmail(): string[];
+
+    getRealPermissions(user_email: string): Permissions;
 }
 
 export class ShopImpl implements Shop {
@@ -661,5 +665,13 @@ export class ShopImpl implements Shop {
         }
         this.inventory.rateProduct(product_id, rating, user_email)
         return true;
+    }
+
+    getAllManagementEmail(): string[] {
+        return this.management.getAllManagementEmails();
+    }
+
+    getRealPermissions(user_email: string): Permissions {
+        return this.management.getRealPermissions(user_email);
     }
 }

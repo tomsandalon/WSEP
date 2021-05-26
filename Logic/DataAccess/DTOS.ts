@@ -21,7 +21,7 @@ export type Shop = {
 export type Product = {
     product_id: number,
     shop_id: number,
-    purchase_type: number,
+    purchase_type_id: number,
     name: string,
     amount: number,
     base_price: number,
@@ -60,7 +60,7 @@ export type Permission = number
 export type Rate = {
     user_id: number,
     product_id: number,
-    rate: string,
+    rate: number,
 }
 
 export type PurchaseSimpleCondition = {

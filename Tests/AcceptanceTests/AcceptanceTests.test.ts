@@ -201,8 +201,8 @@ describe('Acceptance Tests:', () => {
         // expect(typeof add_to_basket == "string").to.be.false
 
         it('Happy', () => {
-            let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
-            expect(typeof purchase == "boolean").to.be.true 
+            system.purchaseShoppingBasket(user, shopID, "hello")
+                .then(purchase => expect(typeof purchase == "boolean").to.be.true)
         });
         it('Sad: two people buying one product', () => {
            system.performRegister("oneUser@test.com", "TESTER");
@@ -211,14 +211,18 @@ describe('Acceptance Tests:', () => {
            system.addItemToBasket(user, 1, shopID, 1)
            let user_two = system.performLogin("secondUser@test.com", "TESTER") as number
            system.addItemToBasket(user_two, 1, shopID, 1)
-           let purchase_one = system.purchaseShoppingBasket(user_one, shopID, "hello")
-           let purchase_two = system.purchaseShoppingBasket(user_two, shopID, "hello")
-           expect(typeof purchase_one == "string").to.be.true 
-           expect(typeof purchase_two == "boolean").to.be.true;
+           system.purchaseShoppingBasket(user_one, shopID, "hello")
+               .then(purchase_one => {
+                   system.purchaseShoppingBasket(user_two, shopID, "hello")
+                       .then(purchase_two => {
+                           expect(typeof purchase_one == "string").to.be.true
+                           expect(typeof purchase_two == "boolean").to.be.true;
+                       })
+               })
         });
         it('Sad: buy basket from non-existing shop', () => {
-            let sad_purchase = system.purchaseShoppingBasket(user, 152, "hello");
-            expect(sad_purchase).to.be.eq(BasketDoesntExists)
+            system.purchaseShoppingBasket(user, 152, "hello")
+                .then(sad_purchase => expect(sad_purchase).to.be.eq(BasketDoesntExists))
         });
         it('Sad: try to buy when inventory is empty', () => {
             // add the 8kTV product with empty inventory to basket
@@ -226,8 +230,8 @@ describe('Acceptance Tests:', () => {
             expect(typeof fail == "string").to.be.true;
         });
         it('Bad: buy a basket with negative user id', () => {
-            let bad_purchase = system.purchaseShoppingBasket(-150, 152, "hello");
-            expect(typeof bad_purchase == "string").to.be.true // bad
+            system.purchaseShoppingBasket(-150, 152, "hello")
+                .then(bad_purchase => expect(typeof bad_purchase == "string").to.be.true)  // bad
         });
     });
 
@@ -414,9 +418,11 @@ describe('Acceptance Tests:', () => {
 
         it('Happy', () => {
             system.purchaseShoppingBasket(user, shopID, "hello")
-            result = system.userOrderHistory(user) as string[]
-            expect(result[0]).to.be.not.eq("Empty order history")
-            expect(result[0].includes("TV")).to.be.true
+                .then(_ => {
+                    result = system.userOrderHistory(user) as string[]
+                    expect(result[0]).to.be.not.eq("Empty order history")
+                    expect(result[0].includes("TV")).to.be.true
+                })
         });
         it('Sad: ', () => {
             //TODO
@@ -763,22 +769,23 @@ describe('Acceptance Tests:', () => {
         let user = system.performLogin("newUser@test.com", "TESTER") as number
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
         expect(typeof add_to_basket == "string").to.be.false
-        let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
-        expect(typeof purchase == "boolean").to.be.true
-        let admin = system.performLogin("admin@gmail.com", "admin") as number
-
-        it('Happy', () => {
-            let result = system.adminDisplayShopHistory(admin, shopID) as string[]
-            expect(result.length).to.be.eq(1)
-        });
-        it('Sad: get a purchase history from non-existing shop', () => {
-            let sad_result = system.adminDisplayShopHistory(admin,150)
-            expect(typeof sad_result == "string").to.be.true
-        });
-        it('Bad: get a purchase history with non-admin user', () => {
-            let bad_result = system.adminDisplayShopHistory(12,shopID)
-            expect(typeof bad_result == "string").to.be.true
-        });
+        system.purchaseShoppingBasket(user, shopID, "hello")
+            .then(purchase => {
+                expect(typeof purchase == "boolean").to.be.true
+                let admin = system.performLogin("admin@gmail.com", "admin") as number
+                it('Happy', () => {
+                    let result = system.adminDisplayShopHistory(admin, shopID) as string[]
+                    expect(result.length).to.be.eq(1)
+                });
+                it('Sad: get a purchase history from non-existing shop', () => {
+                    let sad_result = system.adminDisplayShopHistory(admin,150)
+                    expect(typeof sad_result == "string").to.be.true
+                });
+                it('Bad: get a purchase history with non-admin user', () => {
+                    let bad_result = system.adminDisplayShopHistory(12,shopID)
+                    expect(typeof bad_result == "string").to.be.true
+                });
+            })
     });
     describe('Services:Payment Handler', () => {
         const system: System = SystemDriver.getSystem(true);

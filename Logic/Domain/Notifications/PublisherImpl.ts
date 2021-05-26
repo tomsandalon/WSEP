@@ -2,9 +2,11 @@ import { Notification } from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
 
-// let P: any
-import * as P from "../../Service/Publisher"
+let P: any
+// import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
+import {ClearNotifications, Notify} from "../../DataAccess/API";
+import {SystemImpl} from "../System";
 
 export class PublisherImpl implements Publisher{
     private static instance: PublisherImpl;
@@ -32,9 +34,12 @@ export class PublisherImpl implements Publisher{
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        if (P != undefined) { //TODO remove prints
+        if (P != undefined) {
             if (LoginImpl.getInstance().isLoggedIn(user_id)) {
-            P.Publisher.getInstance().notify(user_id)
+                P.Publisher.getInstance().notify(user_id)
+            }
+            else {
+                Notify([{user_id: user_id, notification: notification.message}]).then(r => r ? {} : SystemImpl.rollback)
             }
         }
         else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
@@ -47,6 +52,7 @@ export class PublisherImpl implements Publisher{
 
     removeNotifications(user_id: number): void{
         this.notificationQueue[user_id] = [];
+        ClearNotifications(user_id).then(r => r ? {} : SystemImpl.rollback())
     }
 
     fetchAllNotifications(): { user_id: number; notifications: Notification[] }[] {

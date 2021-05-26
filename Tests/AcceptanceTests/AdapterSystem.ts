@@ -11,7 +11,7 @@ import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCo
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 
-export class AdapterSystem implements System{
+export class AdapterSystem {
     private system: System;
     public constructor(system: System) {
         this.system = system

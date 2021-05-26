@@ -47,117 +47,117 @@ const {
 
 const success = (_: any) => true;
 const failure = (_: any) => false;
-const RegisterUser = (data: User) => new Promise(success)
+export const RegisterUser = (data: User) => new Promise(success)
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(user.name)
     //         .then(success).catch(failure))
 
-const AddShop = (data: Shop) => new Promise(success)
+export const AddShop = (data: Shop) => new Promise(success)
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(shop.name)
     //         .then(success).catch(failure))
 
-const AddItemToBasket = (data: Basket) => new Promise(success)
+export const AddItemToBasket = (data: Basket) => new Promise(success)
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(basket.name)
     //         .then(success).catch(failure))
 
-const UpdateItemInBasket = (data: Basket) => new Promise(success)
+export const UpdateItemInBasket = (data: Basket) => new Promise(success)
     // // TODO IMPL =- UPDATE
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(basket.name)
     //         .then(success).catch(failure))
 
-const DeleteItemInBasket = (data: Basket) => new Promise(success)
+export const DeleteItemInBasket = (data: Basket) => new Promise(success)
     // // TODO IMPL -- DELETE
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(basket.name)
     //         .then(success).catch(failure))
 
-const AddProduct = (data: Product) => new Promise(success)
+export const AddProduct = (data: Product) => new Promise(success)
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const UpdateProduct = (data: Product) => new Promise(success)
+export const UpdateProduct = (data: Product) => new Promise(success)
     // // TODO IMPL -- UPDATE
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const RemoveProduct = (data: Product) => new Promise(success)
+export const RemoveProduct = (product_id: number) => new Promise(success)
     // // TODO IMPL -- DELETE
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const AppointManager = (target_email: string, appointer_email: string, shop_id: number, permissions: Permission[]) => new Promise(success)
+export const AppointManager = (target_email: string, appointer_email: string, shop_id: number, permissions: Permission[]) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) => new Promise(success)
+export const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const RemoveManager = (target_email: string, shop_id: number) => new Promise(success)
+export const RemoveManager = (target_email: string, shop_id: number) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const RemainingManagement = (management_emails: string[], shop_id: number) => new Promise(success)
+export const RemainingManagement = (management_emails: string[], shop_id: number) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) => new Promise(success)
+export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) => new Promise(success)
+export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const AddDiscount = (shop_id: number, discount_id: number, discount: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) => new Promise(success)
+export const AddDiscount = (shop_id: number, discount_id: number, discount: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const removeDiscount = (shop_id: number, discount_id: number,) => new Promise(success)
+export const removeDiscount = (shop_id: number, discount_id: number,) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const removePurchasePolicy = (shop_id: number, policy_id: number) => new Promise(success)
+export const removePurchasePolicy = (shop_id: number, policy_id: number) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const RateProduct = (rate: Rate) => new Promise(success)
+export const RateProduct = (rate: Rate) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const Notify = (notifications: Notification[]) => new Promise(success)
+export const Notify = (notifications: Notification[]) => new Promise(success)
     // // TODO IMPL -- Cascading
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-const ClearNotifications = (user_id: number) => new Promise(success)
+export const ClearNotifications = (user_id: number) => new Promise(success)
     // // TODO IMPL
     // db.transaction((trx: any) =>
     //     trx.insert(data).into(product.name)
@@ -177,7 +177,7 @@ payment: string
 amount actual price
  */
 
-const PurchaseBasket = (user_id: number, shop_id: number, payment: string, purchase: Purchase[]) => new Promise(success)
+export const PurchaseBasket = (user_id: number, shop_id: number, payment: string, purchase: Purchase[]) => new Promise(success)
 
 // AddUser({
 //     user_id: 5,

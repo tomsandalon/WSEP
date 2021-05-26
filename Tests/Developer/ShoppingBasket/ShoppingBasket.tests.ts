@@ -33,8 +33,8 @@ describe('Buy product by policies', () => {
         shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTX")
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 10);
-        user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect((user.getOrderHistory() as string[])[0]).to.include(10*1000*0.5)
+        user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
+            .then(_ => expect((user.getOrderHistory() as string[])[0]).to.include(10*1000*0.5))
     });
     it('Buy product by composite discount policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
@@ -45,8 +45,8 @@ describe('Buy product by policies', () => {
         shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.3))
         shop.addNumericCompositionDiscount("Tom@gmail.com", NumericOperation.Add, DiscountHandler.discountCounter - 1, DiscountHandler.discountCounter - 2)
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
-        user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect((user.getOrderHistory() as string[])[0]).to.include(50*1000*0.2)
+        user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli").then(_ => expect((user.getOrderHistory() as string[])[0]).to.include(50*1000*0.2))
+
     });
     it('Buy product by simple purchase policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
@@ -56,8 +56,8 @@ describe('Buy product by policies', () => {
         expect(typeof result !== "string").to.be.true;
         result = user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
         expect(typeof result !== "string").to.be.true;
-        result = user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli");
-        expect(typeof result === "string").to.be.true;
+        result = user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli")
+            .then(_ => expect(typeof result === "string").to.be.true)
     });
     it('Buy product by composite purchase policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
@@ -67,8 +67,8 @@ describe('Buy product by policies', () => {
         shop.composePurchasePolicies("Tom@gmail.com", id_counter - 1, id_counter - 2, Operator.And)
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
-        let result = user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli");
-        expect(typeof result === "string").to.be.true;
+        user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli")
+            .then(result => expect(typeof result === "string").to.be.true)
     });
     it('Buy product not by discount policy', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
@@ -77,16 +77,16 @@ describe('Buy product by policies', () => {
         shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTmanyX")
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
-        user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect((user.getOrderHistory() as string[])[0]).to.include(1000*50)
+        user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
+            .then(_ => expect((user.getOrderHistory() as string[])[0]).to.include(1000*50))
    }); })
 describe("Purchase test", () => {
     it('purchase positive amount and more than stock', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
         const user: User = new UserImpl();        shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 5000);
-        const result = user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect(typeof result == "string" && result.includes("doesn't have enough in stock for this purchase")).to.be.true
+        user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
+            .then(result => expect(typeof result == "string" && result.includes("doesn't have enough in stock for this purchase")).to.be.true)
     });
     it('Two concurrent purchases or item which cause lack to stock', () => {
         const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
@@ -95,9 +95,12 @@ describe("Purchase test", () => {
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
         user1.addToBasket(shop.inventory, getNewItem(shop.inventory), 999);
         user2.addToBasket(shop.inventory, getNewItem(shop.inventory), 999);
-        let result = user1.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect(typeof result == "string").to.be.false
-        result = user2.purchaseBasket(shop.shop_id,"1234-Israel-Israeli");
-        expect(typeof result == "string").to.be.true
+        user1.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
+            .then(result => {
+                expect(typeof result == "string").to.be.false
+                user2.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
+                    .then(result => expect(typeof result == "string").to.be.true)
+            })
+
     });
 })
