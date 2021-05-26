@@ -199,11 +199,11 @@ export class Service {
         return this._system.performRegister(user_email, password, age.length == 0 || isNaN(Number(age))? undefined : Number(age))
     }
 
-    purchaseCart(user_id: number, payment_info: string): string | boolean {
+    purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
         return this._system.purchaseCart(user_id, payment_info)
     }
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): string | boolean {
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
         return this._system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 

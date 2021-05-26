@@ -8,6 +8,7 @@ export enum LogicComposition {
     XOR,
     AND,
     OR,
+    __LENGTH
 }
 
 export class LogicCompositionDiscount implements CompositeDiscount {
@@ -41,6 +42,8 @@ export class LogicCompositionDiscount implements CompositeDiscount {
             case LogicComposition.XOR:
                 if (discount_values.some(v => v == 0) && discount_values.some(v => v > 0)) return this.maxValue(discount_values)
                 else return 0
+            default:
+                return -1
         }
     }
 

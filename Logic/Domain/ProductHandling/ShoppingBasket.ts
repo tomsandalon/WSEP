@@ -59,7 +59,7 @@ export interface ShoppingBasket {
      *               if delivery TODO
      * @return Purchase representing items and amount specified in basket
      */
-    purchase(payment_info: string, coupons: any  []): string | Purchase
+    purchase(payment_info: string, coupons: any  []): Promise<string | Purchase>
     toString():string[]
     isEmpty():boolean
 }
@@ -126,11 +126,8 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     }
 
     public editBasketItem(product_id: number, new_amount: number): boolean | string {
-        if (new_amount < 0) {
-            return AmountNonPositiveValue
-        } else if (new_amount == 0){
-            return this.removeItem(product_id)
-        }
+        if (new_amount < 0) return AmountNonPositiveValue
+        if (new_amount == 0) return this.removeItem(product_id)
         for (let product of this._products){
             if(product_id == product.product.product_id){
                 product.amount = new_amount;
@@ -167,14 +164,18 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     isEmpty():boolean {
         return this._products.length == 0
     }
-    purchase(payment_info: string, coupons: any[]): string | Purchase {
+    async purchase(payment_info: string, coupons: any[]): Promise<string | Purchase> {
         const order = PurchaseImpl.create(new Date(), this,[], this.shop, this._user_data);
         if(typeof order == "string")
             return order
-        const order_purchase = order.purchase_self(payment_info);
-        if(typeof order_purchase == "string")
-            return order_purchase
-        this.shop.notifyOwners(order)
-        return order
+        // const order_purchase = order.purchase_self(payment_info);
+        return order.purchase_self(payment_info)
+            .then(order_purchase => {
+                if(typeof order_purchase == "string")
+                    return order_purchase
+                this.shop.notifyOwners(order)
+                return order
+            })
+
     }
 }

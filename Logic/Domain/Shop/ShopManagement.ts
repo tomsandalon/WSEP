@@ -1,7 +1,7 @@
 import {ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {Manager, ManagerImpl} from "../ShopPersonnel/Manager";
 import {Owner, OwnerImpl} from "../ShopPersonnel/Owner";
-import {Action, ManagerPermissions, TotalNumberOfPermissions} from "../ShopPersonnel/Permissions";
+import {Action, ManagerPermissions, Permissions, TotalNumberOfPermissions} from "../ShopPersonnel/Permissions";
 import {logger} from "../Logger";
 import {NotificationAdapter} from "../Notifications/NotificationAdapter";
 
@@ -99,6 +99,10 @@ export interface ShopManagement {
     getPermissions(user_email: string): string | string[];
 
     removePermission(appointer_email: string, appointee_email: string, permission: Action): string | boolean;
+
+    getAllManagementEmails(): string[];
+
+    getRealPermissions(user_email: string): Permissions;
 }
 
 
@@ -350,5 +354,15 @@ export class ShopManagementImpl implements ShopManagement {
         const manager = this.getManagerByEmail(user_email)
         if (manager) return [JSON.stringify(manager.permissions)]
         return `${user_email} is not in shop ${this.shop_id} management`
+    }
+
+    getAllManagementEmails(): string[] {
+        return [this.original_owner].concat(this.owners).map(o => o.user_email)
+            .concat(this.managers.map(m => m.user_email));
+    }
+
+    getRealPermissions(user_email: string): Permissions {
+        if (!this.isManager(user_email)) return new ManagerPermissions()
+        return (this.getManagerByEmail(user_email) as Manager).permissions
     }
 }

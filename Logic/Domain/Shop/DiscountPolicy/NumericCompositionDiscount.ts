@@ -5,7 +5,8 @@ import {DiscountHandler} from "./DiscountHandler";
 
 export enum NumericOperation {
     Max,
-    Add
+    Add,
+    __LENGTH
 }
 
 export class NumericCompositionDiscount implements CompositeDiscount {
@@ -24,6 +25,8 @@ export class NumericCompositionDiscount implements CompositeDiscount {
                 return Math.min(1, this.discounts.reduce((acc, cur) => acc + cur.evaluate(product, amount), 0))
             case NumericOperation.Max:
                 return this.discounts.reduce((max, cur) => Math.max(max, cur.evaluate(product, amount)), 0)
+            default:
+                return -1
         }
     }
 
