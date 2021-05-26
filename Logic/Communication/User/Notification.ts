@@ -35,6 +35,7 @@ export const notify = (user_id: number, amount: number) => {
         const entry = Session.sessions[sid]
         if (entry !== undefined && entry.user_id == user_id) {
             entry.socket.emit(acknowledge_for_notifications, amount)
+            console.log("amount",amount);
             return;
         }
     }

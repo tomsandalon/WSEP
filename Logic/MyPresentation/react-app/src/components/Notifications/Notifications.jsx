@@ -12,16 +12,17 @@ function Notifications(props){
     alerts:[]
     });
     // const [socket, setSocket] = useState(SocketIO(localhost));
-    // socket.emit("Send Notifications",cookie);
     props.socket.emit("Hello", cookie);
+    props.socket.emit("Send Notifications",cookie);
     props.socket.on("Get Notifications", (message) => {
         if(message.length > 2){
             setNotifications({alerts:[message,...notifications.alerts]});
         }
     });
-    props.socket.on("Pending Notifications", () => {
-        props.socket.emit("Send Notifications",cookie);
-    });
+    // props.socket.on("Pending Notifications", (amount) => {
+    //     console.log("amountnofiti",amount);
+    //     props.socket.emit("Send Notifications",cookie);
+    // });
     
         return(
             <div className="wrapper2 fadeInDown">

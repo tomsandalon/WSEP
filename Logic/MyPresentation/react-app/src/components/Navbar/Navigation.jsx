@@ -72,23 +72,19 @@ isUser = () => {
         });
 }
 socketFunc = () => {
-    // this.state.socket.emit("Hello", document.cookie);
-    this.state.socket.emit("Send Notifications",document.cookie);
-    this.state.socket.on("Get Notifications", (message) => {
-        console.log("Here>>>",message);
-        // if(message.length > 2){
-        //     setNotifications({alerts:[message,...notifications.alerts]});
-        // }
+    console.log("Asking weboscket");
+    this.state.socket.emit("Hello", document.cookie);
+    // this.state.socket.emit("Send Notifications",document.cookie);
+    this.state.socket.on("Pending Notifications", (amount) => {
+        console.log("amount",amount)
+        if(amount !== true)
+            this.setState({notifications:amount});
     });
+    console.log("hihi")
 }
 componentDidMount() {
     this.isUser();
-    console.log("this,state,", this.state);
     this.interval = setInterval(() => this.socketFunc(), 3000);
-    // setInterval(() => 
-    // console.log("hi")
-        // this.socketFunc()
-    // , 5000);
 }
 componentWillUnmount() {
     clearInterval(this.interval);
@@ -115,7 +111,7 @@ toggle(){
                 </div>
                 <ul className={this.state.clicked ? 'nav-menu active':'nav-menu'}>
                  {this.state.loggedUser && <li key={104}><a className="nav-links cartButton3 btn-primary btn-sm" href="/notifications">
-                            Notifications<i className="icon3 far fa-bell"></i>
+                            Notifications({this.state.notifications})<i className="icon3 far fa-bell"></i>
                             </a>
                         </li>}
                     {!this.state.loggedUser && MenuItems.map((item,index) => {
@@ -139,7 +135,7 @@ toggle(){
                             Roles</a>
                         </li>}
                         {this.state.loggedUser && <li key={100}><button className="nav-links cartButton btn-dark btn-sm" onClick={this.handleLogout}>
-                        Logout({this.state.random})</button>
+                        Logout</button>
                         <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                         <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
                         </li>}
