@@ -72,15 +72,11 @@ isUser = () => {
         });
 }
 socketFunc = () => {
-    console.log("Asking weboscket");
     this.state.socket.emit("Hello", document.cookie);
-    // this.state.socket.emit("Send Notifications",document.cookie);
-    this.state.socket.on("Pending Notifications", (amount) => {
-        console.log("amount",amount)
-        if(amount !== true)
-            this.setState({notifications:amount});
+    this.state.socket.emit("Get pending notifications",document.cookie);
+    this.state.socket.on("Get pending notifications", (amount) => {
+        this.setState({notifications:amount});
     });
-    console.log("hihi")
 }
 componentDidMount() {
     this.isUser();
@@ -111,7 +107,7 @@ toggle(){
                 </div>
                 <ul className={this.state.clicked ? 'nav-menu active':'nav-menu'}>
                  {this.state.loggedUser && <li key={104}><a className="nav-links cartButton3 btn-primary btn-sm" href="/notifications">
-                            Notifications({this.state.notifications})<i className="icon3 far fa-bell"></i>
+                            Notifications ({this.state.notifications})<i className="icon3 far fa-bell"></i>
                             </a>
                         </li>}
                     {!this.state.loggedUser && MenuItems.map((item,index) => {

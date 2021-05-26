@@ -34,4 +34,11 @@ export class Publisher {
         // return user_id == 4 || user_id == 6
         return this._publisher_domain.hasNotifications(user_id);
     }
+
+    public getAmountOfNotifications(user_id: number): number {
+        if (this._publisher_domain == null){
+            return -1
+        }
+        return this._publisher_domain.getAmountOfNotifications(user_id);
+    }
 }
