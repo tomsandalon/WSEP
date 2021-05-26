@@ -26,18 +26,22 @@ export class PublisherImpl implements Publisher{
         return result;
     }
 
+    notifyFlush(user_id: number): void {
+        if (P != undefined) { //TODO remove prints
+            if (LoginImpl.getInstance().isLoggedIn(user_id)) {
+                P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
+            }
+        }
+        else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
+    }
+
     notify(user_id: number, notification: Notification): void {
         if (user_id in this.notificationQueue) {
             this.notificationQueue[user_id].push(notification)
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        if (P != undefined) { //TODO remove prints
-            if (LoginImpl.getInstance().isLoggedIn(user_id)) {
-            P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
-            }
-        }
-        else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
+        this.notifyFlush(user_id)
     }
 
     getNotifications(user_id: number): Notification[]{
