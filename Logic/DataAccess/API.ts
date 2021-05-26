@@ -389,13 +389,11 @@ TODO add these fields to purchase table
 
 purchase_id
 product_id FK
-purchase_type: number,
 name: string,
 base_price: number,
 description: string,
 categories: string,
-payment: string
 amount actual price
  */
 
-export const PurchaseBasket = (user_id: number, shop_id: number, payment: string, purchase: Purchase[]) => new Promise(success)
+export const PurchaseBasket = (user_id: number, shop_id: number, purchase: Purchase[]) => new Promise(success)

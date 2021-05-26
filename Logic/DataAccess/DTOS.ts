@@ -33,6 +33,10 @@ export type Purchase = {
     product_id: number,
     amount: number,
     actual_price: number,
+    name: string,
+    base_price: number,
+    description: string,
+    categories: string,
 }
 
 export type Basket = {
