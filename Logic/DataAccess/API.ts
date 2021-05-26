@@ -309,15 +309,62 @@ export const AddDiscount = (shop_id: number, discount_id: number, discount_to_ad
                             .del()))
 
 
-// export const removeDiscount = (shop_id: number, discount_id: number,) =>
-//     db.transaction((trx: any) =>
-//         trx(discount.name).where({discount_id: discount_id}).del()
-//             .then(success).catch(failure))
-//
-// export const removePurchasePolicy = (shop_id: number, policy_id: number) =>
-//     db.transaction((trx: any) =>
-//         trx(purchase_condition.name).where({p_condition_id: policy_id}).del()
-//             .then(success).catch(failure))
+export const removeDiscount = (shop_id: number, discount_id: number,) =>{
+    let ids: any[] = []
+    let pending: number[] = []
+    return db.transaction( async (trx: any) =>{
+            const query = (id: number) => trx.raw(`(SELECT discount_id as first, -1 as second FROM discount_simple where discount_id = ${id}) union
+            (SELECT first, second FROM
+                (SELECT discount_composite_id as discount_id FROM discount_composite WHERE discount_composite_id = ${id}) as Com INNER JOIN discount_comprised_composite
+                on discount_comprised_composite.discount_composite_id = Com.discount_id) UNION
+            (SELECT discount_id as first, -2 as second FROM
+                (SELECT discount_conditional_id FROM discount_conditional WHERE discount_conditional_id = ${id}) as Com INNER JOIN discount_comprised_conditional
+                on discount_comprised_conditional.discount_conditional_id = Com.discount_conditional_id)`)
+            ids.push(discount_id);
+            let res = (await query(discount_id))[0];
+            while (res.length != 0 || pending.length != 0){
+                if(res[0].first >= 0 && res[0].second >= 0){
+                    pending.push(res[0].first, res[0].second)
+                } else if(res[0].second == -2){
+                    pending.push(res[0].first)
+                }
+                if(pending.length == 0) break;
+                let [next, ...temp] = pending;
+                ids.push(next);
+                pending = temp;
+                res = (await query(next))[0];
+            }
+        return trx(discount.name).whereIn(discount.pk, ids).del();
+    })
+}
+
+/*
+SELECT * FROM (SELECT first, second FROM
+                (SELECT discount_composite_id as discount_id FROM discount_composite WHERE discount_composite_id = 9) as Com INNER JOIN discount_comprised_composite
+                on discount_comprised_composite.discount_composite_id = Com.discount_id) as A UNION
+        (SELECT discount_id as first, -1 as second FROM
+            (SELECT discount_conditional_id FROM discount_conditional WHERE discount_conditional_id = 9) as Com INNER JOIN discount_comprised_conditional
+            on discount_comprised_conditional.discount_conditional_id = Com.discount_conditional_id) as B
+
+(SELECT discount_id as first, -1 as second FROM discount_simple where discount_id = 9)
+union
+            (SELECT first, second FROM
+                (SELECT discount_composite_id as discount_id FROM discount_composite WHERE discount_composite_id = 9) as Com INNER JOIN discount_comprised_composite
+                on discount_comprised_composite.discount_composite_id = Com.discount_id) UNION
+        (SELECT discount_id as first, -1 as second FROM
+            (SELECT discount_conditional_id FROM discount_conditional WHERE discount_conditional_id = 9) as Com INNER JOIN discount_comprised_conditional
+            on discount_comprised_conditional.discount_conditional_id = Com.discount_conditional_id)
+
+ */
+        // trx(discount_conditional.name).select(trx.ref(discount_conditional.pk).as(discount.pk)).where(discount_conditional.pk, discount_id)]))
+        // trx.from(discount.name).innerJoin(discount_simple.name, `${discount.name}.${discount.pk}`, `${discount_simple.name}.${discount.pk}`))
+        // trx(discount.name).where({discount_id: discount_id}).del()
+        //     .then(success).catch(failure))
+
+export const removePurchasePolicy = (shop_id: number, policy_id: number) =>
+    db.transaction((trx: any) =>
+        trx(purchase_condition.name).where({p_condition_id: policy_id}).del()
+            .then(success).catch(failure))
 
 export const RateProduct = (rate: Rate) =>
     db.transaction((trx: any) =>

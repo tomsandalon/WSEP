@@ -184,8 +184,8 @@ const purchase_comprised = {
     build: () => builder.createTable(purchase_comprised.name, (table) => {
         table.integer(purchase_condition_operator.pk).references(purchase_condition_operator.pk).inTable(purchase_condition_operator.name).unsigned();
         table.integer(purchase_composite_condition.pk).references(purchase_composite_condition.pk).inTable(purchase_composite_condition.name).unsigned().onDelete('CASCADE');
-        table.integer('first').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned();
-        table.integer('second').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned();
+        table.integer('first').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().onDelete('CASCADE');
+        table.integer('second').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().onDelete('CASCADE');
         table.primary([purchase_condition_operator.pk, purchase_composite_condition.pk, 'first', 'second']);
     })
 };
@@ -254,7 +254,6 @@ const discount = {
     pk: 'discount_id',
     build: () => builder.createTable(discount.name, (table) => {
         table.integer(discount.pk).unsigned().primary();
-        table.integer('parent').unsigned().references();
     })
 };
 exports.discount = discount;
@@ -270,8 +269,8 @@ exports.discount_allowed_in = discount_allowed_in;
 const discount_comprised_composite = {
     name: 'discount_comprised_composite',
     build: () => builder.createTable(discount_comprised_composite.name, (table) => {
-        table.integer('first').references(discount.pk).inTable(discount.name).unsigned();
-        table.integer('second').references(discount.pk).inTable(discount.name).unsigned();
+        table.integer('first').references(discount.pk).inTable(discount.name).unsigned().onDelete('CASCADE');
+        table.integer('second').references(discount.pk).inTable(discount.name).unsigned().onDelete('CASCADE');
         table.integer(discount_composite.pk).references(discount_composite.pk).inTable(discount_composite.name).unsigned().onDelete('CASCADE');
         table.integer(discount_operator.pk).references(discount_operator.pk).inTable(discount_operator.name).unsigned();
         table.primary([discount_composite.pk, discount_operator.pk]);

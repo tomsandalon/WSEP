@@ -162,7 +162,7 @@ export const initData = () =>
 // RemoveManager(second_user.email, first_shop.shop_id)
 // AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
 
-// removeDiscount(first_shop.shop_id, 9)
-//     .then((result: any) => console.log(`Finish ${JSON.stringify(result)}`))
+removeDiscount(first_shop.shop_id, 9)
+    .then((result: any) => console.log(`Finish ${JSON.stringify(result[0])}`))
 
-initData().then((result: any) => console.log(`Finish ${result}`))
+// initData().then((result: any) => console.log(`Finish ${result}`))
