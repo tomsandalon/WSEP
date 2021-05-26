@@ -8,10 +8,13 @@ export const configWebSocket = (io: any) =>
                 const sid = parseInt(hello_message.split('=')[1]);
                 Session.sessions[sid].socket = socket;
                 const user_id = Session.sessions[sid].user_id;
+                // console.log("FirstTime connection",hello);
                 if (service.isLoggedIn(user_id) && Session.publisher.hasNotifications(user_id)) {
+                    // console.log("Sending first time acknowledge_for_notifications");
                     socket.emit(acknowledge_for_notifications, true)
                 }
-            } else {
+             }
+            else {
                 socket.close()
             }
         })
@@ -21,6 +24,7 @@ export const configWebSocket = (io: any) =>
                 const entry = Session.sessions[sid];
                 if (entry !== undefined && entry.socket === socket) {
                     const notifications = Session.publisher.fetch(entry.user_id);
+                    console.log("Notifications:",notifications);
                     socket.emit(get_notifications, notifications)
                 }
             }

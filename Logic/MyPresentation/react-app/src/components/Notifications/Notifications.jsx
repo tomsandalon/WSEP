@@ -1,22 +1,32 @@
-import React, { Component} from 'react';
+import React, { useEffect,useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './Noti.css'
-class Notifications extends Component {
-    state = {
-        alerts:["Alert from user 1",
-        "Alert from user 2",
-        "Alert from user 3",
-        "Alert from user 4",
-        "Alert from user 5",
-        "Alert from user 6"]
-    };
-    fetchNotifications = () =>{
-        console.log("Notifications")
-    }
-    componentDidMount(){
-        this.fetchNotifications();
-    }
-    render() {
+import './Noti.css';
+import SocketIO from 'socket.io-client';
+import Helper from './Helper';
+
+function Notifications(){
+    const cookie = document.cookie;
+    const port = 8000;
+    const localhost = 'https://localhost:' + port;
+    const [notifications, setNotifications] = useState({ 
+    alerts:[]
+    });
+    const [socket, setSocket] = useState(SocketIO(localhost));
+    socket.emit("Hello", cookie);
+    // socket.emit("Send Notifications",cookie);
+    socket.on("Get Notifications", (message) => {
+        if(message.length > 2){
+            setNotifications({alerts:[message,...notifications.alerts]});
+        }
+    });
+    socket.on("Pending Notifications", () => {
+        socket.emit("Send Notifications",cookie);
+    });
+    
+    // useEffect(() => {
+    //     socket.emit("Hello", cookie);
+    //     // socket.emit("Send Notifications",cookie);
+    //   }, []);
         return(
             <div className="wrapper2 fadeInDown">
             <div id="form2">
@@ -26,7 +36,10 @@ class Notifications extends Component {
                 </div>
                 <form>
                     <ul>
-                        {this.state.alerts.map((alert) => 
+                        {notifications.alerts.length === 0 ? <div class="rowalert alert alert-danger" role="alert">
+                                                                <i className="icon3 far fa-bell"><h4>No alerts available.</h4></i> 
+                                                            </div>
+                        : notifications.alerts.map((alert) => 
                         <div class="rowalert alert alert-primary" role="alert">
                             <i className="icon3 far fa-bell"></i>{alert}
                         </div>
@@ -36,6 +49,5 @@ class Notifications extends Component {
             </div>
         </div>
         )
-    }
 }
 export default Notifications;

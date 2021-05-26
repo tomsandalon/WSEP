@@ -378,6 +378,12 @@ input[type=email]:placeholder {
   height:35px;
   margin-top:10px;
 }
+.cartButton10{
+  background-color: #56baed;
+  width:300px;
+  height:40px;
+  margin-top:10px;
+}
 .cartButton{
   background-color: #56baed;
   width:100px;

@@ -34,7 +34,13 @@ const cookieParser = require('cookie-parser');
 export const app = express();
 //initialize a https server
 export const server = https.createServer(options, app);
-export const io = socket_io(server);
+export const io = socket_io(server,
+    {
+    cors: {
+        origin: "http://localhost:3000",
+        credentials: true
+    }
+      });
 configWebSocket(io)
 //start our server
 server.listen( port,() => {
@@ -62,4 +68,4 @@ app.use(route_shop_policy, require('./User/Registered/Policy'));
 app.use(route_shop_discount, require('./User/Registered/Discount'));
 //* For debug TODO delete this
 
-// service.initData();
+service.initData();

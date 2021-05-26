@@ -9,6 +9,7 @@ class Login extends Component {
             email:'',
             password:'',
             visible:false,
+            successVisible:false,
             errorMsg:''
         };
     }
@@ -30,7 +31,7 @@ handleSubmit = (event) =>{
         .then(async response => {
             switch (response.status) {
                 case 200: //welcome
-                    this.setState({errorMsg:"Login sucessfully",visible:true})
+                    this.setState({errorMsg:"Login sucessfully",successVisible:true})
                     this.setLoginPermission();
                     window.location.assign("/home")
                     break;
@@ -65,7 +66,8 @@ toggle(){
                 <form onSubmit={this.handleSubmit}>
                     <input type="email" id="login" className="fadeIn second" name="login" placeholder="example@example.com" onChange={this.handleUserEmail}/>
                     <input type="password" id="password" className="fadeIn third" name="login" placeholder="Password" onChange={this.handlePassword}/>
-                <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
+                    <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>
+                    <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
                     <input type="submit" className="fadeIn fourth" value="Login"/>
                 </form>
             </div>
