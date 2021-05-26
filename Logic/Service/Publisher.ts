@@ -23,8 +23,8 @@ export class Publisher {
         // if (user_id == 6) return '["message for 6"]'
         return JSON.stringify(this._publisher_domain.fetchNotifications(user_id))
     }
-    public notify(user_id: number){
-        notify(user_id)
+    public notify(user_id: number, amount: number){
+        notify(user_id, amount)
     }
 
     public hasNotifications(user_id: number): boolean {
