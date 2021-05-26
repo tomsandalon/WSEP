@@ -34,7 +34,7 @@ export class PublisherImpl implements Publisher{
         }
         if (P != undefined) { //TODO remove prints
             if (LoginImpl.getInstance().isLoggedIn(user_id)) {
-            P.Publisher.getInstance().notify(user_id)
+            P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
             }
         }
         else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
