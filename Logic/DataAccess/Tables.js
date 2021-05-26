@@ -158,7 +158,7 @@ const purchase_simple_condition = {
     name: 'purchase_simple_condition',
     pk:'simple_id',
     build: () => builder.createTable(purchase_simple_condition.name, (table) => {
-        table.integer(purchase_simple_condition.pk).references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().primary();
+        table.integer(purchase_simple_condition.pk).references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().primary().onDelete('CASCADE');
         table.string('value').notNullable();
     })
 };
@@ -167,7 +167,7 @@ const purchase_composite_condition = {
     name: 'purchase_composite_condition',
     pk: 'composite_id',
     build: () => builder.createTable(purchase_composite_condition.name, (table) => {
-        table.integer(purchase_composite_condition.pk).references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().primary();
+        table.integer(purchase_composite_condition.pk).references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().primary().onDelete('CASCADE');
     })
 };
 exports.purchase_composite_condition = purchase_composite_condition;
@@ -183,16 +183,17 @@ const purchase_comprised = {
     name: 'purchase_comprised',
     build: () => builder.createTable(purchase_comprised.name, (table) => {
         table.integer(purchase_condition_operator.pk).references(purchase_condition_operator.pk).inTable(purchase_condition_operator.name).unsigned();
-        table.integer(purchase_composite_condition.pk).references(purchase_composite_condition.pk).inTable(purchase_composite_condition.name).unsigned();
-        table.integer(purchase_condition.pk).references(purchase_condition.pk).inTable(purchase_condition.name).unsigned();
-        table.primary([purchase_condition_operator.pk, purchase_composite_condition.pk, purchase_condition.pk]);
+        table.integer(purchase_composite_condition.pk).references(purchase_composite_condition.pk).inTable(purchase_composite_condition.name).unsigned().onDelete('CASCADE');
+        table.integer('first').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned();
+        table.integer('second').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned();
+        table.primary([purchase_condition_operator.pk, purchase_composite_condition.pk, 'first', 'second']);
     })
 };
 exports.purchase_comprised = purchase_comprised;
 const purchase_condition_allowed_in = {
     name: 'purchase_condition_allowed_in',
     build: () => builder.createTable(purchase_condition_allowed_in.name, (table) => {
-        table.integer(purchase_condition.pk).references(purchase_condition.pk).inTable(purchase_condition.name).unsigned();
+        table.integer(purchase_condition.pk).references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().onDelete('CASCADE');
         table.integer(shop.pk).references(shop.pk).inTable(shop.name).unsigned();
         table.primary([purchase_condition.pk, shop.pk]);
     })
@@ -201,7 +202,7 @@ exports.purchase_condition_allowed_in = purchase_condition_allowed_in;
 const purchase_simple_condition_type_of = {
     name: 'purchase_simple_condition_type_of',
     build: () => builder.createTable(purchase_simple_condition_type_of.name, (table) => {
-        table.integer(purchase_simple_condition.pk).references(purchase_simple_condition.pk).inTable(purchase_simple_condition.name).unsigned();
+        table.integer(purchase_simple_condition.pk).references(purchase_simple_condition.pk).inTable(purchase_simple_condition.name).unsigned().onDelete('CASCADE');
         table.integer(purchase_condition_type.pk).references(purchase_condition_type.pk).inTable(purchase_condition_type.name).unsigned();
         table.primary([purchase_simple_condition.pk, purchase_condition_type.pk]);
     })

@@ -68,13 +68,19 @@ export type PurchaseSimpleCondition = {
     purchase_condition: number,
 }
 
+export const isPurchaseSimpleCondition = (x: any): x is PurchaseSimpleCondition => typeof x.purchase_condition == 'number';
+
 export type PurchaseCompositeCondition = {
     first_policy: number,
     second_policy: number,
     operator: number,
 }
 
+export const isPurchaseCompositeCondition = (x: any): x is PurchaseCompositeCondition => typeof x.operator == 'number';
+
 export type DiscountSimpleCondition = number
+
+export const isDiscountSimpleCondition = (x: any): x is DiscountSimpleCondition => typeof x == 'number';
 
 export type DiscountCompositeCondition = {
     first_policy: number,
@@ -82,10 +88,13 @@ export type DiscountCompositeCondition = {
     operator: number,
 }
 
+export const isDiscountCompositeCondition = (x: any): x is DiscountCompositeCondition => typeof x.operator == 'number';
+
 export type DiscountConditionalCondition = {
     discount_param: string,
     discount_condition: number,
     operand_discount: number,
 }
 
+export const isDiscountConditionalCondition = (x: any): x is DiscountConditionalCondition => typeof x.discount_condition == 'number';
 

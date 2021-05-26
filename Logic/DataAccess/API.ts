@@ -1,6 +1,10 @@
 import {db} from './DB.config';
 import {
-    Basket, DiscountCompositeCondition, DiscountConditionalCondition, DiscountSimpleCondition,
+    Basket,
+    DiscountCompositeCondition,
+    DiscountConditionalCondition,
+    DiscountSimpleCondition,
+    isDiscountSimpleCondition, isPurchaseCompositeCondition, isPurchaseSimpleCondition,
     Notification,
     Permission,
     Product,
@@ -11,6 +15,7 @@ import {
     Shop,
     User
 } from "./DTOS";
+import {Purchase_Type} from "../Domain/Shop/ShopInventory";
 const {
     purchase_type,
     permission,
@@ -62,17 +67,17 @@ export const AddPurchaseConditionOperator = (operator: number) =>
 
 export const AddPurchaseConditionType = (type: number) =>
     db.transaction((trx: any) =>
-        trx.insert({type_id: type}).into(purchase_condition_operator.name)
+        trx.insert({type_id: type}).into(purchase_condition_type.name)
             .then(success).catch(failure))
 
 export const AddDiscountOperator = (operator: number) =>
     db.transaction((trx: any) =>
-        trx.insert({operator_id: operator}).into(discount_operator.name)
+        trx.insert({discount_operator_id: operator}).into(discount_operator.name)
             .then(success).catch(failure))
 
 export const AddDiscountConditionType = (type: number) =>
     db.transaction((trx: any) =>
-        trx.insert({type_id: type}).into(discount_condition_type.name)
+        trx.insert({discount_condition_type_id: type}).into(discount_condition_type.name)
             .then(success).catch(failure))
 
 export const AddPurchaseType = (type: number) =>
@@ -181,17 +186,60 @@ export const RemainingManagement = (management_emails: string[], shop_id: number
     //     trx.insert(data).into(product.name)
     //         .then(success).catch(failure))
 
-export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) =>
+    db.transaction((trx: any) =>
+        trx(manages.name).select(permission.pk).whereIn(permission.pk, new_permissions)
+            .then((used_permissions: any) =>
+                Promise.all([
+                    trx(manages.name)
+                        .whereNotIn(user.pk, new_permissions)
+                        .del()
+                ].concat(new_permissions.reduce((acc: any[], perm: any) =>
+                    perm in used_permissions ? acc : acc.concat([
+                        trx(manages.name).insert({
+                        shop_id: shop_id,
+                        manager_id: manager_id,
+                        permission_id: perm,
+                    })]), [])))))
 
-export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) => new Promise(success)
-    // // TODO IMPL
-    // db.transaction((trx: any) =>
-    //     trx.insert(data).into(product.name)
-    //         .then(success).catch(failure))
+export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) =>
+    isPurchaseSimpleCondition(condition)?
+        db.transaction((trx: any) =>
+            trx.insert({p_condition_id: policy_id}).into(purchase_condition.name)
+                .then((_: any) =>
+                    trx.insert({
+                        simple_id: policy_id,
+                        value: condition.value
+                    }).into(purchase_simple_condition.name))
+                .then((_: any) =>
+                    trx.insert({
+                        type_id: condition.purchase_condition,
+                        simple_id: policy_id
+                    }).into(purchase_simple_condition_type_of.name))
+                .then((_: any) =>
+                    trx(purchase_condition_allowed_in.name).insert({
+                        shop_id: shop_id,
+                        p_condition_id: policy_id
+                    }))):
+        db.transaction((trx: any) =>
+            trx.insert({p_condition_id: policy_id}).into(purchase_condition.name)
+                .then((_: any) => trx.insert({composite_id: policy_id}).into(purchase_composite_condition.name))
+                .then((_: any) =>
+                    trx.insert({
+                        operator_id: condition.operator,
+                        composite_id: policy_id,
+                        first: condition.first_policy,
+                        second: condition.second_policy,
+                    }).into(purchase_comprised.name))
+                .then((_: any) => trx.insert({shop_id: shop_id, p_condition_id: policy_id}).into(purchase_condition_allowed_in.name))
+                .then((_: any) =>
+                        trx(purchase_condition_allowed_in.name)
+                            .where({
+                                shop_id: shop_id,
+                            })
+                            .andWhere((query: any) =>
+                                query.where(purchase_condition.pk, condition.first_policy).orWhere(purchase_condition.pk, condition.second_policy))
+                            .del()))
 
 export const AddDiscount = (shop_id: number, discount_id: number, discount: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) => new Promise(success)
     // // TODO IMPL
