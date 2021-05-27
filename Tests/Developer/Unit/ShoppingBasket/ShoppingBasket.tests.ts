@@ -1,14 +1,14 @@
 import 'mocha';
 import {assert, expect} from 'chai';
-import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
-import {ShopImpl} from "../../../Logic/Domain/Shop/Shop";
-import {User, UserImpl} from "../../../Logic/Domain/Users/User";
-import {ShopInventory} from "../../../Logic/Domain/Shop/ShopInventory";
+import {ProductImpl} from "../../../../Logic/Domain/ProductHandling/Product";
+import {ShopImpl} from "../../../../Logic/Domain/Shop/Shop";
+import {User, UserImpl} from "../../../../Logic/Domain/Users/User";
+import {ShopInventory} from "../../../../Logic/Domain/Shop/ShopInventory";
 import {describe} from "mocha";
-import {ConditionType, SimpleCondition} from "../../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
-import {SimpleDiscount} from "../../../Logic/Domain/Shop/DiscountPolicy/SimpleDiscount";
-import {Condition} from "../../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
-import {DiscountHandler} from "../../../Logic/Domain/Shop/DiscountPolicy/DiscountHandler";
+import {ConditionType, SimpleCondition} from "../../../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
+import {SimpleDiscount} from "../../../../Logic/Domain/Shop/DiscountPolicy/SimpleDiscount";
+import {Condition} from "../../../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
+import {DiscountHandler} from "../../../../Logic/Domain/Shop/DiscountPolicy/DiscountHandler";
 
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");

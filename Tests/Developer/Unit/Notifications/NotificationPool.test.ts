@@ -1,7 +1,7 @@
 import {expect} from "chai";
-import {NotificationPool} from "../../../Logic/Domain/Notifications/NotificationPool";
-import {NotificationPoolImpl} from "../../../Logic/Domain/Notifications/NotificationPoolImpl";
-import {Notification} from "../../../Logic/Domain/Notifications/Notification";
+import {NotificationPool} from "../../../../Logic/Domain/Notifications/NotificationPool";
+import {NotificationPoolImpl} from "../../../../Logic/Domain/Notifications/NotificationPoolImpl";
+import {Notification} from "../../../../Logic/Domain/Notifications/Notification";
 describe('Notification Pool testsuite', () => {
     describe('Single element', () => {
         const user_id = 1;

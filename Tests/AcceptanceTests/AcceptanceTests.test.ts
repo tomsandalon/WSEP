@@ -779,6 +779,7 @@ describe('Acceptance Tests:', () => {
             expect(typeof bad_result == "string").to.be.true
         });
     });
+
     describe('Services:Payment Handler', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -805,6 +806,7 @@ describe('Acceptance Tests:', () => {
             expect(typeof purchase == 'string').to.be.true;
         });
     });
+
     describe('Services:Spell Checker', () => {
         const system: System = SystemDriver.getSystem(true);
 
@@ -828,5 +830,18 @@ describe('Acceptance Tests:', () => {
             expect(typeof res == 'string').to.be.true
         });
     });
-    // describe('Services: delivery');
+
+    describe('Services: delivery', () => {
+        it('Happy', () => {
+
+        });
+
+        it('Sad: purchase failed but product delivered.', () => {
+
+        });
+
+        it('Bad:', () => {
+
+        });
+    });
 });

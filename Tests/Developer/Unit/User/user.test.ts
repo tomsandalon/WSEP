@@ -1,13 +1,13 @@
 import 'mocha';
 import {assert, expect} from 'chai';
-import {Authentication} from "../../../Logic/Domain/Users/Authentication";
-import {RegisterImpl} from "../../../Logic/Domain/Users/Register";
-import {LoginImpl} from "../../../Logic/Domain/Users/Login";
-import {ShopInventoryImpl} from "../../../Logic/Domain/Shop/ShopInventory";
-import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
-import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
-import {SystemImpl} from "../../../Logic/Domain/System";
-import {id_counter} from "../../../Logic/Domain/Users/User";
+import {Authentication} from "../../../../Logic/Domain/Users/Authentication";
+import {RegisterImpl} from "../../../../Logic/Domain/Users/Register";
+import {LoginImpl} from "../../../../Logic/Domain/Users/Login";
+import {ShopInventoryImpl} from "../../../../Logic/Domain/Shop/ShopInventory";
+import {ShopManagementImpl} from "../../../../Logic/Domain/Shop/ShopManagement";
+import {ProductImpl} from "../../../../Logic/Domain/ProductHandling/Product";
+import {SystemImpl} from "../../../../Logic/Domain/System";
+import {id_counter} from "../../../../Logic/Domain/Users/User";
 
 describe('Authentication Tests', () => {
     it('should return a hashed password ', () => {

@@ -1,10 +1,10 @@
 import 'mocha';
 import {assert, expect} from 'chai';
-import {Shop, ShopImpl} from "../../../Logic/Domain/Shop/Shop";
-import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
+import {Shop, ShopImpl} from "../../../../Logic/Domain/Shop/Shop";
+import {ProductImpl} from "../../../../Logic/Domain/ProductHandling/Product";
 // import {PurchaseType} from "../../../Logic/Domain/PurchaseProperties/PurchaseType";
-import {Filter_Type, Purchase_Type} from "../../../Logic/Domain/Shop/ShopInventory";
-import {Action} from "../../../Logic/Domain/ShopPersonnel/Permissions";
+import {Filter_Type, Purchase_Type} from "../../../../Logic/Domain/Shop/ShopInventory";
+import {Action} from "../../../../Logic/Domain/ShopPersonnel/Permissions";
 
 
 const createProduct = () => {
