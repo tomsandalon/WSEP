@@ -1,9 +1,14 @@
-import {System, TestNotAssociatedWithImplementation} from "./System";
+import {TestNotAssociatedWithImplementation} from "./System";
 import {AdapterSystem} from "./AdapterSystem";
 // import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
-import {SearchTypes} from "../../Logic/Domain/System";
+import {SearchTypes, System} from "../../Logic/Domain/System";
+import {Condition} from "../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
+import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
+import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
+import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
+import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 
 export class ProxySystem implements System{
     private readonly system: AdapterSystem | undefined
@@ -186,19 +191,19 @@ export class ProxySystem implements System{
         return this.system.performRegister(user_email, password)
     }
 
-    purchaseCart(user_id: number, payment_info: string): string | boolean {
-        if(this.system == undefined){
+    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+        if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
-        return this.system.purchaseCart(user_id, payment_info)
+        return await this.system.purchaseCart(user_id, payment_info)
     }
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): string | boolean {
-        if(this.system == undefined){
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+        if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         //for payment service mock
-        if(payment_info.includes('MOCK')) {
+        if (payment_info.includes('MOCK')) {
             if (payment_info.includes('CRASH'))
                 return "Payment service has been crashed";
             if (payment_info.includes('FAIL'))
@@ -207,7 +212,7 @@ export class ProxySystem implements System{
         }
         //end mock
 
-        return this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
+        return await this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string {
@@ -297,5 +302,103 @@ export class ProxySystem implements System{
             return TestNotAssociatedWithImplementation
         }
         return this.system.isLoggedIn(user_id)
+    }
+
+    addConditionToDiscount(user_id: number, shop_id: number, id: number, condition: Condition, condition_param: string): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addConditionToDiscount(user_id, shop_id, id, condition, condition_param)
+    }
+
+    addDiscount(user_id: number, shop_id: number, value: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addDiscount(user_id, shop_id, value)
+    }
+
+    addLogicComposeDiscount(user_id: number, shop_id: number, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addLogicComposeDiscount(user_id, shop_id, operation, d_id1, d_id2)
+    }
+
+    addNumericComposeDiscount(user_id: number, shop_id: number, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addNumericComposeDiscount(user_id, shop_id, operation, d_id1, d_id2)
+    }
+
+    addPurchasePolicy(user_id: number, shop_id: number, condition: ConditionType, value: string): string[] | string {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addPurchasePolicy(user_id, shop_id, condition, value)
+    }
+
+    composePurchasePolicy(user_id: number, shop_id: number, policy_id1: number, policy_id2: number, operator: Operator): boolean | string {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.composePurchasePolicy(user_id, shop_id, policy_id1, policy_id2, operator)
+    }
+
+    getAllDiscounts(user_id: number, shop_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllDiscounts(user_id, shop_id)
+    }
+
+    getAllPurchasePolicies(user_id: number, shop_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllPurchasePolicies(user_id, shop_id)
+    }
+
+    getAllShops(user_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllShops(user_id)
+    }
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.rateProduct(user_id, shop_id, product_id, rating)
+    }
+
+    removeDiscount(user_id: number, shop_id: number, id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removeDiscount(user_id, shop_id, id)
+    }
+
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removeOwner(user_id, shop_id, target)
+    }
+
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removePermission(user_id, shop_id, target_email, action)
+    }
+
+    removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removePurchasePolicy(user_id, shop_id, policy_id)
     }
 }

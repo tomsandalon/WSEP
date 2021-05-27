@@ -1,5 +1,6 @@
 import {Purchase} from "../ProductHandling/Purchase";
 import {UserHistoryNotFound} from "../ProductHandling/ErrorMessages";
+import {PurchaseBasket} from "../../DataAccess/API";
 
 
 type history_key = {user_id: number, shop_id: number, purchase_id: number};
@@ -36,6 +37,17 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory{
             },
             purchase: purchase
         })
+        PurchaseBasket(user_id, purchase.shop.shop_id, purchase.order_id, purchase.products.map(product => {
+            return {
+                product_id: product.product_id,
+                amount: product.amount,
+                actual_price: product.actual_price,
+                name: product.name,
+                base_price: product.original_price,
+                description: product.description,
+                categories: product.category.join(",")
+            }
+        }))
     }
 
     public getUserPurchases(user_id: number): Purchase[] | string {

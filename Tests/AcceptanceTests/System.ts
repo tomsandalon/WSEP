@@ -2,7 +2,7 @@ import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {SearchTypes} from "../../Logic/Domain/System";
 
-export interface System{
+export interface System {
     openSession(): number
     closeSession(user_id: number): void
     performRegister(user_email:string, password: string): boolean

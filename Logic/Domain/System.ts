@@ -150,6 +150,8 @@ export interface System {
     getAllCategories(user_id: number): string | string[];
 
     rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean
+
+    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
 }
 
 //TODO add toggle underaged
@@ -662,6 +664,7 @@ export class SystemImpl implements System {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
+        if (value > 1 || value < 0) return `Illegal discount value`
         const ret = shop.addDiscount(user_email, new SimpleDiscount(value))
         if (typeof ret != 'string')
             AddDiscount(shop_id, DiscountHandler.discountCounter - 1, value).then(r => r ? {} : SystemImpl.rollback())
@@ -853,4 +856,13 @@ export class SystemImpl implements System {
             return `User id ${user_id} is not a registered user`
         return {shop, user_email}
     }
+
+    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+    //     const result = this.getShopAndUser(user_id, shop_id)
+    //     if (typeof result == "string") return result
+    //     const {shop, user_email} = result
+    //     const user = this._login.retrieveUser(user_id);
+    //     if (typeof user == "string")
+    //         return user
+    // }
 }
