@@ -10,6 +10,7 @@ import {
     RegisterUser, RemainingManagement, removeDiscount,
     RemoveManager, removePurchasePolicy, UpdatePermissions
 } from "./API";
+import {GetShopsManagement, GetShopsRaw, GetUsers, groupBy} from "./Getters";
 const first_purchase_type = 1;
 const first_purchase_condition_type = 1;
 const first_purchase_condition_operator = 1;
@@ -167,8 +168,7 @@ export const initData = () =>
 // AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
 
 // removeDiscount(first_shop.shop_id, 9)
-
-removePurchasePolicy(first_shop.shop_id, 9)
-    .then((result: any) => console.log(`Finish ${JSON.stringify(result[0])}`))
+GetShopsManagement()
+    .then((result: any) => console.log(`Finish ${JSON.stringify(result, null, 2)}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

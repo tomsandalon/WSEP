@@ -161,7 +161,9 @@ export const AppointManager = (target_email: string, appointer_email: string, sh
                 permission_id: perm,
                 user_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [target_email]),
                 appointer_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [appointer_email])
-            }))))
+            })))
+            .then(success)
+            .catch(failure))
 
 export const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) =>
     db.transaction((trx: any) =>
@@ -169,7 +171,9 @@ export const AppointOwner = (target_email: string, appointer_email: string, shop
             shop_id: shop_id,
             user_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [target_email]),
             appointer_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [appointer_email])
-        }))
+        })
+            .then(success)
+            .catch(failure))
 
 export const RemoveManager = (target_email: string, shop_id: number) =>
     db.transaction((trx: any) =>
@@ -178,7 +182,9 @@ export const RemoveManager = (target_email: string, shop_id: number) =>
                 shop_id: shop_id,
                 user_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [target_email])
             })
-            .del())
+            .del()
+            .then(success)
+            .catch(failure))
 
 export const RemainingManagement = (management_emails: string[], shop_id: number) =>
     db.transaction((trx: any) =>
@@ -186,7 +192,9 @@ export const RemainingManagement = (management_emails: string[], shop_id: number
             .where({shop_id: shop_id})
             .whereNotIn(user.pk,
                 trx(user.name).select(user.pk).whereIn('email', management_emails))
-            .del())
+            .del()
+            .then(success)
+            .catch(failure))
 
 export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) =>
     db.transaction((trx: any) =>
@@ -202,7 +210,9 @@ export const UpdatePermissions = (manager_id: number, shop_id: number, new_permi
                         shop_id: shop_id,
                         manager_id: manager_id,
                         permission_id: perm,
-                    })]), [])))))
+                    })]), []))))
+            .then(success)
+            .catch(failure))
 
 export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) =>
     isPurchaseSimpleCondition(condition)?
@@ -222,7 +232,9 @@ export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition:
                     trx(purchase_condition_allowed_in.name).insert({
                         shop_id: shop_id,
                         p_condition_id: policy_id
-                    }))):
+                    }))
+                .then(success)
+                .catch(failure)):
         db.transaction((trx: any) =>
             trx.insert({p_condition_id: policy_id}).into(purchase_condition.name)
                 .then((_: any) => trx.insert({composite_id: policy_id}).into(purchase_composite_condition.name))
@@ -241,7 +253,9 @@ export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition:
                             })
                             .andWhere((query: any) =>
                                 query.where(purchase_condition.pk, condition.first_policy).orWhere(purchase_condition.pk, condition.second_policy))
-                            .del()))
+                            .del())
+                .then(success)
+                .catch(failure))
 
 export const AddDiscount = (shop_id: number, discount_id: number, discount_to_add: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) =>
     isDiscountSimpleCondition(discount_to_add)?
@@ -256,7 +270,9 @@ export const AddDiscount = (shop_id: number, discount_id: number, discount_to_ad
                     trx(discount_allowed_in.name).insert({
                         shop_id: shop_id,
                         discount_id: discount_id
-                    }))):
+                    }))
+                .then(success)
+                .catch(failure)):
     isDiscountCompositeCondition(discount_to_add)?
         db.transaction((trx: any) =>
             trx.insert({discount_id: discount_id}).into(discount.name)
@@ -276,7 +292,9 @@ export const AddDiscount = (shop_id: number, discount_id: number, discount_to_ad
                         })
                         .andWhere((query: any) =>
                             query.where(discount.pk, discount_to_add.first_policy).orWhere(discount.pk, discount_to_add.second_policy))
-                        .del())):
+                        .del())
+                .then(success)
+                .catch(failure)):
             db.transaction((trx: any) =>
                 trx.insert({discount_id: discount_id}).into(discount.name)
                     .then((_: any) => trx(discount_conditional.name).insert({
@@ -306,7 +324,9 @@ export const AddDiscount = (shop_id: number, discount_id: number, discount_to_ad
                                 shop_id: shop_id,
                                 discount_id: discount_to_add.operand_discount,
                             })
-                            .del()))
+                            .del())
+                    .then(success)
+                    .catch(failure))
 
 
 export const removeDiscount = (shop_id: number, discount_id: number,) =>{
@@ -334,7 +354,9 @@ export const removeDiscount = (shop_id: number, discount_id: number,) =>{
                 pending = temp;
                 res = (await query(next))[0];
             }
-        return trx(discount.name).whereIn(discount.pk, ids).del();
+        return trx(discount.name).whereIn(discount.pk, ids).del()
+                .then(success)
+                .catch(failure);
     })
 }
 
@@ -360,7 +382,9 @@ export const removePurchasePolicy = (shop_id: number, policy_id: number) => {
             pending = temp;
             res = (await query(next))[0];
         }
-        return trx(purchase_condition.name).whereIn(purchase_condition.pk, ids).del();
+        return trx(purchase_condition.name).whereIn(purchase_condition.pk, ids).del()
+                .then(success)
+                .catch(failure);
     })
 }
 
@@ -378,22 +402,46 @@ export const Notify = (notifications: Notification[]) =>
                         user_id: message.user_id,
                         notification_id: message.notification_id,
                         notification: message.notification,
-                    }))))
+                    })))
+            .then(success)
+            .catch(failure))
 
 export const ClearNotifications = (user_id: number) =>
     db.transaction((trx: any) =>
-        trx(notification.name).where(user.pk, user_id).del())
+        trx(notification.name).where(user.pk, user_id).del()
+            .then(success)
+            .catch(failure))
 
-/*
-TODO add these fields to purchase table
+// product.amount -= purchase.amount
+// basket(product_id, shop_id, user_id) . del
+// purchase(product_id, shop_id, user_id) . insert
 
-purchase_id
-product_id FK
-name: string,
-base_price: number,
-description: string,
-categories: string,
-amount actual price
- */
-
-export const PurchaseBasket = (user_id: number, shop_id: number, purchase: Purchase[]) => new Promise(success)
+export const PurchaseBasket = (user_id: number, shop_id: number, items: Purchase[]) =>
+    db.transaction((trx: any) =>
+        Promise.all(items.map((item: Purchase) =>
+            trx(product.name).where(product.pk, user_id).update(trx.raw(`amount = amount - ${item.amount}`))
+        ))
+        .then((_: any) =>
+            trx(basket.name)
+                .where({
+                    shop_id: shop_id,
+                    user_id: user_id,
+                })
+                .whereIn(product.pk, items.map((item) => item.product_id))
+                .del())
+        .then((_: any) =>
+            trx(purchase.name).insert(items.map((item) => {
+                return {
+                    user_id: user_id,
+                    shop_id: shop_id,
+                    purchase_id: 0,
+                    product_id: item.product_id,
+                    name: item.name,
+                    categories: item.categories,
+                    description: item.description,
+                    base_price: item.base_price,
+                    amount: item.amount,
+                    actual_price: item.actual_price,
+                }
+            }))
+        ))

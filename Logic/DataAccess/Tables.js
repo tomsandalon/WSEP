@@ -6,7 +6,7 @@ const user = {
         table.integer(user.pk).unsigned().primary();
         table.string('email').notNullable();
         table.string('password').notNullable();
-        table.integer('age').unsigned().notNullable();
+        table.integer('age').unsigned();
     })
 };
 exports.user = user;
@@ -44,10 +44,15 @@ const purchase = {
     build: () => builder.createTable(purchase.name, (table) => {
         table.integer(user.pk).unsigned().references(user.pk).inTable(user.name);
         table.integer(shop.pk).unsigned().references(shop.pk).inTable(shop.name);
+        table.integer('purchase_id').unsigned();
         table.integer(product.pk).unsigned().references(product.pk).inTable(product.name);
+        table.text('name').notNullable();
+        table.text('categories');
+        table.text('description');
+        table.float('base_price');
         table.integer('amount').unsigned().notNullable();
         table.float('actual_price').unsigned().notNullable();
-        table.primary([user.pk, shop.pk, product.pk]);
+        table.primary([user.pk, shop.pk, 'purchase_id', product.pk]);
     })
 };
 exports.purchase = purchase;
