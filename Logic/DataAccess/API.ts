@@ -373,8 +373,6 @@ export const removePurchasePolicy = (shop_id: number, policy_id: number) => {
         while (res.length != 0 || pending.length != 0){
             if(res[0].first >= 0 && res[0].second >= 0){
                 pending.push(res[0].first, res[0].second)
-            } else if(res[0].second == -2){
-                pending.push(res[0].first)
             }
             if(pending.length == 0) break;
             let [next, ...temp] = pending;
@@ -416,7 +414,7 @@ export const ClearNotifications = (user_id: number) =>
 // basket(product_id, shop_id, user_id) . del
 // purchase(product_id, shop_id, user_id) . insert
 
-export const PurchaseBasket = (user_id: number, shop_id: number, items: Purchase[]) =>
+export const PurchaseBasket = (user_id: number, shop_id: number, purchase_id: number, items: Purchase[]) =>
     db.transaction((trx: any) =>
         Promise.all(items.map((item: Purchase) =>
             trx(product.name).where(product.pk, user_id).update(trx.raw(`amount = amount - ${item.amount}`))
@@ -434,7 +432,7 @@ export const PurchaseBasket = (user_id: number, shop_id: number, items: Purchase
                 return {
                     user_id: user_id,
                     shop_id: shop_id,
-                    purchase_id: 0,
+                    purchase_id: purchase_id,
                     product_id: item.product_id,
                     name: item.name,
                     categories: item.categories,

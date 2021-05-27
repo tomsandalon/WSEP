@@ -64,12 +64,19 @@ export const GetUsers = () =>
                     users.map(async (u: any) => {
                     const purchases = await trx.select().from(purchase.name).where(user.pk, u.user_id)
                     const baskets = await trx.select().from(basket.name).where(user.pk, u.user_id)
+                    const rates = await trx.select().form().where(user.pk, u.user_id)
                     return {
                         user_id: u.user,
                         email: u.email,
                         password: u.password,
                         age: u.age,
                         purchases_ids: purchases.map((p: any) => p.purchase_id),
+                        rates: rates.map((r: any) => {
+                            return {
+                                product_id: r.product_id,
+                                rate: r.rate,
+                            }
+                        }),
                         cart: baskets.map((b: any) => {
                             return {
                                 shop_id: b.shop_id,
@@ -101,7 +108,7 @@ export const GetShopsRaw = () =>
             )
     )
 
-const groupBy = (managers: any[]): any[] =>{
+export const groupBy = (managers: any[]): any[] =>{
     managers.sort((first: any, second: any) => first.manager_id - second.manager_id)
     let output = [];
     let flag = -1;
@@ -143,9 +150,105 @@ export const GetShopsManagement = () =>
         }
     )
 
+export const GetPurchaseConditions = (policy_id: number) =>{
+    return db.transaction( async (trx: any) =>{
+        const query = (id: number) => trx.raw(`(SELECT simple_id as first, -1 as second FROM purchase_simple_condition where simple_id = ${id}) union
+            (SELECT first, second FROM
+                (SELECT composite_id as p_condition_id FROM purchase_composite_condition WHERE composite_id = ${id}) as Com INNER JOIN purchase_comprised
+                on purchase_comprised.composite_id = Com.p_condition_id)`)
+        const getType = (id: number) =>
+            trx.raw(`SELECT type_id FROM ${purchase_simple_condition_type_of.name} WHERE ${purchase_simple_condition.pk} = ${id}`)
+        const getOperator = (id: number) =>
+            trx.raw(`SELECT operator_id FROM ${purchase_comprised.name} WHERE ${purchase_composite_condition.pk} = ${id}`)
+        const f = async (pid: number): Promise<{value: any, type?: number, operator?: number, left?: any, right?: any}> =>{
+            let res = (await query(pid))[0];
+            if(res[0].first >= 0 && res[0].second >= 0){
+                const operator = (await getOperator(pid))[0][0];
+                const left = await f(res[0].first);
+                const right = await f(res[0].second);
+                return {
+                    value: pid,
+                    operator: operator.operator_id,
+                    left: left,
+                    right: right
+                }
+            } else {
+                const type = (await getType(pid))[0][0];
+                return {
+                    value: pid,
+                    type: type.type_id
+                }
+            }
+        }
+        return f(policy_id);
+    })
+}
+
+
+// export const GetDiscount = (policy_id: number) =>{
+//     return db.transaction( async (trx: any) =>{
+//         const query = (id: number) => trx.raw(`(SELECT discount_id as first, -1 as second FROM discount_simple where discount_id = ${id}) union
+//             (SELECT first, second FROM
+//                 (SELECT discount_composite_id as discount_id FROM discount_composite WHERE discount_composite_id = ${id}) as Com INNER JOIN discount_comprised_composite
+//                 on discount_comprised_composite.discount_composite_id = Com.discount_id) UNION
+//             (SELECT discount_id as first, -2 as second FROM
+//                 (SELECT discount_conditional_id FROM discount_conditional WHERE discount_conditional_id = ${id}) as Com INNER JOIN discount_comprised_conditional
+//                 on discount_comprised_conditional.discount_conditional_id = Com.discount_conditional_id)`)
+//         const f = async (did: number): Promise<{value: any, left?: any, right?: any}> =>{
+//             let res = (await query(did))[0];
+//             if(res[0].first >= 0 && res[0].second >= 0){
+//                 const left = await f(res[0].first);
+//                 const right = await f(res[0].second);
+//                 return {
+//                     value: did,
+//                     left: left,
+//                     right: right
+//                 }
+//             } else if(res[0].second == -2) {
+//                 const left = await f(res[0].first);
+//                 return {
+//                     value: did,
+//                     left: left
+//                 }
+//             } else return {value: did}
+//         }
+//         return f(policy_id);
+//     })
+// }
+
 export const GetShopsInventory = () =>
-
-
+    db.transaction(async (trx: any) => {
+        // const shops = await trx.select(shop.pk).from(shop.name);
+        // const products = await trx.select(product.pk).from(product.name)
+        // const purchaseConditions =
+    })
+/*
+let ids: any[] = []
+    let pending: number[] = []
+    return db.transaction( async (trx: any) =>{
+        const query = (id: number) => trx.raw(`(SELECT simple_id as first, -1 as second FROM purchase_simple_condition where simple_id = ${id}) union
+            (SELECT first, second FROM
+                (SELECT composite_id as p_condition_id FROM purchase_composite_condition WHERE composite_id = ${id}) as Com INNER JOIN purchase_comprised
+                on purchase_comprised.composite_id = Com.p_condition_id)`)
+        ids.push(policy_id);
+        let res = (await query(policy_id))[0];
+        while (res.length != 0 || pending.length != 0){
+            if(res[0].first >= 0 && res[0].second >= 0){
+                pending.push(res[0].first, res[0].second)
+            } else if(res[0].second == -2){
+                pending.push(res[0].first)
+            }
+            if(pending.length == 0) break;
+            let [next, ...temp] = pending;
+            ids.push(next);
+            pending = temp;
+            res = (await query(next))[0];
+        }
+        return trx(purchase_condition.name).whereIn(purchase_condition.pk, ids).del()
+                .then(success)
+                .catch(failure);
+    })
+ */
 export const GetPurchases = () => new Promise(success);
 
 export const GetPurchaseTypes = () => new Promise(success);

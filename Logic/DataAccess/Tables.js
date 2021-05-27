@@ -193,7 +193,7 @@ const purchase_comprised = {
         table.integer(purchase_composite_condition.pk).references(purchase_composite_condition.pk).inTable(purchase_composite_condition.name).unsigned().onDelete('CASCADE');
         table.integer('first').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().onDelete('CASCADE');
         table.integer('second').references(purchase_condition.pk).inTable(purchase_condition.name).unsigned().onDelete('CASCADE');
-        table.primary([purchase_condition_operator.pk, purchase_composite_condition.pk, 'first', 'second']);
+        table.primary([purchase_condition_operator.pk, purchase_composite_condition.pk]);
     })
 };
 exports.purchase_comprised = purchase_comprised;
