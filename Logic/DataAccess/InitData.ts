@@ -1,24 +1,25 @@
 import {db} from './DB.config';
 import {
-    AddDiscount, AddDiscountConditionType, AddDiscountOperator,
+    AddDiscount, AddDiscountConditionType, AddDiscountOperator, AddItemToBasket,
     AddPermission,
     AddProduct, AddPurchaseConditionOperator, AddPurchaseConditionType, AddPurchasePolicy,
     AddPurchaseType,
     AddShop,
     AppointManager,
-    AppointOwner, RateProduct,
+    AppointOwner, PurchaseBasket, RateProduct,
     RegisterUser, RemainingManagement, removeDiscount,
     RemoveManager, removePurchasePolicy, UpdatePermissions
 } from "./API";
 import {
-    GetDiscount,
-    GetPurchaseConditions,
+    GetDiscount, GetNotifications,
+    GetPurchaseConditions, GetPurchases,
     GetShopsInventory,
     GetShopsManagement,
     GetShopsRaw,
     GetUsers,
     groupByManagers
 } from "./Getters";
+import {purchase_cart} from "../Communication/Config/Config";
 const first_purchase_type = 1;
 const first_purchase_condition_type = 1;
 const first_purchase_condition_operator = 1;
@@ -176,7 +177,33 @@ export const initData = () =>
 // AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
 
 // removeDiscount(first_shop.shop_id, 9)
-GetShopsInventory()
+// AddItemToBasket({
+//     user_id: third_user.user_id,
+//     shop_id: first_shop.shop_id,
+//     product_id: first_product.product_id,
+//     amount: 20
+// })
+//     .then((_: any) => PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, [{
+//             product_id: first_product.product_id,
+//             amount: 20,
+//             actual_price: 14,
+//             name: first_product.name,
+//             base_price: first_product.base_price,
+//             description: first_product.description,
+//             categories: first_product.categories,
+//         }
+//     ]))
+// PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, [{
+//             product_id: first_product.product_id,
+//             amount: 20,
+//             actual_price: 14,
+//             name: first_product.name,
+//             base_price: first_product.base_price,
+//             description: first_product.description,
+//             categories: first_product.categories,
+//         }
+//     ])
+GetPurchases()
     .then((result: any) => console.log(`Finish ${JSON.stringify(result, null, 2)}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

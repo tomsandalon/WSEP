@@ -410,14 +410,10 @@ export const ClearNotifications = (user_id: number) =>
             .then(success)
             .catch(failure))
 
-// product.amount -= purchase.amount
-// basket(product_id, shop_id, user_id) . del
-// purchase(product_id, shop_id, user_id) . insert
-
 export const PurchaseBasket = (user_id: number, shop_id: number, purchase_id: number, items: Purchase[]) =>
     db.transaction((trx: any) =>
         Promise.all(items.map((item: Purchase) =>
-            trx(product.name).where(product.pk, user_id).update(trx.raw(`amount = amount - ${item.amount}`))
+                trx.raw(`UPDATE ${product.name} SET amount = amount - ${item.amount} WHERE ${product.pk} = ${item.product_id}`)
         ))
         .then((_: any) =>
             trx(basket.name)
@@ -442,4 +438,7 @@ export const PurchaseBasket = (user_id: number, shop_id: number, purchase_id: nu
                     actual_price: item.actual_price,
                 }
             }))
-        ))
+        )
+        .then(success)
+        .catch(failure)
+    )

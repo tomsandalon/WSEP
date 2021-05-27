@@ -1,21 +1,5 @@
 import {db} from './DB.config';
-import {
-    Basket,
-    DiscountCompositeCondition,
-    DiscountConditionalCondition,
-    DiscountSimpleCondition, isDiscountCompositeCondition,
-    isDiscountSimpleCondition, isPurchaseCompositeCondition, isPurchaseSimpleCondition,
-    Notification,
-    Permission,
-    Product,
-    Purchase,
-    PurchaseCompositeCondition,
-    PurchaseSimpleCondition,
-    Rate,
-    Shop,
-    User
-} from "./DTOS";
-import {Purchase_Type} from "../Domain/Shop/ShopInventory";
+
 const {
     purchase_type,
     permission,
@@ -245,7 +229,6 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
     shops.sort((first: any, second: any) => first.shop_id - second.shop_id)
     let output: ShopRich[] = [];
     let flag = -1;
-    console.log('Input', shops, '============')
     for (let i = 0; i < shops.length; i++) {
         if (flag == shops[i].shop_id) {
             if (shops[i].p_condition_id != undefined){
@@ -291,21 +274,28 @@ export const GetShopsInventory = () =>
         const products = await trx.select().from(product.name)
         const purchaseConditions = await trx.select().from(purchase_condition_allowed_in.name);
         const discounts = await trx.select().from(discount_allowed_in.name);
-        const discountAndPurchases = groupByShops(purchaseConditions.concat(discounts).concat(products))
-        return discountAndPurchases
+        return groupByShops(purchaseConditions.concat(discounts).concat(products))
     })
 
-export const GetPurchases = () => new Promise(success);
+export const GetNotifications = () =>
+    db.transaction(async (trx: any) =>
+        trx.select().from(notification.name))
+
+export const GetPurchases = () =>
+    db.transaction(async (trx: any) =>
+        trx.select().from(purchase.name))
+
+//TODO ask TOM available??
 
 export const GetPurchaseTypes = () => new Promise(success);
+//TODO ask TOM is needed
 
 export const GetPurchaseConditionOperator = () => new Promise(success);
+//TODO ask TOM is needed
 
 export const GetPurchaseConditionType = () => new Promise(success);
+//TODO ask TOM is needed
 
 export const GetDiscountType = () => new Promise(success);
-
+//TODO ask TOM is needed
 export const GetDiscountOperator = () => new Promise(success);
-
-export const GetNotifications = () => new Promise(success);
-
