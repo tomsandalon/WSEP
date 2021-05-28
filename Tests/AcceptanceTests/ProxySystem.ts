@@ -243,4 +243,13 @@ export class ProxySystem implements System{
         }
         return 'panic: spell checker';
     }
+
+    //mock
+    deliverItem(product_id : number, amount: number, shop_id: number, to: string ,transaction_id : boolean | string): boolean {
+        if (product_id < 0 || amount < 0 || shop_id < 0 || to.includes("Drop table") || (typeof transaction_id == 'string') )
+            return false;
+        else
+            return true;
+    }
+
 }
