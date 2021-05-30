@@ -18,6 +18,11 @@ const ManagersStore = () => {
     staffError,
   } = useFetch(`/user/shop/management?shop_id=${storeID}`);
   const parsedStaff = JSON.parse(staff);
+  const {
+    data: myEmail,
+    detailsIsPending,
+    detailsError,
+  } = useFetch(`/user/details`);
 
   return (
     <div className="row">
@@ -35,13 +40,16 @@ const ManagersStore = () => {
             </button>
           </Link>
           <h3>Store Managers:</h3>
-          <ManagersBlock
-            managers={parsedStaff.managers}
-            error={staffError}
-            isPending={staffIsPending}
-            storeID = {storeID}
-            storeName = {name}
-          />
+          {myEmail && (
+            <ManagersBlock
+              managers={parsedStaff.managers}
+              error={staffError}
+              isPending={staffIsPending}
+              storeID={storeID}
+              storeName={name}
+              myEmail = {myEmail.email}
+            />
+          )}
           <Link to={`/addmanager/${storeID}/manager/${name}`}>
             <button className="btn btn-outline-primary btn-sm ">
               Add Manager <i className="fa fa-plus"></i>

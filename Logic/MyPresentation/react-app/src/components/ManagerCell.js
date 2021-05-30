@@ -3,13 +3,13 @@ import Avatar from "@material-ui/core/Avatar";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
 
-
 const ManagerCell = (props) => {
   const id = props.id;
   const managerName = props.managerName;
   const storeID = props.storeID;
   const storeName = props.storeName;
-
+  const isEditable = props.isEditable;
+  console.log(isEditable);
 
   return (
     <tr tabIndex={-1} key={id}>
@@ -29,9 +29,11 @@ const ManagerCell = (props) => {
 
       <td className="text-right ">
         <figcaption className="info align-self-center ">
-          <Link to={`/editpermissionspre/${storeID}/${storeName}/${id}`}>
-            <EditIcon />
-          </Link>
+          {isEditable && (
+            <Link to={`/editpermissionspre/${storeID}/${storeName}/${id}`}>
+              <EditIcon />
+            </Link>
+          )}
         </figcaption>
       </td>
     </tr>

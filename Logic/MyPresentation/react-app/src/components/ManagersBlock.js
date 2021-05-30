@@ -1,6 +1,6 @@
 import React from "react";
 import ManagerCell from "./ManagerCell";
-import useFetchNoJSON from "../useFetchNoJSON";
+import useFetch from "../useFetch";
 
 const ManagersBlock = (props) => {
   const managers = props.managers;
@@ -8,12 +8,8 @@ const ManagersBlock = (props) => {
   const error = props.error;
   const storeID = props.storeID;
   const storeName = props.storeName;
-  const {
-    data: myEmail,
-    detailsIsPending,
-    detailsError,
-  } = useFetchNoJSON(`/user/details`);
-  console.log(myEmail);
+  const myEmail = props.myEmail;
+
   return (
     <div className="Card">
       {error && <div> {error}</div>}
@@ -30,6 +26,7 @@ const ManagersBlock = (props) => {
                   key={parsedManager._user_email}
                   storeID={storeID}
                   storeName={storeName}
+                  isEditable={myEmail === parsedManager._appointer_user_email}
                 />
               );
             })}
