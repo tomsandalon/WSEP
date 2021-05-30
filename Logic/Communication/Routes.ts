@@ -1,4 +1,12 @@
-import {assign_manager, assign_owner, categories, purchase_cart, rate, shop_purchase_history} from "./Config/Config";
+import {
+    assign_manager,
+    assign_owner,
+    categories, isAdmin, isLoggedIn, isManager, isOwner,
+    permissions,
+    purchase_cart,
+    rate,
+    shop_purchase_history
+} from "./Config/Config";
 
 export const route_notifications = "/"
 export const route_guest = "/guest"
@@ -29,7 +37,67 @@ export const route_filter = "/home/filter"
  */
 export const route_shop = "/user/shop"
 export const route_admin = "/user/admin"
+/**
+ * @method GET
+ * @function getManagingShops
+ * @params user_id
+ * @return 404 -> server not found error -> text
+ * @return 400 -> error -> text
+ * @return 200 -> json
+ */
 export const route_user_management = "/user"
+
+/**
+ * @method GET
+ * @function getPermissions
+ * @params user_id, shop_id
+ * @location body
+ * @return 404 -> server not found error -> text
+ * @return 400 -> error -> text
+ * @return 200 -> json
+ */
+export const route_user_management_permissions = route_user_management + permissions
+
+/**
+ * @method GET
+ * @function isLoggedIn
+ * @params user_id
+ * @return 404 -> server not found error -> text
+ * @return 400 -> error -> text
+ * @return 200 -> text -> boolean
+ */
+export const route_user_management_is_logged_in = route_user_management + isLoggedIn
+
+/**
+ * @method GET
+ * @function isAdmin
+ * @params user_id
+ * @return 404 -> server not found error -> text
+ * @return 400 -> error -> text
+ * @return 200 -> text -> boolean
+ */
+export const route_user_management_is_admin = route_user_management + isAdmin
+
+/**
+ * @method GET
+ * @function isManager
+ * @params user_id
+ * @return 404 -> server not found error -> text
+ * @return 400 -> error -> text
+ * @return 200 -> text -> boolean
+ */
+export const route_user_management_is_manager = route_user_management + isManager
+
+/**
+ * @method GET
+ * @function isOwner
+ * @params user_id
+ * @return 404 -> server not found error -> text
+ * @return 400 -> error -> text
+ * @return 200 -> text -> boolean
+ */
+export const route_user_management_is_owner = route_user_management + isOwner
+
 /**
  * @method DELETE
  * @function removeProduct

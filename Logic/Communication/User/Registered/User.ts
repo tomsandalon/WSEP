@@ -1,4 +1,14 @@
-import {OK, ServerNotFound, service, Session, sid, Unauthorized} from "../../Config/Config";
+import {
+    isAdmin, isLoggedIn,
+    isManager, isOwner,
+    OK,
+    permissions,
+    ServerNotFound,
+    service,
+    Session,
+    sid,
+    Unauthorized
+} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -23,7 +33,7 @@ router.get('/', (request: any, response: any) => {
     }
     response.end();
 })
-router.get('/permissions', (request: any, response: any) => {
+router.get(permissions, (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -44,7 +54,7 @@ router.get('/permissions', (request: any, response: any) => {
     }
     response.end();
 })
-router.get('/is/loggedin', (request: any, response: any) => {
+router.get(isLoggedIn, (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -59,7 +69,7 @@ router.get('/is/loggedin', (request: any, response: any) => {
     response.send(result)
     response.end();
 })
-router.get('/is/admin', (request: any, response: any) => {
+router.get(isAdmin, (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -74,7 +84,7 @@ router.get('/is/admin', (request: any, response: any) => {
     response.send(result)
     response.end();
 })
-router.get('/is/owner', (request: any, response: any) => {
+router.get(isOwner, (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -89,7 +99,7 @@ router.get('/is/owner', (request: any, response: any) => {
     response.send(result)
     response.end();
 })
-router.get('/is/manager', (request: any, response: any) => {
+router.get(isManager, (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
