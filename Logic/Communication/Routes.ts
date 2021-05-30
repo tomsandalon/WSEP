@@ -100,7 +100,7 @@ export const route_user_management_is_owner = route_user_management + isOwner
 
 /**
  * @method GET
- * @function shopOrderHistory
+ * @function getUserEmailFromUserId
  * @params user_id
  * @return 404 -> error -> server not found mssg
  * @return 400 -> error -> text
