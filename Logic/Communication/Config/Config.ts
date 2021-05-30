@@ -37,6 +37,11 @@ export const categories = '/categories'
 export const assign_manager = '/assign/manager'
 export const assign_owner = '/assign/owner'
 export const permissions = '/permissions'
+export const isAdmin = '/is/admin'
+export const isManager = '/is/manager'
+export const isOwner = '/is/owner'
+export const isLoggedIn = '/is/loggedin'
+
 export const shop_purchase_history = '/purchase_history'
 export const purchase_cart = "/all"
 export const second = 1000;
