@@ -92,9 +92,15 @@ export const GetShopsRaw = () =>
             )
     )
 
+export type Manager = {
+    manager_id: number,
+    appointer_id: number,
+    permissions: number[],
+}
+
 export const groupByManagers = (managers: any[]): any[] =>{
     managers.sort((first: any, second: any) => first.manager_id - second.manager_id)
-    let output = [];
+    let output: Manager[] = [];
     let flag = -1;
     for (let i = 0; i < managers.length; i++) {
         if (flag == managers[i].manager_id) {
