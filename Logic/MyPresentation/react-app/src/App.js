@@ -19,6 +19,7 @@ import RoleSelection from "./components/RoleSelection";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import UserHistory from "./components/UserHistory/UserHistory";
 import AdminMenu from "./components/Admin/AdminMenu";
+import AddProduct from "./pages/Add_Product";
 import Notifications from "./components/Notifications/Notifications";
 import Unatho from "./components/Unatho";
 function App() {
@@ -38,9 +39,10 @@ function App() {
           <Route path="/register" component={Register} />
           <ProtectedRoute role={"admin"} path="/admin-menu" component={AdminMenu} />
           <Route path="/unauthorized" component={Unatho}/>
-          <Route path="/addmanager/:storeID"><AddManager/></Route>
+          <Route path="/addmanager/:storeID/:managerOwner/:storeName"><AddManager/></Route>
           <Route path="/addstore"><AddStore/></Route>
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
+          <Route path="/addproduct/:storeID/:storeName"><AddProduct /></Route>
         </Switch>
       </div>
     </Router>

@@ -1,14 +1,16 @@
 import React from "react";
 import ManagerCell from "./ManagerCell";
-import useFetch from "../useFetch";
+
 
 const ManagersBlock = (props) => {
-  const storeID = props.storeID;
-  const {
-    data: managers,
-    isPending,
-    error,
-  } = useFetch(`/user/shop/management?shop_id=${storeID}`);
+  const managers = props.managers;
+  const isPending = props.isPending;
+  const error = props.error;
+  // const {
+  //   data: managers,
+  //   isPending,
+  //   error,
+  // } = useFetch(`/user/shop/management?shop_id=${storeID}`);
 
   return (
     <div className="Card">
