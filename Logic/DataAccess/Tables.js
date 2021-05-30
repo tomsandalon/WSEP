@@ -30,7 +30,7 @@ const product = {
     build: () => builder.createTable(product.name, (table) => {
         table.integer(product.pk).unsigned().primary();
         table.integer(shop.pk).unsigned().notNullable().references(shop.pk).inTable(shop.name);
-        table.integer(purchase_type.pk).unsigned().notNullable().references(purchase_type.pk).inTable(purchase_type.name);
+        table.integer('purchase_type').unsigned().notNullable().references(purchase_type.pk).inTable(purchase_type.name);
         table.string('name').notNullable();
         table.integer('amount').unsigned().notNullable();
         table.float('base_price').unsigned().notNullable();
@@ -140,8 +140,8 @@ const available = {
     name: 'available',
     build: () => builder.createTable(available.name, (table) => {
         table.integer(shop.pk).references(shop.pk).inTable(shop.name).unsigned();
-        table.integer(product.pk).references(product.pk).inTable(product.name).unsigned();
-        table.primary([shop.pk, product.pk]);
+        table.integer(purchase_type.pk).references(purchase_type.pk).inTable(purchase_type.name).unsigned();
+        table.primary([shop.pk, purchase_type.pk]);
     })
 };
 exports.available = available;

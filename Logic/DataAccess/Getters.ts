@@ -224,7 +224,7 @@ export const GetDiscount = (policy_id: number) =>{
     })
 }
 
-type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[]};
+type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
 export const groupByShops = (shops: any[]): ShopRich[]  =>{
     shops.sort((first: any, second: any) => first.shop_id - second.shop_id)
     let output: ShopRich[] = [];
@@ -237,6 +237,8 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
             } else if(shops[i].discount_id != undefined){
                 // @ts-ignore
                 output[output.length - 1].discounts.push(shops[i].discount_id)
+            } else if(shops[i].purchase_type_id != undefined) {
+                output[output.length - 1].purchase_types.push(shops[i].purchase_type_id)
             } else {
                 output[output.length - 1].products.push(shops[i])
             }
@@ -247,21 +249,32 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
                     shop_id: shops[i].shop_id,
                     products: [],
                     purchase_conditions: [shops[i].p_condition_id],
-                    discounts: []
+                    discounts: [],
+                    purchase_types: [],
                 })
             } else if(shops[i].discount_id != undefined){
                 output.push({
                     shop_id: shops[i].shop_id,
                     products: [],
                     purchase_conditions: [],
-                    discounts: [shops[i].discount_id]
+                    discounts: [shops[i].discount_id],
+                    purchase_types: [],
+                })
+            } else if(shops[i].purchase_type_id != undefined){
+                output.push({
+                    shop_id: shops[i].shop_id,
+                    products: [],
+                    purchase_conditions: [],
+                    discounts: [],
+                    purchase_types: [shops[i].purchase_type_id],
                 })
             } else {
                 output.push({
                     shop_id: shops[i].shop_id,
                     products: [shops[i]],
                     purchase_conditions: [],
-                    discounts: []
+                    discounts: [],
+                    purchase_types: [],
                 })
             }
         }
@@ -269,12 +282,15 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
     return output;
 }
 
+//TODO test add product, update product and get shops inventory
+
 export const GetShopsInventory = () =>
     db.transaction(async (trx: any) => {
+        const purchase_types = await trx.select().from(available.name);
         const products = await trx.select().from(product.name)
         const purchaseConditions = await trx.select().from(purchase_condition_allowed_in.name);
         const discounts = await trx.select().from(discount_allowed_in.name);
-        return groupByShops(purchaseConditions.concat(discounts).concat(products))
+        return groupByShops(purchaseConditions.concat(discounts).concat(products).concat(purchase_types))
     })
 
 export const GetNotifications = () =>
@@ -285,17 +301,3 @@ export const GetPurchases = () =>
     db.transaction(async (trx: any) =>
         trx.select().from(purchase.name))
 
-//TODO ask TOM available??
-
-export const GetPurchaseTypes = () => new Promise(success);
-//TODO ask TOM is needed
-
-export const GetPurchaseConditionOperator = () => new Promise(success);
-//TODO ask TOM is needed
-
-export const GetPurchaseConditionType = () => new Promise(success);
-//TODO ask TOM is needed
-
-export const GetDiscountType = () => new Promise(success);
-//TODO ask TOM is needed
-export const GetDiscountOperator = () => new Promise(success);

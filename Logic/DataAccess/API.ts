@@ -134,7 +134,7 @@ export const UpdateProduct = (data: Product) =>
             shop_id: data.product_id,
         })
         .update({
-            purchase_type_id: data.purchase_type_id,
+            purchase_type: data.purchase_type,
             name: data.name,
             amount: data.amount,
             base_price: data.base_price,
