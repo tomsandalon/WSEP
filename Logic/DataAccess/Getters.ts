@@ -39,13 +39,28 @@ const failure = (err: any) => {
     console.log(err)
     return false;
 }
-
-export const GetUsers = () =>
+export type User = {
+    user_id: number,
+    email: string,
+    password: string,
+    age: number,
+    purchases_ids: number[],
+    rates: {
+        product_id: number,
+        rate: number,
+    }[],
+    cart: {
+        shop_id: number,
+        product_id: number,
+        amount: number
+    }[],
+}
+export const GetUsers = (): Promise<User[]> =>
     db.transaction((trx: any) =>
         trx.select().from(user.name)
             .then((users: any[]) =>
                 Promise.all(
-                    users.map(async (u: any) => {
+                    users.map(async (u: any): Promise<User> => {
                     const purchases = await trx.select().from(purchase.name).where(user.pk, u.user_id)
                     const baskets = await trx.select().from(basket.name).where(user.pk, u.user_id)
                     const rates = await trx.select().form().where(user.pk, u.user_id)
@@ -74,11 +89,21 @@ export const GetUsers = () =>
             )
     )
 
-export const GetShopsRaw = () =>
-    db.transaction((trx: any) =>
+export type ShopRaw = {
+    shop_id: number,
+    original_owner: number,
+    name: string,
+    description: string,
+    location: string,
+    bank_info: string,
+    active: number,
+}
+
+export const GetShopsRaw = (): Promise<ShopRaw[]> =>
+    db.transaction((trx: any): Promise<ShopRaw[]> =>
         trx.select().from(shop.name)
             .then((shops: any[]) =>
-                shops.map((s: any) => {
+                shops.map((s: any): ShopRaw => {
                     return {
                         shop_id: s.shop_id,
                         original_owner: s.user_id,
@@ -98,7 +123,7 @@ export type Manager = {
     permissions: number[],
 }
 
-export const groupByManagers = (managers: any[]): any[] =>{
+export const groupByManagers = (managers: any[]): Manager[] =>{
     managers.sort((first: any, second: any) => first.manager_id - second.manager_id)
     let output: Manager[] = [];
     let flag = -1;
@@ -117,14 +142,23 @@ export const groupByManagers = (managers: any[]): any[] =>{
     return output;
 };
 
-export const GetShopsManagement = () =>
-    db.transaction(async (trx: any) => {
+export type ShopManagement = {
+    shop_id: number,
+    owners: {
+        owner_id: number,
+        appointer_id: number,
+    }[],
+    managers: Manager[]
+}
+
+export const GetShopsManagement = (): Promise<ShopManagement[]> =>
+    db.transaction(async (trx: any): Promise<ShopManagement[]> => {
             const shops = await trx.select(shop.pk).from(shop.name);
             const owners = (await trx.raw(`SELECT * FROM 
                            (SELECT ${shop.pk} FROM ${shop.name}) as A INNER JOIN ${owns.name} ON A.${shop.pk} = ${owns.name}.${shop.pk}`))[0]
             const managers = (await trx.raw(`SELECT * FROM 
                         (SELECT ${shop.pk} FROM ${shop.name}) as A INNER JOIN ${manages.name} ON A.${shop.pk} = ${manages.name}.${shop.pk}`))[0]
-            return shops.map((s: any) => {
+            return shops.map((s: any): ShopManagement => {
                 return {
                     shop_id: s.shop_id,
                     owners: owners.filter((o: any) => o.shop_id == s.shop_id),
@@ -140,7 +174,15 @@ export const GetShopsManagement = () =>
         }
     )
 
-export const GetPurchaseConditions = (policy_id: number) =>{
+export type PurchaseConditionTree = {
+    id: any,
+    value?: number,
+    type?: number,
+    operator?: number,
+    left?: any,
+    right?: any
+}
+export const GetPurchaseConditions = (policy_id: number): Promise<PurchaseConditionTree> =>{
     return db.transaction( async (trx: any) =>{
         const query = (id: number) => trx.raw(`(SELECT simple_id as first, -1 as second FROM purchase_simple_condition where simple_id = ${id}) union
             (SELECT first, second FROM
@@ -152,7 +194,7 @@ export const GetPurchaseConditions = (policy_id: number) =>{
             trx.raw(`SELECT value FROM ${purchase_simple_condition.name} WHERE ${purchase_simple_condition.pk} = ${id}`)
         const getOperator = (id: number) =>
             trx.raw(`SELECT operator_id FROM ${purchase_comprised.name} WHERE ${purchase_composite_condition.pk} = ${id}`)
-        const f = async (pid: number): Promise<{id: any, value?: number, type?: number, operator?: number, left?: any, right?: any}> =>{
+        const f = async (pid: number): Promise<PurchaseConditionTree> =>{
             let res = (await query(pid))[0];
             if(res[0].first >= 0 && res[0].second >= 0){
                 const operator = (await getOperator(pid))[0][0];
@@ -178,8 +220,16 @@ export const GetPurchaseConditions = (policy_id: number) =>{
     })
 }
 
-
-export const GetDiscount = (policy_id: number) =>{
+export type DiscountTree = {
+    id: any,
+    param?: any,
+    type?:any,
+    value?: any,
+    operator?:any,
+    left?: any,
+    right?: any
+}
+export const GetDiscount = (policy_id: number): Promise<DiscountTree> =>{
     return db.transaction( async (trx: any) =>{
         const query = (id: number) => trx.raw(`(SELECT discount_id as first, -1 as second FROM discount_simple where discount_id = ${id}) union
             (SELECT first, second FROM
@@ -196,7 +246,7 @@ export const GetDiscount = (policy_id: number) =>{
             trx.raw(`SELECT ${discount_operator.pk} FROM ${discount_comprised_composite.name} WHERE ${discount_composite.pk} = ${id}`)
         const getParam = (id: number) =>
             trx.raw(`SELECT discount_param FROM ${discount_conditional.name} WHERE ${discount_conditional.pk} = ${id}`)
-        const f = async (did: number): Promise<{id: any, param?: any, type?:any, value?: any, operator?:any, left?: any, right?: any}> =>{
+        const f = async (did: number): Promise<DiscountTree> =>{
             let res = (await query(did))[0];
             if(res[0].first >= 0 && res[0].second >= 0){
                 const operator = (await getOperator(did))[0][0];
@@ -290,8 +340,8 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
 
 //TODO test add product, update product and get shops inventory
 
-export const GetShopsInventory = () =>
-    db.transaction(async (trx: any) => {
+export const GetShopsInventory = (): Promise<ShopRich[]> =>
+    db.transaction(async (trx: any): Promise<ShopRich[]> => {
         const purchase_types = await trx.select().from(available.name);
         const products = await trx.select().from(product.name)
         const purchaseConditions = await trx.select().from(purchase_condition_allowed_in.name);
