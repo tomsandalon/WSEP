@@ -29,14 +29,15 @@ export class PublisherImpl implements Publisher{
         return result;
     }
 
-    notifyFlush(user_id: number): void {
+    notifyFlush(user_id: number): boolean {
         if (P != undefined) { //TODO remove prints
             if (LoginImpl.getInstance().isLoggedIn(user_id)) {
                 P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
+                return true;
             }
-            else Notify([{user_id: user_id, notification: notification.message, notification_id: PublisherImpl.id_counter++}]).then((r: any) => r ? {} : SystemImpl.rollback)
         }
         else logger.Error(`Failed to send notifications to ${user_id} as the publisher is not defined`)
+        return false
     }
 
     getAmountOfNotifications(user_id: number): number {
@@ -52,7 +53,11 @@ export class PublisherImpl implements Publisher{
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        this.notifyFlush(user_id)
+        if(!this.notifyFlush(user_id)){
+            Notify([
+                {user_id: user_id, notification: notification.message, notification_id: PublisherImpl.id_counter++}
+            ]).then((r: any) => r ? {} : SystemImpl.rollback)
+        }
     }
 
     getNotifications(user_id: number): Notification[]{
