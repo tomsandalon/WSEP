@@ -21,7 +21,7 @@ export const permission_to_numbers = (p: Permissions): number[] => {
 }
 
 export const numbers_to_permission = (n: number[]): boolean[] => {
-    let ret = []
+    let ret:boolean[] = []
     ret[Action.AddItem] = false
     ret[Action.ManagePolicies] = false
     ret[Action.RemoveItem] = false

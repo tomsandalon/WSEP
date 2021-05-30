@@ -10,13 +10,14 @@ import {SystemImpl} from "../System";
 
 export class PublisherImpl implements Publisher{
     private static instance: PublisherImpl;
-    private readonly notificationQueue: {[user_id: number]: Notification[]};
+    private static id_counter = 0;
+    notificationQueue: {[user_id: number]: Notification[]};
     private constructor() {
         this.notificationQueue = {};
     }
 
-    public static getInstance(): PublisherImpl{
-        if(PublisherImpl.instance == undefined){
+    public static getInstance(reset? :boolean): PublisherImpl{
+        if(PublisherImpl.instance == undefined || reset){
             PublisherImpl.instance = new PublisherImpl();
         }
         return PublisherImpl.instance;
@@ -39,7 +40,7 @@ export class PublisherImpl implements Publisher{
                 P.Publisher.getInstance().notify(user_id)
             }
             else {
-                Notify([{user_id: user_id, notification: notification.message}]).then(r => r ? {} : SystemImpl.rollback)
+                Notify([{user_id: user_id, notification: notification.message, notification_id: PublisherImpl.id_counter++}]).then((r: any) => r ? {} : SystemImpl.rollback)
             }
         }
         else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
@@ -53,6 +54,10 @@ export class PublisherImpl implements Publisher{
     removeNotifications(user_id: number): void{
         this.notificationQueue[user_id] = [];
         ClearNotifications(user_id).then(r => r ? {} : SystemImpl.rollback())
+    }
+
+    removeAllNotificationsForTests(): void {
+        this.notificationQueue = {}
     }
 
     fetchAllNotifications(): { user_id: number; notifications: Notification[] }[] {
