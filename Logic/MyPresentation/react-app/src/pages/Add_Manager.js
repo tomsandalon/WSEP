@@ -11,7 +11,7 @@ const AddManager = () => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-  const ownerPage = managerOwner == "owner";
+  const ownerPage = managerOwner === "owner";
   console.log(ownerPage);
 
   const onDismiss = () => setVisible(false);

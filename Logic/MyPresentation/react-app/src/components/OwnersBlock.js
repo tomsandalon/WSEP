@@ -1,6 +1,6 @@
 import React from "react";
 import OwnerCell from "./OwnerCell";
-import useFetch from "../useFetch";
+
 
 const OwnersBlock = (props) => {
   const owners = props.owners;

@@ -39,6 +39,7 @@ const ManagersStore = () => {
             managers={parsedStaff.managers}
             error={staffError}
             isPending={staffIsPending}
+            storeID = {storeID}
           />
           <Link to={`/addmanager/${storeID}/manager/${name}`}>
             <button className="btn btn-outline-primary btn-sm ">

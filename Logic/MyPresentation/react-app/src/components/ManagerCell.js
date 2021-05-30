@@ -2,10 +2,12 @@ import React from "react";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
 
 const ManagerCell = (props) => {
   const id = props.id;
   const managerName = props.managerName;
+  const storeID = props.storeID;
 
   return (
     <tr tabIndex={-1} key={id}>
@@ -25,9 +27,11 @@ const ManagerCell = (props) => {
 
       <td className="text-right ">
         <figcaption className="info align-self-center ">
-          <IconButton aria-label="edit">
-            <EditIcon />
-          </IconButton>
+
+            <Link to={`/editpermissionspre/${storeID}/${id}`}>
+              <EditIcon />
+            </Link>
+
         </figcaption>
       </td>
     </tr>
