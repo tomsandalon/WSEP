@@ -75,12 +75,13 @@ socketFunc = () => {
     this.state.socket.emit("Hello", document.cookie);
     this.state.socket.emit("Get pending notifications",document.cookie);
     this.state.socket.on("Get pending notifications", (amount) => {
-        this.setState({notifications:amount});
+        if(amount >= 0)
+            this.setState({notifications:amount});
     });
 }
 componentDidMount() {
     this.isUser();
-    this.interval = setInterval(() => this.socketFunc(), 3000);
+    this.interval = setInterval(() => this.socketFunc(), 1000);
 }
 componentWillUnmount() {
     clearInterval(this.interval);

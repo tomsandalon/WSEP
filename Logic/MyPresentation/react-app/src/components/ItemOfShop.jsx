@@ -71,7 +71,7 @@ class ItemOfShop extends Component {
                             {/* //rating={item._rating.real_rating} raters={item._rating.number_of_rating} */}
                             <h6>Amount of raters: {this.props.raters}</h6>
                             <Rating readonly={true} placeholderRating={this.props.rating}></Rating>
-                            <input type="number" className="amount form-control" placeholder="Amount:" onChange={this.handleAmount}/>
+                            <input type="number" className="amount form-control" placeholder="Amount:" value={this.state.desiredAmount} onChange={this.handleAmount}/>
                             <button className="btn btn-primary btn-sm" onClick={this.handleAddToCart}> Add to cart 
                                 <i className="fa fa-shopping-cart"></i> 
                             </button>
