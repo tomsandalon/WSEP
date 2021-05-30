@@ -30,6 +30,33 @@ export const route_filter = "/home/filter"
 export const route_shop = "/user/shop"
 export const route_admin = "/user/admin"
 export const route_user_management = "/user"
+/**
+ * @method DELETE
+ * @function removeProduct
+ * @params user_id, shop_id, product_id
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> json
+ *
+ *
+ * @method PUT
+ * @function editProduct
+ * @params user_id, shop_id, product_id, action, value
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> json
+ *
+ *
+ * @method POST
+ * @function addProduct
+ * @params user_id, shop_id, name, description, amount, categories, base_price,
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> json
+ */
 export const route_shop_manage_product = "/user/shop/product"
 export const route_shop_management = "/user/shop/management"
 export const route_shop_ownership = "/user/shop/ownership"
