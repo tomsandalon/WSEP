@@ -3,12 +3,10 @@ import OwnerCell from "./OwnerCell";
 import useFetch from "../useFetch";
 
 const OwnersBlock = (props) => {
-  const storeID = props.storeID;
-  const {
-    data: owners,
-    isPending,
-    error,
-  } = useFetch(`/user/shop/management?shop_id=${storeID}`);
+  const owners = props.owners;
+  const isPending = props.isPending;
+  const error = props.error;
+
 
   return (
     <div className="table-responsive-material table-userdetail-mmin">
