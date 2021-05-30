@@ -27,8 +27,8 @@ const getNewItem = (shop: ShopInventory): number => shop.products.reduce((acc, p
 describe('Buy product by policies', () => {
     ProductImpl.resetIDs();
     it('Buy product by conditional discount policy', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
-        const user: User = new UserImpl();
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
+        const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 999, ["GPU", "HW"], 1000);
         shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTX")
@@ -37,8 +37,8 @@ describe('Buy product by policies', () => {
             .then(_ => expect((user.getOrderHistory() as string[])[0]).to.include(10*1000*0.5))
     });
     it('Buy product by composite discount policy', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
-        const user: User = new UserImpl();
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
+        const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 999, ["GPU", "HW"], 1000);
         shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTX")
@@ -49,8 +49,8 @@ describe('Buy product by policies', () => {
 
     });
     it('Buy product by simple purchase policy', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
-        const user: User = new UserImpl();
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
+        const user: User = UserImpl.create();
         shop.addPolicy("Tom@gmail.com", new SimpleCondition(ConditionType.NotCategory, "GPU"))
         let result: any = shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
         expect(typeof result !== "string").to.be.true;
@@ -60,8 +60,8 @@ describe('Buy product by policies', () => {
             .then(_ => expect(typeof result === "string").to.be.true)
     });
     it('Buy product by composite purchase policy', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
-        const user: User = new UserImpl();
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons")
+        const user: User = UserImpl.create();
         shop.addPolicy("Tom@gmail.com", new SimpleCondition(ConditionType.NotCategory, "GPU"))
         shop.addPolicy("Tom@gmail.com", new SimpleCondition(ConditionType.LowerAmount, 2))
         shop.composePurchasePolicies("Tom@gmail.com", id_counter - 1, id_counter - 2, Operator.And)
@@ -71,8 +71,8 @@ describe('Buy product by policies', () => {
             .then(result => expect(typeof result === "string").to.be.true)
     });
     it('Buy product not by discount policy', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
-        const user: User = new UserImpl();
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
+        const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 999, ["GPU", "HW"], 1000);
         shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTmanyX")
@@ -82,16 +82,16 @@ describe('Buy product by policies', () => {
    }); })
 describe("Purchase test", () => {
     it('purchase positive amount and more than stock', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
-        const user: User = new UserImpl();        shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
+        const user: User = UserImpl.create();        shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 5000);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
             .then(result => expect(typeof result == "string" && result.includes("doesn't have enough in stock for this purchase")).to.be.true)
     });
     it('Two concurrent purchases or item which cause lack to stock', () => {
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
-        const user1: User = new UserImpl();
-        const user2: User = new UserImpl();
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
+        const user1: User = UserImpl.create();
+        const user2: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
         user1.addToBasket(shop.inventory, getNewItem(shop.inventory), 999);
         user2.addToBasket(shop.inventory, getNewItem(shop.inventory), 999);

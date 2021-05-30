@@ -84,4 +84,10 @@ export class PublisherImpl implements Publisher{
         const entry = this.notificationQueue[user_id];
         return entry !== undefined && entry.length !== 0;
     }
+
+    addNotificationsFromDB(notifications) {
+        notifications.forEach(notification => {
+            this.notificationQueue[notification.user_id].push(Notification.create(notification.notification_id, notification.notification))
+        })
+    }
 }

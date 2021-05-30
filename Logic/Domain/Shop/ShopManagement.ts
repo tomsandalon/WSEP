@@ -103,18 +103,20 @@ export interface ShopManagement {
     getAllManagementEmails(): string[];
 
     getRealPermissions(user_email: string): Permissions;
+
+    addManagement(owners, managers): void;
 }
 
 
 export class ShopManagementImpl implements ShopManagement {
-    private readonly _original_owner: Owner;
+    private _original_owner: Owner;
     private readonly _shop_id: number;
 
     constructor(shop_id: number, original_owner: string, shop_inventory?: ShopInventory) {
         this._shop_id = shop_id;
         //placing a temporary value which is immediately replaced
         this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "");
-        this._original_owner = new OwnerImpl(original_owner);
+        this._original_owner = OwnerImpl.create(original_owner);
         this._managers = [];
         this._owners = [];
     }
@@ -207,7 +209,7 @@ export class ShopManagementImpl implements ShopManagement {
             return "Appointer is not an owner"
         }
 
-        this._managers = this._managers.concat([new ManagerImpl(appointee_email, appointer_email)])
+        this._managers = this._managers.concat([ManagerImpl.create(appointee_email, appointer_email)])
         const original = this.owners.find(o => o.user_email == appointer_email)
         if (original && original.appointees_emails().every(mail => mail != appointee_email)) {
             original.appointed_managers = original.appointed_managers.concat([appointee_email])
@@ -224,7 +226,7 @@ export class ShopManagementImpl implements ShopManagement {
             logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointer is not a owner`)
             return "Appointer is not an owner"
         }
-        this._owners = this._owners.concat([new OwnerImpl(appointee_email, appointer_email)])
+        this._owners = this._owners.concat([OwnerImpl.create(appointee_email, appointer_email)])
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
         const original = this.owners.find(o => o.user_email == appointer_email)
         if (original) {
@@ -364,5 +366,25 @@ export class ShopManagementImpl implements ShopManagement {
     getRealPermissions(user_email: string): Permissions {
         if (!this.isManager(user_email)) return new ManagerPermissions()
         return (this.getManagerByEmail(user_email) as Manager).permissions
+    }
+
+    addManagement(owners, managers): void {
+        this.updateOriginalOwner(owners, managers)
+        this._owners = owners.forEach(o => OwnerImpl.createFromDB(
+            managers.filter(m => m.appointer_email == o.user_email).map(m => m.user_email),
+            owners.filter(o => o.appointer_email == o.user_email).map(o => o.user_email),
+            o.appointer_email,
+            o.user_email
+        ))
+        this._managers = managers.forEach(m => ManagerImpl.createFromDB(
+            m.appointer_email,
+            m.permissions,
+            m.user_email
+        ))
+    }
+
+    private updateOriginalOwner(owners, managers) {
+        this._original_owner.appointed_owners = owners.filter(o => o.appointer_email == this._original_owner.user_email).map(o => o.user_email)
+        this._original_owner.appointed_managers = managers.filter(m => m.appointer_email == this._original_owner.user_email).map(m => m.user_email)
     }
 }

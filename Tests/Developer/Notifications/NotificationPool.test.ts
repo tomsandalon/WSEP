@@ -61,8 +61,8 @@ describe('Domain notifications tests', () => {
     it('Purchase', () => {
         const pool: PublisherImpl = PublisherImpl.getInstance(true);
         pool.removeAllNotificationsForTests()
-        const shop: ShopImpl = new ShopImpl("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
-        const user: User = new UserImpl();
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
+        const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 2);
         user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli")
@@ -71,7 +71,7 @@ describe('Domain notifications tests', () => {
 
     it('Demotion', () => {
         const pool: PublisherImpl = PublisherImpl.getInstance(true);
-        const shop: Shop = new ShopImpl("tomsand123@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand123@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         RegisterImpl.getInstance().register("tomsand123@post.bgu.ac.il","123456");
         RegisterImpl.getInstance().register("owner1123@bgu.ac.il","123456");
         RegisterImpl.getInstance().register("owner2123@bgu.ac.il","123456");

@@ -44,28 +44,41 @@ export class UserImpl implements User {
     private readonly _order_history: UserPurchaseHistory
     private readonly _user_id: number
     private readonly _is_guest: boolean
+    private _cart: ShoppingBasket[]
+
     private readonly _payment_handler: PaymentHandler
 
-    constructor(user_email?: string, password?: string, is_admin: boolean = false, age?: number) {
-        if (user_email != undefined && password != undefined && is_admin != undefined) {
-            this._user_email = user_email;
-            this._password = password;
-            this._is_admin = is_admin;
-            this._is_guest = false
-        } else {
-            this._user_email = "";
-            this._password = "";
-            this._is_admin = false;
-            this._is_guest = true;
-        }
-        this._cart = [];
-        this._order_history = UserPurchaseHistoryImpl.getInstance();
-        this._user_id = generateId();
-        this._payment_handler = PaymentHandlerImpl.getInstance();
-        this._underaged = (age) ? age < LEGAL_DRINKING_AGE : false;
+    private constructor(user_email: string, password: string, is_admin: boolean, order_history: UserPurchaseHistory, user_id: number, is_guest: boolean, underaged: boolean, cart: ShoppingBasket[]) {
+        this._user_email = user_email
+        this._password = password
+        this._is_admin = is_admin
+        this._order_history = order_history
+        this._user_id = user_id
+        this._is_guest = is_guest
+        this._underaged = underaged
+        this._payment_handler = PaymentHandlerImpl.getInstance()
+        this._cart = cart
     }
 
-    private _cart: ShoppingBasket[]
+    static create(user_email?: string, password?: string, is_admin: boolean = false, age?: number) {
+        let _user_email = ""
+        let _password = ""
+        let _is_admin = false
+        let _is_guest = true
+        if (user_email != undefined && password != undefined && is_admin != undefined) {
+            _user_email = user_email;
+            _password = password;
+            _is_admin = is_admin;
+            _is_guest = false
+        }
+        let _cart = [];
+        let _order_history = UserPurchaseHistoryImpl.getInstance();
+        let _user_id = generateId();
+        let _payment_handler = PaymentHandlerImpl.getInstance();
+        let _underaged = (age) ? age < LEGAL_DRINKING_AGE : false;
+
+        return new UserImpl(_user_email, _password, _is_admin, _order_history, _user_id, _is_guest, _is_admin, [])
+    }
 
     get cart(): ShoppingBasket[] {
         return this._cart;
@@ -274,6 +287,35 @@ export class UserImpl implements User {
                 product_purchase.rating = rating
             }
         )
+    }
+
+    static createFromEntry(entry) {
+        if (entry.user_id >= id_counter) id_counter = entry.user_id + 1
+        return new UserImpl(entry.email, entry.password, entry.is_admin, UserPurchaseHistoryImpl.getInstance(), entry.user_id, entry.is_guest, entry.age != 0,
+                [] //TODO
+            )
+
+        //    private constructor(user_email: string, password: string, is_admin: boolean, order_history: UserPurchaseHistory, user_id: number, is_guest: boolean, underaged: boolean) {
+        // return {
+        //     user_id: u.user,
+        //     email: u.email,
+        //     password: u.password,
+        //     age: u.age,
+        //     purchases_ids: purchases.map((p: any) => p.purchase_id),
+        //     rates: rates.map((r: any) => {
+        //         return {
+        //             product_id: r.product_id,
+        //             rate: r.rate,
+        //         }
+        //     }),
+        //     cart: baskets.map((b: any) => {
+        //         return {
+        //             shop_id: b.shop_id,
+        //             product_id: b.product_id,
+        //             amount: b.amount
+        //         }
+        //     })
+        // }
     }
 }
 
