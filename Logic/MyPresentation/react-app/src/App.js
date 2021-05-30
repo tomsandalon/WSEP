@@ -46,7 +46,7 @@ function App() {
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
           <Route path="/addproduct/:storeID/:storeName"><AddProduct /></Route>
           <Route path="/editproduct/:storeID/:storeName"><EditProduct /></Route>
-          <Route path="/editpermissionspre/:storeID/:managerID"><EditPermissionsPre /></Route>
+          <Route path="/editpermissionspre/:storeID/:storeName/:managerID"><EditPermissionsPre /></Route>
         </Switch>
       </div>
     </Router>

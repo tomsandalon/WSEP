@@ -8,7 +8,7 @@ const ManagerCell = (props) => {
   const id = props.id;
   const managerName = props.managerName;
   const storeID = props.storeID;
-
+  const storeName = props.storeName;
   return (
     <tr tabIndex={-1} key={id}>
       <td>
@@ -27,11 +27,9 @@ const ManagerCell = (props) => {
 
       <td className="text-right ">
         <figcaption className="info align-self-center ">
-
-            <Link to={`/editpermissionspre/${storeID}/${id}`}>
-              <EditIcon />
-            </Link>
-
+          <Link to={`/editpermissionspre/${storeID}/${storeName}/${id}`}>
+            <EditIcon />
+          </Link>
         </figcaption>
       </td>
     </tr>
