@@ -127,13 +127,14 @@ router.get(details, (request: any, response: any) => {
     }
     const user_id = session_data.user_id;
     const result = service.getUserEmailFromUserId(user_id);
-    response.setHeader("Content-Type", "text/html");
     if (typeof result == "string"){
+        response.setHeader("Content-Type", "text/html");
         response.status(BadRequest)
         response.send(result)
     } else {
         response.status(OK)
-        response.send(result[0])
+        response.setHeader("Content-Type", "application/json");
+        response.send({email: result[0]})
     }
     response.end();
 })
