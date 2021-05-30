@@ -1,7 +1,7 @@
 import {
     assign_manager,
     assign_owner,
-    categories, isAdmin, isLoggedIn, isManager, isOwner,
+    categories, details, isAdmin, isLoggedIn, isManager, isOwner,
     permissions,
     purchase_cart,
     rate,
@@ -97,6 +97,16 @@ export const route_user_management_is_manager = route_user_management + isManage
  * @return 200 -> text -> boolean
  */
 export const route_user_management_is_owner = route_user_management + isOwner
+
+/**
+ * @method GET
+ * @function getUserEmailFromUserId
+ * @params user_id
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> text -> email
+ */
+export const route_user_management_details = route_user_management + details;
 
 /**
  * @method DELETE
