@@ -2,8 +2,8 @@ import { Notification } from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
 
-let P: any
-// import * as P from "../../Service/Publisher"
+// let P: any
+import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
 import {ClearNotifications, Notify} from "../../DataAccess/API";
 import {SystemImpl} from "../System";
@@ -29,21 +29,30 @@ export class PublisherImpl implements Publisher{
         return result;
     }
 
+    notifyFlush(user_id: number): void {
+        if (P != undefined) { //TODO remove prints
+            if (LoginImpl.getInstance().isLoggedIn(user_id)) {
+                P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
+            }
+            else Notify([{user_id: user_id, notification: notification.message, notification_id: PublisherImpl.id_counter++}]).then((r: any) => r ? {} : SystemImpl.rollback)
+        }
+        else logger.Error(`Failed to send notifications to ${user_id} as the publisher is not defined`)
+    }
+
+    getAmountOfNotifications(user_id: number): number {
+        if (user_id in this.notificationQueue) {
+            return this.notificationQueue[user_id].length
+        }
+        else return -1;
+    }
+
     notify(user_id: number, notification: Notification): void {
         if (user_id in this.notificationQueue) {
             this.notificationQueue[user_id].push(notification)
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        if (P != undefined) {
-            if (LoginImpl.getInstance().isLoggedIn(user_id)) {
-                P.Publisher.getInstance().notify(user_id)
-            }
-            else {
-                Notify([{user_id: user_id, notification: notification.message, notification_id: PublisherImpl.id_counter++}]).then((r: any) => r ? {} : SystemImpl.rollback)
-            }
-        }
-        else logger.Error(`Failed to send notification ${notification.message} to ${user_id} as the publisher is not defined`)
+        this.notifyFlush(user_id)
     }
 
     getNotifications(user_id: number): Notification[]{

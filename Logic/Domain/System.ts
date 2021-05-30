@@ -154,6 +154,9 @@ export interface System {
     rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean
 
     // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
+
+    //string is bad, string[] is good and the answer is at [0]
+    getUserEmailFromUserId(user_id: number): string | string[]
 }
 
 //TODO add toggle underaged
@@ -584,7 +587,7 @@ export class SystemImpl implements System {
         return ret
     }
 
-    editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean {
+    editProduct(user_id: number, shop_id: number, product_id: number, action : Item_Action, value: string): string | boolean {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
@@ -858,6 +861,12 @@ export class SystemImpl implements System {
         user.logRating(product_id, shop_id, rating)
         RateProduct({user_id: user_id, product_id: product_id, rate: rating}).then(r => r ? {} : SystemImpl.rollback())
         return true
+    }
+
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        const result = this.login.retrieveUser(user_id)
+        if (typeof result == "string") return result
+        return [result.user_email]
     }
 
     private getShopById(shop_id: number): Shop | undefined {

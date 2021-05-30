@@ -281,4 +281,9 @@ export class Service {
     removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
         return this._system.removePermission(user_id, shop_id, target_email, action)
     }
+
+    //string is bad, string[] is good and the answer is at [0]
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        return this._system.getUserEmailFromUserId(user_id);
+    }
 }

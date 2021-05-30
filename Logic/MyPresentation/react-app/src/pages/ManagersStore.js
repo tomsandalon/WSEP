@@ -12,35 +12,52 @@ const ManagersStore = () => {
     itemsIsPending,
     error: itemsError,
   } = useFetch(`/user/shop?shop_id=${storeID}`);
+  const {
+    data: staff,
+    staffIsPending,
+    staffError,
+  } = useFetch(`/user/shop/management?shop_id=${storeID}`);
+  const parsedStaff = JSON.parse(staff);
 
   return (
     <div className="row">
-      <div className="col-xl-4">
-        <h3>Store Owners:</h3>
-          <OwnersBlock storeID={storeID} />
+      {parsedStaff && (
+        <div className="col-xl-4">
+          <h3>Store Owners:</h3>
+          <OwnersBlock
+            owners={parsedStaff.owners}
+            error={staffError}
+            isPending={staffIsPending}
+          />
           <Link to={`/addmanager/${storeID}/owner/${name}`}>
             <button className="btn btn-outline-primary btn-sm ">
               Add Owner <i className="fa fa-plus"></i>
             </button>
           </Link>
-        <h3>Store Managers:</h3>
-          <ManagersBlock storeID={storeID} />
+          <h3>Store Managers:</h3>
+          <ManagersBlock
+            managers={parsedStaff.managers}
+            error={staffError}
+            isPending={staffIsPending}
+          />
           <Link to={`/addmanager/${storeID}/manager/${name}`}>
             <button className="btn btn-outline-primary btn-sm ">
               Add Manager <i className="fa fa-plus"></i>
             </button>
           </Link>
-      </div>
+        </div>
+      )}
       <div className="col-xl-8">
         <div className="store-view" key={storeID}>
           <h3 className="mb-0">{name}</h3>
+          <Link to={`/addproduct/${storeID}/${name}`}>
+            <button className="btn btn-outline-primary btn-sm ">
+              Add Product <i className="fa fa-plus"></i>
+            </button>
+          </Link>
           {itemsError && <div> {itemsError}</div>}
           {itemsIsPending && <div>Loading...</div>}
-          <ItemsBlock
-            id={storeID}
-            storeItems={storeItems}
-            title="Store Title"
-          ></ItemsBlock>
+          <ItemsBlock id={storeID} storeItems={storeItems}></ItemsBlock>
         </div>
       </div>
     </div>

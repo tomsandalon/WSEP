@@ -2,6 +2,8 @@ import {Notification} from "./Notification";
 
 export interface Publisher {
     notify(user_id: number, notification: Notification): void;
+    notifyFlush(user_id: number): void;
+    getAmountOfNotifications(user_id: number): number;
     notifyAll(user_id: number, notifications: Notification[]): void;
     notifyThem(collection: {[userid: number]: Notification}): void;
     notifyThemAll(collection: {[userid: number]: Notification[]}): void;
