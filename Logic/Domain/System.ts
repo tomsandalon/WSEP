@@ -85,6 +85,9 @@ export interface System{
     getAllCategories(user_id: number): string | string[];
 
     rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean
+
+    //string is bad, string[] is good and the answer is at [0]
+    getUserEmailFromUserId(user_id: number): string | string[]
 }
 
 //TODO add toggle underaged
@@ -621,5 +624,11 @@ export class SystemImpl implements System {
         if (typeof ret == "string") return ret
         user.logRating(product_id, shop_id, rating)
         return true
+    }
+
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        const result = this.login.retrieveUser(user_id)
+        if (typeof result == "string") return result
+        return [result.user_email]
     }
 }
