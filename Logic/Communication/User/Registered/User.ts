@@ -1,4 +1,6 @@
 import {
+    BadRequest,
+    details,
     isAdmin, isLoggedIn,
     isManager, isOwner,
     OK,
@@ -112,5 +114,26 @@ router.get(isManager, (request: any, response: any) => {
     response.setHeader("Content-Type", "text/html");
     response.status(OK)
     response.send(result)
+    response.end();
+})
+
+router.get(details, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const user_id = session_data.user_id;
+    const result = service.getUserEmailFromUserId(user_id);
+    response.setHeader("Content-Type", "text/html");
+    if (typeof result == "string"){
+        response.status(BadRequest)
+        response.send(result)
+    } else {
+        response.status(OK)
+        response.send(result[0])
+    }
     response.end();
 })
