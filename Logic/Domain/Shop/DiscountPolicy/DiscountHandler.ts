@@ -5,6 +5,8 @@ import {Condition, ConditionalDiscount} from "./ConditionalDiscount";
 import {NumericCompositionDiscount, NumericOperation} from "./NumericCompositionDiscount";
 import {LogicComposition, LogicCompositionDiscount} from "./LogicCompositionDiscount";
 import {MinimalUserData} from "../../ProductHandling/ShoppingBasket";
+import {DiscountTree, GetDiscount} from "../../../DataAccess/Getters";
+import {SimpleDiscount} from "./SimpleDiscount";
 
 
 export class DiscountHandler {
@@ -41,7 +43,7 @@ export class DiscountHandler {
         const discount = this._discounts.find(d => d.id == discount_id)
         if (!discount) return false;
         this._discounts = this._discounts.filter(d => d.id != discount_id).concat([
-            new ConditionalDiscount(condition, discount, condition_param)
+            ConditionalDiscount.create(condition, discount, condition_param)
         ])
         return true
     }
@@ -51,7 +53,7 @@ export class DiscountHandler {
         const discount2 = this._discounts.find(d => d.id == d_id2)
         if (!discount1 || !discount2) return false;
         this._discounts = this._discounts.filter(d => d.id != d_id1 && d.id != d_id2).concat([
-            new NumericCompositionDiscount(operation, [discount1, discount2])
+            NumericCompositionDiscount.create(operation, [discount1, discount2])
         ])
         return true
     }
@@ -61,7 +63,7 @@ export class DiscountHandler {
         const discount2 = this._discounts.find(d => d.id == d_id2)
         if (!discount1 || !discount2) return false;
         this._discounts = this._discounts.filter(d => d.id != d_id1 && d.id != d_id2).concat([
-            new LogicCompositionDiscount(operation, discount1, discount2)
+            LogicCompositionDiscount.create(operation, discount1, discount2)
         ])
         return true
     }
@@ -74,5 +76,25 @@ export class DiscountHandler {
         const result = products.reduce((acc, cur) =>
             acc + (cur.amount * cur.original_price * (1 - this.evaluateDiscount(cur, cur.amount))), 0)
         return DiscountHandler.roundHalf(result)
+    }
+
+    async discountFromDTO(discount: DiscountTree): Promise<Discount> {
+        return discount.left && discount.right ? new SimpleDiscount(discount.id, discount.value) :
+            discount.left ? GetDiscount(discount.left).then(left => this.discountFromDTO(left).then(other => new ConditionalDiscount(discount.id, discount.operator, other, discount.value))) :
+                GetDiscount(discount.left).then(left => this.discountFromDTO(left).then(left =>
+                GetDiscount(discount.right).then(right => this.discountFromDTO(right).then(right => {
+                        if (discount.operator >= NumericOperation.__LENGTH) return new LogicCompositionDiscount(discount.id, discount.operator + NumericOperation.__LENGTH, left, right)
+                        else return new NumericCompositionDiscount(discount.id, discount.operator, [left, right])
+                    })))
+        );
+    }
+
+    addDiscountsFromDB(discounts) {
+        discounts.forEach(discountId => {
+            DiscountHandler.discountCounter = Math.max(DiscountHandler.discountCounter, discountId + 1)
+            GetDiscount(discountId).then(discount => {
+                this.discountFromDTO(discount).then(result => this._discounts.push(result))
+            })
+        })
     }
 }

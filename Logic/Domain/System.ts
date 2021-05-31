@@ -38,7 +38,14 @@ import {
 import {id_counter} from "./Shop/PurchasePolicy/PurchaseCondition";
 import {DiscountHandler} from "./Shop/DiscountPolicy/DiscountHandler";
 import {PublisherImpl} from "./Notifications/PublisherImpl";
-import {GetNotifications, GetPurchases, GetShopsManagement, GetShopsRaw, GetUsers} from "../DataAccess/Getters";
+import {
+    GetNotifications,
+    GetPurchases,
+    GetShopsInventory,
+    GetShopsManagement,
+    GetShopsRaw,
+    GetUsers
+} from "../DataAccess/Getters";
 
 export enum SearchTypes {
     name,
@@ -687,7 +694,7 @@ export class SystemImpl implements System {
         if (typeof result == "string") return result
         const {shop, user_email} = result
         if (value > 1 || value < 0) return `Illegal discount value`
-        const ret = shop.addDiscount(user_email, new SimpleDiscount(value))
+        const ret = shop.addDiscount(user_email, SimpleDiscount.create(value))
         if (typeof ret != 'string')
             AddDiscount(shop_id, DiscountHandler.discountCounter - 1, value).then(r => r ? {} : SystemImpl.rollback())
         return ret
@@ -934,12 +941,12 @@ export class SystemImpl implements System {
                     shop_id: s.shop_id,
                     owners: s.owners.map(o => {
                         return {
-                            owner_email: this.getEmailFromIDFromList(users, o.user_id),
+                            owner_email: this.getEmailFromIDFromList(users, o.owner_id),
                             appointer_email: this.getEmailFromIDFromList(users, o.appointer_id)
                         }
                     }),
                     managers: s.managers.map(m => { return {
-                        manager_email: this.getEmailFromIDFromList(users, m.user_id),
+                        manager_email: this.getEmailFromIDFromList(users, m.manager_id),
                         appointer_id: this.getEmailFromIDFromList(users, m.appointer_id),
                         permissions: m.permissions
                     }})
@@ -958,7 +965,12 @@ export class SystemImpl implements System {
     }
 
     private static reloadItems() {
-
+       GetShopsInventory().then(inventory => {
+           inventory.forEach(i => {
+               const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl
+               shop.addInventoryFromDB(i)
+           }) //TODO purchase policies
+       })
     }
 
     private static reloadPurchases() {

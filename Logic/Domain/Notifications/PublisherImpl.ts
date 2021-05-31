@@ -2,8 +2,8 @@ import { Notification } from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
 
-// let P: any
-import * as P from "../../Service/Publisher"
+let P: any
+// import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
 import {ClearNotifications, Notify} from "../../DataAccess/API";
 import {SystemImpl} from "../System";
@@ -101,7 +101,8 @@ export class PublisherImpl implements Publisher{
 
     addNotificationsFromDB(notifications) {
         notifications.forEach(notification => {
-            this.notificationQueue[notification.user_id].push(Notification.create(notification.notification_id, notification.notification))
+            this.notificationQueue[notification.user_id].push(new Notification(notification.notification))
+            PublisherImpl.id_counter = Math.max(PublisherImpl.id_counter, notification.notification_id + 1)
         })
     }
 }

@@ -30,7 +30,7 @@ describe('Buy product by policies', () => {
         const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
         const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 999, ["GPU", "HW"], 1000);
-        shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
+        shop.addDiscount("Tom@gmail.com", SimpleDiscount.create(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTX")
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 10);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
@@ -40,9 +40,9 @@ describe('Buy product by policies', () => {
         const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
         const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 999, ["GPU", "HW"], 1000);
-        shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
+        shop.addDiscount("Tom@gmail.com", SimpleDiscount.create(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTX")
-        shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.3))
+        shop.addDiscount("Tom@gmail.com", SimpleDiscount.create(0.3))
         shop.addNumericCompositionDiscount("Tom@gmail.com", NumericOperation.Add, DiscountHandler.discountCounter - 1, DiscountHandler.discountCounter - 2)
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli").then(_ => expect((user.getOrderHistory() as string[])[0]).to.include(50*1000*0.2))
@@ -74,7 +74,7 @@ describe('Buy product by policies', () => {
         const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
         const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 999, ["GPU", "HW"], 1000);
-        shop.addDiscount("Tom@gmail.com", new SimpleDiscount(0.5))
+        shop.addDiscount("Tom@gmail.com", SimpleDiscount.create(0.5))
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTmanyX")
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")

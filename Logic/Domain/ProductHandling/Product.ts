@@ -122,20 +122,44 @@ export class ProductImpl implements Product{
     private _description: string;
     private _name: string;
     private _purchase_type: Purchase_Type;
-    private _rating = new Rating();
+    private _rating = Rating.create();
 
-    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
-        this._base_price = base_price;
-        this._description = description;
-        this._name = name;
-        this._product_id = product_id;
-        this._purchase_type = purchase_type ? purchase_type : Purchase_Type.Immediate;
-        this._category = [];
-        this._amount = 0;
+    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type: Purchase_Type, category: Category[], amount: number, rating: Rating) {
+        this._product_id = product_id
+        this._base_price = base_price
+        this._name = name
+        this._description = description
+        this._purchase_type = purchase_type
+        this._category = category
+        this._amount = amount
+        this._rating = rating
     }
 
     static resetIDs = () => ProductImpl._product_id_specifier = 0
 
+    static createFromDB(product) {
+        return new ProductImpl(
+            product.data.base_price,
+            product.data.description,
+            product.data.name,
+            product.data.product_id,
+            product.data.purchase_type,
+            product.data.categories.split(","),
+            product.data.amount,
+            Rating.createFromDB(product.rates)
+        )
+    }
+
+    private static createSupporter(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
+        let _base_price = base_price;
+        let _description = description;
+        let _name = name;
+        let _product_id = product_id;
+        let _purchase_type = purchase_type ? purchase_type : Purchase_Type.Immediate;
+        let _category = [];
+        let _amount = 0;
+        return new ProductImpl(_base_price, _description, _name, _product_id, _purchase_type, _category, _amount, Rating.create())
+    }
 
     public static create(base_price: number, description: string, name: string, purchase_type?: Purchase_Type): Product | string {
         const result = ProductImpl.isValid(base_price, description, name);
@@ -143,7 +167,7 @@ export class ProductImpl implements Product{
             return result;
         }
         const id: number = this._product_id_specifier++;
-        return new ProductImpl(base_price, description, name, id, purchase_type);
+        return ProductImpl.createSupporter(base_price, description, name, id, purchase_type);
     }
 
     private static isValid(base_price: number, description: string, name: string): string | boolean{

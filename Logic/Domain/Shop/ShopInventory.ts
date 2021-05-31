@@ -15,6 +15,7 @@ import {CompositeCondition, Operator} from "./PurchasePolicy/CompositeCondition"
 import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
+import {ShopRich} from "../../DataAccess/Getters";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 export enum Filter_Type {
@@ -168,13 +169,15 @@ export interface ShopInventory {
     alreadyRated(product_id: number, user_email: string): Boolean;
 
     hasPurchased(user_id: number, product_id: number): Boolean;
+
+    addInventoryFromDB(inventory: ShopRich): void;
 }
 
 export class ShopInventoryImpl implements ShopInventory {
     private readonly _discount_policies: DiscountHandler;
     private _purchase_policies: PurchaseCondition[];
 
-    private readonly _purchase_types: Purchase_Type[]
+    private _purchase_types: Purchase_Type[]
 
 
     private readonly _shop_id: number;
@@ -551,5 +554,12 @@ export class ShopInventoryImpl implements ShopInventory {
     hasPurchased(user_id: number, product_id: number): Boolean {
         return (this.purchase_history.getShopPurchases(this.shop_id) as Purchase[]).some(
             purchase => purchase.products.some(product => product.product_id == product_id) && purchase.minimal_user_data.userId == user_id)
+    }
+
+    //export type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
+    addInventoryFromDB(inventory: ShopRich): void {
+        this._products = inventory.products.map(p => ProductImpl.createFromDB(p))
+        this._purchase_types = (inventory.purchase_types) ? inventory.purchase_types : [Purchase_Type.Immediate]
+        this.discount_policies.addDiscountsFromDB(inventory.discounts)
     }
 }
