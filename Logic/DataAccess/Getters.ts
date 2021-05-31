@@ -446,7 +446,7 @@ const groupByPurchases = (purchases: any[]): Purchase[] => {
     return output;
 }
 
-export const GetPurchases = () =>
-    db.transaction((trx: any) =>
+export const GetPurchases = (): Promise<Purchase[]> =>
+    db.transaction((trx: any): Promise<Purchase[]> =>
         trx.select().from(purchase.name)
             .then((purchases: any[]) => groupByPurchases(purchases)))
