@@ -1,5 +1,4 @@
 import {db} from './DB.config';
-import {rate} from "../Communication/Config/Config";
 
 const {
     purchase_type,
@@ -292,6 +291,7 @@ export type ShopRich = {
     discounts: number[],
     purchase_types: number[]
 };
+
 export const groupByShops = (shops: any[]): ShopRich[]  =>{
     shops.sort((first: any, second: any) => first.shop_id - second.shop_id)
     let output: ShopRich[] = [];

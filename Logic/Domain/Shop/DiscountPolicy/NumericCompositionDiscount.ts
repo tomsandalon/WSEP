@@ -13,10 +13,14 @@ export class NumericCompositionDiscount implements CompositeDiscount {
     operation: NumericOperation
     discounts: Discount[]
 
-    constructor(operation: NumericOperation, discounts: Discount[]) {
-        this.id = DiscountHandler.discountCounter++;
+    constructor(id: number, operation: NumericOperation, discounts: Discount[]) {
+        this.id = id;
         this.operation = operation;
         this.discounts = discounts;
+    }
+
+    static create(operation: NumericOperation, discounts: Discount[]) {
+        return new NumericCompositionDiscount(DiscountHandler.discountCounter++, operation, discounts)
     }
 
     evaluate(product: ProductPurchase, amount: number): number {

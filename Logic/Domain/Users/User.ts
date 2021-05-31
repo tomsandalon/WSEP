@@ -294,28 +294,6 @@ export class UserImpl implements User {
         return new UserImpl(entry.email, entry.password, entry.is_admin, UserPurchaseHistoryImpl.getInstance(), entry.user_id, entry.is_guest, entry.age != 0,
                 [] //TODO
             )
-
-        //    private constructor(user_email: string, password: string, is_admin: boolean, order_history: UserPurchaseHistory, user_id: number, is_guest: boolean, underaged: boolean) {
-        // return {
-        //     user_id: u.user,
-        //     email: u.email,
-        //     password: u.password,
-        //     age: u.age,
-        //     purchases_ids: purchases.map((p: any) => p.purchase_id),
-        //     rates: rates.map((r: any) => {
-        //         return {
-        //             product_id: r.product_id,
-        //             rate: r.rate,
-        //         }
-        //     }),
-        //     cart: baskets.map((b: any) => {
-        //         return {
-        //             shop_id: b.shop_id,
-        //             product_id: b.product_id,
-        //             amount: b.amount
-        //         }
-        //     })
-        // }
     }
 }
 

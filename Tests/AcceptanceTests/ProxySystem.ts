@@ -401,4 +401,11 @@ export class ProxySystem implements System{
         }
         return this.system.removePurchasePolicy(user_id, shop_id, policy_id)
     }
+
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getUserEmailFromUserId(user_id)
+    }
 }

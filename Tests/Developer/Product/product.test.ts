@@ -198,14 +198,6 @@ describe('ProductImpl Class Test suit', () => {
                 // assert.fail("Test case not implemented")
             });
         });
-        describe('calculatePrice', () => {
-            it('', () => {
-                const product = createProduct();
-                //TODO Implement Milestone 2
-
-                // assert.fail("Test case not implemented")
-            });
-        });
         describe('returnAmount', () => {
             it('Return negative amount', () => {
                 const product = createProduct();

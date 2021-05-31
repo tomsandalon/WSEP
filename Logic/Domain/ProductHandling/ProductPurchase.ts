@@ -25,18 +25,26 @@ export class ProductPurchaseImpl implements ProductPurchase{
     private _rating: number = -1;
 
 
-    private constructor(product: Product, original_price: number, amount: number, actual_price: number) {
-        this._product_id = product.product_id;
-        this._name = product.name;
-        this._description = product.description;
+    private constructor(product_id: number, name: string, description: string, amount: number, category: ReadonlyArray<Category>, original_price: number, actual_price: number) {
+        this._product_id = product_id;
+        this._name = name;
+        this._description = description;
         this._amount = amount;
-        this._category = product.category;
+        this._category = category;
         this._original_price = original_price
         this._actual_price = actual_price;
     }
 
+    private static createSupporterFunction(product: Product, original_price: number, amount: number, actual_price: number) {
+        let product_id = product.product_id;
+        let name = product.name;
+        let description = product.description;
+        let category = product.category;
+        return new ProductPurchaseImpl(product_id, name, description, amount, category, original_price, actual_price)
+    }
+
     public static create(product: Product, coupons: any[], amount: number, shop: ShopInventory, actual_price?: number): ProductPurchase | string{
-        const ret = new ProductPurchaseImpl(product, product.price, amount, 0)
+        const ret = ProductPurchaseImpl.createSupporterFunction(product, product.price, amount, 0)
         if (!actual_price) {
             const final_price = shop.calculatePrice([ret], {userId: -1, underaged: false});
             if (typeof final_price === "string") {

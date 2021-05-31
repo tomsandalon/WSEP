@@ -228,4 +228,8 @@ export class AdapterSystem implements System {
     removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
         return this.system.removePermission(user_id, shop_id, target_email, action);
     }
+
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        return this.system.getUserEmailFromUserId(user_id);
+    }
 }

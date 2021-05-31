@@ -13,6 +13,7 @@ import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 import {ManagerImpl} from "../ShopPersonnel/Manager";
 // import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
+import {ShopRich} from "../../DataAccess/Getters"
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
@@ -693,21 +694,17 @@ export class ShopImpl implements Shop {
     }
 
     static createFromDB(entry) {
+        id_counter = Math.max(id_counter, entry. shop_id + 1)
         let _management = new ShopManagementImpl(entry.shop_id, entry.user_email)
         let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info)
-        return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active); //TODO
-        // return {
-        //     shop_id: s.shop_id,
-        //     original_owner: s.user_email,
-        //     name: s.name,
-        //     description: s.description,
-        //     location: s.location,
-        //     bank_info: s.bank_info,
-        //     active: s.active,
-        // }
+        return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active);
     }
 
     addManagement(owners, managers) {
         this.management.addManagement(owners, managers)
+    }
+
+    addInventoryFromDB(inventory: ShopRich) {
+        this.inventory.addInventoryFromDB(inventory)
     }
 }

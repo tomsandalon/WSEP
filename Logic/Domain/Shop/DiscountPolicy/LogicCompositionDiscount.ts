@@ -16,11 +16,16 @@ export class LogicCompositionDiscount implements CompositeDiscount {
     firstDiscount: Discount
     secondDiscount: Discount
 
-    constructor(logic_composition: LogicComposition, firstDiscount: Discount, secondDiscount: Discount) {
-        this.id = DiscountHandler.discountCounter++;
+    constructor(id: number, logic_composition: LogicComposition, firstDiscount: Discount, secondDiscount: Discount) {
+        this.id = id
         this.logic_composition = logic_composition;
         this.firstDiscount = firstDiscount
         this.secondDiscount = secondDiscount
+    }
+
+    static create(logic_condition: LogicComposition, firstDiscount: Discount, secondDiscount: Discount) {
+        let id = DiscountHandler.discountCounter++;
+        return new LogicCompositionDiscount(id, logic_condition, firstDiscount, secondDiscount)
     }
 
     private minValue(numbers: number[]): number {
