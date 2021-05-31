@@ -388,7 +388,11 @@ export const removePurchasePolicy = (shop_id: number, policy_id: number) => {
 
 export const RateProduct = (rate: Rate) =>
     db.transaction((trx: any) =>
-        trx.insert(rate).into(rates.name)
+        trx.insert({
+            user_id: rate.user_id,
+            p_id: rate.product_id,
+            rate: rate.rate,
+        }).into(rates.name)
             .then(success).catch(failure))
 
 export const Notify = (notifications: Notification[]) =>
