@@ -50,6 +50,9 @@ export interface System {
     isLoggedIn(user_id: number): string | boolean
 
     getAllCategories(user_id: number): string | string[];
+
+    spellCheck(input : string ): string | string[]
+    deliverItem(product_id : number, amount: number, shop_id: number, to: string ,transaction_id : boolean | string): boolean
 }
 
 export const TestNotAssociatedWithImplementation = "Test not associated with implementation";
