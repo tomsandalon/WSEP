@@ -29,11 +29,15 @@ const ManagersStore = () => {
       {parsedStaff && (
         <div className="col-xl-4">
           <h3>Store Owners:</h3>
-          <OwnersBlock
-            owners={parsedStaff.owners}
-            error={staffError}
-            isPending={staffIsPending}
-          />
+          {myEmail && (
+            <OwnersBlock
+              owners={parsedStaff.owners}
+              error={staffError}
+              isPending={staffIsPending}
+              myEmail={myEmail.email}
+              storeID = {storeID}
+            />
+          )}
           <Link to={`/addmanager/${storeID}/owner/${name}`}>
             <button className="btn btn-outline-primary btn-sm ">
               Add Owner <i className="fa fa-plus"></i>
@@ -47,7 +51,7 @@ const ManagersStore = () => {
               isPending={staffIsPending}
               storeID={storeID}
               storeName={name}
-              myEmail = {myEmail.email}
+              myEmail={myEmail.email}
             />
           )}
           <Link to={`/addmanager/${storeID}/manager/${name}`}>
