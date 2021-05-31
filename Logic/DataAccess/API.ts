@@ -414,7 +414,7 @@ export const ClearNotifications = (user_id: number) =>
             .then(success)
             .catch(failure))
 
-export const PurchaseBasket = (user_id: number, shop_id: number, purchase_id: number, items: Purchase[]) =>
+export const PurchaseBasket = (user_id: number, shop_id: number, purchase_id: number, date: Date, items: Purchase[]) =>
     db.transaction((trx: any) =>
         Promise.all(items.map((item: Purchase) =>
                 trx.raw(`UPDATE ${product.name} SET amount = amount - ${item.amount} WHERE ${product.pk} = ${item.product_id}`)

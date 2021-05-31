@@ -1,4 +1,5 @@
-import {generateId, PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
+import {PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
+import {generateId} from "../ShopInventory";
 
 export enum Operator {
     And,
@@ -8,10 +9,14 @@ export enum Operator {
 export class CompositeCondition implements PurchaseCondition {
     id: number;
 
-    constructor(conditions: PurchaseCondition[], action: Operator) {
-        this.id = generateId();
+    constructor(id: number, conditions: PurchaseCondition[], action: Operator) {
+        this.id = id;
         this.conditions = conditions;
         this.action = action;
+    }
+    
+    static create(conditions: PurchaseCondition[], action: Operator) {
+        return new CompositeCondition(generateId(), conditions, action)
     }
 
     conditions: PurchaseCondition[]

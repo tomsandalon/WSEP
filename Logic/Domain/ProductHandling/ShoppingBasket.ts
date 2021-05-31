@@ -55,8 +55,7 @@ export interface ShoppingBasket {
      * @Requirement 2.9
      * @param payment_info
      * @param coupons
-     * @return Error if payment method didnt succeed OR
-     *               if delivery TODO
+     * @return Error
      * @return Purchase representing items and amount specified in basket
      */
     purchase(payment_info: string, coupons: any  []): Promise<string | Purchase>

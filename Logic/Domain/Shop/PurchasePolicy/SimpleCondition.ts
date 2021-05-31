@@ -1,4 +1,5 @@
-import {generateId, PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
+import {PurchaseCondition, PurchaseEvalData} from "./PurchaseCondition";
+import {generateId} from "../ShopInventory";
 
 export enum ConditionType {
     NotCategory,
@@ -15,10 +16,14 @@ export class SimpleCondition implements PurchaseCondition {
     condition: ConditionType
     value: string
 
-    constructor(condition: ConditionType, value: any) {
-        this.id = generateId();
+    constructor(id: number, condition: ConditionType, value: any) {
+        this.id = id;
         this.condition = condition;
         this.value = value.toString()
+    }
+
+    static create(condition: ConditionType, value: any) {
+        return new SimpleCondition(generateId(), condition, value)
     }
 
     evaluate(purchase_data: PurchaseEvalData): Boolean {

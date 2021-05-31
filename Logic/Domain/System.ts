@@ -2,7 +2,7 @@ import {UserImpl} from "./Users/User";
 import {Shop, ShopImpl} from "./Shop/Shop";
 import {LoginImpl} from "./Users/Login";
 import {RegisterImpl} from "./Users/Register";
-import {Filter, Item_Action, Purchase_Type} from "./Shop/ShopInventory";
+import {Filter, id_counter, Item_Action, Purchase_Type} from "./Shop/ShopInventory";
 import {Action, ManagerPermissions, permission_to_numbers} from "./ShopPersonnel/Permissions";
 import {ProductImpl} from "./ProductHandling/Product";
 // import {PurchaseType} from "./PurchaseProperties/PurchaseType";
@@ -35,7 +35,6 @@ import {
     UpdateItemInBasket,
     UpdatePermissions
 } from "../DataAccess/API";
-import {id_counter} from "./Shop/PurchasePolicy/PurchaseCondition";
 import {DiscountHandler} from "./Shop/DiscountPolicy/DiscountHandler";
 import {PublisherImpl} from "./Notifications/PublisherImpl";
 import {
@@ -46,6 +45,7 @@ import {
     GetShopsRaw,
     GetUsers
 } from "../DataAccess/Getters";
+import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
 
 export enum SearchTypes {
     name,
@@ -81,7 +81,8 @@ export interface System {
 
     editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number): string | void
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> //TODO in db
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean>
+
     purchaseCart(user_id: number, payment_info: string): Promise<string | boolean>
 
     addShop(user_id: number, name: string, description: string,
@@ -166,8 +167,6 @@ export interface System {
     getUserEmailFromUserId(user_id: number): string | string[]
 }
 
-//TODO add toggle underaged
-
 export class SystemImpl implements System {
     private static instance: SystemImpl;
 
@@ -215,16 +214,14 @@ export class SystemImpl implements System {
         return this.instance;
     }
 
-    static rollback() {
-         GetUsers().then(users => {
+    static async rollback() {
+         await GetUsers().then(users => {
              this.deleteData();
              this.reloadShop(users);
              this.reloadShopPersonnel(users);
              this.reloadItems();
              this.reloadPurchases();
              this.reloadUsers(users);
-             this.reloadDiscounts();
-             this.reloadPurchaseConditions();
              this.reloadNotifications();
              this.terminateAllConnections();
          }
@@ -635,7 +632,7 @@ export class SystemImpl implements System {
                 if (isNaN(Number(value)) || Number(value) < 0) return `${value} is an invalid amount`
                 break;
         }
-        const ret = shop.addPolicy(user_email, new SimpleCondition(condition, value))
+        const ret = shop.addPolicy(user_email, SimpleCondition.create(condition, value))
         if (typeof ret != 'string')
             AddPurchasePolicy(shop_id, id_counter - 1, {
                 value: value,
@@ -969,23 +966,15 @@ export class SystemImpl implements System {
            inventory.forEach(i => {
                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl
                shop.addInventoryFromDB(i)
-           }) //TODO purchase policies
+           })
        })
     }
 
     private static reloadPurchases() {
-
-    }
-
-    private static reloadDiscounts() {
-
-    }
-
-    private static reloadPurchaseConditions() {
-
+        GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases))
     }
 
     private static terminateAllConnections() {
-
+        //TODO with mark
     }
 }

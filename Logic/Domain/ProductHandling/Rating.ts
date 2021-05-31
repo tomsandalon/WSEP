@@ -25,7 +25,7 @@ export class Rating {
         return new Rating(0, 0, [])
     }
 
-    static createFromDB(rates) {
+    static createFromDB(rates: { user_email: string; score: number }[]) {
         const sum = rates.map(r => r.score).reduce((a, b) => a + b, 0);
         const avg = (sum / rates.length) || 0;
 

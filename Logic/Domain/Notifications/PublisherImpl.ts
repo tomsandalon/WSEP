@@ -30,7 +30,7 @@ export class PublisherImpl implements Publisher{
     }
 
     notifyFlush(user_id: number): boolean {
-        if (P != undefined) { //TODO remove prints
+        if (P != undefined) {
             if (LoginImpl.getInstance().isLoggedIn(user_id)) {
                 P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
                 return true;
@@ -104,5 +104,9 @@ export class PublisherImpl implements Publisher{
             this.notificationQueue[notification.user_id].push(new Notification(notification.notification))
             PublisherImpl.id_counter = Math.max(PublisherImpl.id_counter, notification.notification_id + 1)
         })
+    }
+
+    static terminateAllConnections() {
+
     }
 }

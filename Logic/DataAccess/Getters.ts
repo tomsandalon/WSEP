@@ -291,7 +291,7 @@ export type ShopRich = {
     discounts: number[],
     purchase_types: number[]
 };
-export type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
+
 export const groupByShops = (shops: any[]): ShopRich[]  =>{
     shops.sort((first: any, second: any) => first.shop_id - second.shop_id)
     let output: ShopRich[] = [];

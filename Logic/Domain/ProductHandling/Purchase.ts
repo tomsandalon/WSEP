@@ -33,7 +33,7 @@ export class PurchaseImpl implements Purchase {
     private readonly _date: Date;
     private readonly _products: ReadonlyArray<ProductPurchase>;
 
-    private constructor(date: Date, order_id: number, products: ReadonlyArray<ProductPurchase>, shop: ShopInventory, minimal_user_data: MinimalUserData) {
+    constructor(date: Date, minimal_user_data: MinimalUserData, products: ReadonlyArray<ProductPurchase>, shop: ShopInventory, order_id: number) {
         this._date = date;
         this._order_id = order_id;
         this._products = products;
@@ -76,7 +76,7 @@ export class PurchaseImpl implements Purchase {
             return DiscountNotExists
         }
         const id = this._order_id_specifier++;
-        return new PurchaseImpl(date, id, products as ProductPurchase[], basket.shop, minimal_user_data)
+        return new PurchaseImpl(date, minimal_user_data, products as ProductPurchase[], basket.shop, id)
     }
 
     async purchase_self(payment_info: string): Promise<string | boolean> {
@@ -89,7 +89,6 @@ export class PurchaseImpl implements Purchase {
                 if (typeof result_of_purchase === "string") {
                     return result_of_purchase
                 }
-                this.shop.logOrder(this)
                 // const result_payment = PaymentHandlerImpl.getInstance().charge(payment_info, total_price, this._shop.bank_info);
                 return s.pay(payment_info, payment_info, payment_info, payment_info, payment_info, payment_info) //TODO fill real info
                     .then(payment_transaction_id => {

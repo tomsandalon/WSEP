@@ -1,4 +1,4 @@
-import {Category} from "./Category";
+import {Category, CategoryImpl} from "./Category";
 // import {Purchase_Type} from "../PurchaseProperties/Purchase_Type";
 import {
     AmountIsLargerThanStock,
@@ -11,6 +11,7 @@ import {
 } from "./ErrorMessages";
 import {Purchase_Type} from "../Shop/ShopInventory";
 import {Rating} from "./Rating";
+import {ProductData} from "../../DataAccess/Getters";
 
 
 
@@ -88,15 +89,6 @@ export interface Product {
     addSupplies(amount: number): string | boolean
 
     /**
-     *
-     * @param coupons
-     * @return actual_price considering all discounts applied on this product and coupons that the customer applied
-     * @return DiscountNotExists iff the customer entered a coupon that can't be applied on this product
-     */
-    calculatePrice(coupons: any[]): number | string
-
-
-    /**
      * @Requirement 2.7
      * @functionality increase amount of supplies of this product account of what the user returned
      * @param amount
@@ -137,14 +129,14 @@ export class ProductImpl implements Product{
 
     static resetIDs = () => ProductImpl._product_id_specifier = 0
 
-    static createFromDB(product) {
+    static createFromDB(product: ProductData) {
         return new ProductImpl(
             product.data.base_price,
             product.data.description,
             product.data.name,
             product.data.product_id,
             product.data.purchase_type,
-            product.data.categories.split(","),
+            product.data.categories.split(",").map(category => CategoryImpl.create(category) as CategoryImpl),
             product.data.amount,
             Rating.createFromDB(product.rates)
         )
@@ -256,29 +248,8 @@ export class ProductImpl implements Product{
         return this._purchase_type;
     }
     public changePurchaseType(purchaseType: Purchase_Type): string | boolean{
-        //TODO purchasetype.change
         this._purchase_type = purchaseType;
         return true;
-    }
-
-    //TODO move function to inventory
-    public calculatePrice(coupons: any[]): number | string{
-        let price = this._base_price;
-        let privateDiscounts: number[] = [];
-        for (let coupon of coupons){
-            // const position = this._discount_types.indexOf(coupon);
-            // if( position < 0){
-            //     return DiscountNotExists
-            // }
-            // privateDiscounts.push(position);
-            // price = coupon.applyDiscount(price);
-        }
-        // this._discount_types.forEach((discount: DiscountType, index: number) => {
-        //         if(privateDiscounts.indexOf(index) < 0){
-        //             price = discount.applyDiscount(price)
-        //         }
-        // });
-        return price
     }
 
     public returnAmount(amount: number): string | boolean {
