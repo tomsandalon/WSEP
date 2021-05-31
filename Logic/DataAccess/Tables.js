@@ -52,6 +52,7 @@ const purchase = {
         table.float('base_price');
         table.integer('amount').unsigned().notNullable();
         table.float('actual_price').unsigned().notNullable();
+        table.timestamp('timestamp')
         table.primary([user.pk, shop.pk, 'purchase_id', product.pk]);
     })
 };

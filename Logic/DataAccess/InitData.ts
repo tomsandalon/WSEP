@@ -103,6 +103,12 @@ export const initData = () =>
         .then((_: any) =>
             AddShop(first_shop))
         .then((_: any) => AddProduct(first_product))
+        .then((_: any) => AddItemToBasket({
+            user_id: third_user.user_id,
+            shop_id: first_shop.shop_id,
+            product_id: first_product.product_id,
+            amount: 20
+        }))
         .then((_: any) => AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm]))
         .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 1, {
             value: "VVV",
@@ -177,23 +183,8 @@ export const initData = () =>
 // AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
 
 // removeDiscount(first_shop.shop_id, 9)
-// AddItemToBasket({
-//     user_id: third_user.user_id,
-//     shop_id: first_shop.shop_id,
-//     product_id: first_product.product_id,
-//     amount: 20
-// })
-//     .then((_: any) => PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, [{
-//             product_id: first_product.product_id,
-//             amount: 20,
-//             actual_price: 14,
-//             name: first_product.name,
-//             base_price: first_product.base_price,
-//             description: first_product.description,
-//             categories: first_product.categories,
-//         }
-//     ]))
-// PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, [{
+
+// PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, new Date(), [{
 //             product_id: first_product.product_id,
 //             amount: 20,
 //             actual_price: 14,
@@ -203,7 +194,7 @@ export const initData = () =>
 //             categories: first_product.categories,
 //         }
 //     ])
-GetShopsInventory()
+GetPurchases()
     .then((result: any) => console.log(`Finish ${JSON.stringify(result, null, 2)}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

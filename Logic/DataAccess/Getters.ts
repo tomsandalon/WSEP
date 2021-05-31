@@ -402,7 +402,51 @@ export const GetNotifications = () =>
     db.transaction(async (trx: any) =>
         trx.select().from(notification.name))
 
-export const GetPurchases = () =>
-    db.transaction(async (trx: any) =>
-        trx.select().from(purchase.name))
+export type ProductPurchase = {
+    product_id: number,
+    name: string,
+    categories: string,
+    description: string,
+    base_price: number,
+    amount: number,
+    actual_price: number,
+}
+export type Purchase = {
+    user_id: number,
+    shop_id: number,
+    purchase_id: number,
+    products: ProductPurchase[]
+    date: Date,
+}
+const groupByPurchases = (purchases: any[]): Purchase[] => {
+    let output: Purchase[] = []
+    purchases.sort((first: any, second: any) => first.purchase_id - second.purchase_id)
+    let flag = -1;
+    for (let i = 0; i < purchases.length; i++) {
+        if(flag != purchases[i].purchase_id){
+            flag = purchases[i].purchase_id;
+            output.push({
+                date: new Date(purchases[i].timestamp),
+                purchase_id: purchases[i].purchase_id,
+                shop_id: purchases[i].shop_id,
+                user_id: purchases[i].user,
+                products: []
+            })
+        }
+        output[output.length - 1].products.push({
+            product_id: purchases[i].product_id,
+            actual_price: purchases[i].actual_price,
+            amount: purchases[i].amount,
+            base_price: purchases[i].base_price,
+            categories: purchases[i].categories,
+            description: purchases[i].description,
+            name: purchases[i].name
+        })
+    }
+    return output;
+}
 
+export const GetPurchases = () =>
+    db.transaction((trx: any) =>
+        trx.select().from(purchase.name)
+            .then((purchases: any[]) => groupByPurchases(purchases)))
