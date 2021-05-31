@@ -8,7 +8,7 @@ export interface Discount {
      * @param amount the amount of the product to evaluate
      * @return total percent of discount. 0 for no discount.
      */
-    evaluate(product: Product | ProductPurchase, amount: number): number
+    evaluate(product: ProductPurchase, amount: number): number
 
     id: number
 }

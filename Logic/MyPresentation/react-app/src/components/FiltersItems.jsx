@@ -22,11 +22,6 @@ class FiltersItems extends Component {
     handleSearch = (event) => {
         this.setState({search: event.target.value})
     }
-    handleSearchClick = () => {
-        if(this.state.search !== ''){
-            console.log("searching",this.state.search);
-        }
-    }
     handleRating(event) {
         this.setState({
           rating: event.target.value
@@ -61,7 +56,7 @@ class FiltersItems extends Component {
 				</form>
                 <ul>
                     <h6 className="title">Filter Categories</h6>
-                    {((this.props !== null) && (this.props.shopsInfo.length !== 0)) &&
+                    {((this.props.shopsInfo !== null) && (this.props.shopsInfo.length !== 0)) &&
                         this.state.categories.map((category,index) =>(
                         <li key={index}><span className="btn btn-outline-primary btn-sm" type="blob" padding="105">{category}</span></li>
                     ))
@@ -96,7 +91,7 @@ class FiltersItems extends Component {
             <h6 className="title">Filter by rating</h6>
 		</header>
         <input type="text" className="btnRating form-control" placeholder="Rating 1 - 5" onChange={this.handleCategoies}/>
-        <button className="btn-primary" type="button"><i className="fa fa-search" onClick={() => this.props.handleFilter(this.state)}></i></button> 
+        <button className="btn-primary" type="button"><i className="fas fa-star" onClick={() => this.props.handleFilter(this.state)}></i></button> 
     </article>
 </div> 
 </output>

@@ -1,36 +1,28 @@
-import React, { Component } from "react";
+import React from "react";
 import Image from "./images/shirt.jpg";
 import "./Product.css";
-class EditableItem extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: this.props.name,
-      available: this.props.available,
-      amount: this.props.amount,
-      price: this.props.price,
-    };
-  }
-  render() {
-    return (
-      <div className="col-md-3">
-        <figure className="itemside mb-4">
-          <div className="right-aside">
-            <img src={Image} className="img-sm" />
-          </div>
-          <figcaption className="info align-self-center">
-            <h4 classNameName="center">{this.state.name}</h4>
-            <h4>{this.state.available}</h4>
-            <h4>{this.state.amount}</h4>
-            <h4>{this.state.price}</h4>
-            <button className="btn btn-outline-primary btn-sm">
-              {" "}
-              Edit Item <i className="fa fa-edit"></i>
-            </button>
-          </figcaption>
-        </figure>
-      </div>
-    );
-  }
-}
+const EditableItem = (props) => {
+  const name = props.name;
+  const amount = props.amount;
+  const price = props.price;
+  const id = props.id;
+
+  return (
+    <div className="col-md-3">
+      <figure className="itemside mb-4">
+        <div className="right-aside">
+          <img src={Image} alt="E" className="img-sm" />
+        </div>
+        <figcaption className="info align-self-center">
+          <h4 className="center">{name}</h4>
+          <h4>{"Amount: " + amount}</h4>
+          <h4>{"Price: " + price}</h4>
+          <button className="btn btn-outline-primary btn-sm">
+            Edit Item <i className="fa fa-edit"></i>
+          </button>
+        </figcaption>
+      </figure>
+    </div>
+  );
+};
 export default EditableItem;

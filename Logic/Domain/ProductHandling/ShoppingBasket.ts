@@ -1,5 +1,5 @@
 import {Product} from "./Product";
-import {ProductPurchase} from "./ProductPurchase";
+import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {Shop} from "../Shop/Shop";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {
@@ -13,7 +13,7 @@ import {Purchase, PurchaseImpl} from "./Purchase";
 import {User} from "../Users/User";
 import {NotificationAdapter} from "../Notifications/NotificationAdapter";
 
-type Entry = {product: Product, amount: number}
+type Entry = {product: Product, amount: number, price_after_discount: number}
 export type ShoppingEntry = {productId: number, amount: number}
 export type MinimalUserData = {userId: number, underaged: boolean}
 
@@ -55,11 +55,10 @@ export interface ShoppingBasket {
      * @Requirement 2.9
      * @param payment_info
      * @param coupons
-     * @return Error if payment method didnt succeed OR
-     *               if delivery TODO
+     * @return Error
      * @return Purchase representing items and amount specified in basket
      */
-    purchase(payment_info: string, coupons: any  []): string | Purchase
+    purchase(payment_info: string, coupons: any  []): Promise<string | Purchase>
     toString():string[]
     isEmpty():boolean
 }
@@ -89,9 +88,11 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         if (typeof fetched_product === "string"){
             return fetched_product
         }
-        const final_product = {product: fetched_product, amount: product.amount};
+        const user_data = {userId: user.user_id, underaged: user.underaged}
+        const final_product = {product: fetched_product, amount: product.amount,
+            price_after_discount: shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], product.amount, shop) as ProductPurchase], user_data)};
         const id = this._basket_id_specifier++;
-        return new ShoppingBasketImpl(id, shop, final_product, {userId: user.user_id, underaged: user.underaged})
+        return new ShoppingBasketImpl(id, shop, final_product, user_data)
     }
 
     get products(){
@@ -117,17 +118,15 @@ export class ShoppingBasketImpl implements ShoppingBasket{
             return fetched_product
         }
         if (fetched_product.amount < amount) return StockLessThanBasket
-        const product = {product: fetched_product, amount: amount};
+        const product = {product: fetched_product, amount: amount,
+            price_after_discount: this.shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], amount, this.shop) as ProductPurchase], this.user_data)};
         this._products.push(product);
         return true
     }
 
     public editBasketItem(product_id: number, new_amount: number): boolean | string {
-        if (new_amount < 0) {
-            return AmountNonPositiveValue
-        } else if (new_amount == 0){
-            return this.removeItem(product_id)
-        }
+        if (new_amount < 0) return AmountNonPositiveValue
+        if (new_amount == 0) return this.removeItem(product_id)
         for (let product of this._products){
             if(product_id == product.product.product_id){
                 product.amount = new_amount;
@@ -156,6 +155,7 @@ export class ShoppingBasketImpl implements ShoppingBasket{
                 id: this.shop.shop_id,
             },
             products: this.products,
+            total_price_after_discount: this.shop.calculatePrice(this.products.map(p => ProductPurchaseImpl.create(p.product, [], p.amount, this.shop) as ProductPurchase), this.user_data)
             // user_data: this.user_data,
         })]
         // this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
@@ -163,14 +163,18 @@ export class ShoppingBasketImpl implements ShoppingBasket{
     isEmpty():boolean {
         return this._products.length == 0
     }
-    purchase(payment_info: string, coupons: any[]): string | Purchase {
+    async purchase(payment_info: string, coupons: any[]): Promise<string | Purchase> {
         const order = PurchaseImpl.create(new Date(), this,[], this.shop, this._user_data);
         if(typeof order == "string")
             return order
-        const order_purchase = order.purchase_self(payment_info);
-        if(typeof order_purchase == "string")
-            return order_purchase
-        this.shop.notifyOwners(order)
-        return order
+        // const order_purchase = order.purchase_self(payment_info);
+        return order.purchase_self(payment_info)
+            .then(order_purchase => {
+                if(typeof order_purchase == "string")
+                    return order_purchase
+                this.shop.notifyOwners(order)
+                return order
+            })
+
     }
 }

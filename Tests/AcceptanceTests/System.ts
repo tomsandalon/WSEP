@@ -2,13 +2,13 @@ import {Filter, Item_Action} from "../../Logic/Domain/Shop/ShopInventory";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {SearchTypes} from "../../Logic/Domain/System";
 
-export interface System{
+export interface System {
     openSession(): number
     closeSession(user_id: number): void
     performRegister(user_email:string, password: string): boolean
     performLogin(user_email:string, password: string): string | number
     performGuestLogin():number
-    logout(user_email: string): number
+    logout(user_id: number): string | boolean
     displayShops(): string[]
     getItemsFromShop(shop_id:number): string | string[]
     searchItemFromShops(search_type:SearchTypes, search_term: string): string[]
@@ -16,9 +16,9 @@ export interface System{
     addItemToBasket(user_id:number, product_id: number, shop_id:number, amount:number):string | void
     displayShoppingCart(user_id:number): string | string[][]
     editShoppingCart(user_id:number, shop_id:number, product_id:number, amount:number):string | void
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string):string | boolean
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info:string): Promise<string | boolean>
     removeManager(user_id: number, shop_id: number, target: string): string | boolean
-    purchaseCart(user_id: number, payment_info:string):string | boolean
+    purchaseCart(user_id: number, payment_info:string):Promise<string | boolean>
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info:string): number | string
     userOrderHistory(user_id: number):string | string[]
@@ -39,7 +39,17 @@ export interface System{
     getShopInfo(shop_id: number) : string | string[]
 
     spellCheck(input : string) : string | string[]
-    deliverItem(product_id : number, amount: number, shop_id: number, to: string ,transaction_id : boolean | string): boolean
+
+    isAdmin(user_id: number): string | boolean
+    isManager(user_id: number): string | boolean
+    isOwner(user_id: number): string | boolean
+
+    getManagingShops(user_id: number): string | string[]
+    getPermissions(user_id: number, shop_id: number): string | string[]
+    getAllUsers(user_id: number): string | string[]
+    isLoggedIn(user_id: number): string | boolean
+
+    getAllCategories(user_id: number): string | string[];
 }
 
 export const TestNotAssociatedWithImplementation = "Test not associated with implementation";

@@ -1,7 +1,6 @@
 import React from "react";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
-// import "../pages/_stores.scss";
 import EditIcon from "@material-ui/icons/Edit";
 
 const ManagerCell = (props) => {
@@ -17,7 +16,7 @@ const ManagerCell = (props) => {
             src={"./images/Anon_Avatar.png"}
             className="user-avatar"
           />
-          <div className="user-detail ">
+          <div className="user-detail">
             <h5 className="user-name ">{managerName} </h5>
             {/* <p className="user-description">{userId} </p> */}
           </div>
@@ -26,7 +25,7 @@ const ManagerCell = (props) => {
 
       <td className="text-right ">
         <figcaption className="info align-self-center ">
-          <IconButton aria-label="delete">
+          <IconButton aria-label="edit">
             <EditIcon />
           </IconButton>
         </figcaption>

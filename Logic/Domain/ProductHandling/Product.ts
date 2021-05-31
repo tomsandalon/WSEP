@@ -1,4 +1,4 @@
-import {Category} from "./Category";
+import {Category, CategoryImpl} from "./Category";
 // import {Purchase_Type} from "../PurchaseProperties/Purchase_Type";
 import {
     AmountIsLargerThanStock,
@@ -10,6 +10,10 @@ import {
     ProductNameEmpty
 } from "./ErrorMessages";
 import {Purchase_Type} from "../Shop/ShopInventory";
+import {Rating} from "./Rating";
+import {ProductData} from "../../DataAccess/Getters";
+
+
 
 export interface Product {
     readonly product_id: number
@@ -19,6 +23,7 @@ export interface Product {
     category: Category[]
     price: number // >= 0
     purchase_type: Purchase_Type
+    rating: Rating
 
     /**
      * @Requirement - Quality assurance No. 5a
@@ -84,15 +89,6 @@ export interface Product {
     addSupplies(amount: number): string | boolean
 
     /**
-     *
-     * @param coupons
-     * @return actual_price considering all discounts applied on this product and coupons that the customer applied
-     * @return DiscountNotExists iff the customer entered a coupon that can't be applied on this product
-     */
-    calculatePrice(coupons: any[]): number | string
-
-
-    /**
      * @Requirement 2.7
      * @functionality increase amount of supplies of this product account of what the user returned
      * @param amount
@@ -100,6 +96,10 @@ export interface Product {
      * @return AmountNonPositiveValue otherwise
      */
     returnAmount(amount: number): string | boolean;
+
+    rate(rating: number, rater: string): void
+
+    alreadyRated(user_email: string): Boolean;
 }
 
 export class ProductImpl implements Product{
@@ -114,18 +114,44 @@ export class ProductImpl implements Product{
     private _description: string;
     private _name: string;
     private _purchase_type: Purchase_Type;
-    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
-        this._base_price = base_price;
-        this._description = description;
-        this._name = name;
-        this._product_id = product_id;
-        this._purchase_type = purchase_type ? purchase_type : Purchase_Type.Immediate;
-        this._category = [];
-        this._amount = 0;
+    private _rating = Rating.create();
+
+    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type: Purchase_Type, category: Category[], amount: number, rating: Rating) {
+        this._product_id = product_id
+        this._base_price = base_price
+        this._name = name
+        this._description = description
+        this._purchase_type = purchase_type
+        this._category = category
+        this._amount = amount
+        this._rating = rating
     }
 
     static resetIDs = () => ProductImpl._product_id_specifier = 0
 
+    static createFromDB(product: ProductData) {
+        return new ProductImpl(
+            product.data.base_price,
+            product.data.description,
+            product.data.name,
+            product.data.product_id,
+            product.data.purchase_type,
+            product.data.categories.split(",").map(category => CategoryImpl.create(category) as CategoryImpl),
+            product.data.amount,
+            Rating.createFromDB(product.rates)
+        )
+    }
+
+    private static createSupporter(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
+        let _base_price = base_price;
+        let _description = description;
+        let _name = name;
+        let _product_id = product_id;
+        let _purchase_type = purchase_type ? purchase_type : Purchase_Type.Immediate;
+        let _category = [];
+        let _amount = 0;
+        return new ProductImpl(_base_price, _description, _name, _product_id, _purchase_type, _category, _amount, Rating.create())
+    }
 
     public static create(base_price: number, description: string, name: string, purchase_type?: Purchase_Type): Product | string {
         const result = ProductImpl.isValid(base_price, description, name);
@@ -133,7 +159,7 @@ export class ProductImpl implements Product{
             return result;
         }
         const id: number = this._product_id_specifier++;
-        return new ProductImpl(base_price, description, name, id, purchase_type);
+        return ProductImpl.createSupporter(base_price, description, name, id, purchase_type);
     }
 
     private static isValid(base_price: number, description: string, name: string): string | boolean{
@@ -222,29 +248,8 @@ export class ProductImpl implements Product{
         return this._purchase_type;
     }
     public changePurchaseType(purchaseType: Purchase_Type): string | boolean{
-        //TODO purchasetype.change
         this._purchase_type = purchaseType;
         return true;
-    }
-
-    //TODO move function to inventory
-    public calculatePrice(coupons: any[]): number | string{
-        let price = this._base_price;
-        let privateDiscounts: number[] = [];
-        for (let coupon of coupons){
-            // const position = this._discount_types.indexOf(coupon);
-            // if( position < 0){
-            //     return DiscountNotExists
-            // }
-            // privateDiscounts.push(position);
-            // price = coupon.applyDiscount(price);
-        }
-        // this._discount_types.forEach((discount: DiscountType, index: number) => {
-        //         if(privateDiscounts.indexOf(index) < 0){
-        //             price = discount.applyDiscount(price)
-        //         }
-        // });
-        return price
     }
 
     public returnAmount(amount: number): string | boolean {
@@ -255,8 +260,21 @@ export class ProductImpl implements Product{
         return true;
     }
 
+
+    get rating(): Rating {
+        return this._rating;
+    }
+
+    rate(rating: number, rater: string): void {
+        if (0 <= rating && rating <= 5) this.rating.add_rating(rating, rater)
+    }
+
     public toString(){
         return JSON.stringify(this)
-        // return `Product id: ${this._product_id}\tName: ${this._name}\tAvailableAmount: ${this._amount}\tBase price: ${this._base_price}\nCategories:\n${this.category.reduce((acc, category) => acc + category.name + "\n", "")}`
+
+    }
+
+    alreadyRated(user_email: string): Boolean {
+        return this.rating.raters_email.some(past_rater => past_rater == user_email)
     }
 }

@@ -1,4 +1,4 @@
-import {ManagerPermissions, Permissions} from "./Permissions";
+import {ManagerPermissions, numbers_to_permission, Permissions} from "./Permissions";
 
 export interface Manager {
     user_email: string
@@ -7,10 +7,21 @@ export interface Manager {
 }
 
 export class ManagerImpl implements Manager {
-    constructor(user_email: string, appointer_user_email: string) {
+    constructor(appointer_user_email: string, permissions: Permissions, user_email: string) {
         this._appointer_user_email = appointer_user_email;
         this._permissions = new ManagerPermissions();
         this._user_email = user_email;
+    }
+
+    static createFromDB(appointer_user_email: string, permissions: number[], user_email: string) {
+        return new ManagerImpl(
+            appointer_user_email,
+            new ManagerPermissions(numbers_to_permission(permissions)),
+            user_email)
+    }
+
+    static create(user_email: string, appointer_user_email: string) {
+        return new ManagerImpl(appointer_user_email, new ManagerPermissions(), user_email)
     }
 
     private _appointer_user_email: string;

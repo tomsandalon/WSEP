@@ -218,15 +218,17 @@ describe('User Tests', () => {
                 if(typeof logged_user == "string")
                     assert.fail()
                 expect(typeof (logged_user.addToBasket(shop, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
-                const purchase =logged_user.purchaseBasket(1, "paying");
-                if(typeof purchase == "string"){
-                    assert.fail()
-                }
-                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
-                const history = logged_user.getOrderHistory();
-                if(typeof history == "string")
-                    assert.fail()
-                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+                logged_user.purchaseBasket(1, "paying")
+                    .then(purchase => {
+                        if(typeof purchase == "string"){
+                            assert.fail()
+                        }
+                        expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
+                        const history = logged_user.getOrderHistory();
+                        if(typeof history == "string")
+                            assert.fail()
+                        expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+                    })
             }
         });
     });
@@ -255,17 +257,21 @@ describe('User Tests', () => {
                     assert.fail()
                 expect(typeof (logged_user.addToBasket(shop, ProductImpl._product_id_specifier - 2,15)) !== "string").eq(true);
                 expect(typeof (logged_user.addToBasket(shop2, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
-                const purchase =logged_user.purchaseBasket(1, "paying");
-                const purchase2 =logged_user.purchaseBasket(2, "paying");
-                if(typeof purchase == "string" || typeof  purchase2 == "string"){
-                    assert.fail()
-                }
-                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
-                const history = logged_user.getOrderHistory();
-                if(typeof history == "string")
-                    assert.fail()
-                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
-                expect(history[1].includes("banana")).is.eq(true); // cart purchase
+                logged_user.purchaseBasket(1, "paying")
+                    .then(purchase => {
+                        logged_user.purchaseBasket(2, "paying")
+                            .then(purchase2 => {
+                                if(typeof purchase == "string" || typeof  purchase2 == "string"){
+                                    assert.fail()
+                                }
+                                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
+                                const history = logged_user.getOrderHistory();
+                                if(typeof history == "string")
+                                    assert.fail()
+                                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+                                expect(history[1].includes("banana")).is.eq(true); // cart purchase
+                            })
+                    })
             }
         });
     });

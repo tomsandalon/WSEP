@@ -19,6 +19,7 @@ class ShoppingCart extends Component {
 					response.json().then(
 						baskets => {
 							let cart =[]
+							console.log(baskets)
 							cart = baskets.map(basket => {
 								const temp ={
 									basket_id:JSON.parse(basket).basket_id,
@@ -35,6 +36,7 @@ class ShoppingCart extends Component {
 					break;
 					case 400:
 					const err_message = await response.text();
+					console.log("shopping cart error msg", err_message)
                     this.setState({cart:[]})
                     break;
                 	case 404: //server not found
@@ -58,12 +60,14 @@ class ShoppingCart extends Component {
 					case 200: //welcome
 					response.json().then(
 						baskets => {
+							console.log(baskets);
 							const cart = baskets.map(basket => {
 								const temp ={
 									basket_id:JSON.parse(basket).basket_id,
 									shop_id:JSON.parse(basket).shop.id,
 									shop_name:JSON.parse(basket).shop.name,
 									products:JSON.parse(basket).products,
+									basket_total_price:JSON.parse(basket).total_price_after_discount
 								}
 								return temp;
 								// JSON.parse(basket).products.forEach(product => console.log(product))
@@ -86,7 +90,7 @@ class ShoppingCart extends Component {
 	  render(){
 		  return(
 				<div className="row">
-					{this.state.cart.length == 0 ? <div className="col-4"><h1>Cart is empty!</h1></div> : this.state.cart.map(basket => 
+					{this.state.cart.length === 0 ? <div className="col-4"><h1>Cart is empty!</h1></div> : this.state.cart.map(basket => 
 					<Basket refreshCart={this.refreshCart} basket_products={basket.products} selected_basket={basket}></Basket>
 					)}
 				</div>

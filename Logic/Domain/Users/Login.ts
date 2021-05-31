@@ -23,7 +23,7 @@ export class LoginImpl  implements  Login{
 
     private createAdmin() {
         this._register.register("admin@gmail.com", "admin");
-        this.existing_users.push(new UserImpl("admin@gmail.com", "admin", true));
+        this.existing_users.push(UserImpl.create("admin@gmail.com", "admin", true));
     }
 
     private constructor(reset?: boolean) {
@@ -60,7 +60,7 @@ export class LoginImpl  implements  Login{
             if(this._logged_users.filter(element => element === user_email).length == 0){ // user not logged in
                 const value = this._existing_users.filter(element => element.user_email === user_email)
                 if(value.length === 0){ // first time login
-                    const new_user = new UserImpl(user_email,password,false); //TODO every user is not an admin, maybe only the admin can set this attribute later on?
+                    const new_user = UserImpl.create(user_email,password,false);
                     this._existing_users.push(new_user);
                     this._logged_users.push(user_email);
                     return new_user.user_id;
@@ -122,7 +122,7 @@ export class LoginImpl  implements  Login{
      * adds a new guest to the system
      */
     guestLogin():number{
-        let user = new UserImpl();
+        let user = UserImpl.create();
         this._logged_guests.push(user.user_id)
         this._existing_user_guests.push(user);
         return user.user_id;
@@ -164,6 +164,19 @@ export class LoginImpl  implements  Login{
         return result.user_id
     }
 
+    isLoggedIn(user: string | number): boolean {
+        let email = ""
+        if (typeof user == 'string')
+            email = user
+        else {
+            const result = this.retrieveUser(user)
+            if (typeof result == 'string') return false
+            email = result.user_email
+        }
+        return this._logged_users.some(u => u == email)
+    }
 
-
+    reloadUser(entry) {
+        this.existing_users.push(UserImpl.createFromEntry(entry))
+    }
 }

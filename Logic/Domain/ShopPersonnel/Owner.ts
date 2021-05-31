@@ -1,24 +1,34 @@
 export interface Owner {
     user_email: string
-    appointees_emails: string[]
+    appointees_emails(): string[]
+    appointed_managers: string[]
+    appointed_owners: string[]
     appointer_email?: string
 }
 
 export class OwnerImpl implements Owner {
-    constructor(user_email: string, appointer_email?: string) {
-        this._appointees_emails = [];
-        if (appointer_email) this._appointer_email = appointer_email;
-        this._user_email = user_email;
+    appointed_managers: string[];
+    appointed_owners: string[];
+    private constructor(_appointed_managers: string[], _appointed_owners: string[], _appointer_email: string | undefined, user_email: string) {
+        this.appointed_managers = _appointed_owners
+        this.appointed_owners = _appointed_owners
+        this._appointer_email = _appointer_email
+        this._user_email = user_email
+    }
+    
+    static createFromDB(_appointed_managers: string[], _appointed_owners: string[], _appointer_email: string | undefined, user_email: string) {
+        return new OwnerImpl(_appointed_managers,_appointed_owners, _appointer_email, user_email)
+    }
+    
+    static create(user_email: string, appointer_email?: string) {
+        let _appointed_managers = [];
+        let _appointed_owners = [];
+        let _appointer_email = (appointer_email) ? appointer_email : undefined;
+        return new OwnerImpl(_appointed_managers, _appointed_owners, _appointer_email, user_email)
     }
 
-    private _appointees_emails: string[];
-
-    get appointees_emails(): string[] {
-        return this._appointees_emails;
-    }
-
-    set appointees_emails(value: string[]) {
-        this._appointees_emails = value;
+    appointees_emails(): string[] {
+        return this.appointed_owners.concat(this.appointed_managers)
     }
 
     private _user_email: string;
@@ -43,8 +53,5 @@ export class OwnerImpl implements Owner {
 
     toString(): string {
         return JSON.stringify(this)
-        // return `$Email: ${this.user_email}\t${this._appointer_email ?
-        //     "Appointer: " + this._appointer_email.concat("\t") : ""}Appointees: ${this.appointees_emails}\nRole: ${
-        //     this._appointer_email ? "Original owner" : "Owner"}`;
     }
 }

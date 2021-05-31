@@ -1,39 +1,157 @@
-import {service, Session, sid} from "../../Config/Config";
+import {
+    assign_manager,
+    assign_owner,
+    BadRequest, OK,
+    permissions,
+    ServerNotFound,
+    service,
+    Session,
+    sid
+} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
-router.get('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
-        response.status(404);
-        response.send('Bad session id')
-        response.end()
-    }
-    response.setHeader("Content-Type", "application/json");
-    const result = service.getAllShops(user_id);
-    console.log(result)
-    response.json(result)
-    response.end();
-})
-router.put('/', (req: any, res: any) => {
-    //TODO perform logout
-    res.send("My first server!\n" + req.url + "\n:D")
-})
 
-router.post('/', (request: any, response: any) => {
-    const user_id = Session.sessions[request.cookies[sid]];
-    if (user_id == undefined) {
-        response.status(404);
+router.post(assign_manager, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
         response.send('Bad session id')
         response.end()
+        return
     }
-    const result = service.addItemToBasket(user_id, request.body.product_id, request.body.shop_id, request.body.amount);
+    const user_id = session_data.user_id;
+    const result = service.appointManager(user_id, request.body.shop_id, request.body.email);
     if (typeof result === 'string') {
-        response.status(400);
+        response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
-        response.status(200);
+        response.status(OK);
+        response.end();
+    }
+})
+
+router.post(assign_owner, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const user_id = session_data.user_id;
+    const result = service.appointOwner(user_id, request.body.shop_id, request.body.email);
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
+        response.status(OK);
+        response.end();
+    }
+})
+
+router.delete(assign_manager, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const user_id = session_data.user_id;
+    const result = service.removeManager(user_id, request.body.shop_id, request.body.target);
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
+        response.status(OK);
+        response.end();
+    }
+})
+
+router.delete(assign_owner, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const user_id = session_data.user_id;
+    const result = service.removeOwner(user_id, request.body.shop_id, request.body.target);
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
+        response.status(OK);
+        response.end();
+    }
+})
+
+router.post(assign_manager + permissions, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const user_id = session_data.user_id;
+    const result = service.addPermissions(user_id, request.body.shop_id, request.body.target, request.body.action);
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
+        response.status(OK);
+        response.end();
+    }
+})
+
+router.put(assign_manager + permissions, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const user_id = session_data.user_id;
+    const result = service.editPermissions(user_id, request.body.shop_id, request.body.target, request.body.actions);
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
+        response.status(OK);
+        response.end();
+    }
+})
+
+
+router.delete(assign_manager + permissions, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    const user_id = session_data.user_id;
+    const result = ''
+    //TODO once implemented uncomment
+
+    // const result = service.removePermission(user_id, request.body.shop_id, request.body.target, request.body.action);
+    if (typeof result === 'string') {
+        response.status(BadRequest);
+        response.setHeader("Content-Type", "text/html");
+        response.send(result);
+    } else {
+        response.status(OK);
         response.end();
     }
 })
