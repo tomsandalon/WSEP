@@ -70,7 +70,7 @@ const first_shop = {
 const first_product = {
     product_id: 1,
     shop_id: first_shop.shop_id,
-    purchase_type_id: first_purchase_type,
+    purchase_type: first_purchase_type,
     name: "Patriot",
     amount: 1000,
     base_price: 4000,
@@ -203,7 +203,7 @@ export const initData = () =>
 //             categories: first_product.categories,
 //         }
 //     ])
-GetPurchases()
+GetShopsInventory()
     .then((result: any) => console.log(`Finish ${JSON.stringify(result, null, 2)}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

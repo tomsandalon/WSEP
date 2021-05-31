@@ -130,9 +130,9 @@ const rates = {
     name: 'rates',
     build: () => builder.createTable(rates.name, (table) => {
         table.integer(user.pk).references(user.pk).inTable(user.name).unsigned();
-        table.integer(product.pk).references(product.pk).inTable(product.name).unsigned();
+        table.integer('p_id').references(product.pk).inTable(product.name).unsigned();
         table.integer('rate').unsigned().notNullable();
-        table.primary([user.pk, product.pk]);
+        table.primary([user.pk, 'p_id']);
     })
 };
 exports.rates = rates;

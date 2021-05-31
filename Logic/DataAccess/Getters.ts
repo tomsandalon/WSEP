@@ -1,4 +1,5 @@
 import {db} from './DB.config';
+import {rate} from "../Communication/Config/Config";
 
 const {
     purchase_type,
@@ -45,10 +46,6 @@ export type User = {
     password: string,
     age: number,
     purchases_ids: number[],
-    rates: {
-        product_id: number,
-        rate: number,
-    }[],
     cart: {
         shop_id: number,
         product_id: number,
@@ -63,19 +60,12 @@ export const GetUsers = (): Promise<User[]> =>
                     users.map(async (u: any): Promise<User> => {
                     const purchases = await trx.select().from(purchase.name).where(user.pk, u.user_id)
                     const baskets = await trx.select().from(basket.name).where(user.pk, u.user_id)
-                    const rates = await trx.select().form().where(user.pk, u.user_id)
                     return {
                         user_id: u.user,
                         email: u.email,
                         password: u.password,
                         age: u.age,
                         purchases_ids: purchases.map((p: any) => p.purchase_id),
-                        rates: rates.map((r: any) => {
-                            return {
-                                product_id: r.product_id,
-                                rate: r.rate,
-                            }
-                        }),
                         cart: baskets.map((b: any) => {
                             return {
                                 shop_id: b.shop_id,
@@ -280,7 +270,28 @@ export const GetDiscount = (policy_id: number): Promise<DiscountTree> =>{
     })
 }
 
-type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
+export type ProductData = {
+    data: {
+        product_id: number,
+        purchase_type: number,
+        name: string,
+        amount: number,
+        base_price: number,
+        description: string,
+        categories: string,
+    },
+    rates: {
+        user_email: string,
+        score: number,
+    }[],
+}
+export type ShopRich = {
+    shop_id: number,
+    products: ProductData[],
+    purchase_conditions: number[],
+    discounts: number[],
+    purchase_types: number[]
+};
 export const groupByShops = (shops: any[]): ShopRich[]  =>{
     shops.sort((first: any, second: any) => first.shop_id - second.shop_id)
     let output: ShopRich[] = [];
@@ -296,7 +307,7 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
             } else if(shops[i].purchase_type_id != undefined) {
                 output[output.length - 1].purchase_types.push(shops[i].purchase_type_id)
             } else {
-                output[output.length - 1].products.push(shops[i])
+                output[output.length - 1].products.push(shops[i].product)
             }
         } else {
             flag = shops[i].shop_id;
@@ -327,7 +338,7 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
             } else {
                 output.push({
                     shop_id: shops[i].shop_id,
-                    products: [shops[i]],
+                    products: [shops[i].product],
                     purchase_conditions: [],
                     discounts: [],
                     purchase_types: [],
@@ -338,15 +349,53 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
     return output;
 }
 
-//TODO test add product, update product and get shops inventory
+const groupByProduct = (products: any[]): {shop_id: number, product: ProductData }[] => {
+    products.sort((first: any, second: any) => first.product_id - second.product_id)
+    let flag = -1;
+    let output: {shop_id: number, product: ProductData }[] = []
+    for (let i = 0; i < products.length; i++) {
+        if (flag != products[i].product_id) {
+            flag = products[i].product_id;
+            output.push({
+                shop_id: products[i].shop_id,
+                product: {
+                    data: {
+                        product_id: products[i].product_id,
+                        purchase_type: products[i].purchase_type,
+                        name: products[i].name,
+                        amount: products[i].amount,
+                        base_price: products[i].base_price,
+                        description: products[i].description,
+                        categories: products[i].categories,
+                    },
+                    rates: []
+                }
+            })
+        }
+        if (products[i].rate != null){
+            output[output.length - 1].product.rates.push({
+                score: products[i].rate,
+                user_email: products[i].email,
+            })
+        }
+    }
+    return output;
+}
 
+//TODO test add product, update product and get shops inventory
 export const GetShopsInventory = (): Promise<ShopRich[]> =>
     db.transaction(async (trx: any): Promise<ShopRich[]> => {
         const purchase_types = await trx.select().from(available.name);
-        const products = await trx.select().from(product.name)
+        const products = await
+            trx.select().from({
+                B: trx.select('p_id', 'email', 'rate')
+                    .from({A: trx(rates.name).select('p_id', 'rate', trx.ref('user_id').as('u_id'))})
+                    .innerJoin(user.name, `${user.name}.${user.pk}`, `A.u_id`)
+            }).rightOuterJoin(product.name, `${product.name}.${product.pk}`, `B.p_id`)
+        const sortedProducts = groupByProduct(products);
         const purchaseConditions = await trx.select().from(purchase_condition_allowed_in.name);
         const discounts = await trx.select().from(discount_allowed_in.name);
-        return groupByShops(purchaseConditions.concat(discounts).concat(products).concat(purchase_types))
+        return groupByShops(purchaseConditions.concat(discounts).concat(sortedProducts).concat(purchase_types))
     })
 
 export const GetNotifications = () =>
