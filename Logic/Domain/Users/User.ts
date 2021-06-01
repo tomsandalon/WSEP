@@ -6,6 +6,8 @@ import {ShopInventory} from "../Shop/ShopInventory";
 import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/PaymentHandler";
 import {UserPurchaseHistory, UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {BasketDoesntExists} from "../ProductHandling/ErrorMessages";
+import {User as UserFromDB} from "../../DataAccess/Getters"
+import {SystemImpl} from "../System";
 
 const LEGAL_DRINKING_AGE = 18
 export let id_counter: number = 0;
@@ -44,8 +46,6 @@ export class UserImpl implements User {
     private readonly _order_history: UserPurchaseHistory
     private readonly _user_id: number
     private readonly _is_guest: boolean
-    private _cart: ShoppingBasket[]
-
     private readonly _payment_handler: PaymentHandler
 
     private constructor(user_email: string, password: string, is_admin: boolean, order_history: UserPurchaseHistory, user_id: number, is_guest: boolean, underaged: boolean, cart: ShoppingBasket[]) {
@@ -60,25 +60,7 @@ export class UserImpl implements User {
         this._cart = cart
     }
 
-    static create(user_email?: string, password?: string, is_admin: boolean = false, age?: number) {
-        let _user_email = ""
-        let _password = ""
-        let _is_admin = false
-        let _is_guest = true
-        if (user_email != undefined && password != undefined && is_admin != undefined) {
-            _user_email = user_email;
-            _password = password;
-            _is_admin = is_admin;
-            _is_guest = false
-        }
-        let _cart = [];
-        let _order_history = UserPurchaseHistoryImpl.getInstance();
-        let _user_id = generateId();
-        let _payment_handler = PaymentHandlerImpl.getInstance();
-        let _underaged = (age) ? age < LEGAL_DRINKING_AGE : false;
-
-        return new UserImpl(_user_email, _password, _is_admin, _order_history, _user_id, _is_guest, _is_admin, [])
-    }
+    private _cart: ShoppingBasket[]
 
     get cart(): ShoppingBasket[] {
         return this._cart;
@@ -114,7 +96,46 @@ export class UserImpl implements User {
         this._underaged = value;
     }
 
+    static create(user_email?: string, password?: string, is_admin: boolean = false, age?: number) {
+        let _user_email = ""
+        let _password = ""
+        let _is_admin = false
+        let _is_guest = true
+        if (user_email != undefined && password != undefined && is_admin != undefined) {
+            _user_email = user_email;
+            _password = password;
+            _is_admin = is_admin;
+            _is_guest = false
+        }
+        let _cart = [];
+        let _order_history = UserPurchaseHistoryImpl.getInstance();
+        let _user_id = generateId();
+        let _payment_handler = PaymentHandlerImpl.getInstance();
+        let _underaged = (age) ? age < LEGAL_DRINKING_AGE : false;
+
+        return new UserImpl(_user_email, _password, _is_admin, _order_history, _user_id, _is_guest, _is_admin, [])
+    }
+
     static resetIDs = () => id_counter = 0
+
+    static createFromEntry(entry: UserFromDB) {
+        if (entry.user_id >= id_counter) id_counter = entry.user_id + 1
+        const ret = new UserImpl(entry.email, entry.password, false, UserPurchaseHistoryImpl.getInstance(), entry.user_id, false, entry.age != 0, []) //TODO replace false with is admin
+        entry.cart.forEach(cart => {
+            ret.addToBasket(SystemImpl.getInstance().getShopInventoryFromID(cart.shop_id), cart.product_id, cart.amount)
+        })
+        return ret
+    }
+
+    static usersAreEqual(u1: UserImpl, u2: UserImpl) {
+        return u1._user_id == u2._user_id &&
+            u1._password == u2._password &&
+            u1._user_email == u2._user_email &&
+            u1._is_guest == u2._is_guest &&
+            u1._underaged == u2._underaged &&
+            u1.is_admin == u2.is_admin &&
+            u1._cart.every(c1 => u2.cart.some(c2 => ShoppingBasketImpl.basketsAreEqual(c1, c2)))
+    }
 
     /**
      * Requirement number 3.1
@@ -287,13 +308,6 @@ export class UserImpl implements User {
                 product_purchase.rating = rating
             }
         )
-    }
-
-    static createFromEntry(entry) {
-        if (entry.user_id >= id_counter) id_counter = entry.user_id + 1
-        return new UserImpl(entry.email, entry.password, entry.is_admin, UserPurchaseHistoryImpl.getInstance(), entry.user_id, entry.is_guest, entry.age != 0,
-                [] //TODO
-            )
     }
 }
 

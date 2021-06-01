@@ -1,6 +1,5 @@
 import {CompositeDiscount} from "./CompositeDiscount";
 import {Discount} from "./Discount";
-import {Product} from "../../ProductHandling/Product";
 import {DiscountHandler} from "./DiscountHandler";
 import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 
@@ -15,6 +14,7 @@ export class LogicCompositionDiscount implements CompositeDiscount {
     logic_composition: LogicComposition
     firstDiscount: Discount
     secondDiscount: Discount
+    id: number;
 
     constructor(id: number, logic_composition: LogicComposition, firstDiscount: Discount, secondDiscount: Discount) {
         this.id = id
@@ -26,14 +26,6 @@ export class LogicCompositionDiscount implements CompositeDiscount {
     static create(logic_condition: LogicComposition, firstDiscount: Discount, secondDiscount: Discount) {
         let id = DiscountHandler.discountCounter++;
         return new LogicCompositionDiscount(id, logic_condition, firstDiscount, secondDiscount)
-    }
-
-    private minValue(numbers: number[]): number {
-        return numbers.reduce((min, cur) => Math.min(min, cur), 1);
-    }
-
-    private maxValue(numbers: number[]): number {
-        return numbers.reduce((min, cur) => Math.max(min, cur), 1);
     }
 
     evaluate(product: ProductPurchase, amount: number): number {
@@ -52,8 +44,15 @@ export class LogicCompositionDiscount implements CompositeDiscount {
         }
     }
 
-    id: number;
     toString(): string {
         return JSON.stringify(this)
+    }
+
+    private minValue(numbers: number[]): number {
+        return numbers.reduce((min, cur) => Math.min(min, cur), 1);
+    }
+
+    private maxValue(numbers: number[]): number {
+        return numbers.reduce((min, cur) => Math.max(min, cur), 1);
     }
 }

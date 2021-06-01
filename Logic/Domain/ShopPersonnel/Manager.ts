@@ -13,17 +13,6 @@ export class ManagerImpl implements Manager {
         this._user_email = user_email;
     }
 
-    static createFromDB(appointer_user_email: string, permissions: number[], user_email: string) {
-        return new ManagerImpl(
-            appointer_user_email,
-            new ManagerPermissions(numbers_to_permission(permissions)),
-            user_email)
-    }
-
-    static create(user_email: string, appointer_user_email: string) {
-        return new ManagerImpl(appointer_user_email, new ManagerPermissions(), user_email)
-    }
-
     private _appointer_user_email: string;
 
     get appointer_user_email(): string {
@@ -52,6 +41,17 @@ export class ManagerImpl implements Manager {
 
     set user_email(value: string) {
         this._user_email = value;
+    }
+
+    static createFromDB(appointer_user_email: string, permissions: number[], user_email: string) {
+        return new ManagerImpl(
+            appointer_user_email,
+            new ManagerPermissions(numbers_to_permission(permissions)),
+            user_email)
+    }
+
+    static create(user_email: string, appointer_user_email: string) {
+        return new ManagerImpl(appointer_user_email, new ManagerPermissions(), user_email)
     }
 
     toString(): string {

@@ -1,6 +1,6 @@
 import 'mocha';
 import {expect} from 'chai';
-import {Action, ManagerPermissions} from "../../../Logic/Domain/ShopPersonnel/Permissions";
+import {Action, ManagerPermissions} from "../../../../Logic/Domain/ShopPersonnel/Permissions";
 
 describe('Permissions test', () => {
     it('Create default permissions', () => {

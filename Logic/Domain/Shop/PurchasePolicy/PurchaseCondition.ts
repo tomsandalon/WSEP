@@ -8,5 +8,6 @@ export type PurchaseEvalData = {
 
 export interface PurchaseCondition {
     id: number,
+
     evaluate(pData: PurchaseEvalData): Boolean
 }

@@ -6,7 +6,8 @@
   "module": "CommonJS",
   "scripts": {
     "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*",
-    "dev-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/*/*",
+    "unit-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Unit/*/*",
+    "integ-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Integration/*",
     "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/*/*/*",
     "server": "nodemon Logic/Communication/Server.ts",
     "client": "ts-node Logic/Communication/Client.ts",
@@ -24,6 +25,7 @@
     "@types/express": "^4.17.11",
     "bootstrap": "^4.1.1",
     "cookie-parser": "^1.4.5",
+    "csv-parser": "^3.0.0",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "form-data": "^2.5.1",

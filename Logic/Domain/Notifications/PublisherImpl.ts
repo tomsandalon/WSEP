@@ -1,26 +1,31 @@
-import { Notification } from "./Notification";
+import {Notification} from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
-
-let P: any
 // import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
 import {ClearNotifications, Notify} from "../../DataAccess/API";
 import {SystemImpl} from "../System";
 
-export class PublisherImpl implements Publisher{
+let P: any
+
+export class PublisherImpl implements Publisher {
     private static instance: PublisherImpl;
     private static id_counter = 0;
-    notificationQueue: {[user_id: number]: Notification[]};
+    notificationQueue: { [user_id: number]: Notification[] };
+
     private constructor() {
         this.notificationQueue = {};
     }
 
-    public static getInstance(reset? :boolean): PublisherImpl{
-        if(PublisherImpl.instance == undefined || reset){
+    public static getInstance(reset?: boolean): PublisherImpl {
+        if (PublisherImpl.instance == undefined || reset) {
             PublisherImpl.instance = new PublisherImpl();
         }
         return PublisherImpl.instance;
+    }
+
+    static terminateAllConnections() {
+
     }
 
     fetchNotifications(user_id: number): Notification[] {
@@ -35,16 +40,14 @@ export class PublisherImpl implements Publisher{
                 P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
                 return true;
             }
-        }
-        else logger.Error(`Failed to send notifications to ${user_id} as the publisher is not defined`)
+        } else logger.Error(`Failed to send notifications to ${user_id} as the publisher is not defined`)
         return false
     }
 
     getAmountOfNotifications(user_id: number): number {
         if (user_id in this.notificationQueue) {
             return this.notificationQueue[user_id].length
-        }
-        else return -1;
+        } else return -1;
     }
 
     notify(user_id: number, notification: Notification): void {
@@ -53,19 +56,19 @@ export class PublisherImpl implements Publisher{
         } else {
             this.notificationQueue[user_id] = [notification]
         }
-        if(!this.notifyFlush(user_id)){
+        if (!this.notifyFlush(user_id)) {
             Notify([
                 {user_id: user_id, notification: notification.message, notification_id: PublisherImpl.id_counter++}
             ]).then((r: any) => r ? {} : SystemImpl.rollback)
         }
     }
 
-    getNotifications(user_id: number): Notification[]{
+    getNotifications(user_id: number): Notification[] {
         const result = this.notificationQueue[user_id];
-        return result == undefined? []: result;
+        return result == undefined ? [] : result;
     }
 
-    removeNotifications(user_id: number): void{
+    removeNotifications(user_id: number): void {
         this.notificationQueue[user_id] = [];
         ClearNotifications(user_id).then(r => r ? {} : SystemImpl.rollback())
     }
@@ -104,9 +107,5 @@ export class PublisherImpl implements Publisher{
             this.notificationQueue[notification.user_id].push(new Notification(notification.notification))
             PublisherImpl.id_counter = Math.max(PublisherImpl.id_counter, notification.notification_id + 1)
         })
-    }
-
-    static terminateAllConnections() {
-
     }
 }

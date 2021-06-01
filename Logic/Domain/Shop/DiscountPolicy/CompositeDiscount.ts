@@ -1,3 +1,4 @@
 import {Discount} from "./Discount";
 
-export interface CompositeDiscount extends Discount{}
+export interface CompositeDiscount extends Discount {
+}

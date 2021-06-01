@@ -1,14 +1,14 @@
 import {expect} from "chai";
-import {Publisher} from "../../../Logic/Domain/Notifications/Publisher";
-import {PublisherImpl} from "../../../Logic/Domain/Notifications/PublisherImpl";
-import {Notification} from "../../../Logic/Domain/Notifications/Notification";
-import {Shop, ShopImpl} from "../../../Logic/Domain/Shop/Shop";
-import {id_counter, User, UserImpl} from "../../../Logic/Domain/Users/User";
+import {Publisher} from "../../../../Logic/Domain/Notifications/Publisher";
+import {PublisherImpl} from "../../../../Logic/Domain/Notifications/PublisherImpl";
+import {Notification} from "../../../../Logic/Domain/Notifications/Notification";
+import {Shop, ShopImpl} from "../../../../Logic/Domain/Shop/Shop";
+import {id_counter, User, UserImpl} from "../../../../Logic/Domain/Users/User";
 import {pool} from "async-parallel";
-import {ShopInventory} from "../../../Logic/Domain/Shop/ShopInventory";
-import {RegisterImpl} from "../../../Logic/Domain/Users/Register";
-import {LoginImpl} from "../../../Logic/Domain/Users/Login";
-import {SystemImpl} from "../../../Logic/Domain/System";
+import {ShopInventory} from "../../../../Logic/Domain/Shop/ShopInventory";
+import {RegisterImpl} from "../../../../Logic/Domain/Users/Register";
+import {LoginImpl} from "../../../../Logic/Domain/Users/Login";
+import {SystemImpl} from "../../../../Logic/Domain/System";
 describe('Notification Pool testsuite', () => {
     describe('Single element', () => {
         const user_id = 1;
