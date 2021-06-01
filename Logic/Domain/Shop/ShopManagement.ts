@@ -311,9 +311,9 @@ export class ShopManagementImpl implements ShopManagement {
 
     private removeAllSubordinates(user_email: string, original: string) {
         this.managers.filter(m => m.appointer_user_email == user_email)
-            .forEach(m => this.removeManagerByRecursion(m.user_email, original))
+            .forEach(m => this.removeManagerByRecursion(original, m.user_email))
         this.owners.filter(o => o.appointer_email == user_email)
-            .forEach(o => this.removeOwnerByRecursion(o.user_email, original))
+            .forEach(o => this.removeOwnerByRecursion(original, o.user_email))
     }
 
     isOwner(user_email: string) {
