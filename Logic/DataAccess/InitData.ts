@@ -45,6 +45,7 @@ const third_user = {
     email: "tomer@gmail.com",
     password: "1234",
     age: 25,
+    admin: true
 };
 const four_user = {
     user_id: 4,
@@ -194,7 +195,7 @@ export const initData = () =>
 //             categories: first_product.categories,
 //         }
 //     ])
-GetPurchases()
-    .then((result: any) => console.log(`Finish ${JSON.stringify(result, null, 2)}`))
+GetUsers()
+    .then((result: any) => console.log(`Finish ${result[0].admin} -- ${typeof result[0].admin} \n${JSON.stringify(result, null, 2)}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

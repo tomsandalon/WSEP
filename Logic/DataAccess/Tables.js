@@ -7,6 +7,7 @@ const user = {
         table.string('email').notNullable();
         table.string('password').notNullable();
         table.integer('age').unsigned();
+        table.boolean('admin').defaultTo(false)
     })
 };
 exports.user = user;

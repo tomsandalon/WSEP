@@ -44,6 +44,7 @@ export type User = {
     email: string,
     password: string,
     age: number,
+    admin: boolean,
     purchases_ids: number[],
     cart: {
         shop_id: number,
@@ -64,6 +65,7 @@ export const GetUsers = (): Promise<User[]> =>
                         email: u.email,
                         password: u.password,
                         age: u.age,
+                        admin: u.admin == 1,
                         purchases_ids: purchases.map((p: any) => p.purchase_id),
                         cart: baskets.map((b: any) => {
                             return {

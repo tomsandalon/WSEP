@@ -6,6 +6,7 @@ export type User = {
     email: string,
     password: string,
     age: number,
+    admin?: boolean
 }
 
 export type Shop = {
