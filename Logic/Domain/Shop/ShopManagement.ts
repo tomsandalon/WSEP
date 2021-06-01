@@ -272,7 +272,7 @@ export class ShopManagementImpl implements ShopManagement {
         const ownerToRemove = this.getOwnerByEmail(target);
         if (!ownerToRemove) return false;
         if (ownerToRemove.appointer_email != user_email) return false;
-        // this._owners = this.owners.filter(m => m.user_email != target)
+        this._owners = this.owners.filter(m => m.user_email != target)
         NotificationAdapter.getInstance().notify(target,
             `You have been demoted by ${user_email}`)
         this.removeAllSubordinates(target, user_email)
