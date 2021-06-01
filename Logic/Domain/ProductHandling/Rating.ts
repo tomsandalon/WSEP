@@ -31,4 +31,11 @@ export class Rating {
         if (this.real_rating == undefined) return undefined
         return Math.round(this.real_rating)
     }
+
+    static ratingsAreEqual(r1: Rating, r2: Rating) {
+        return r1.number_of_rating == r2.number_of_rating &&
+            Math.abs(r1.real_rating - r2.real_rating) < 0.1 &&
+            r1.raters_email.length == r2.raters_email.length &&
+            r1.raters_email.every(r1 => r2.raters_email.some(r2 => r1 == r2))
+    }
 }

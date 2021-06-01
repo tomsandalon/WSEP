@@ -7,7 +7,7 @@ import {CategoryImpl} from "../ProductHandling/Category";
 
 
 type history_key = { user_id: number, shop_id: number, purchase_id: number };
-type history_entry = { key: history_key, purchase: Purchase };
+export type history_entry = { key: history_key, purchase: Purchase };
 
 export interface UserPurchaseHistory {
     history: history_entry[]
@@ -111,5 +111,19 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory {
                 )
             }
         ])
+    }
+
+    static historiesAreEqual(h1: history_entry, h2: history_entry) {
+        const key1 = h1.key
+        const key2 = h2.key
+        const p1 = h1.purchase
+        const p2 = h2.purchase
+        return key1.user_id == key2.user_id &&
+            key1.shop_id == key2.shop_id &&
+            p1.shop.shop_id == p2.shop.shop_id &&
+            p1.date == p2.date &&
+            p1.minimal_user_data.userId == p2.minimal_user_data.userId &&
+            p1.products.length == p2.products.length &&
+            p1.products.every(p1 => p2.products.some(p2 => ProductPurchaseImpl.productsAreEqual(p1, p2)))
     }
 }

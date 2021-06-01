@@ -103,4 +103,14 @@ export class ProductPurchaseImpl implements ProductPurchase {
         let category = product.category;
         return new ProductPurchaseImpl(product_id, name, description, amount, category, original_price, actual_price)
     }
+
+    static productsAreEqual(p1: ProductPurchase, p2: ProductPurchase) {
+        return p1.product_id == p2.product_id &&
+            p1.description == p2.description &&
+            p1.category.length == p2.category.length &&
+            p1.category.every(c1 => p2.category.some(c2 => c1.name == c2.name)) &&
+            p1.amount == p2.amount &&
+            p1.original_price == p2.original_price &&
+            p1.actual_price == p2.actual_price
+    }
 }

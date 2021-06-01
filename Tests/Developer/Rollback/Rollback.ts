@@ -8,6 +8,7 @@ import {ConditionType} from "../../../Logic/Domain/Shop/PurchasePolicy/SimpleCon
 import {SystemImpl} from "../../../Logic/Domain/System";
 import {PublisherImpl} from "../../../Logic/Domain/Notifications/PublisherImpl";
 import {Notification} from '../../../Logic/Domain/Notifications/Notification';
+import {history_entry, UserPurchaseHistoryImpl} from "../../../Logic/Domain/Users/UserPurchaseHistory";
 
 
 function shopsAreEquals(shop1: Shop[], shop2: Shop[]): boolean {
@@ -24,6 +25,10 @@ function notificationsAreRestored(n1: {[p: number]: Notification[]}, n2: {[p: nu
         if (!Notification.notificationsAreEqual(n1[i], n2[i])) return false
     }
     return true
+}
+
+function purchasesAreRestored(h1: history_entry[], h2: history_entry[]) {
+    return h1.length == h2.length && h1.every(h1 => h2.some(h2 => UserPurchaseHistoryImpl.historiesAreEqual(h1, h2)))
 }
 
 describe("Test rollback", () => {
@@ -55,6 +60,7 @@ describe("Test rollback", () => {
     const shops = system.shops
     const users = system.login.existing_users
     const notifications = PublisherImpl.getInstance().notificationQueue
+    const purchases = UserPurchaseHistoryImpl.getInstance().history
 
     it("Check shops are restored", async () => {
         await SystemImpl.rollback().then(_ => {
@@ -74,6 +80,11 @@ describe("Test rollback", () => {
     it("Check notifications are restored", async () => {
         await SystemImpl.rollback().then(_ => {
             expect(notificationsAreRestored(notifications, PublisherImpl.getInstance().notificationQueue)).to.be.true
+        })
+    })
+    it("Check purchases are restored", async () => {
+        await SystemImpl.rollback().then(_ => {
+            expect(purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)).to.be.true
         })
     })
 })

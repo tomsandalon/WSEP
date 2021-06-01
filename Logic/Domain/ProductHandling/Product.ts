@@ -188,7 +188,17 @@ export class ProductImpl implements Product {
     }
 
     static productsAreEqual(p1: Product[], p2: Product[]) {
-        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => JSON.stringify(p1) == JSON.stringify(p2)))
+        return p1.length == p2.length && p1.every(p1 => p2.some(p2 =>
+            p1.product_id == p2.product_id &&
+            p1.amount == p2.amount &&
+            p1.name == p2.name &&
+            p1.price == p2.price &&
+            p1.purchase_type == p2.purchase_type &&
+            p1.category.length == p2.category.length &&
+            p1.category.every(c1 => p2.category.some(c2 => c1.name == c2.name)) &&
+            p1.description == p2.description &&
+            Rating.ratingsAreEqual(p1.rating, p2.rating)
+        ))
     }
 
     private static createSupporter(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
