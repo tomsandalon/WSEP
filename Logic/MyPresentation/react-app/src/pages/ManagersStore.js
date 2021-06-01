@@ -1,12 +1,13 @@
 import ItemsBlock from "../components/ItemsBlock";
 import ManagersBlock from "../components/ManagersBlock";
 import OwnersBlock from "../components/OwnersBlock";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useHistory } from "react-router-dom";
 import useFetch from "../useFetch";
 import { React } from "react";
 
 const ManagersStore = () => {
   const { storeID, name } = useParams();
+  const history = useHistory();
   const {
     data: storeItems,
     itemsIsPending,
@@ -23,7 +24,26 @@ const ManagersStore = () => {
     detailsIsPending,
     detailsError,
   } = useFetch(`/user/details`);
-
+  const isUser = () => {
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json", Cookie: document.cookie },
+    };
+    fetch("/user/is/loggedin", requestOptions).then(async (response) => {
+      switch (response.status) {
+        case 200:
+          let value = await response.text();
+          value = value === "true" ? true : false;
+          if (!value) history.push("/home");
+          // return value;
+          break;
+        default:
+          history.push("/home");
+          break;
+      }
+    });
+  };
+  isUser();
   return (
     <div className="row">
       {parsedStaff && (
@@ -35,7 +55,7 @@ const ManagersStore = () => {
               error={staffError}
               isPending={staffIsPending}
               myEmail={myEmail.email}
-              storeID = {storeID}
+              storeID={storeID}
             />
           )}
           <Link to={`/addmanager/${storeID}/owner/${name}`}>

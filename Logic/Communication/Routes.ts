@@ -42,7 +42,7 @@ export const route_admin = "/user/admin"
  * @function getManagingShops
  * @params user_id
  * @return 404 -> server not found error -> text
- * @return 400 -> error -> text
+ // * @return 400 -> error -> text
  * @return 200 -> json
  */
 export const route_user_management = "/user"
