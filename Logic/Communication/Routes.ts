@@ -138,7 +138,68 @@ export const route_user_management_details = route_user_management + details;
 export const route_shop_manage_product = "/user/shop/product"
 export const route_shop_management = "/user/shop/management"
 export const route_shop_ownership = "/user/shop/ownership"
+/**
+ * @method GET
+ * @function getAllPurchasePolicies
+ * @params user_id, shop_id
+ * @location query
+ * @return 404 -> error -> server not found mssg
+ * @return 401 -> error -> text
+ * @return 200 -> json
+ *
+ * @method DELETE
+ * @function removePurchasePolicy
+ * @params user_id, shop_id, policy_id
+ * @location query
+ * @return 404 -> error -> server not found mssg
+ * @return 401 -> error -> text
+ * @return 200 -> OK
+ *
+ * @method PUT
+ * @function composePurchasePolicy
+ * @params user_id, shop_id, policy_id_first, policy_id_second, operator
+ * @location query
+ * @return 404 -> error -> server not found mssg
+ * @return 401 -> error -> text
+ * @return 200 -> OK
+ *
+ * @method POST
+ * @function addPurchasePolicy
+ * @params user_id, shop_id, condition, value
+ * @location query
+ * @return 404 -> error -> server not found mssg
+ * @return 401 -> error -> text
+ * @return 200 -> json
+ */
 export const route_shop_policy = "/user/shop/policy"
+/**
+ * @method GET
+ * @function getAllDiscounts
+ * @params user_id, shop_id
+ * @location query
+ * @return 404 -> error -> server not found mssg
+ * @return 401 -> error -> text
+ * @return 200 -> json
+ *
+ * @method DELETE
+ * @function removeDiscount
+ * @params user_id, shop_id, id
+ * @location query
+ * @return 404 -> error -> server not found mssg
+ * @return 401 -> error -> text
+ * @return 200 -> OK
+ *
+ * @method POST
+ * @location body
+ ** If request = 1 => addDiscount => params user_id, shop_id, value
+ ** If request = 2 => addConditionToDiscount => params user_id, shop_id, id, condition, condition_param
+ ** If request = 3 => addNumericComposeDiscount => params user_id, shop_id, operation, discount_id_one, discount_id_two
+ ** If request = 4 => addLogicComposeDiscount => params user_id, shop_id, operation, discount_id_one, discount_id_two
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 401 -> error -> text
+ * @return 200 -> OK
+ */
 export const route_shop_discount = "/user/shop/discount"
 /**
  * @method GET
