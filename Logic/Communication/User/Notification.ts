@@ -45,7 +45,7 @@ export const configWebSocket = (io: any) =>
 export const notify = (user_id: number, amount: number) => {
     for (let sid in Session.sessions) {
         const entry = Session.sessions[sid]
-        if (entry !== undefined && entry.user_id == user_id) {
+        if (entry != null && entry.socket != null && entry.user_id == user_id) {
             entry.socket.emit(acknowledge_for_notifications, amount)
             return;
         }
