@@ -12,8 +12,6 @@ import {Condition} from "../../Logic/Domain/Shop/DiscountPolicy/ConditionalDisco
 import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ProductImpl} from "../../Logic/Domain/ProductHandling/Product";
-import {purchase_cart} from "../../Logic/Communication/Config/Config";
-import {pool} from "async-parallel";
 import {PublisherImpl} from "../../Logic/Domain/Notifications/PublisherImpl";
 
 
@@ -861,10 +859,10 @@ describe('Acceptance Tests:', () => {
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 200)
         expect(typeof add_to_basket == "string").to.be.false
 
-        it('Happy', () => {
+        it('Happy', async () => {
             //TODO milestone 2
-            let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK was charged successfully")
-            expect(purchase).to.be.true
+            await system.purchaseShoppingBasket(user, shopID, "MOCK was charged successfully")
+                .then(purchase => expect(purchase).to.be.true)
         });
         it('Sad: user dont have enough money', () => {
             system.addItemToBasket(user, 0, shopID, 200)
