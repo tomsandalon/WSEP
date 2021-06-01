@@ -1,39 +1,65 @@
-import {Data} from "ws";
-import WebSocket = require("ws");
-import {sleep} from "async-parallel";
-import {System} from "../../Tests/AcceptanceTests/System";
-import {SystemDriver} from "../../Tests/AcceptanceTests/SystemDriver";
+import * as https from 'https';
+import {
+    assign_manager,
+    assign_owner,
+    options,
+    permissions,
+    port,
+    service,
+} from "./Config/Config";
+import {
+    route_admin,
+    route_cart,
+    route_filter, route_guest,
+    route_home,
+    route_login,
+    route_logout,
+    route_purchase,
+    route_register,
+    route_shop,
+    route_shop_discount,
+    route_shop_manage_product,
+    route_shop_management,
+    route_shop_ownership,
+    route_shop_policy,
+    route_user_management
+} from "./Routes";
+import {configWebSocket} from "./User/Notification";
+const socket_io = require('socket.io');
+const fs = require('fs')
+const path = require('path');
+const express = require('express');
+// const expressWs = require('express-ws');
+const cookieParser = require('cookie-parser');
+export const app = express();
+//initialize a https server
+export const server = https.createServer(options, app);
+export const io = socket_io(server);
+configWebSocket(io)
+//start our server
+server.listen( port,() => {
+    console.log(`Server is running on port ${port}`);
+})
+// expressWs(app, server);
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+app.use(route_guest, require('./User/Guest'))
+app.use(route_login, require('./User/Registered/Login'));
+app.use(route_logout, require('./User/Registered/Logout'))
+app.use(route_register, require('./User/Register'));
+app.use(route_cart, require('./User/Cart'));
+app.use(route_purchase, require('./User/Purchase'));
+app.use(route_home, require('./Home/Home'));
+app.use(route_filter, require('./Home/Filter'));
+app.use(route_shop_management, require('./User/Registered/Management'));
+app.use(route_shop_ownership, require('./User/Registered/Ownership'));
+app.use(route_shop_manage_product, require('./User/Registered/Product'))
+app.use(route_shop, require('./User/Registered/Shop'));
+app.use(route_admin, require('./User/Registered/Admin'));
+app.use(route_user_management, require('./User/Registered/User'));
+app.use(route_shop_policy, require('./User/Registered/Policy'));
+app.use(route_shop_discount, require('./User/Registered/Discount'));
+//* For debug TODO delete this
 
-// const wss = new WebSocket.Server({
-//     port: 8080,
-//     perMessageDeflate: {
-//         zlibDeflateOptions: {
-//             // See zlib defaults.
-//             chunkSize: 1024,
-//             memLevel: 7,
-//             level: 3
-//         },
-//         zlibInflateOptions: {
-//             chunkSize: 10 * 1024
-//         },
-//         // Other options settable:
-//         clientNoContextTakeover: true, // Defaults to negotiated value.
-//         serverNoContextTakeover: true, // Defaults to negotiated value.
-//         serverMaxWindowBits: 10, // Defaults to negotiated value.
-//         // Below options specified as default values.
-//         concurrencyLimit: 10, // Limits zlib concurrency for perf.
-//         threshold: 1024 // Size (in bytes) below which messages
-//         // should not be compressed.
-//     }
-// });
-const system: System = SystemDriver.getSystem(true);
-const wss = new WebSocket.Server({ port: 8080 });
-wss.on('connection', function connection(ws: WebSocket) {
-    let id = system.openSession();
-    ws.on('message', function incoming(message: Data) {
-        ws.send(`Hey you are client ${id}`)
-        // sleep(1000).then(_ => ws.send(`Hey you are client ${id}`))
-        console.log('received: %s', message);
-    });
-});
-console.log("Server successful boot")
+service.initData();

@@ -1,30 +1,28 @@
-import {User, UserImpl} from "./User";
+import {UserImpl} from "./User";
 import {RegisterImpl} from "./Register";
 import {Authentication} from "./Authentication";
 import {logger} from "../Logger";
 import {UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
+import {User as UserFromDB} from "../../DataAccess/Getters";
 
 export interface Login {
     login(user_email: string, password: string): number | string
+
     guestLogin(): number
+
     logout(user_email: string): void
-    exit(user_id:number):void
+
+    exit(user_id: number): void
+
     getUserId(user_email: string): number | undefined
 }
 
-export class LoginImpl  implements  Login{
-    private _logged_users: string[]
-    private _logged_guests: number[]
+export class LoginImpl implements Login {
+    private static instance: LoginImpl;
     private _existing_user_guests: UserImpl[]
     private readonly _existing_users: UserImpl[]
-    private _password_handler:Authentication
-    private _register:RegisterImpl
-    private static instance: LoginImpl;
-
-    private createAdmin() {
-        this._register.register("admin@gmail.com", "admin");
-        this.existing_users.push(new UserImpl("admin@gmail.com", "admin", true));
-    }
+    private _password_handler: Authentication
+    private _register: RegisterImpl
 
     private constructor(reset?: boolean) {
         this._logged_users = [];
@@ -37,12 +35,27 @@ export class LoginImpl  implements  Login{
         UserPurchaseHistoryImpl.getInstance(reset)
     }
 
+    private _logged_users: string[]
+
+    get logged_users(): string[] {
+        return this._logged_users;
+    }
+
+    private _logged_guests: number[]
+
+    get logged_guests(): number[] {
+        return this._logged_guests;
+    }
+
+    get existing_users(): UserImpl[] {
+        return this._existing_users;
+    }
+
     /**
      * Singleton design pattern.
      */
     public static getInstance(reset?: boolean): LoginImpl {
-        if(!LoginImpl.instance || reset)
-        {
+        if (!LoginImpl.instance || reset) {
             LoginImpl.instance = new LoginImpl(reset);
         }
         return LoginImpl.instance;
@@ -56,16 +69,15 @@ export class LoginImpl  implements  Login{
      * @return The user that tried to logging in to the system.
      */
     login(user_email: string, password: string): number | string {
-        if(this._register.loginVerification(user_email,password)){ // user is registered.
-            if(this._logged_users.filter(element => element === user_email).length == 0){ // user not logged in
+        if (this._register.loginVerification(user_email, password)) { // user is registered.
+            if (this._logged_users.filter(element => element === user_email).length == 0) { // user not logged in
                 const value = this._existing_users.filter(element => element.user_email === user_email)
-                if(value.length === 0){ // first time login
-                    const new_user = new UserImpl(user_email,password,false); //TODO every user is not an admin, maybe only the admin can set this attribute later on?
+                if (value.length === 0) { // first time login
+                    const new_user = UserImpl.create(user_email, password, false);
                     this._existing_users.push(new_user);
                     this._logged_users.push(user_email);
                     return new_user.user_id;
-                }
-                else{ // already logged in before so just return the user
+                } else { // already logged in before so just return the user
                     this._logged_users.push(user_email);
                     return value[0].user_id;
                 }
@@ -73,8 +85,12 @@ export class LoginImpl  implements  Login{
             logger.Error(`${user_email} already logged in the system.`);
             return `${user_email} already logged in the system.`;
         }
-        logger.Error(`${user_email} isn't a registered in the system.`);
-        return `${user_email} isn't a registered in the system.`;
+        if (user_email == '') {
+            logger.Error(`Email can't be empty!`);
+            return `Email can't be empty!`;
+        }
+        logger.Error(`${user_email} isn't a registered user in the system.`);
+        return `${user_email} isn't a registered user the system.`;
     }
 
     /**
@@ -83,31 +99,29 @@ export class LoginImpl  implements  Login{
      * @param user_email
      */
     logout(user_email: string): void {
-       let value = this._logged_users.filter(element => element === user_email);
-       if(value.length == 0) {
-           logger.Error(`${user_email} isn't logged in the system therefore cant logged out.`)
-           return;
-       }
-       this._logged_users = this._logged_users.filter(element => element !== user_email);
+        let value = this._logged_users.filter(element => element === user_email);
+        if (value.length == 0) {
+            logger.Error(`${user_email} isn't logged in the system therefore cant logged out.`)
+            return;
+        }
+        this._logged_users = this._logged_users.filter(element => element !== user_email);
     }
 
     /**
      * Requirement number 2.2
      * removes the current user_id from the guest list / users list
      */
-    exit(user_id:number):void{
+    exit(user_id: number): void {
         const user = this._existing_user_guests.filter(user => user.user_id == user_id);
-        if(user.length == 0){ //not a guest
+        if (user.length == 0) { //not a guest
             const logged_user = this._existing_users.filter(user => user.user_id == user_id)
-            if(logged_user.length == 0) {
+            if (logged_user.length == 0) {
                 logger.Error(`User id ${user_id} which is neither a guest nor a user tried to exit system`)
                 return
-            }
-        else {
+            } else {
                 this.logout(logged_user[0].user_email);
             }
-        }
-        else{
+        } else {
             this._existing_user_guests = this._existing_user_guests.filter(user => user.user_id != user_id)
             this._logged_guests = this._logged_guests.filter(guest => guest != user_id);
         }
@@ -117,41 +131,26 @@ export class LoginImpl  implements  Login{
      * Requirement number 2.1
      * adds a new guest to the system
      */
-    guestLogin():number{
-        let user = new UserImpl();
+    guestLogin(): number {
+        let user = UserImpl.create();
         this._logged_guests.push(user.user_id)
         this._existing_user_guests.push(user);
         return user.user_id;
 
     }
 
-    retrieveUser(user_id:number):UserImpl | string{
+    retrieveUser(user_id: number): UserImpl | string {
         const user = this._existing_user_guests.filter(guest => guest.user_id == user_id);
-        if(user.length == 0)
-        {
+        if (user.length == 0) {
             const logged_user = this._existing_users.filter(user => user.user_id == user_id)
-            if(logged_user.length == 0) {
+            if (logged_user.length == 0) {
                 logger.Error(`${user_id} isn't a guest nor a registered user`);
                 return `${user_id} isn't a guest nor a registered user`
-            }
-            else
+            } else
                 return logged_user[0]
-        }
-        else{
+        } else {
             return user[0]
         }
-    }
-
-
-    get logged_users(): string[]{
-        return this._logged_users;
-    }
-    get logged_guests(): number[]{
-        return this._logged_guests;
-    }
-
-    get existing_users(): UserImpl[]{
-        return this._existing_users;
     }
 
     getUserId(user_email: string): number | undefined {
@@ -160,6 +159,24 @@ export class LoginImpl  implements  Login{
         return result.user_id
     }
 
+    isLoggedIn(user: string | number): boolean {
+        let email = ""
+        if (typeof user == 'string')
+            email = user
+        else {
+            const result = this.retrieveUser(user)
+            if (typeof result == 'string') return false
+            email = result.user_email
+        }
+        return this._logged_users.some(u => u == email)
+    }
 
+    reloadUser(entry: UserFromDB) {
+        this.existing_users.push(UserImpl.createFromEntry(entry))
+    }
 
+    private createAdmin() {
+        this._register.register("admin@gmail.com", "admin");
+        this.existing_users.push(UserImpl.create("admin@gmail.com", "admin", true));
+    }
 }

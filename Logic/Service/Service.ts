@@ -9,11 +9,50 @@ import {Operator} from "../Domain/Shop/PurchasePolicy/CompositeCondition";
 
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 
-class Service {
+export class Service {
     private _system: System
 
     constructor(reset?: boolean) {
         this._system = SystemImpl.getInstance(reset);
+    }
+
+    public initData(){
+        // const no_to_all: DiscountType = {
+        //     percent: 0.5, // 0 <= percent <= 1
+        //     expiration_date: new Date(),
+        //     can_be_applied: value => true,
+        //     applyDiscount: value => 0.5
+        // }
+        const dummy: Purchase_Type = Purchase_Type.Immediate
+        this._system.performRegister("Liorpev@gmail.com", "123456")
+        this._system.performRegister("Mark@gmail.com", "123456")
+        this._system.performRegister("TomAndSons@gmail.com", "123456") // Owner
+        this._system.performRegister("Tomer@gmail.com", "123456") // Manager
+        this._system.performRegister("a@gmail.com", "123456")
+        this._system.performRegister("b@gmail.com", "123456")
+
+        const tom_id = this._system.performLogin("TomAndSons@gmail.com", "123456")
+        if (typeof tom_id === "string")
+            return
+        const nvidia_id = this.addShop(tom_id, "INVIDIA", "BEST GPU 4 Ever", 'Taiwan', "Taiwan 4 ever")
+        const zara_id = this.addShop(tom_id, "ZARA", "Best style in UK", 'China', "Budaa 4 ever")
+        if (typeof nvidia_id === "string" || typeof zara_id === "string")
+            return
+        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, dummy)
+        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 1, ["GPU"], 2000, dummy)
+        this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, dummy)
+        this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, dummy)
+        this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, dummy)
+        this.addDiscount(tom_id, nvidia_id, 0.5)
+        this.addConditionToDiscount(tom_id, nvidia_id, 0, Condition.Amount, "3")
+        this.addDiscount(tom_id, nvidia_id, 0.2)
+
+        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, dummy)
+        this.logout(tom_id);
     }
 
     addConditionToDiscount(user_id: number, shop_id: number, id: number, condition: Condition, condition_param: string): string | boolean {
@@ -43,10 +82,10 @@ class Service {
     removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
         return this._system.removeOwner(user_id, shop_id, target)
     }
+
     removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
         return this._system.removePurchasePolicy(user_id, shop_id, policy_id)
     }
-
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
         return this._system.addItemToBasket(user_id, product_id, shop_id, amount);
     }
@@ -55,7 +94,7 @@ class Service {
         return this._system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string {
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
         return this._system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, purchase_type)
     }
 
@@ -107,17 +146,17 @@ class Service {
         return this._system.editShoppingCart(user_id, shop_id, product_id, amount)
     }
 
+    removeItemFromBasket(user_id: number, shop_id: number, product_id: number): string | void {
+        return this._system.editShoppingCart(user_id, shop_id, product_id, 0)
+    }
 
-    // [19:52, 5/7/2021] ליאור ניתוצ: //(category_name[]strings, min_price:number,max_price:number,rating:number,search_name_term:string)
-    //     [19:53, 5/7/2021] ליאור ניתוצ: default value for rating,minprice,maxprice is 0 meaning no need to filter by them
-    // [19:53, 5/7/2021] ליאור ניתוצ: default value for search_name is '' meaning no need to filter by it
-    // [19:53, 5/7/2021] ליאור ניתוצ: default value for category [] is empty array meaning no need to filter by it
-    filterSearch(categories: string[], min_price: number, max_price: number,
+    filterSearch(category_list: string, min_price: number, max_price: number,
                  rating: number, name_search_term: string): string[] {
         const search_type = SearchTypes.name
         const search_term = name_search_term
+        const categories = category_list.split(",")
         let filters: Filter[] = []
-        if (categories.length > 0) {
+        if (categories.length > 0 && category_list.length > 0) {
             categories.forEach(c => {
                 filters = filters.concat([{filter_type: Filter_Type.Category, filter_value: c}])
             })
@@ -140,8 +179,8 @@ class Service {
         return this._system.getShopInfo(shop_id);
     }
 
-    logout(user_email: string): number {
-        return this._system.logout(user_email)
+    logout(user_id: number): string | boolean {
+        return this._system.logout(user_id);
     }
 
     openSession(): number {
@@ -156,15 +195,15 @@ class Service {
         return this._system.performLogin(user_email, password)
     }
 
-    performRegister(user_email: string, password: string): boolean {
-        return this._system.performRegister(user_email, password)
+    performRegister(user_email: string, password: string, age: string): boolean {
+        return this._system.performRegister(user_email, password, age.length == 0 || isNaN(Number(age))? undefined : Number(age))
     }
 
-    purchaseCart(user_id: number, payment_info: string): string | boolean {
+    purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
         return this._system.purchaseCart(user_id, payment_info)
     }
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): string | boolean {
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
         return this._system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 
@@ -200,4 +239,51 @@ class Service {
         return this._system.removeDiscount(user_id, shop_id, id)
     }
 
+    getAllShops(user_id: number): string | string[]{
+        return this._system.getAllShops(user_id)
+    }
+    isAdmin(user_id: number): boolean {
+        return (this._system.isAdmin(user_id) as boolean);
+    }
+
+    isManager(user_id: number): boolean {
+        return (this._system.isManager(user_id) as boolean)
+    }
+
+    isOwner(user_id: number): boolean {
+        return (this._system.isOwner(user_id) as boolean)
+    }
+
+    getAllUsers(user_id: number): string | string[] {
+        return this._system.getAllUsers(user_id);
+    }
+
+    getManagingShops(user_id: number): string | string[] {
+        return this._system.getManagingShops(user_id)
+    }
+
+    getPermissions(user_id: number, shop_id: number): string | string[] {
+        return this._system.getPermissions(user_id, shop_id)
+    }
+
+    isLoggedIn(user_id: number): boolean {
+        return (this._system.isLoggedIn(user_id) as boolean)
+    }
+
+    getAllCategories(user_id: number): string | string [] {
+        return this._system.getAllCategories(user_id)
+    }
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean {
+        return this._system.rateProduct(user_id, shop_id, product_id, rating)
+    }
+
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        return this._system.removePermission(user_id, shop_id, target_email, action)
+    }
+
+    //string is bad, string[] is good and the answer is at [0]
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        return this._system.getUserEmailFromUserId(user_id);
+    }
 }

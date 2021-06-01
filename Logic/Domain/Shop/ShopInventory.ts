@@ -15,13 +15,16 @@ import {CompositeCondition, Operator} from "./PurchasePolicy/CompositeCondition"
 import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
+import {GetPurchaseConditions, ShopRich} from "../../DataAccess/Getters";
+import {SimpleCondition} from "./PurchasePolicy/SimpleCondition";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
+
 export enum Filter_Type {
     BelowPrice,
     AbovePrice,
     Category,
-    // Rating
+    Rating
 }
 
 export enum Item_Action {
@@ -56,7 +59,7 @@ export interface ShopInventory {
      * @Requirement 2.5
      * @return product list of the items currently sold in the store
      */
-    getAllItems(): Product[]
+    getAllItems(all?: boolean): Product[]
 
     /**
      * @Requirement 2.6
@@ -130,11 +133,7 @@ export interface ShopInventory {
     editItem(product_id: number, action: Item_Action, value: string): string | boolean;
 
     /**
-     * @param order the order to log in the shop order history
-     */
-    logOrder(order: Purchase): void
-
-    /**
+     *
      * @param discount the discount to add
      */
     addDiscount(discount: Discount): void
@@ -151,7 +150,9 @@ export interface ShopInventory {
 
     composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string
 
-    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData): number
+    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number
+
+    displayItems(): string
 
     addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string): string | boolean;
 
@@ -160,24 +161,25 @@ export interface ShopInventory {
     addLogicCompositionDiscount(operation: LogicComposition, d_id1: number, d_id2: number): boolean | string;
 
     notifyOwners(order: Purchase): void;
+
+    rateProduct(product_id: number, rating: number, rater: string): void;
+
+    alreadyRated(product_id: number, user_email: string): Boolean;
+
+    hasPurchased(user_id: number, product_id: number): Boolean;
+
+    addInventoryFromDB(inventory: ShopRich): void;
 }
+
+export let id_counter: number = 0;
+export const generateId = () => id_counter++;
 
 export class ShopInventoryImpl implements ShopInventory {
     private readonly _discount_policies: DiscountHandler;
-    private _purchase_policies: PurchaseCondition[];
-
-    private readonly _purchase_types: Purchase_Type[]
-
-
     private readonly _shop_id: number;
     private readonly _bank_info: string;
-    private _purchase_history: UserPurchaseHistory;
-    get discount_policies(): DiscountHandler {
-        return this._discount_policies;
-    }
-    get purchase_policies(): PurchaseCondition[] {
-        return this._purchase_policies;
-    }
+    private readonly _shop_name: string;
+
     constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
@@ -190,11 +192,26 @@ export class ShopInventoryImpl implements ShopInventory {
         this._purchase_policies = Array<PurchaseCondition>();
     }
 
+    private _purchase_policies: PurchaseCondition[];
 
-    private readonly _shop_name: string;
+    get purchase_policies(): PurchaseCondition[] {
+        return this._purchase_policies;
+    }
+
+    private _purchase_types: Purchase_Type[]
+
+    get purchase_types(): Purchase_Type[] {
+        return this._purchase_types;
+    }
+
+    private _purchase_history: UserPurchaseHistory;
 
     get purchase_history(): UserPurchaseHistory {
         return this._purchase_history;
+    }
+
+    get discount_policies(): DiscountHandler {
+        return this._discount_policies;
     }
 
     get shop_name(): string {
@@ -217,16 +234,38 @@ export class ShopInventoryImpl implements ShopInventory {
         this._shop_management = value;
     }
 
-    get purchase_types(): Purchase_Type[] {
-        return this._purchase_types;
-    }
-
     get shop_id(): number {
         return this._shop_id;
     }
 
     get bank_info(): string {
         return this._bank_info
+    }
+
+    static shopsAreEqual(inv1: ShopInventory, inv2: ShopInventory) {
+        return inv1.shop_id == inv2.shop_id &&
+            inv1.shop_name == inv2.shop_name &&
+            inv1.bank_info == inv2.bank_info &&
+            DiscountHandler.discountsAreEqual(inv1.discount_policies, inv2.discount_policies) &&
+            ShopInventoryImpl.purchaseTypesAreEqual(inv1.purchase_types, inv2.purchase_types) &&
+            ShopInventoryImpl.purchasePoliciesAreEqual(inv1.purchase_policies, inv2.purchase_policies) &&
+            ProductImpl.productsAreEqual(inv1.products, inv2.products)
+    }
+
+    private static createPurchasePoliciesFromDB(purchase_condition: number): Promise<PurchaseCondition> {
+        if (id_counter + 1 <= purchase_condition) id_counter = purchase_condition + 1
+        return GetPurchaseConditions(purchase_condition).then(result =>
+            (result.left && result.right) ? this.createPurchasePoliciesFromDB(result.left).then(left => this.createPurchasePoliciesFromDB(result.right).then(right =>
+                    new CompositeCondition(purchase_condition, [left, right], result.operator as number))) :
+                new SimpleCondition(purchase_condition, result.operator as number, result.value))
+    }
+
+    private static purchaseTypesAreEqual(p1: Purchase_Type[], p2: Purchase_Type[]) {
+        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => JSON.stringify(p1) == JSON.stringify(p2)))
+    }
+
+    private static purchasePoliciesAreEqual(p1: PurchaseCondition[], p2: PurchaseCondition[]) {
+        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => JSON.stringify(p1) == JSON.stringify(p2)));
     }
 
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
@@ -248,7 +287,6 @@ export class ShopInventoryImpl implements ShopInventory {
             logger.Error(result)
             return result
         }
-        // item.addDiscountType(discount_type) //TODO
         this._products = this._products.concat([item]);
         return true;
     }
@@ -258,17 +296,17 @@ export class ShopInventoryImpl implements ShopInventory {
         const passed_filter = (f: Filter) => (product: Product) => {
             return (f.filter_type == Filter_Type.AbovePrice) ? product.price >= Number(f.filter_value) :
                 (f.filter_type == Filter_Type.BelowPrice) ? product.price <= Number(f.filter_value) :
-                    // ((f.filter_type == Filter_Type.Rating) ? true :   // add rating to product
-                    (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
-                        //can add more
-                        false;
+                    (f.filter_type == Filter_Type.Rating) ? product.rating.get_rating() == Number(f.filter_value) :
+                        (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
+                            //can add more
+                            false;
         }
         return (filters.length == 0) ? products :
             this.filter(products.filter(passed_filter(filters[0])), filters.slice(1));
     }
 
-    getAllItems(): Product[] {
-        return this.products.filter(p => p.amount > 0);
+    getAllItems(all?: boolean): Product[] {
+        return (all) ? this.products : this.products.filter(p => p.amount > 0);
     }
 
     getShopHistory(): string[] {
@@ -280,15 +318,6 @@ export class ShopInventoryImpl implements ShopInventory {
         return result.map(p => p.toString());
     }
 
-    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
-        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
-        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
-            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
-            return `Purchase policy doesn't allow this purchase`
-        }
-        return true
-    }
-
     purchaseItems(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
         let result = this.evaluatePurchaseItem(products, minimal_user_data)
         if (typeof result == "string") return result
@@ -297,12 +326,10 @@ export class ShopInventoryImpl implements ShopInventory {
             if (typeof product == "string") {
                 logger.Error(`Failed to purchase as ${p.product_id} was not found`)
                 result = `Product ${p.product_id} was not found`
-            }
-            else if (product.amount < 1) {
+            } else if (product.amount < 1) {
                 logger.Error(`Failed to purchase as ${p.product_id} has an amount lower than 1`)
                 result = `Product ${p.product_id} has an amount lower than 1`
-            }
-            else if (product.amount < p.amount) {
+            } else if (product.amount < p.amount) {
                 logger.Error(`Failed to purchase as ${p.product_id} has ${product.amount} units but requires ${p.amount}`)
                 result = `Product ${p.product_id} doesn't have enough in stock for this purchase`
             }
@@ -370,6 +397,12 @@ export class ShopInventoryImpl implements ShopInventory {
         })
     }
 
+    displayItems(): string {
+        return JSON.stringify(
+            this.products.filter(p => p.amount > 0).map(p => p.toString()),
+        )
+    }
+
     toString(): string {
         return JSON.stringify({
             shop_id: this.shop_id,
@@ -381,31 +414,10 @@ export class ShopInventoryImpl implements ShopInventory {
             discount_policies: this.discount_policies,
             purchase_policies: this.purchase_policies
         })
-        // this._shop_id = shop_id;
-        // this._shop_management = shop_management;
-        // this._discount_types = [];
-        // this._purchase_types = [Purchase_Type.Immediate];
-        // this._products = [];
-        // this._bank_info = bank_info;
-        // this._shop_name = shop_name;
-        // this._purchase_history = UserPurchaseHistoryImpl.getInstance();
-        // this._discount_policies = new DiscountHandler();
-        // this._purchase_policies = Array<PurchaseCondition>();
-        //
-        // return JSON.stringify(this.products.filter(p => p.amount > 0).map(p => p.toString()))
-        // return this.products.reduce(function(acc, cur) {
-        //     return acc.concat(cur.amount != 0 ? cur.toString().concat("\n") : "")}, "")
     }
 
-    logOrder(order: Purchase): void {
-        //still maintained in order to support further logic expansion.
-        //for now, it shall stay unimplemented
-        return
-    }
-
-    calculatePrice(products: ReadonlyArray<ProductPurchase | Product>, user_data: MinimalUserData): number {
-        return products.reduce((acc, cur) =>
-            acc + (cur.amount * cur.price * (1 - this.discount_policies.evaluateDiscount(cur, cur.amount))), 0)
+    calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number {
+        return this.discount_policies.calculatePrice(products, user_data)
     }
 
     addDiscount(discount: Discount): void {
@@ -429,31 +441,6 @@ export class ShopInventoryImpl implements ShopInventory {
         return JSON.stringify(
             this.purchase_policies.map(p => p.toString())
         );
-    }
-
-    addPurchasePolicy(condition: PurchaseCondition): void {
-        this._purchase_policies = this.purchase_policies.concat([condition])
-    }
-
-    removePurchasePolicy(id: number): boolean {
-        const length = this._purchase_policies.length
-        this._purchase_policies = this._purchase_policies.filter(p => p.id != id);
-        return length != this._purchase_policies.length
-    }
-
-    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
-        if (this._purchase_policies.every(p => p.id != id1) ||
-            this._purchase_policies.every(p => p.id != id2)) {
-            logger.Error(`Policies not found`)
-            return "Policies not found"
-        }
-        const new_policy = new CompositeCondition([
-            this._purchase_policies.find(p => p.id == id1) as PurchaseCondition,
-            this._purchase_policies.find(p => p.id == id2) as PurchaseCondition
-        ], operator)
-        this._purchase_policies = this._purchase_policies.filter(p => p.id == id1 || p.id == id2)
-        this._purchase_policies = this._purchase_policies.concat([new_policy])
-        return true
     }
 
     //temp
@@ -488,6 +475,31 @@ export class ShopInventoryImpl implements ShopInventory {
     //  */
     // addDiscountType(discountType: DiscountType): string | boolean
 
+    addPurchasePolicy(condition: PurchaseCondition): void {
+        this._purchase_policies = this.purchase_policies.concat([condition])
+    }
+
+    removePurchasePolicy(id: number): boolean {
+        const length = this._purchase_policies.length
+        this._purchase_policies = this._purchase_policies.filter(p => p.id != id);
+        return length != this._purchase_policies.length
+    }
+
+    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
+        if (this._purchase_policies.every(p => p.id != id1) ||
+            this._purchase_policies.every(p => p.id != id2)) {
+            logger.Error(`Policies not found`)
+            return "Policies not found"
+        }
+        const new_policy = CompositeCondition.create([
+            this._purchase_policies.find(p => p.id == id1) as PurchaseCondition,
+            this._purchase_policies.find(p => p.id == id2) as PurchaseCondition
+        ], operator)
+        this._purchase_policies = this._purchase_policies.filter(p => p.id == id1 || p.id == id2)
+        this._purchase_policies = this._purchase_policies.concat([new_policy])
+        return true
+    }
+
     addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string) {
         const result = this.discount_policies.addConditionToDiscount(discount_id, condition, condition_param)
         if (!result) {
@@ -517,9 +529,45 @@ export class ShopInventoryImpl implements ShopInventory {
 
     notifyOwners(order: Purchase): void {
         this._shop_management.notifyOwners(`New successful order:\n` +
-        `Order number: ${order.order_id}\n` +
-        `Items: ${order.products.reduce(
-            (acc, cur) => acc + "\n" + cur.name, ""
-        )}`)
+            `Order number: ${order.order_id}\n` +
+            `Items: ${order.products.reduce(
+                (acc, cur) => acc + "\n" + cur.name, ""
+            )}`)
+    }
+
+    rateProduct(product_id: number, rating: number, rater: string): void {
+        const product = this._products.find(p => product_id == p.product_id)
+        if (product == undefined) return
+        product.rate(rating, rater)
+    }
+
+    alreadyRated(product_id: number, user_email: string): Boolean {
+        const product = this._products.find(p => product_id == p.product_id)
+        if (product == undefined) return true
+        return product.alreadyRated(user_email)
+    }
+
+    hasPurchased(user_id: number, product_id: number): Boolean {
+        return (this.purchase_history.getShopPurchases(this.shop_id) as Purchase[]).some(
+            purchase => purchase.products.some(product => product.product_id == product_id) && purchase.minimal_user_data.userId == user_id)
+    }
+
+    //export type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
+    addInventoryFromDB(inventory: ShopRich): void {
+        this._products = inventory.products.map(p => ProductImpl.createFromDB(p))
+        this._purchase_types = (inventory.purchase_types) ? inventory.purchase_types : [Purchase_Type.Immediate]
+        this.discount_policies.addDiscountsFromDB(inventory.discounts)
+        inventory.purchase_types.map(condition => ShopInventoryImpl.createPurchasePoliciesFromDB(condition)).forEach(result => {
+            result.then(result => this._purchase_policies = this._purchase_policies.concat([result]))
+        })
+    }
+
+    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
+        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
+        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
+            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
+            return `Purchase policy doesn't allow this purchase`
+        }
+        return true
     }
 }

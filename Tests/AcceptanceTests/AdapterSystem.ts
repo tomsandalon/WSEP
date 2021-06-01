@@ -1,10 +1,17 @@
-import {SearchTypes, System} from "../../Logic/Domain/System";
+import {SearchTypes} from "../../Logic/Domain/System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 // import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
-import * as Tests from "./System";
+import {TestNotAssociatedWithImplementation} from "./System";
 import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
+import * as Tests from "./System"
+import {System} from "../../Logic/Domain/System";
+import {Condition} from "../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
+import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
+import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
+import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
+import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 
-export class AdapterSystem implements Tests.System{
+export class AdapterSystem implements System {
     private system: System;
     public constructor(system: System) {
         this.system = system
@@ -22,7 +29,7 @@ export class AdapterSystem implements Tests.System{
         return this.system.addPermissions(user_id, shop_id, target_email, action)
     }
 
-    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type: Purchase_Type): boolean | string {
+    addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
         return this.system.addProduct(user_id, shop_id, name, description, amount, categories, base_price, purchase_type)
     }
 
@@ -78,8 +85,8 @@ export class AdapterSystem implements Tests.System{
         return this.system.getItemsFromShop(shop_id)
     }
 
-    logout(user_email: string): number {
-        return this.system.logout(user_email)
+    logout(user_id: number): string | boolean { //what happens where?
+        return this.system.logout(user_id)
     }
 
     openSession(): number {
@@ -98,12 +105,12 @@ export class AdapterSystem implements Tests.System{
         return this.system.performRegister(user_email, password)
     }
 
-    purchaseCart(user_id: number, payment_info: string): string | boolean {
-        return this.system.purchaseCart(user_id, payment_info)
+    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+        return await this.system.purchaseCart(user_id, payment_info)
     }
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): string | boolean {
-        return this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+        return await this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string {
@@ -132,5 +139,97 @@ export class AdapterSystem implements Tests.System{
 
     spellCheck(input : string) :string | string[]{
         return ''
+    }
+
+    isAdmin(user_id: number): string | boolean {
+        return this.system.isAdmin(user_id);
+    }
+
+    isManager(user_id: number): string | boolean {
+        return this.system.isManager(user_id);
+    }
+
+    isOwner(user_id: number): string | boolean {
+        return this.system.isOwner(user_id);
+    }
+
+    addConditionToDiscount(user_id: number, shop_id: number, id: number, condition: Condition, condition_param: string): string | boolean {
+        return this.system.addConditionToDiscount(user_id, shop_id, id, condition, condition_param)
+    }
+
+    addDiscount(user_id: number, shop_id: number, value: number): string | boolean {
+        return this.system.addDiscount(user_id, shop_id, value)
+    }
+
+    addLogicComposeDiscount(user_id: number, shop_id: number, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean {
+        return this.system.addLogicComposeDiscount(user_id, shop_id, operation, d_id1, d_id2)
+    }
+
+    addNumericComposeDiscount(user_id: number, shop_id: number, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean {
+        return this.system.addNumericComposeDiscount(user_id, shop_id, operation, d_id1, d_id2)
+    }
+
+    addPurchasePolicy(user_id: number, shop_id: number, condition: ConditionType, value: string): string[] | string {
+        return this.system.addPurchasePolicy(user_id, shop_id, condition, value)
+    }
+
+    composePurchasePolicy(user_id: number, shop_id: number, policy_id1: number, policy_id2: number, operator: Operator): boolean | string {
+        return this.system.composePurchasePolicy(user_id, shop_id, policy_id1, policy_id2, operator)
+    }
+
+    getAllCategories(user_id: number): string | string[] {
+        return this.system.getAllCategories(user_id)
+    }
+
+    getAllDiscounts(user_id: number, shop_id: number): string | string[] {
+        return this.system.getAllDiscounts(user_id, shop_id)
+    }
+
+    getAllPurchasePolicies(user_id: number, shop_id: number): string | string[] {
+        return this.system.getAllPurchasePolicies(user_id, shop_id)
+    }
+
+    getAllShops(user_id: number): string | string[] {
+        return this.system.getAllShops(user_id)
+    }
+
+    getAllUsers(user_id: number): string | string[] {
+        return this.system.getAllUsers(user_id)
+    }
+
+    getManagingShops(user_id: number): string | string[] {
+        return this.system.getManagingShops(user_id)
+    }
+
+    getPermissions(user_id: number, shop_id: number): string | string[] {
+        return this.system.getPermissions(user_id, shop_id)
+    }
+
+    isLoggedIn(user_id: number): string | boolean {
+        return this.system.isLoggedIn(user_id)
+    }
+
+    removeDiscount(user_id: number, shop_id: number, id: number): string | boolean {
+        return this.system.removeDiscount(user_id, shop_id, id)
+    }
+
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
+        return this.system.removeOwner(user_id, shop_id, target)
+    }
+
+    removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
+        return this.system.removePurchasePolicy(user_id, shop_id, policy_id)
+    }
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean {
+        return this.system.rateProduct(user_id, shop_id, product_id, rating);
+    }
+
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        return this.system.removePermission(user_id, shop_id, target_email, action);
+    }
+
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        return this.system.getUserEmailFromUserId(user_id);
     }
 }

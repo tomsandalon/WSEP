@@ -9,6 +9,29 @@ export enum Action {
     EditPolicies,
 }
 
+export const permission_to_numbers = (p: Permissions): number[] => {
+    let ret: number[] = []
+    if (p.add_item) ret.push(Action.AddItem)
+    if (p.manage_policies) ret.push(Action.ManagePolicies)
+    if (p.remove_item) ret.push(Action.RemoveItem)
+    if (p.view_shop_history) ret.push(Action.ViewShopHistory)
+    if (p.get_staff_info) ret.push(Action.GetStaffInfo)
+    if (p.edit_policies) ret.push(Action.EditPolicies)
+    return ret
+}
+
+export const numbers_to_permission = (n: number[]): boolean[] => {
+    let ret: boolean[] = []
+    ret[Action.AddItem] = false
+    ret[Action.ManagePolicies] = false
+    ret[Action.RemoveItem] = false
+    ret[Action.EditPolicies] = false
+    ret[Action.GetStaffInfo] = false
+    ret[Action.ViewShopHistory] = false
+    n.forEach(num => ret[num] = true)
+    return ret
+}
+
 export interface Permissions {
     add_item: boolean,
     manage_policies: boolean,
@@ -32,9 +55,6 @@ export interface Permissions {
 
 // noinspection RedundantConditionalExpressionJS
 export class ManagerPermissions implements Permissions {
-    get edit_policies(): boolean {
-        return this._edit_policies;
-    }
     /**
      * Get staff info:
      * @Requirement 4.5
@@ -81,10 +101,6 @@ export class ManagerPermissions implements Permissions {
 
     private _manage_policies: boolean;
 
-    set edit_policies(value: boolean) {
-        this._edit_policies = value;
-    }
-
     get manage_policies(): boolean {
         return this._manage_policies;
     }
@@ -113,6 +129,16 @@ export class ManagerPermissions implements Permissions {
         this._view_shop_history = value;
     }
 
+    private _edit_policies: boolean;
+
+    get edit_policies(): boolean {
+        return this._edit_policies;
+    }
+
+    set edit_policies(value: boolean) {
+        this._edit_policies = value;
+    }
+
     isAllowed(action: Action): boolean {
         return action == Action.AddItem ? this.add_item :
             action == Action.ViewShopHistory ? this.view_shop_history :
@@ -136,6 +162,4 @@ export class ManagerPermissions implements Permissions {
                             action == Action.EditPolicies ? this.edit_policies = value :
                                 null
     }
-
-    private _edit_policies: boolean;
 }
