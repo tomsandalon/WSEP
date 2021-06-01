@@ -318,9 +318,6 @@ export class ShopManagementImpl implements ShopManagement {
             managers: this.managers,
             owners: this.owners
         })
-        // return `Original owner: ${this.original_owner.user_email}\t` +
-        //     `Owners: ${this.owners.reduce((acc, curr) => acc + ", " + curr.user_email, "")}\t` +
-        //     `Managers: ${this.managers.reduce((acc, curr) => acc + ", " + curr.user_email, "")}`
     }
 
     isOwner(user_email: string) {

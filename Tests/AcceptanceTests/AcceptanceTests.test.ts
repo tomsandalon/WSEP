@@ -837,6 +837,7 @@ describe('Acceptance Tests:', () => {
             .then(purchase => {
                 expect(typeof purchase == "boolean").to.be.true
                 let admin = system.performLogin("admin@gmail.com", "admin") as number
+                let admin = system.performLogin("admin@gmail.com", "admin") as number
                 it('Happy', () => {
                     let result = system.adminDisplayShopHistory(admin, shopID) as string[]
                     expect(result.length).to.be.eq(1)
