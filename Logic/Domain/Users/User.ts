@@ -183,7 +183,7 @@ export class UserImpl implements User {
                 success.push(index)
             }
         });
-        this._cart = this._cart.filter((_, index) => index in success);
+        this._cart = this._cart.filter((_, index) => !(index in success));
         return errors.length > 0 ? errors : true;
     }
 
