@@ -257,17 +257,7 @@ export class ProxySystem implements System{
         return this.system.removeManager(user_id, shop_id, target);
     }
 
-    //mock
-    spellCheck(input : string ): string | string[]{
-        if (input.includes('CRASH'))
-            return "spell checker service has been crashed";
-        else if (input.includes('FAEEEL'))
-            return ['404'];
-        else if (input.includes('FAIEL')){
-            return ['FAIL'];
-        }
-        return 'panic: spell checker';
-    }
+
 
     getAllCategories(user_id: number): string | string[] {
         if(this.system == undefined){
@@ -407,5 +397,25 @@ export class ProxySystem implements System{
             return TestNotAssociatedWithImplementation
         }
         return this.system.getUserEmailFromUserId(user_id)
+    }
+
+    //mock
+    spellCheck(input : string ): string | string[]{
+        if (input.includes('CRASH'))
+            return "spell checker service has been crashed";
+        else if (input.includes('FAEEEL'))
+            return ['404'];
+        else if (input.includes('FAIEL')){
+            return ['FAIL'];
+        }
+        return 'panic: spell checker';
+    }
+
+    //mock
+    deliverItem(product_id : number, amount: number, shop_id: number, to: string ,transaction_id : boolean | string): boolean {
+        if (product_id < 0 || amount < 0 || shop_id < 0 || to.includes("Drop table") || (typeof transaction_id == 'string') )
+            return false;
+        else
+            return true;
     }
 }

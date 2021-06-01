@@ -1,25 +1,16 @@
-import 'mocha';
-import {assert, expect} from 'chai';
-import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
+import {expect} from "chai";
 import {ShopImpl} from "../../../Logic/Domain/Shop/Shop";
 import {User, UserImpl} from "../../../Logic/Domain/Users/User";
 import {id_counter, ShopInventory} from "../../../Logic/Domain/Shop/ShopInventory";
 import {describe} from "mocha";
-import {ConditionType, SimpleCondition} from "../../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
+import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 import {SimpleDiscount} from "../../../Logic/Domain/Shop/DiscountPolicy/SimpleDiscount";
-import {Condition} from "../../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
 import {DiscountHandler} from "../../../Logic/Domain/Shop/DiscountPolicy/DiscountHandler";
+import {Condition} from "../../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "../../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
+import {ConditionType, SimpleCondition} from "../../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 
-
-const createProduct = () => {
-    const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");
-    if(typeof temp === "string"){
-        assert.fail("Failed to created product")
-    }
-    return temp
-};
 
 const getNewItem = (shop: ShopInventory): number => shop.products.reduce((acc, product) => Math.max(product.product_id, acc), -1);
 
@@ -78,7 +69,7 @@ describe('Buy product by policies', () => {
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 50);
         user.purchaseBasket(shop.shop_id,"1234-Israel-Israeli")
             .then(_ => expect((user.getOrderHistory() as string[])[0]).to.include(1000*50))
-   }); })
+    }); })
 describe("Purchase test", () => {
     it('purchase positive amount and more than stock', () => {
         const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");

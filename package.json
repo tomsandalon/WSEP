@@ -6,7 +6,8 @@
   "module": "CommonJS",
   "scripts": {
     "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*",
-    "dev-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/*/*",
+    "unit-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Unit/*/*",
+    "integ-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Integration/*",
     "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/*/*/*",
     "server": "nodemon Logic/Communication/Server.ts",
     "client": "ts-node Logic/Communication/Client.ts",

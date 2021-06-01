@@ -119,7 +119,6 @@ describe('Acceptance Tests:', () => {
         system.addProduct(originOwner, shopID2,"TV2", "Best desc", 2202, ["monitors"],222)
         system.addProduct(originOwner, shopID3,"TV3", "Best desc", 3303, ["monitors"],333)
 
-        console.log(system.getAllCategories(originOwner))
         // expect(system.searchItemFromShops(SearchTypes.name, "TV1").length == 1 &&
         //     system.searchItemFromShops(SearchTypes.name, "TV1")[0].includes("TV1")).to.be.true
         // expect(system.searchItemFromShops(SearchTypes.category, "monitors").length == 2 &&
@@ -852,6 +851,7 @@ describe('Acceptance Tests:', () => {
                 });
             })
     });
+
     describe('Services:Payment Handler', () => {
         const system: System = SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -876,6 +876,63 @@ describe('Acceptance Tests:', () => {
         it('Bad: service crash', () => {
             let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK CRASH server is down")
             expect(typeof purchase == 'string').to.be.true;
+        });
+    });
+
+    describe('Services:Spell Checker', () => {
+        const system: System = SystemDriver.getSystem(true);
+
+        it('Happy', () => {
+            //TODO milestone 2
+            let res = system.spellCheck('FAIEL');
+            if (typeof res !== 'string')
+                expect(res[0]).eq('FAIL')
+            else
+                assert.fail();
+        });
+        it('Sad: input include a word not in english', () => {
+            let res = system.spellCheck('FAEEEL');
+            if (typeof res !== 'string')
+                expect(res[0]).eq('404')
+            else
+                assert.fail();
+        });
+        it('Bad: service crash', () => {
+            let res = system.spellCheck('CRASH')
+            expect(typeof res == 'string').to.be.true
+        });
+    });
+
+    describe('Services: delivery', () => {
+        const system: System = SystemDriver.getSystem(true);
+
+        it('Happy', () => {
+            let delivery = system.deliverItem(0,50, 0, "Beer Sheva Arlozorov 54",true);
+            expect(delivery).to.be.true;
+        });
+
+        it('Sad: negative amount', () => {
+            let delivery = system.deliverItem(0,-50, 0, "Beer Sheva Arlozorov 26",true);
+            expect(delivery).to.be.false;
+        });
+
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        system.performRegister("newUser@test.com", "TESTER");
+        let user = system.performLogin("newUser@test.com", "TESTER") as number
+        system.addItemToBasket(user, 0, shopID, 500)
+
+        it('Sad: purchase failed product not delivered.', () => {
+            let transaction = system.purchaseShoppingBasket(-150, 152, "MOCK");
+            let delivery = system.deliverItem( 0,50, 0, "Beer Sheva Arlozorov 54", transaction);
+            expect(delivery).to.be.false;
+        });
+
+        it('Bad: injection', () => {
+            let delivery = system.deliverItem(0,50, 0, "Drop table",true);
+            expect(delivery).to.be.false;
         });
     });
 });

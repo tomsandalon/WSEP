@@ -166,6 +166,7 @@ export interface System {
 
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
+
 }
 
 export class SystemImpl implements System {
