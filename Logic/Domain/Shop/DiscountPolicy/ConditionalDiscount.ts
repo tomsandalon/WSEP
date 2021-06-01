@@ -1,5 +1,3 @@
-import {CompositeDiscount} from "./CompositeDiscount";
-import {Product} from "../../ProductHandling/Product";
 import {Discount} from "./Discount";
 import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 import {DiscountHandler} from "./DiscountHandler";
@@ -48,6 +46,7 @@ export class ConditionalDiscount implements Discount {
         }
         return shouldApply ? this.discount.evaluate(product, amount) : 0
     }
+
     toString(): string {
         return JSON.stringify(this)
     }

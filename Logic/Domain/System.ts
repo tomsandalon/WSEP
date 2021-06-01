@@ -43,7 +43,8 @@ import {
     GetShopsInventory,
     GetShopsManagement,
     GetShopsRaw,
-    GetUsers
+    GetUsers,
+    User
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
 
@@ -215,16 +216,16 @@ export class SystemImpl implements System {
     }
 
     static async rollback() {
-         await GetUsers().then(users => {
-             this.deleteData();
-             this.reloadShop(users);
-             this.reloadShopPersonnel(users);
-             this.reloadItems();
-             this.reloadPurchases();
-             this.reloadUsers(users);
-             this.reloadNotifications();
-             this.terminateAllConnections();
-         }
+        await GetUsers().then(users => {
+                this.deleteData();
+                this.reloadShop(users);
+                this.reloadShopPersonnel(users);
+                this.reloadItems();
+                this.reloadPurchases();
+                this.reloadUsers(users);
+                this.reloadNotifications();
+                this.terminateAllConnections();
+            }
         )
     }
 
@@ -239,6 +240,72 @@ export class SystemImpl implements System {
         ProductImpl.resetIDs()
         PurchaseImpl.resetIDs()
         NotificationAdapter.getInstance(true)
+    }
+
+    private static reloadUsers(users: User[]) {
+        users.forEach(entry => {
+            LoginImpl.getInstance().reloadUser(entry)
+        })
+    }
+
+    private static reloadShop(users) {
+        GetShopsRaw().then(result =>
+            result.forEach(entry => {
+                SystemImpl.getInstance().addShopFromDB(entry, users)
+            }))
+    }
+
+    private static getEmailFromIDFromList(users, target_id) {
+        return users.find(u => u.user_id == target_id).email as string
+    }
+
+    private static reloadShopPersonnel(users: User[]) {
+        GetShopsManagement().then(result => {
+            result.map(s => {
+                return {
+                    shop_id: s.shop_id,
+                    owners: s.owners.map(o => {
+                        return {
+                            owner_email: this.getEmailFromIDFromList(users, o.owner_id),
+                            appointer_email: this.getEmailFromIDFromList(users, o.appointer_id)
+                        }
+                    }),
+                    managers: s.managers.map(m => {
+                        return {
+                            manager_email: this.getEmailFromIDFromList(users, m.manager_id),
+                            appointer_id: this.getEmailFromIDFromList(users, m.appointer_id),
+                            permissions: m.permissions
+                        }
+                    })
+                }
+            }).forEach(entry => {
+                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == entry.shop_id) as ShopImpl
+                shop.addManagement(entry.owners, entry.managers)
+            })
+        })
+    }
+
+    private static reloadNotifications() {
+        GetNotifications().then(result => {
+            PublisherImpl.getInstance().addNotificationsFromDB(result)
+        })
+    }
+
+    private static reloadItems() {
+        GetShopsInventory().then(inventory => {
+            inventory.forEach(i => {
+                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl
+                shop.addInventoryFromDB(i)
+            })
+        })
+    }
+
+    private static reloadPurchases() {
+        GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases))
+    }
+
+    private static terminateAllConnections() {
+        //TODO with mark
     }
 
     adminDisplayShopHistory(admin_id: number, shop_id: number): string | string[] {
@@ -477,7 +544,7 @@ export class SystemImpl implements System {
             user_id: user_id,
             email: user_email,
             password: hashed_pass,
-            age: age ? age : -1,
+            age: age ? age : -1
         }).then(r => {
             if (!r) SystemImpl.rollback()
         })
@@ -591,7 +658,7 @@ export class SystemImpl implements System {
         return ret
     }
 
-    editProduct(user_id: number, shop_id: number, product_id: number, action : Item_Action, value: string): string | boolean {
+    editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
@@ -784,8 +851,8 @@ export class SystemImpl implements System {
                 .concat(my_shops_as_owner)
                 .map(
                     shop => {
-                        shop_id: shop.shop_id
-                        name: shop.name
+                        shop.shop_id
+                        shop.name
                     }))
     }
 
@@ -810,12 +877,25 @@ export class SystemImpl implements System {
         return this.shops.some(shop => shop.isOwner(user.user_email))
     }
 
+    getShopInventoryFromID(shop_id: number) {
+        return (this.shops.find(s => s.shop_id == shop_id) as ShopImpl).inventory
+    }
+
     getPermissions(user_id: number, shop_id: number): string | string[] {
         const result = this.getShopAndUser(user_id, shop_id)
         if (typeof result == "string") return result
         const {shop, user_email} = result
         return shop.getPermissions(user_email)
     }
+
+    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+    //     const result = this.getShopAndUser(user_id, shop_id)
+    //     if (typeof result == "string") return result
+    //     const {shop, user_email} = result
+    //     const user = this._login.retrieveUser(user_id);
+    //     if (typeof user == "string")
+    //         return user
+    // }
 
     getManagingShops(user_id: number): string | string[] {
         const user = this._login.retrieveUser(user_id);
@@ -889,29 +969,6 @@ export class SystemImpl implements System {
         return {shop, user_email}
     }
 
-    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
-    //     const result = this.getShopAndUser(user_id, shop_id)
-    //     if (typeof result == "string") return result
-    //     const {shop, user_email} = result
-    //     const user = this._login.retrieveUser(user_id);
-    //     if (typeof user == "string")
-    //         return user
-    // }
-
-    private static reloadUsers(users) {
-        //update login
-        users.forEach(entry => {
-            LoginImpl.getInstance().reloadUser(entry)
-        })
-    }
-
-    private static reloadShop(users) {
-        GetShopsRaw().then(result =>
-            result.forEach(entry => {
-                SystemImpl.getInstance().addShopFromDB(entry, users)
-            }))
-    }
-
     private addShopFromDB(entry, users) {
         const newEntry = entry.map(e => {
             return {
@@ -925,56 +982,5 @@ export class SystemImpl implements System {
             }
         })
         this.shops.push(ShopImpl.createFromDB(newEntry))
-    }
-
-    private static getEmailFromIDFromList(users, target_id) {
-        return users.find(u => u.user_id == target_id).email as string
-    }
-
-    private static reloadShopPersonnel(users) {
-        GetShopsManagement().then(result => {
-            result.map(s => {
-                return {
-                    shop_id: s.shop_id,
-                    owners: s.owners.map(o => {
-                        return {
-                            owner_email: this.getEmailFromIDFromList(users, o.owner_id),
-                            appointer_email: this.getEmailFromIDFromList(users, o.appointer_id)
-                        }
-                    }),
-                    managers: s.managers.map(m => { return {
-                        manager_email: this.getEmailFromIDFromList(users, m.manager_id),
-                        appointer_id: this.getEmailFromIDFromList(users, m.appointer_id),
-                        permissions: m.permissions
-                    }})
-                }
-            }).forEach(entry => {
-                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == entry.shop_id) as ShopImpl
-                shop.addManagement(entry.owners, entry.managers)
-            })
-        })
-    }
-
-    private static reloadNotifications() {
-        GetNotifications().then(result => {
-            PublisherImpl.getInstance().addNotificationsFromDB(result)
-        })
-    }
-
-    private static reloadItems() {
-       GetShopsInventory().then(inventory => {
-           inventory.forEach(i => {
-               const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl
-               shop.addInventoryFromDB(i)
-           })
-       })
-    }
-
-    private static reloadPurchases() {
-        GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases))
-    }
-
-    private static terminateAllConnections() {
-        //TODO with mark
     }
 }

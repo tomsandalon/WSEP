@@ -21,7 +21,7 @@ export const permission_to_numbers = (p: Permissions): number[] => {
 }
 
 export const numbers_to_permission = (n: number[]): boolean[] => {
-    let ret:boolean[] = []
+    let ret: boolean[] = []
     ret[Action.AddItem] = false
     ret[Action.ManagePolicies] = false
     ret[Action.RemoveItem] = false
@@ -55,9 +55,6 @@ export interface Permissions {
 
 // noinspection RedundantConditionalExpressionJS
 export class ManagerPermissions implements Permissions {
-    get edit_policies(): boolean {
-        return this._edit_policies;
-    }
     /**
      * Get staff info:
      * @Requirement 4.5
@@ -104,10 +101,6 @@ export class ManagerPermissions implements Permissions {
 
     private _manage_policies: boolean;
 
-    set edit_policies(value: boolean) {
-        this._edit_policies = value;
-    }
-
     get manage_policies(): boolean {
         return this._manage_policies;
     }
@@ -136,6 +129,16 @@ export class ManagerPermissions implements Permissions {
         this._view_shop_history = value;
     }
 
+    private _edit_policies: boolean;
+
+    get edit_policies(): boolean {
+        return this._edit_policies;
+    }
+
+    set edit_policies(value: boolean) {
+        this._edit_policies = value;
+    }
+
     isAllowed(action: Action): boolean {
         return action == Action.AddItem ? this.add_item :
             action == Action.ViewShopHistory ? this.view_shop_history :
@@ -159,6 +162,4 @@ export class ManagerPermissions implements Permissions {
                             action == Action.EditPolicies ? this.edit_policies = value :
                                 null
     }
-
-    private _edit_policies: boolean;
 }

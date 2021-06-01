@@ -11,7 +11,6 @@ import {Operator} from "./PurchasePolicy/CompositeCondition";
 import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
-import {ManagerImpl} from "../ShopPersonnel/Manager";
 // import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
 import {ShopRich} from "../../DataAccess/Getters"
 
@@ -214,20 +213,8 @@ export class ShopImpl implements Shop {
     private readonly _inventory: ShopInventory;
     private readonly _shop_id: number;
     private readonly _management: ShopManagement;
-
     private readonly _is_active: boolean;
-    static resetIDs = () => {
-        id_counter = 0
-        DiscountHandler.discountCounter = 0
-    }
 
-    // static check(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
-    //     if (bank_info.length == 0) return "Bank info can't be empty"
-    //     if (location.length == 0) return "Location can't be empty"
-    //     if (name.length == 0) return "Name can't be empty"
-    //     return ShopImpl.create(user_email, bank_info, description, location, name)
-    // }
-    
     /**
      * @Requirement 3.2
      * @param shop_id
@@ -249,29 +236,12 @@ export class ShopImpl implements Shop {
         this._inventory = inventory
         this._is_active = is_active;
     }
-    
-    static create(user_email: string, bank_info: string, description: string, location: string, name: string) {
-        // const result = this.check(user_email, bank_info, description, location, name)
-        // if (typeof  result == "string") return result
-        let _shop_id = generateId();
-        let _bank_info = bank_info;
-        let _description = description;
-        let _location = location;
-        let _name = name;
-        let _management = new ShopManagementImpl(_shop_id, user_email)
-        let _inventory = new ShopInventoryImpl(_shop_id, _management, name, bank_info)
-        _management.shop_inventory = _inventory;
-        let _is_active = true;
-        return new ShopImpl(_shop_id, _bank_info, _description, _location, _name, _management, _inventory, _is_active)
-    }
-
-    displayItems(): string {
-        return JSON.stringify({
-            shopID: this.shop_id,
-            name: this.name,
-            products: this.inventory.displayItems(),
-        })
-    }
+    // static check(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
+    //     if (bank_info.length == 0) return "Bank info can't be empty"
+    //     if (location.length == 0) return "Location can't be empty"
+    //     if (name.length == 0) return "Name can't be empty"
+    //     return ShopImpl.create(user_email, bank_info, description, location, name)
+    // }
 
     private _bank_info: string;
 
@@ -327,6 +297,51 @@ export class ShopImpl implements Shop {
 
     get is_active(): boolean {
         return this._is_active;
+    }
+
+    static resetIDs = () => {
+        id_counter = 0
+        DiscountHandler.discountCounter = 0
+    }
+
+    static create(user_email: string, bank_info: string, description: string, location: string, name: string) {
+        // const result = this.check(user_email, bank_info, description, location, name)
+        // if (typeof  result == "string") return result
+        let _shop_id = generateId();
+        let _bank_info = bank_info;
+        let _description = description;
+        let _location = location;
+        let _name = name;
+        let _management = new ShopManagementImpl(_shop_id, user_email)
+        let _inventory = new ShopInventoryImpl(_shop_id, _management, name, bank_info)
+        _management.shop_inventory = _inventory;
+        let _is_active = true;
+        return new ShopImpl(_shop_id, _bank_info, _description, _location, _name, _management, _inventory, _is_active)
+    }
+
+    static createFromDB(entry) {
+        id_counter = Math.max(id_counter, entry.shop_id + 1)
+        let _management = new ShopManagementImpl(entry.shop_id, entry.user_email)
+        let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info)
+        return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active);
+    }
+
+    static shopsAreEquals(s1: Shop, s2: Shop) {
+        return s1.shop_id == s2.shop_id &&
+            s1.name == s2.name &&
+            s1.location == s2.location &&
+            s1.bank_info == s2.bank_info &&
+            s1.description == s2.description &&
+            ShopInventoryImpl.shopsAreEqual(s1.inventory, s2.inventory) &&
+            ShopManagementImpl.shopsAreEqual(s1.management, s2.management)
+    }
+
+    displayItems(): string {
+        return JSON.stringify({
+            shopID: this.shop_id,
+            name: this.name,
+            products: this.inventory.displayItems(),
+        })
     }
 
     addItem(user_email: string, name: string, description: string, amount: number, categories: string[], base_price: number,
@@ -691,13 +706,6 @@ export class ShopImpl implements Shop {
 
     getRealPermissions(user_email: string): Permissions {
         return this.management.getRealPermissions(user_email);
-    }
-
-    static createFromDB(entry) {
-        id_counter = Math.max(id_counter, entry. shop_id + 1)
-        let _management = new ShopManagementImpl(entry.shop_id, entry.user_email)
-        let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info)
-        return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active);
     }
 
     addManagement(owners, managers) {

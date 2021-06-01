@@ -12,6 +12,7 @@ export enum NumericOperation {
 export class NumericCompositionDiscount implements CompositeDiscount {
     operation: NumericOperation
     discounts: Discount[]
+    id: number;
 
     constructor(id: number, operation: NumericOperation, discounts: Discount[]) {
         this.id = id;
@@ -34,7 +35,6 @@ export class NumericCompositionDiscount implements CompositeDiscount {
         }
     }
 
-    id: number;
     toString(): string {
         return JSON.stringify(this)
     }
