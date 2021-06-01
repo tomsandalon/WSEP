@@ -3,12 +3,12 @@ import ManagerCell from "./ManagerCell";
 import useFetch from "../useFetch";
 
 const ManagersBlock = (props) => {
+  const managers = props.managers;
+  const isPending = props.isPending;
+  const error = props.error;
   const storeID = props.storeID;
-  const {
-    data: managers,
-    isPending,
-    error,
-  } = useFetch(`/user/shop/management?shop_id=${storeID}`);
+  const storeName = props.storeName;
+  const myEmail = props.myEmail;
 
   return (
     <div className="Card">
@@ -24,6 +24,9 @@ const ManagersBlock = (props) => {
                   id={parsedManager._user_email}
                   managerName={parsedManager._user_email}
                   key={parsedManager._user_email}
+                  storeID={storeID}
+                  storeName={storeName}
+                  isEditable={myEmail === parsedManager._appointer_user_email}
                 />
               );
             })}

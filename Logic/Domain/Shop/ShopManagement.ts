@@ -272,7 +272,7 @@ export class ShopManagementImpl implements ShopManagement {
         const ownerToRemove = this.getOwnerByEmail(target);
         if (!ownerToRemove) return false;
         if (ownerToRemove.appointer_email != user_email) return false;
-        // this._owners = this.owners.filter(m => m.user_email != target)
+        this._owners = this.owners.filter(m => m.user_email != target)
         NotificationAdapter.getInstance().notify(target,
             `You have been demoted by ${user_email}`)
         this.removeAllSubordinates(target, user_email)
@@ -311,9 +311,9 @@ export class ShopManagementImpl implements ShopManagement {
 
     private removeAllSubordinates(user_email: string, original: string) {
         this.managers.filter(m => m.appointer_user_email == user_email)
-            .forEach(m => this.removeManagerByRecursion(m.user_email, original))
+            .forEach(m => this.removeManagerByRecursion(original, m.user_email))
         this.owners.filter(o => o.appointer_email == user_email)
-            .forEach(o => this.removeOwnerByRecursion(o.user_email, original))
+            .forEach(o => this.removeOwnerByRecursion(original, o.user_email))
     }
 
     isOwner(user_email: string) {

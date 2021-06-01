@@ -1,14 +1,12 @@
 import React from "react";
 import OwnerCell from "./OwnerCell";
-import useFetch from "../useFetch";
 
 const OwnersBlock = (props) => {
+  const owners = props.owners;
+  const isPending = props.isPending;
+  const error = props.error;
+  const myEmail = props.myEmail;
   const storeID = props.storeID;
-  const {
-    data: owners,
-    isPending,
-    error,
-  } = useFetch(`/user/shop/management?shop_id=${storeID}`);
 
   return (
     <div className="table-responsive-material table-userdetail-mmin">
@@ -24,6 +22,8 @@ const OwnersBlock = (props) => {
                   id={parsedManager._user_email}
                   ownerName={parsedManager._user_email}
                   key={parsedManager._user_email}
+                  isEditable={myEmail === parsedManager._appointer_email}
+                  storeID = {storeID}
                 />
               );
             })}

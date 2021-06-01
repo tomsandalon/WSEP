@@ -19,6 +19,9 @@ import RoleSelection from "./components/RoleSelection";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import UserHistory from "./components/UserHistory/UserHistory";
 import AdminMenu from "./components/Admin/AdminMenu";
+import AddProduct from "./pages/Add_Product";
+import EditProduct from "./pages/Edit_Product";
+import EditPermissionsPre from "./pages/EditPermissionsPre";
 import Notifications from "./components/Notifications/Notifications";
 import Unatho from "./components/Unatho";
 import SocketIO from 'socket.io-client';
@@ -49,9 +52,12 @@ function App() {
           <Route path="/register" component={Register} />
           <ProtectedRoute role={"admin"} path="/admin-menu" component={AdminMenu} />
           <Route path="/unauthorized" component={Unatho}/>
-          <Route path="/addmanager/:storeID"><AddManager/></Route>
+          <Route path="/addmanager/:storeID/:managerOwner/:storeName"><AddManager/></Route>
           <Route path="/addstore"><AddStore/></Route>
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
+          <Route path="/addproduct/:storeID/:storeName"><AddProduct /></Route>
+          <Route path="/editproduct/:storeID/:storeName"><EditProduct /></Route>
+          <Route path="/editpermissionspre/:storeID/:storeName/:managerID"><EditPermissionsPre /></Route>
         </Switch>
       </div>
     </Router>
