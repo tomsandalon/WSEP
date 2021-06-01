@@ -495,6 +495,7 @@ export class SystemImpl implements System {
         if (typeof user == "string")
             return user
         if (!this._register.verifyUserEmail(user.user_email)) return "User is not registered"
+        if (name.length == 0) return "Name cannot be empty"
         const shop = ShopImpl.create(user.user_email, bank_info, description, location, name)
         if (typeof shop == "string") return shop
         this._shops = this._shops.concat(shop)

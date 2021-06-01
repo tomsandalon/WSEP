@@ -120,10 +120,10 @@ export class UserImpl implements User {
 
     static createFromEntry(entry: UserFromDB) {
         if (entry.user_id >= id_counter) id_counter = entry.user_id + 1
-        const ret = new UserImpl(entry.email, entry.password, false, UserPurchaseHistoryImpl.getInstance(), entry.user_id, false, entry.age != 0, []) //TODO replace false with is admin
-        entry.cart.forEach(cart => {
-            ret.addToBasket(SystemImpl.getInstance().getShopInventoryFromID(cart.shop_id), cart.product_id, cart.amount)
-        })
+        const ret = new UserImpl(entry.email, entry.password, entry.admin, UserPurchaseHistoryImpl.getInstance(), entry.user_id, false, entry.age != 0, []) =
+            entry.cart.forEach(cart => {
+                ret.addToBasket(SystemImpl.getInstance().getShopInventoryFromID(cart.shop_id), cart.product_id, cart.amount)
+            })
         return ret
     }
 
