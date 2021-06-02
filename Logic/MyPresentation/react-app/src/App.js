@@ -20,6 +20,7 @@ import {ProtectedRoute} from "./components/ProtectedRoute";
 import UserHistory from "./components/UserHistory/UserHistory";
 import AdminMenu from "./components/Admin/AdminMenu";
 import AddProduct from "./pages/Add_Product";
+import AddDiscount from "./pages/AddDiscount";
 import EditProduct from "./pages/Edit_Product";
 import EditPermissionsPre from "./pages/EditPermissionsPre";
 import Notifications from "./components/Notifications/Notifications";
@@ -56,6 +57,7 @@ function App() {
           <Route path="/addstore"><AddStore/></Route>
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
           <Route path="/addproduct/:storeID/:storeName"><AddProduct /></Route>
+          <Route path="/adddiscount/:storeID/:storeName"><AddDiscount /></Route>
           <Route path="/editproduct/:storeID/:storeName"><EditProduct /></Route>
           <Route path="/editpermissionspre/:storeID/:storeName/:managerID"><EditPermissionsPre /></Route>
         </Switch>
