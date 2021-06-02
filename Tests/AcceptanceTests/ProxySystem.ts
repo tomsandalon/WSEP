@@ -17,6 +17,13 @@ export class ProxySystem implements System{
         this.system = system;
     }
 
+    init(): Promise<void> {
+        if(this.system == undefined){
+            return Promise.resolve(undefined);
+        }
+        return this.system.init();
+    }
+
     isAdmin(user_id: number): string | boolean {
         if(this.system == undefined){
             return TestNotAssociatedWithImplementation

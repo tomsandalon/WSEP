@@ -17,6 +17,10 @@ export class AdapterSystem implements System {
         this.system = system
     }
 
+    init(): Promise<void> {
+        return this.system.init();
+    }
+
     userOrderHistory(user_id: number): string | string[] {
         return this.system.userOrderHistory(user_id);
     }

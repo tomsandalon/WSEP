@@ -16,7 +16,11 @@ export class Service {
         this._system = SystemImpl.getInstance(reset);
     }
 
-    public initData(){
+    init(): Promise<void> {
+        return this._system.init();
+    }
+
+    public initData() {
         // const no_to_all: DiscountType = {
         //     percent: 0.5, // 0 <= percent <= 1
         //     expiration_date: new Date(),

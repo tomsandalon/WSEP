@@ -376,13 +376,6 @@ export class ShopManagementImpl implements ShopManagement {
         ))
     }
 
-    private removeAllSubordinates(user_email: string, original: string) {
-        this.managers.filter(m => m.appointer_user_email == user_email)
-            .forEach(m => this.removeManagerByRecursion(original, m.user_email))
-        this.owners.filter(o => o.appointer_email == user_email)
-            .forEach(o => this.removeOwnerByRecursion(original, o.user_email))
-    }
-
     private getOwnerByEmail(user_email: string) {
         return [this._original_owner].concat(this._owners).find((o: Owner) => o.user_email == user_email)
     }

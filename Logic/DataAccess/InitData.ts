@@ -1,14 +1,30 @@
 import {db} from './DB.config';
 import {
-    AddDiscount, AddDiscountConditionType, AddDiscountOperator, AddItemToBasket,
+    AddDiscount, addDiscountConditionType,
+    AddDiscountConditionType, addDiscountOperator,
+    AddDiscountOperator,
+    AddItemToBasket,
     AddPermission,
-    AddProduct, AddPurchaseConditionOperator, AddPurchaseConditionType, AddPurchasePolicy,
+    addPermissionsDB,
+    AddProduct,
+    addPurchaseConditionOperator,
+    AddPurchaseConditionOperator,
+    addPurchaseConditionType,
+    AddPurchaseConditionType,
+    AddPurchasePolicy,
     AddPurchaseType,
+    addPurchaseTypes,
     AddShop,
     AppointManager,
-    AppointOwner, PurchaseBasket, RateProduct,
-    RegisterUser, RemainingManagement, removeDiscount,
-    RemoveManager, removePurchasePolicy, UpdatePermissions
+    AppointOwner,
+    PurchaseBasket,
+    RateProduct,
+    RegisterUser,
+    RemainingManagement,
+    removeDiscount,
+    RemoveManager,
+    removePurchasePolicy,
+    UpdatePermissions
 } from "./API";
 import {
     GetDiscount, GetNotifications,
@@ -195,7 +211,14 @@ export const initData = () =>
 //             categories: first_product.categories,
 //         }
 //     ])
-GetUsers()
-    .then((result: any) => console.log(`Finish ${result[0].admin} -- ${typeof result[0].admin} \n${JSON.stringify(result, null, 2)}`))
+// addPurchaseTypes([1,2,3,4,5])
+//     .then(_ => addPermissionsDB([1,2,3,4,5]))
+//     .then(_ => addPurchaseConditionType([1,2,3,4,5]))
+//     .then(_ => addPurchaseConditionOperator([1,2,3,4,5]))
+//     .then(_ => addDiscountOperator([1,2,3,4,5]))
+//     .then(_ => addDiscountConditionType([1,2,3,4,5]))
+//     .then((result: any) => console.log(`Finish`))
 
+// AddProduct(first_product)
+//         .then((result: any) => console.log(`Finish ${result}`))
 // initData().then((result: any) => console.log(`Finish ${result}`))

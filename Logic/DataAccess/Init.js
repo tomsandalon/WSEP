@@ -9,4 +9,7 @@ const initTables = async () => {
         }, []))
     await some[some.length - 1];
 };
-initTables().then(_ => console.log('Finish'))
+exports.initTables = initTables;
+// initTables()
+//     .then(mssg => console.log(`Finish ${mssg}`))
+//     .catch(err => console.log(`Err ${err}`))

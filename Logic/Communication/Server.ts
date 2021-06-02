@@ -35,6 +35,10 @@ export const app = express();
 //initialize a https server
 export const server = https.createServer(options, app);
 export const io = socket_io(server);
+service.init().then(_ =>{
+    service.initData();
+    console.log('Inited')
+})
 configWebSocket(io)
 //start our server
 server.listen( port,() => {
@@ -60,6 +64,4 @@ app.use(route_admin, require('./User/Registered/Admin'));
 app.use(route_user_management, require('./User/Registered/User'));
 app.use(route_shop_policy, require('./User/Registered/Policy'));
 app.use(route_shop_discount, require('./User/Registered/Discount'));
-//* For debug TODO delete this
 
-service.initData();

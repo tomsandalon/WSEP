@@ -17,10 +17,10 @@ import {NotificationAdapter} from "./Notifications/NotificationAdapter";
 import {logger} from "./Logger";
 import {Authentication} from "./Users/Authentication";
 import {
-    AddDiscount,
-    AddItemToBasket,
-    AddProduct,
-    AddPurchasePolicy,
+    AddDiscount, addDiscountConditionType, addDiscountOperator,
+    AddItemToBasket, addPermissionsDB,
+    AddProduct, addPurchaseConditionOperator, addPurchaseConditionType,
+    AddPurchasePolicy, addPurchaseTypes,
     AddShop,
     AppointManager,
     AppointOwner,
@@ -47,6 +47,7 @@ import {
     User
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
+const {initTables} = require('../DataAccess/Init');
 
 export enum SearchTypes {
     name,
@@ -167,11 +168,12 @@ export interface System {
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
 
+    init(): Promise<void>
 }
 
 export class SystemImpl implements System {
     private static instance: SystemImpl;
-
+    private static isInRollbackProcess: boolean = false;
     private constructor(reset?: boolean) {
         if (reset) SystemImpl.reset()
         this._login = LoginImpl.getInstance(reset);
@@ -216,7 +218,33 @@ export class SystemImpl implements System {
         return this.instance;
     }
 
+    private static range(end: number): number[]{
+        const output: number[] = []
+        for (let i = 0; i < end; i++) {
+            output.push(i)
+        }
+        return output
+    }
+
+    async init(): Promise<void> {
+        await initTables();
+        let range = SystemImpl.range;
+        await addPurchaseTypes(range(10));
+        await addPermissionsDB(range(10));
+        await addPurchaseConditionType(range(10));
+        await addPurchaseConditionOperator(range(10));
+        await addDiscountOperator(range(10));
+        await addDiscountConditionType(range(10));
+        return;
+    }
+
     static async rollback() {
+        if(this.isInRollbackProcess){
+            return;
+        }
+        this.isInRollbackProcess = true;
+        console.log('Her -----------------')
+        await initTables();
         await GetUsers().then(users => {
                 this.deleteData();
                 this.reloadShop(users);
@@ -228,6 +256,7 @@ export class SystemImpl implements System {
                 this.terminateAllConnections();
             }
         )
+        this.isInRollbackProcess = false;
     }
 
     private static deleteData() {
@@ -536,17 +565,16 @@ export class SystemImpl implements System {
     }
 
     performRegister(user_email: string, password: string, age?: number): boolean {
-        const result = this._register.register(user_email, password, age)
-        if (!result) return result
-        const hashed_pass = Authentication.getInstance().hash(password)
-        this.performLogin(user_email, hashed_pass)
+        const hashed_password = this._register.register(user_email, password, age)
+        if (!hashed_password) return false
+        this.performLogin(user_email, password)
         const user_id = this.login.getUserId(user_email) as number
         this.logout(user_id)
         RegisterUser({
             user_id: user_id,
             email: user_email,
-            password: hashed_pass,
-            age: age ? age : -1
+            password: (hashed_password) as string,
+            age: age ? age : 999
         }).then(r => {
             if (!r) SystemImpl.rollback()
         })
