@@ -54,11 +54,11 @@ const {
 const success = (_: any) => true;
 const failure = async (err: any, f: TryAgain, input: any, currAttempt: number) => {
     // console.log(err)
-    console.log('Retrying' + JSON.stringify(input, null, 2))
+    // console.log('Retrying' + JSON.stringify(input, null, 2))
     if(currAttempt > 0){
         await f(input, currAttempt - 1)
     } else {
-        console.log('Failure')
+        // console.log('Failure')
     }
     return false;
 }

@@ -30,61 +30,68 @@ function notificationsAreRestored(n1: {[p: number]: Notification[]}, n2: {[p: nu
 function purchasesAreRestored(h1: history_entry[], h2: history_entry[]) {
     return h1.length == h2.length && h1.every(h1 => h2.some(h2 => UserPurchaseHistoryImpl.historiesAreEqual(h1, h2)))
 }
-
-describe("Test rollback", () => {
+describe('Rollback', () => {
     const system: SystemImpl = SystemImpl.getInstance(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-
-    system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000)
-    system.addProduct(originOwner, shopID,"4KTV", "Best desc", 1, ["monitors"],1000)
-    system.addProduct(originOwner, shopID,"8KTV", "Best desc", 20, ["monitors"],1000)
-    let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
-    let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
-    system.appointOwner(originOwner, shopID,"OvedMetzuyan@post.co.il")
-    system.performRegister("ManagerMetzuyan@post.co.il", "123")
-    system.performLogin("ManagerMetzuyan@post.co.il", "123")
-    system.appointOwner(nEmpID, shopID,"ManagerMetzuyan@post.co.il")
-    system.performRegister("newUser@test.com", "TESTER");
-    let tester = system.performLogin("newUser@test.com", "TESTER") as number
-
-    system.addDiscount(originOwner, shopID, 0.5)
-    system.addPurchasePolicy(originOwner, shopID, ConditionType.NotCategory, "GTX")
-
-    system.addItemToBasket(tester, ProductImpl._product_id_specifier - 1, shopID, 2)
-    system.purchaseCart(tester, "something")
-    system.addItemToBasket(tester, ProductImpl._product_id_specifier - 2, shopID, 1)
-
-
-    const shops = system.shops
-    const users = system.login.existing_users
-    const notifications = PublisherImpl.getInstance().notificationQueue
-    const purchases = UserPurchaseHistoryImpl.getInstance().history
-
-    it("Check shops are restored", async () => {
-        await SystemImpl.rollback().then(_ => {
-            expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
+    before((done) => {
+        system.init().then(_ => {
+            console.log('OK')
+            done()
         })
     })
-    it("Check users are restored", async () => {
-        await SystemImpl.rollback().then(_ => {
-            expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
+    describe("Test rollback", () => {
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+
+        system.addProduct(originOwner, shopID,"TV", "Best desc", 1000, ["monitors"],1000)
+        system.addProduct(originOwner, shopID,"4KTV", "Best desc", 1, ["monitors"],1000)
+        system.addProduct(originOwner, shopID,"8KTV", "Best desc", 20, ["monitors"],1000)
+        let newEmp = system.performRegister("OvedMetzuyan@post.co.il", "123")
+        let nEmpID = system.performLogin("OvedMetzuyan@post.co.il", "123") as number
+        system.appointOwner(originOwner, shopID,"OvedMetzuyan@post.co.il")
+        system.performRegister("ManagerMetzuyan@post.co.il", "123")
+        system.performLogin("ManagerMetzuyan@post.co.il", "123")
+        system.appointOwner(nEmpID, shopID,"ManagerMetzuyan@post.co.il")
+        system.performRegister("newUser@test.com", "TESTER");
+        let tester = system.performLogin("newUser@test.com", "TESTER") as number
+
+        system.addDiscount(originOwner, shopID, 0.5)
+        system.addPurchasePolicy(originOwner, shopID, ConditionType.NotCategory, "GTX")
+
+        system.addItemToBasket(tester, ProductImpl._product_id_specifier - 1, shopID, 2)
+        system.purchaseCart(tester, "something")
+        system.addItemToBasket(tester, ProductImpl._product_id_specifier - 2, shopID, 1)
+
+
+        const shops = system.shops
+        const users = system.login.existing_users
+        const notifications = PublisherImpl.getInstance().notificationQueue
+        const purchases = UserPurchaseHistoryImpl.getInstance().history
+
+        it("Check shops are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
+            })
         })
-    })
-    it("Check users are restored", async () => {
-        await SystemImpl.rollback().then(_ => {
-            expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
+        it("Check users are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
+            })
         })
-    })
-    it("Check notifications are restored", async () => {
-        await SystemImpl.rollback().then(_ => {
-            expect(notificationsAreRestored(notifications, PublisherImpl.getInstance().notificationQueue)).to.be.true
+        it("Check users are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
+            })
         })
-    })
-    it("Check purchases are restored", async () => {
-        await SystemImpl.rollback().then(_ => {
-            expect(purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)).to.be.true
+        it("Check notifications are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(notificationsAreRestored(notifications, PublisherImpl.getInstance().notificationQueue)).to.be.true
+            })
+        })
+        it("Check purchases are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)).to.be.true
+            })
         })
     })
 })
