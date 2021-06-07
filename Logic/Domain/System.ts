@@ -245,17 +245,15 @@ export class SystemImpl implements System {
         this.isInRollbackProcess = true;
         console.log('Her -----------------')
         await initTables();
-        await GetUsers().then(users => {
-                this.deleteData();
-                this.reloadShop(users);
-                this.reloadShopPersonnel(users);
-                this.reloadItems();
-                this.reloadPurchases();
-                this.reloadUsers(users);
-                this.reloadNotifications();
-                this.terminateAllConnections();
-            }
-        )
+        const users = await GetUsers()
+        this.deleteData();
+        this.reloadShop(users);
+        this.reloadShopPersonnel(users);
+        this.reloadItems();
+        this.reloadPurchases();
+        this.reloadUsers(users);
+        this.reloadNotifications();
+        this.terminateAllConnections();
         this.isInRollbackProcess = false;
     }
 
