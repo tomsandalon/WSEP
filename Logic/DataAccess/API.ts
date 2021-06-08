@@ -51,7 +51,7 @@ const {
     discount_condition_type,
     discount_conditional_type_of,
 } = require("./Tables");
-const {getDB, connectToDB, isConnectedToDB} = require('./DB.config')
+const {getDB, connectToDB, isConnectedToDB, getBuilder, config} = require('./DB.config')
 
 const success = (_: any) => true;
 const failure = async (err: any, f: TryAgain, input: any, currAttempt: number) => {
@@ -666,3 +666,9 @@ export const addDiscountConditionType = (types: number[]) =>
             .then(success)
             //.catch(failure)
     )
+
+export const ClearDB = async () => {
+    let builder = getBuilder();
+    const dropRequests = config.reduceRight((acc, table) => acc.concat([builder.dropTable(table.name)]), []);
+    await dropRequests[0]
+};
