@@ -708,11 +708,18 @@ export class ShopImpl implements Shop {
         return this.management.getRealPermissions(user_email);
     }
 
-    addManagement(owners, managers) {
+    addManagement(owners: {
+        owner_email: string,
+        appointer_email: string
+    }[], managers: {
+        manager_email: string,
+        appointer_email: string,
+        permissions: number[]
+    }[]) {
         this.management.addManagement(owners, managers)
     }
 
-    addInventoryFromDB(inventory: ShopRich) {
-        this.inventory.addInventoryFromDB(inventory)
+    async addInventoryFromDB(inventory: ShopRich): Promise<void> {
+        await this.inventory.addInventoryFromDB(inventory)
     }
 }

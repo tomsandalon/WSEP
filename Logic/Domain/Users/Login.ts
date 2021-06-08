@@ -4,6 +4,7 @@ import {Authentication} from "./Authentication";
 import {logger} from "../Logger";
 import {UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {User as UserFromDB} from "../../DataAccess/Getters";
+import {CreateAdminIfNotExist} from "../../DataAccess/API";
 
 export interface Login {
     login(user_email: string, password: string): number | string
@@ -73,7 +74,7 @@ export class LoginImpl implements Login {
             if (this._logged_users.filter(element => element === user_email).length == 0) { // user not logged in
                 const value = this._existing_users.filter(element => element.user_email === user_email)
                 if (value.length === 0) { // first time login
-                    const new_user = UserImpl.create(user_email, password, false);
+                    const new_user = UserImpl.create(user_email, this._password_handler.hash(password), false);
                     this._existing_users.push(new_user);
                     this._logged_users.push(user_email);
                     return new_user.user_id;
@@ -175,8 +176,7 @@ export class LoginImpl implements Login {
         this.existing_users.push(UserImpl.createFromEntry(entry))
     }
 
-    private createAdmin() {
-        this._register.register("admin@gmail.com", "admin");
-        this.existing_users.push(UserImpl.create("admin@gmail.com", "admin", true));
+    createAdmin(): Promise<void> {
+        return CreateAdminIfNotExist("admin@gmail.com", this._password_handler.hash("admin"), 999);
     }
 }

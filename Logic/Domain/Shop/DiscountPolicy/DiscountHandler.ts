@@ -99,12 +99,10 @@ export class DiscountHandler {
                 );
     }
 
-    addDiscountsFromDB(discounts) {
-        discounts.forEach(discountId => {
-            DiscountHandler.discountCounter = Math.max(DiscountHandler.discountCounter, discountId + 1)
-            GetDiscount(discountId).then(discount => {
-                this.discountFromDTO(discount).then(result => this._discounts.push(result))
-            })
-        })
+    async addDiscountsFromDB(discounts): Promise<void> {
+        this._discounts = await Promise.all(discounts.map(discount => {
+            DiscountHandler.discountCounter = Math.max(DiscountHandler.discountCounter, discount + 1)
+            return GetDiscount(discount).then(res => this.discountFromDTO(res))
+        }))
     }
 }

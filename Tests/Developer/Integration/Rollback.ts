@@ -57,7 +57,7 @@ describe('Rollback', async () => {
             system.appointOwner(originOwner, shopID, "OvedMetzuyan@post.co.il")
             system.performRegister("ManagerMetzuyan@post.co.il", "123")
             system.performLogin("ManagerMetzuyan@post.co.il", "123")
-            system.appointOwner(nEmpID, shopID, "ManagerMetzuyan@post.co.il")
+            system.appointManager(nEmpID, shopID, "ManagerMetzuyan@post.co.il")
             system.performRegister("newUser@test.com", "TESTER");
             tester = system.performLogin("newUser@test.com", "TESTER") as number
 
@@ -73,16 +73,17 @@ describe('Rollback', async () => {
             users = system.login.existing_users
             notifications = PublisherImpl.getInstance().notificationQueue
             purchases = UserPurchaseHistoryImpl.getInstance().history
+            console.log('here')
         })
         it("Check shops are restored", async () => {
             await SystemImpl.rollback()
             expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
         })
-        // it("Check users are restored", async () => {
-        //     await SystemImpl.rollback().then(_ => {
-        //         expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
-        //     })
-        // })
+        it("Check users are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
+            })
+        })
         // it("Check users are restored", async () => {
         //     await SystemImpl.rollback().then(_ => {
         //         expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true

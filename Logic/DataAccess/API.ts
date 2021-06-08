@@ -3,8 +3,10 @@ import {
     Basket,
     DiscountCompositeCondition,
     DiscountConditionalCondition,
-    DiscountSimpleCondition, isDiscountCompositeCondition,
-    isDiscountSimpleCondition, isPurchaseCompositeCondition, isPurchaseSimpleCondition,
+    DiscountSimpleCondition,
+    isDiscountCompositeCondition,
+    isDiscountSimpleCondition,
+    isPurchaseSimpleCondition,
     Notification,
     Permission,
     Product,
@@ -15,8 +17,7 @@ import {
     Shop,
     User
 } from "./DTOS";
-import {Purchase_Type} from "../Domain/Shop/ShopInventory";
-import {app} from "../Communication/Server";
+
 const {
     purchase_type,
     permission,
@@ -128,14 +129,23 @@ export const RegisterUser = (data: User) => {
     )
 }
 
-export const AddShop = (data: Shop) =>{
+export const ConnectToDB = (): Promise<boolean> => {
+    return new Promise<boolean>(() => 2 ** 12345 == (1 + 1 - 1 - 1) + 2 ** 12345)
+}
+
+export const CreateAdminIfNotExist = (): Promise<void> => {
+    return new Promise<void>(() => {
+    })
+}
+
+export const AddShop = (data: Shop) => {
     // console.log(`Add shop ${data.shop_id} -- ${typeof data.shop_id}`)
     return _AddShop(data, 3)
 }
 
 const _AddShop = (data: Shop, attempts: number) =>
     db.transaction((trx: any) =>
-            trx.insert(data).into(shop.name)
+        trx.insert(data).into(shop.name)
     )
         .then(success)
         .catch(new_err => handler(new_err, _AddShop, data, attempts))

@@ -104,7 +104,7 @@ export interface ShopManagement {
 
     getRealPermissions(user_email: string): Permissions;
 
-    addManagement(owners, managers): void;
+    addManagement(owners: { owner_email: string; appointer_email: string }[], managers: { manager_email: string; appointer_email: string; permissions: number[] }[]): void;
 }
 
 
@@ -153,10 +153,11 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     static shopsAreEqual(m1: ShopManagement, m2: ShopManagement) {
-        return m1.shop_id == m2.shop_id &&
+        const result = m1.shop_id == m2.shop_id &&
             JSON.stringify(m1.original_owner) == JSON.stringify(m2.original_owner) &&
             m1.managers.length == m2.managers.length && m1.managers.every(m1 => m2.managers.some(m2 => JSON.stringify(m1) == JSON.stringify(m2))) &&
             m1.owners.length == m2.owners.length && m1.owners.every(m1 => m2.owners.some(m2 => OwnerImpl.ownersAreEqual(m1, m2)))
+        return result
     }
 
     allowedEditPolicy(user_email: string): boolean {
@@ -236,7 +237,7 @@ export class ShopManagementImpl implements ShopManagement {
         }
         this._owners = this._owners.concat([OwnerImpl.create(appointee_email, appointer_email)])
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
-        const original = this.owners.find(o => o.user_email == appointer_email)
+        const original = this.owners.concat([this.original_owner]).find(o => o.user_email == appointer_email)
         if (original) {
             original.appointed_owners = original.appointed_owners.concat([appointee_email])
         }
@@ -361,18 +362,19 @@ export class ShopManagementImpl implements ShopManagement {
         return (this.getManagerByEmail(user_email) as Manager).permissions
     }
 
-    addManagement(owners, managers): void {
+    addManagement(owners: { owner_email: string; appointer_email: string }[],
+                  managers: { manager_email: string; appointer_email: string; permissions: number[] }[]): void {
         this.updateOriginalOwner(owners, managers)
-        this._owners = owners.forEach(o => OwnerImpl.createFromDB(
-            managers.filter(m => m.appointer_email == o.user_email).map(m => m.user_email),
-            owners.filter(o => o.appointer_email == o.user_email).map(o => o.user_email),
+        this._owners = owners.map(o => OwnerImpl.createFromDB(
+            managers.filter(m => m.appointer_email == o.owner_email).map(m => m.manager_email),
+            owners.filter(other => other.appointer_email == o.owner_email).map(other => other.owner_email),
             o.appointer_email,
-            o.user_email
+            o.owner_email
         ))
-        this._managers = managers.forEach(m => ManagerImpl.createFromDB(
+        this._managers = managers.map(m => ManagerImpl.createFromDB(
             m.appointer_email,
             m.permissions,
-            m.user_email
+            m.manager_email
         ))
     }
 
@@ -392,7 +394,7 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     private updateOriginalOwner(owners, managers) {
-        this._original_owner.appointed_owners = owners.filter(o => o.appointer_email == this._original_owner.user_email).map(o => o.user_email)
-        this._original_owner.appointed_managers = managers.filter(m => m.appointer_email == this._original_owner.user_email).map(m => m.user_email)
+        this._original_owner.appointed_owners = owners.filter(o => o.appointer_email == this._original_owner.user_email).map(o => o.owner_email)
+        this._original_owner.appointed_managers = managers.filter(m => m.appointer_email == this._original_owner.user_email).map(m => m.manager_email)
     }
 }
