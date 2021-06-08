@@ -7,7 +7,7 @@ module.exports.connectToDB = () => {
     return connection
 }
 module.exports.getDB = () => connection;
-exports.getBuilder = () => exports.db.schema;
+exports.getBuilder = () => module.exports.getDB().schema;
 const defs = require('./Tables');
 const config = [
     defs.purchase_type,

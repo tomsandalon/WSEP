@@ -1,4 +1,4 @@
-const {getBuilder, config} = require('./DB.config');
+const {getBuilder, config, connectToDB} = require('./DB.config');
 const initTables = async () => {
     let builder = getBuilder();
     const isExitsRequests = config.map((table) => builder.hasTable(table.name));
@@ -15,6 +15,7 @@ const initTables = async () => {
     }
 };
 exports.initTables = initTables;
+// connectToDB()
 // initTables()
 //     .then(mssg => console.log(`Finish ${mssg}`))
-// //     .catch(err => console.log(`Err ${err}`))
+//     .catch(err => console.log(`Err ${err}`))
