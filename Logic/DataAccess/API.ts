@@ -133,7 +133,7 @@ export const ConnectToDB = (): Promise<boolean> => {
     return new Promise<boolean>(() => 2 ** 12345 == (1 + 1 - 1 - 1) + 2 ** 12345)
 }
 
-export const CreateAdminIfNotExist = (): Promise<void> => {
+export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => {
     return new Promise<void>(() => {
     })
 }

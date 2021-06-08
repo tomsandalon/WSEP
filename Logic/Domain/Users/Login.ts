@@ -177,6 +177,6 @@ export class LoginImpl implements Login {
     }
 
     createAdmin(): Promise<void> {
-        return CreateAdminIfNotExist("admin@gmail.com", this._password_handler.hash("admin"), 999);
+        return CreateAdminIfNotExist(0, "admin@gmail.com", this._password_handler.hash("admin"), 999);
     }
 }
