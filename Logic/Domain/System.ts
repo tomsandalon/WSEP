@@ -20,7 +20,7 @@ import {
     addDiscountConditionType,
     addDiscountOperator,
     AddItemToBasket,
-    addPermissionsDB,
+    addPermissions,
     AddProduct,
     addPurchaseConditionOperator,
     addPurchaseConditionType,
@@ -54,6 +54,7 @@ import {
     User
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
+import {connectToDB} from "../DataAccess/DB.config";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -325,15 +326,16 @@ export class SystemImpl implements System {
     }
 
     async init(): Promise<void> {
+        await connectToDB();
         await initTables();
         let range = SystemImpl.range;
         await addPurchaseTypes(range(10));
-        await addPermissionsDB(range(10));
+        await addPermissions(range(10));
         await addPurchaseConditionType(range(10));
         await addPurchaseConditionOperator(range(10));
         await addDiscountOperator(range(10));
         await addDiscountConditionType(range(10));
-        await this.login.createAdmin();
+        // await this.login.createAdmin();
         return;
     }
 

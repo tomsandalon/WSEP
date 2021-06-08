@@ -79,11 +79,11 @@ describe('Rollback', async () => {
             await SystemImpl.rollback()
             expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
         })
-        it("Check users are restored", async () => {
-            await SystemImpl.rollback().then(_ => {
-                expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
-            })
-        })
+        // it("Check users are restored", async () => {
+        //     await SystemImpl.rollback().then(_ => {
+        //         expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
+        //     })
+        // })
         // it("Check users are restored", async () => {
         //     await SystemImpl.rollback().then(_ => {
         //         expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true

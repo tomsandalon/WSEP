@@ -1,4 +1,3 @@
-import {db} from './DB.config';
 import {
     Basket,
     DiscountCompositeCondition,
@@ -51,6 +50,7 @@ const {
     discount_condition_type,
     discount_conditional_type_of,
 } = require("./Tables");
+const {getDB, connectToDB} = require('./DB.config')
 
 const success = (_: any) => true;
 const failure = async (err: any, f: TryAgain, input: any, currAttempt: number) => {
@@ -74,49 +74,49 @@ const returnFalse = (err: any) => {
 }
 type TryAgain = (_: any, attemps: number) => any
 export const AddPermission = (perm: Permission) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert({permission_id: perm}).into(permission.name)
             .then(success)
             .catch(returnFalse)
     )
 
 export const AddPurchaseConditionOperator = (operator: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert({operator_id: operator}).into(purchase_condition_operator.name)
             .then(success)
             .catch(returnFalse)
     )
 
 export const AddPurchaseConditionType = (type: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert({type_id: type}).into(purchase_condition_type.name)
             .then(success)
             .catch(returnFalse)
     )
 
 export const AddDiscountOperator = (operator: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert({discount_operator_id: operator}).into(discount_operator.name)
             .then(success)
             .catch(returnFalse)
     )
 
 export const AddDiscountConditionType = (type: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert({discount_condition_type_id: type}).into(discount_condition_type.name)
             .then(success)
             .catch(returnFalse)
     )
 
 export const AddPurchaseType = (type: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert({purchase_type_id: type}).into(purchase_type.name)
             .then(success)
             .catch(returnFalse)
     )
 export const RegisterUser = (data: User) => {
     // console.log(`Date ${JSON.stringify(data, null, 2)}`)
-    return db.transaction((trx: any) =>
+    return getDB().transaction((trx: any) =>
         trx.insert({
             user_id: data.user_id,
             email: data.email,
@@ -130,7 +130,8 @@ export const RegisterUser = (data: User) => {
 }
 
 export const ConnectToDB = (): Promise<boolean> => {
-    return new Promise<boolean>(() => 2 ** 12345 == (1 + 1 - 1 - 1) + 2 ** 12345)
+    connectToDB()
+    return new Promise<boolean>(() => 1 == 1)
 }
 
 export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => {
@@ -144,7 +145,7 @@ export const AddShop = (data: Shop) => {
 }
 
 const _AddShop = (data: Shop, attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert(data).into(shop.name)
     )
         .then(success)
@@ -153,7 +154,7 @@ const _AddShop = (data: Shop, attempts: number) =>
 export const AddItemToBasket = (data: Basket) => _AddItemToBasket(data, 3)
 
 const _AddItemToBasket = (data: Basket, attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert(data).into(basket.name)
     )
         .then(success)
@@ -162,7 +163,7 @@ const _AddItemToBasket = (data: Basket, attempts: number) =>
 export const UpdateItemInBasket = (data: Basket) => _UpdateItemInBasket(data, 3)
 
 const _UpdateItemInBasket = (data: Basket, attempts: number) =>
-    db(basket.name)
+    getDB()(basket.name)
         .where({
             shop_id: data.shop_id,
             user_id: data.user_id,
@@ -176,7 +177,7 @@ const _UpdateItemInBasket = (data: Basket, attempts: number) =>
 
 export const DeleteItemInBasket = (data: Basket) => _DeleteItemInBasket(data, 3)
 const _DeleteItemInBasket = (data: Basket, attempts: number) =>
-    db(basket.name)
+    getDB()(basket.name)
         .where({
             shop_id: data.shop_id,
             user_id: data.user_id,
@@ -192,7 +193,7 @@ export const AddProduct = (data: Product) =>{
 }
 
 const _AddProduct: TryAgain = (data: Product, attempts: number) =>{
-    return db.transaction((trx: any) =>
+    return getDB().transaction((trx: any) =>
         trx.insert(data).into(product.name)
             )
         .then(success).catch(new_err => handler(new_err, _AddProduct, data, attempts))
@@ -200,7 +201,7 @@ const _AddProduct: TryAgain = (data: Product, attempts: number) =>{
 export const UpdateProduct = (data: Product) => _UpdateProduct(data, 3)
 
 const _UpdateProduct = (data: Product, attempts: number) =>
-    db(product.name)
+    getDB()(product.name)
         .where({
             shop_id: data.product_id,
         })
@@ -219,7 +220,7 @@ const _UpdateProduct = (data: Product, attempts: number) =>
 export const RemoveProduct = (product_id: number) => _RemoveProduct(product_id, 3)
 
 const _RemoveProduct = (product_id: number, attempts: number) =>
-    db(product.name)
+    getDB()(product.name)
         .where({
             product_id: product_id,
         })
@@ -231,7 +232,7 @@ export const AppointManager = (target_email: string, appointer_email: string, sh
     _AppointManager([target_email, appointer_email, shop_id, permissions], 3)
 
 const _AppointManager = ([target_email, appointer_email, shop_id, permissions]: [string, string, number, Permission[]], attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
             Promise.all(permissions.map((perm) =>
                 trx(manages.name).insert({
                     shop_id: shop_id,
@@ -247,7 +248,7 @@ export const AppointOwner = (target_email: string, appointer_email: string, shop
     _AppointOwner([target_email, appointer_email, shop_id], 3)
 
 const _AppointOwner = ([target_email, appointer_email, shop_id]: [string, string, number], attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(owns.name).insert({
             shop_id: shop_id,
             user_id: trx.raw("(SELECT user_id FROM user WHERE email = ?)", [target_email]),
@@ -261,7 +262,7 @@ export const RemoveManager = (target_email: string, shop_id: number) =>
     _RemoveManager([target_email, shop_id], 3)
 
 const _RemoveManager = ([target_email, shop_id]: [string, number], attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(manages.name)
             .where({
                 shop_id: shop_id,
@@ -276,7 +277,7 @@ export const RemainingManagement = (management_emails: string[], shop_id: number
     _RemainingManagement([management_emails, shop_id], 3)
 
 const _RemainingManagement = ([management_emails, shop_id]: [string[], number], attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(owns.name)
             .where({shop_id: shop_id})
             .whereNotIn(user.pk,
@@ -290,7 +291,7 @@ export const UpdatePermissions = (manager_id: number, shop_id: number, new_permi
     _UpdatePermissions([manager_id, shop_id, new_permissions], 3)
 
 const _UpdatePermissions = ([manager_id, shop_id, new_permissions]:[number, number, Permission[]], attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(manages.name).select(permission.pk).whereIn(permission.pk, new_permissions)
             .then((used_permissions: any) =>
                 Promise.all([
@@ -313,7 +314,7 @@ export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition:
 
 const _AddPurchasePolicy = ([shop_id, policy_id, condition]: [number, number, PurchaseSimpleCondition | PurchaseCompositeCondition], attempts: number) =>
     isPurchaseSimpleCondition(condition)?
-        db.transaction((trx: any) =>
+        getDB().transaction((trx: any) =>
             trx.insert({p_condition_id: policy_id}).into(purchase_condition.name)
                 .then((_: any) =>
                     trx.insert({
@@ -334,7 +335,7 @@ const _AddPurchasePolicy = ([shop_id, policy_id, condition]: [number, number, Pu
             .then(success)
             .catch(new_err => handler(new_err, _AddPurchasePolicy, [shop_id, policy_id, condition], attempts))
         :
-        db.transaction((trx: any) =>
+        getDB().transaction((trx: any) =>
             trx.insert({p_condition_id: policy_id}).into(purchase_condition.name)
                 .then((_: any) => trx.insert({composite_id: policy_id}).into(purchase_composite_condition.name))
                 .then((_: any) =>
@@ -362,7 +363,7 @@ export const AddDiscount = (shop_id: number, discount_id: number, discount_to_ad
 
 const _AddDiscount = ([shop_id, discount_id, discount_to_add]: [number, number, DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition], attempts: number) =>
     isDiscountSimpleCondition(discount_to_add)?
-        db.transaction((trx: any) =>
+        getDB().transaction((trx: any) =>
             trx.insert({discount_id: discount_id}).into(discount.name)
                 .then((_: any) =>
                     trx.insert({
@@ -379,7 +380,7 @@ const _AddDiscount = ([shop_id, discount_id, discount_to_add]: [number, number, 
             .catch(new_err => handler(new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
         :
         isDiscountCompositeCondition(discount_to_add)?
-            db.transaction((trx: any) =>
+            getDB().transaction((trx: any) =>
                 trx.insert({discount_id: discount_id}).into(discount.name)
                     .then((_: any) => trx.insert({discount_composite_id: discount_id}).into(discount_composite.name))
                     .then((_: any) =>
@@ -402,7 +403,7 @@ const _AddDiscount = ([shop_id, discount_id, discount_to_add]: [number, number, 
                 .then(success)
                 .catch(new_err => handler(new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
             :
-            db.transaction((trx: any) =>
+            getDB().transaction((trx: any) =>
                 trx.insert({discount_id: discount_id}).into(discount.name)
                     .then((_: any) => trx(discount_conditional.name).insert({
                         discount_conditional_id: discount_id,
@@ -442,7 +443,7 @@ export const removeDiscount = (shop_id: number, discount_id: number,) =>
 const _removeDiscount = ([shop_id, discount_id]: [number, number], attempts: number) =>{
     let ids: any[] = []
     let pending: number[] = []
-    return db.transaction( async (trx: any) =>{
+    return getDB().transaction( async (trx: any) =>{
         const query = (id: number) => trx.raw(`(SELECT discount_id as first, -1 as second FROM discount_simple where discount_id = ${id}) union
             (SELECT first, second FROM
                 (SELECT discount_composite_id as discount_id FROM discount_composite WHERE discount_composite_id = ${id}) as Com INNER JOIN discount_comprised_composite
@@ -476,7 +477,7 @@ export const removePurchasePolicy = (shop_id: number, policy_id: number) =>
 const _removePurchasePolicy = ([shop_id, policy_id]: [number, number], attempts: number) => {
     let ids: any[] = []
     let pending: number[] = []
-    return db.transaction( async (trx: any) =>{
+    return getDB().transaction( async (trx: any) =>{
         const query = (id: number) => trx.raw(`(SELECT simple_id as first, -1 as second FROM purchase_simple_condition where simple_id = ${id}) union
             (SELECT first, second FROM
                 (SELECT composite_id as p_condition_id FROM purchase_composite_condition WHERE composite_id = ${id}) as Com INNER JOIN purchase_comprised
@@ -502,7 +503,7 @@ const _removePurchasePolicy = ([shop_id, policy_id]: [number, number], attempts:
 export const RateProduct = (rate: Rate) => _RateProduct(rate, 3)
 
 const _RateProduct = (rate: Rate, attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx.insert({
             user_id: rate.user_id,
             p_id: rate.product_id,
@@ -515,7 +516,7 @@ const _RateProduct = (rate: Rate, attempts: number) =>
 export const Notify = (notifications: Notification[]) => _Notify(notifications, 3)
 
 const _Notify = (notifications: Notification[], attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         Promise.all(
             notifications.map((message: Notification) =>
                 trx(notification.name)
@@ -532,7 +533,7 @@ const _Notify = (notifications: Notification[], attempts: number) =>
 export const ClearNotifications = (user_id: number) => _ClearNotifications(user_id, 3)
 
 const _ClearNotifications = (user_id: number, attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(notification.name).where(user.pk, user_id).del()
     )
         .then(success)
@@ -542,7 +543,7 @@ export const PurchaseBasket = (user_id: number, shop_id: number, purchase_id: nu
     _PurchaseBasket([user_id, shop_id, purchase_id, date, items], 3)
 
 const _PurchaseBasket = ([user_id, shop_id, purchase_id, date,  items]: [number, number, number, Date, Purchase[]], attempts: number) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         Promise.all(items.map((item: Purchase) =>
             trx.raw(`UPDATE ${product.name} SET amount = amount - ${item.amount} WHERE ${product.pk} = ${item.product_id}`)
         ))
@@ -577,7 +578,7 @@ const _PurchaseBasket = ([user_id, shop_id, purchase_id, date,  items]: [number,
 
 
 export const addPurchaseTypes = (types: number[]) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(purchase_type.name).insert(types.map(t => {
             return {
                 purchase_type_id: t
@@ -587,8 +588,8 @@ export const addPurchaseTypes = (types: number[]) =>
             //.catch(failure)
     )
 
-export const addPermissionsDB = (permissions: number[]) =>
-    db.transaction((trx: any) =>
+export const addPermissions = (permissions: number[]) =>
+    getDB().transaction((trx: any) =>
         trx(permission.name).insert(permissions.map(p => {
             return {
                 permission_id: p
@@ -599,7 +600,7 @@ export const addPermissionsDB = (permissions: number[]) =>
     )
 
 export const addPurchaseConditionType = (types: number[]) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(purchase_condition_type.name).insert(types.map(t => {
             return {
                 type_id: t
@@ -610,7 +611,7 @@ export const addPurchaseConditionType = (types: number[]) =>
     )
 
 export const addPurchaseConditionOperator = (operators: number[]) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(purchase_condition_operator.name).insert(operators.map(o => {
             return {
                 operator_id: o
@@ -621,7 +622,7 @@ export const addPurchaseConditionOperator = (operators: number[]) =>
     )
 
 export const addDiscountOperator = (operators: number[]) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(discount_operator.name).insert(operators.map(o => {
             return {
                 discount_operator_id: o
@@ -632,7 +633,7 @@ export const addDiscountOperator = (operators: number[]) =>
     )
 
 export const addDiscountConditionType = (types: number[]) =>
-    db.transaction((trx: any) =>
+    getDB().transaction((trx: any) =>
         trx(discount_condition_type.name).insert(types.map(t => {
             return {
                 discount_condition_type_id: t

@@ -1,10 +1,12 @@
 const knex = require('knex');
 const db_configurations = require('./knexfile');
+let connection = undefined
 module.exports.connectToDB = () => {
-    const connection = knex(db_configurations.development)
+    connection = knex(db_configurations.development)
     exports.db = connection;
     return connection
 }
+module.exports.getDB = () => connection;
 exports.getBuilder = () => exports.db.schema;
 const defs = require('./Tables');
 const config = [
