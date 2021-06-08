@@ -65,3 +65,11 @@ app.use(route_user_management, require('./User/Registered/User'));
 app.use(route_shop_policy, require('./User/Registered/Policy'));
 app.use(route_shop_discount, require('./User/Registered/Discount'));
 
+export const connectToDB = () => {
+    service.connectToDB()
+}
+
+const reconnect = () => {
+    connectToDB()
+    setTimeout(reconnect, 500)
+}

@@ -294,4 +294,8 @@ export class Service {
     isAvailable(): boolean{
         return true
     }
+
+    connectToDB() {
+
+    }
 }

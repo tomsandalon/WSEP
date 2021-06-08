@@ -1,8 +1,11 @@
 const knex = require('knex');
 const db_configurations = require('./knexfile');
-const db = knex(db_configurations.development);
-exports.db = db;
-exports.getBuilder = () => db.schema;
+module.exports.connectToDB = () => {
+    const connection = knex(db_configurations.development)
+    exports.db = connection;
+    return connection
+}
+exports.getBuilder = () => exports.db.schema;
 const defs = require('./Tables');
 const config = [
     defs.purchase_type,
