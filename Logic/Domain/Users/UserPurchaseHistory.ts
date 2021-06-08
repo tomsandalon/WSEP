@@ -48,7 +48,7 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory {
                 name: product.name,
                 base_price: product.original_price,
                 description: product.description,
-                categories: product.category.join(",")
+                categories: product.category.map(c => c.name).join(",")
             }
         }))
     }

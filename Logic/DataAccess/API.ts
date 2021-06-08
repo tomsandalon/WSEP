@@ -557,6 +557,7 @@ const _PurchaseBasket = ([user_id, shop_id, purchase_id, date,  items]: [number,
                     .del())
             .then((_: any) =>
                 trx(purchase.name).insert(items.map((item) => {
+                    console.log("for mark " + item.categories)
                     return {
                         user_id: user_id,
                         shop_id: shop_id,
@@ -642,3 +643,5 @@ export const addDiscountConditionType = (types: number[]) =>
             .then(success)
             //.catch(failure)
     )
+
+export const ClearDB = (): Promise<boolean> => new Promise(() => true)
