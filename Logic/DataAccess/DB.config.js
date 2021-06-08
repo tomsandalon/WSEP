@@ -6,6 +6,10 @@ module.exports.connectToDB = () => {
     exports.db = connection;
     return connection
 }
+module.exports.isConnectedToDB = () =>
+    connection.raw('select 1+1 as result')
+        .then(_ => true)
+        .catch(_ => false)
 module.exports.getDB = () => connection;
 exports.getBuilder = () => module.exports.getDB().schema;
 const defs = require('./Tables');

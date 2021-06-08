@@ -32,7 +32,7 @@ const {
     discount_conditional_type_of,
 } = require("./Tables");
 
-const {getDB, connectToDB} = require('./DB.config')
+const {getDB} = require('./DB.config')
 
 const success = (_: any) => true;
 const failure = (err: any) => {

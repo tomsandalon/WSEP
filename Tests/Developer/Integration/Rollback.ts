@@ -73,7 +73,21 @@ describe('Rollback', async () => {
             users = system.login.existing_users
             notifications = PublisherImpl.getInstance().notificationQueue
             purchases = UserPurchaseHistoryImpl.getInstance().history
-            console.log('here')
+        })
+        function timeout(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        it("Check reconnect to db", async () => {
+            expect(false).to.be.true
+            // TODO uncomment, run the test case, wait for 'Sleeping to be printed', kill DB via terminal,
+            //  wait for wake up and expect to see 'Reconnecting', then start up the DB then expect mocha to pass the test
+            // console.log('Sleeping')
+            // await timeout(10*1000)
+            // console.log('Wake up')
+            // await SystemImpl.rollback()
+            // expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
+            // console.log('OK')
+
         })
         it("Check shops are restored", async () => {
             await SystemImpl.rollback()

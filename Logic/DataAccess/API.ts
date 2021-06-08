@@ -16,6 +16,7 @@ import {
     Shop,
     User
 } from "./DTOS";
+import {service} from "../Communication/Config/Config";
 
 const {
     purchase_type,
@@ -50,12 +51,12 @@ const {
     discount_condition_type,
     discount_conditional_type_of,
 } = require("./Tables");
-const {getDB, connectToDB} = require('./DB.config')
+const {getDB, connectToDB, isConnectedToDB} = require('./DB.config')
 
 const success = (_: any) => true;
 const failure = async (err: any, f: TryAgain, input: any, currAttempt: number) => {
     // console.log(err)
-    // console.log('Retrying' + JSON.stringify(input, null, 2))
+    console.log('Retrying')
     if(currAttempt > 0){
         await f(input, currAttempt - 1)
     } else {
@@ -129,9 +130,32 @@ export const RegisterUser = (data: User) => {
     )
 }
 
-export const ConnectToDB = (): Promise<boolean> => {
-    connectToDB()
-    return new Promise<boolean>(() => 1 == 1)
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const reconnect = async () => {
+    while (true){
+        await timeout(500)
+        console.log('Reconnecting...')
+        try {
+            connectToDB()
+        }catch (_) {}
+        if(await isConnectedToDB()){
+            break;
+        }
+    }
+}
+
+export const ConnectToDB = async (): Promise<boolean> => {
+    try{
+        connectToDB()
+    } catch (_) {}
+    if (!await isConnectedToDB()) {
+        await reconnect();
+        return true;
+    }
+    return true;
 }
 
 export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => {

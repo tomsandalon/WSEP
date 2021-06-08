@@ -54,7 +54,6 @@ import {
     User
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
-import {connectToDB} from "../DataAccess/DB.config";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -65,8 +64,6 @@ export enum SearchTypes {
 }
 
 export interface System {
-
-    connectToDB(): Promise<boolean> //TODO
 
     openSession(): number
 
@@ -269,6 +266,7 @@ export class SystemImpl implements System {
         }
         this.isInRollbackProcess = true;
         console.log('Her -----------------')
+        await ConnectToDB();
         await initTables();
         const users: User[] = await GetUsers()
         this.deleteData();
@@ -326,7 +324,7 @@ export class SystemImpl implements System {
     }
 
     async init(): Promise<void> {
-        await connectToDB();
+        await ConnectToDB();
         await initTables();
         let range = SystemImpl.range;
         await addPurchaseTypes(range(10));
@@ -1020,9 +1018,5 @@ export class SystemImpl implements System {
             active: entry.active,
         }
         this.shops.push(ShopImpl.createFromDB(newEntry))
-    }
-
-    connectToDB(): Promise<boolean> {
-        return ConnectToDB();
     }
 }
