@@ -6,7 +6,7 @@ import {
     OK,
     permissions,
     ServerNotFound,
-    service,
+    service, ServiceUnavailable,
     Session,
     sid,
     Unauthorized
@@ -21,6 +21,11 @@ router.get('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.getManagingShops(user_id);
@@ -43,6 +48,11 @@ router.get(permissions, (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.getPermissions(user_id, request.query.shop_id);
     if (typeof result == 'string'){
@@ -64,6 +74,11 @@ router.get(isLoggedIn, (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.isLoggedIn(user_id);
     response.setHeader("Content-Type", "text/html");
@@ -78,6 +93,11 @@ router.get(isAdmin, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.isAdmin(user_id);
@@ -94,6 +114,11 @@ router.get(isOwner, (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.isOwner(user_id);
     response.setHeader("Content-Type", "text/html");
@@ -108,6 +133,11 @@ router.get(isManager, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.isManager(user_id);
@@ -124,6 +154,11 @@ router.get(details, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.getUserEmailFromUserId(user_id);

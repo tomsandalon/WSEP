@@ -4,7 +4,7 @@ import {
     BadRequest, OK,
     permissions,
     ServerNotFound,
-    service,
+    service, ServiceUnavailable,
     Session,
     sid
 } from "../../Config/Config";
@@ -19,6 +19,11 @@ router.post(assign_manager, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.appointManager(user_id, request.body.shop_id, request.body.email);
@@ -40,6 +45,11 @@ router.post(assign_owner, (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.appointOwner(user_id, request.body.shop_id, request.body.email);
     if (typeof result === 'string') {
@@ -59,6 +69,11 @@ router.delete(assign_manager, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.removeManager(user_id, request.body.shop_id, request.body.target);
@@ -80,6 +95,11 @@ router.delete(assign_owner, (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.removeOwner(user_id, request.body.shop_id, request.body.target);
     if (typeof result === 'string') {
@@ -99,6 +119,11 @@ router.post(assign_manager + permissions, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.addPermissions(user_id, request.body.shop_id, request.body.target, request.body.action);
@@ -120,6 +145,11 @@ router.put(assign_manager + permissions, (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.editPermissions(user_id, request.body.shop_id, request.body.target, request.body.actions);
     if (typeof result === 'string') {
@@ -140,6 +170,11 @@ router.delete(assign_manager + permissions, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = ''

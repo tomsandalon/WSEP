@@ -290,4 +290,8 @@ export class Service {
     getUserEmailFromUserId(user_id: number): string | string[] {
         return this._system.getUserEmailFromUserId(user_id);
     }
+
+    isAvailable(): boolean{
+        return true
+    }
 }
