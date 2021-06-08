@@ -1,4 +1,4 @@
-import {BadRequest, OK, ServerNotFound, service, Session, sid} from "../Config/Config";
+import {BadRequest, OK, ServerNotFound, service, ServiceUnavailable, Session, sid} from "../Config/Config";
 import {request} from "express";
 const express = require('express');
 const router = express.Router();
@@ -10,6 +10,11 @@ router.get('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.displayShoppingCart(user_id);
@@ -37,6 +42,11 @@ router.post('/', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.addItemToBasket(user_id, request.body.product_id, request.body.shop_id, request.body.amount);
     if (typeof result === 'string') {
@@ -57,6 +67,11 @@ router.put('/', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.editShoppingCart(user_id, request.body.shop_id, request.body.product_id, request.body.amount);
     if (typeof result === 'string') {
@@ -76,6 +91,11 @@ router.delete('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.removeItemFromBasket(user_id, request.body.shop_id, request.body.product_id);

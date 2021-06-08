@@ -31,7 +31,7 @@ export const BadRequest = 400;
 export const Unauthorized = 401;
 export const ServerNotFound = 404;
 export const OK = 200;
-
+export const ServiceUnavailable = 503;
 export const details = '/details'
 export const rate = '/rate'
 export const categories = '/categories'

@@ -2,7 +2,7 @@ import {
     assign_manager,
     assign_owner, BadRequest, OK,
     ServerNotFound,
-    service,
+    service, ServiceUnavailable,
     Session,
     sid, Unauthorized
 } from "../../Config/Config";
@@ -17,6 +17,11 @@ router.get('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.getAllDiscounts(user_id, request.query.shop_id)
@@ -39,6 +44,11 @@ router.delete('/', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.removeDiscount(user_id, request.body.shop_id, request.body.id);
     response.setHeader("Content-Type", "text/html");
@@ -58,6 +68,11 @@ router.post('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     let result;
