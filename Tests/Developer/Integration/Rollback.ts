@@ -76,10 +76,7 @@ describe('Rollback', async () => {
         })
         it("Check shops are restored", async () => {
             await SystemImpl.rollback()
-            console.log('Good')
-            // .then(_ => {
-            //     expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
-            // })
+            expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
         })
         // it("Check users are restored", async () => {
         //     await SystemImpl.rollback().then(_ => {

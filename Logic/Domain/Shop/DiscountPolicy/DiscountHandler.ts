@@ -89,8 +89,8 @@ export class DiscountHandler {
     }
 
     async discountFromDTO(discount: DiscountTree): Promise<Discount> {
-        return discount.left && discount.right ? new SimpleDiscount(discount.id, discount.value) :
-            discount.left ? GetDiscount(discount.left).then(left => this.discountFromDTO(left).then(other => new ConditionalDiscount(discount.id, discount.operator, other, discount.value))) :
+        return !discount.left && !discount.right ? new SimpleDiscount(discount.id, discount.value) :
+            !discount.right ? GetDiscount(discount.left).then(left => this.discountFromDTO(left).then(other => new ConditionalDiscount(discount.id, discount.operator, other, discount.value))) :
                 GetDiscount(discount.left).then(left => this.discountFromDTO(left).then(left =>
                     GetDiscount(discount.right).then(right => this.discountFromDTO(right).then(right => {
                         if (discount.operator >= NumericOperation.__LENGTH) return new LogicCompositionDiscount(discount.id, discount.operator + NumericOperation.__LENGTH, left, right)

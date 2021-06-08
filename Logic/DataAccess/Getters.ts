@@ -61,7 +61,7 @@ export const GetUsers = (): Promise<User[]> =>
                     const purchases = await trx.select().from(purchase.name).where(user.pk, u.user_id)
                     const baskets = await trx.select().from(basket.name).where(user.pk, u.user_id)
                     return {
-                        user_id: u.user,
+                        user_id: u.user_id,
                         email: u.email,
                         password: u.password,
                         age: u.age,
@@ -87,7 +87,7 @@ export type ShopRaw = {
     description: string,
     location: string,
     bank_info: string,
-    active: number,
+    active: boolean,
 }
 
 export const GetShopsRaw = (): Promise<ShopRaw[]> =>
@@ -102,7 +102,7 @@ export const GetShopsRaw = (): Promise<ShopRaw[]> =>
                         description: s.description,
                         location: s.location,
                         bank_info: s.bank_info,
-                        active: s.active,
+                        active: s.active == 1,
                     }
                 })
             )
@@ -152,7 +152,12 @@ export const GetShopsManagement = (): Promise<ShopManagement[]> =>
             return shops.map((s: any): ShopManagement => {
                 return {
                     shop_id: s.shop_id,
-                    owners: owners.filter((o: any) => o.shop_id == s.shop_id),
+                    owners: owners.filter((o: any) => o.shop_id == s.shop_id).map(o => {
+                        return {
+                            owner_id: o.user_id,
+                            appointer_id: o.appointer_id,
+                        }
+                    }),
                     managers: groupByManagers(managers.filter((m: any) => m.shop_id == s.shop_id).map((m: any) => {
                         return {
                             manager_id: m.user_id,

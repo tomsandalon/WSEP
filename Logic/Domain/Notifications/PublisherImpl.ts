@@ -104,7 +104,10 @@ export class PublisherImpl implements Publisher {
 
     addNotificationsFromDB(notifications) {
         notifications.forEach(notification => {
-            this.notificationQueue[notification.user_id].push(new Notification(notification.notification))
+            const newNotification = new Notification(notification.notification)
+            this.notificationQueue[notification.user_id] = this.notificationQueue[notification.user_id] ?
+                this.notificationQueue[notification.user_id].concat([newNotification]) :
+                [newNotification]
             PublisherImpl.id_counter = Math.max(PublisherImpl.id_counter, notification.notification_id + 1)
         })
     }

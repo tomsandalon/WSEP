@@ -180,10 +180,10 @@ export class ShopInventoryImpl implements ShopInventory {
     private readonly _bank_info: string;
     private readonly _shop_name: string;
 
-    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string) {
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string, purchase_type?: Purchase_Type[]) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
-        this._purchase_types = [Purchase_Type.Immediate];
+        this._purchase_types = purchase_type ? purchase_type : [Purchase_Type.Immediate];
         this._products = [];
         this._bank_info = bank_info;
         this._shop_name = shop_name;
@@ -555,7 +555,7 @@ export class ShopInventoryImpl implements ShopInventory {
     //export type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
     addInventoryFromDB(inventory: ShopRich): void {
         this._products = inventory.products.map(p => ProductImpl.createFromDB(p))
-        this._purchase_types = (inventory.purchase_types) ? inventory.purchase_types : [Purchase_Type.Immediate]
+        this._purchase_types = inventory.purchase_types && inventory.purchase_types.length > 0 ? inventory.purchase_types : [Purchase_Type.Immediate]
         this.discount_policies.addDiscountsFromDB(inventory.discounts)
         inventory.purchase_types.map(condition => ShopInventoryImpl.createPurchasePoliciesFromDB(condition)).forEach(result => {
             result.then(result => this._purchase_policies = this._purchase_policies.concat([result]))
