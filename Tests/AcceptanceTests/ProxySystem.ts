@@ -9,6 +9,7 @@ import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicComp
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
+import {ClearDB} from "../../Logic/DataAccess/API";
 
 export class ProxySystem implements System{
     private readonly system: AdapterSystem | undefined
@@ -419,10 +420,14 @@ export class ProxySystem implements System{
     }
 
     //mock
-    deliverItem(product_id : number, amount: number, shop_id: number, to: string ,transaction_id : boolean | string): boolean {
-        if (product_id < 0 || amount < 0 || shop_id < 0 || to.includes("Drop table") || (typeof transaction_id == 'string') )
+    deliverItem(product_id: number, amount: number, shop_id: number, to: string, transaction_id: boolean | string): boolean {
+        if (product_id < 0 || amount < 0 || shop_id < 0 || to.includes("Drop table") || (typeof transaction_id == 'string'))
             return false;
         else
             return true;
+    }
+
+    connectToDB(): Promise<boolean> {
+        return ClearDB()
     }
 }

@@ -16,7 +16,6 @@ import {
     Shop,
     User
 } from "./DTOS";
-import {service} from "../Communication/Config/Config";
 
 const {
     purchase_type,
@@ -667,7 +666,7 @@ export const addDiscountConditionType = (types: number[]) =>
             //.catch(failure)
     )
 
-export const ClearDB = async () => {
+export const ClearDB = async (): Promise<void> => {
     let builder = getBuilder();
     const dropRequests = config.reduceRight((acc, table) => acc.concat([builder.dropTable(table.name)]), []);
     await dropRequests[0]
