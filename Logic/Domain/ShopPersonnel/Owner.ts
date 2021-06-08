@@ -12,7 +12,7 @@ export class OwnerImpl implements Owner {
     appointed_owners: string[];
 
     private constructor(_appointed_managers: string[], _appointed_owners: string[], _appointer_email: string | undefined, user_email: string) {
-        this.appointed_managers = _appointed_owners
+        this.appointed_managers = _appointed_managers
         this.appointed_owners = _appointed_owners
         this._appointer_email = _appointer_email
         this._user_email = user_email

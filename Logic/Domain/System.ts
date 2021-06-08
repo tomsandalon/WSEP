@@ -29,6 +29,7 @@ import {
     AddShop,
     AppointManager,
     AppointOwner,
+    ConnectToDB,
     DeleteItemInBasket,
     RateProduct,
     RegisterUser,
@@ -63,6 +64,8 @@ export enum SearchTypes {
 }
 
 export interface System {
+
+    connectToDB(): Promise<boolean> //TODO
 
     openSession(): number
 
@@ -225,7 +228,7 @@ export class SystemImpl implements System {
         return this.instance;
     }
 
-    private static range(end: number): number[]{
+    private static range(end: number): number[] {
         const output: number[] = []
         for (let i = 0; i < end; i++) {
             output.push(i)
@@ -233,16 +236,30 @@ export class SystemImpl implements System {
         return output
     }
 
-    async init(): Promise<void> {
-        await initTables();
-        let range = SystemImpl.range;
-        await addPurchaseTypes(range(10));
-        await addPermissionsDB(range(10));
-        await addPurchaseConditionType(range(10));
-        await addPurchaseConditionOperator(range(10));
-        await addDiscountOperator(range(10));
-        await addDiscountConditionType(range(10));
-        return;
+    private static reloadShopPersonnel(users: User[]): Promise<void> {
+        return GetShopsManagement().then(result => {
+            result.map(s => {
+                return {
+                    shop_id: s.shop_id,
+                    owners: s.owners.map(o => {
+                        return {
+                            owner_email: this.getEmailFromIDFromList(users, o.owner_id),
+                            appointer_email: this.getEmailFromIDFromList(users, o.appointer_id)
+                        };
+                    }),
+                    managers: s.managers.map(m => {
+                        return {
+                            manager_email: this.getEmailFromIDFromList(users, m.manager_id),
+                            appointer_email: this.getEmailFromIDFromList(users, m.appointer_id),
+                            permissions: m.permissions
+                        };
+                    })
+                };
+            }).forEach(entry => {
+                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == entry.shop_id) as ShopImpl;
+                shop.addManagement(entry.owners, entry.managers);
+            });
+        });
     }
 
     static async rollback() {
@@ -293,30 +310,12 @@ export class SystemImpl implements System {
         return (users.find(u => u.user_id == target_id) as User).email
     }
 
-    private static reloadShopPersonnel(users: User[]): Promise<void> {
-        return GetShopsManagement().then(result => {
-            result.map(s => {
-                return {
-                    shop_id: s.shop_id,
-                    owners: s.owners.map(o => {
-                        return {
-                            owner_email: this.getEmailFromIDFromList(users, o.owner_id),
-                            appointer_email: this.getEmailFromIDFromList(users, o.appointer_id)
-                        };
-                    }),
-                    managers: s.managers.map(m => {
-                        return {
-                            manager_email: this.getEmailFromIDFromList(users, m.manager_id),
-                            appointer_id: this.getEmailFromIDFromList(users, m.appointer_id),
-                            permissions: m.permissions
-                        };
-                    })
-                };
-            }).forEach(entry => {
-                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == entry.shop_id) as ShopImpl;
-                shop.addManagement(entry.owners, entry.managers);
-            });
-        });
+    private static reloadItems(): Promise<void[]> {
+        return GetShopsInventory().then(inventory =>
+            Promise.all(inventory.map(async i => {
+                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl;
+                return await shop.addInventoryFromDB(i);
+            })))
     }
 
     private static reloadNotifications(): Promise<void> {
@@ -325,13 +324,17 @@ export class SystemImpl implements System {
         });
     }
 
-    private static reloadItems(): Promise<void> {
-        return GetShopsInventory().then(inventory => {
-            inventory.forEach(i => {
-                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl;
-                shop.addInventoryFromDB(i);
-            });
-        });
+    async init(): Promise<void> {
+        await initTables();
+        let range = SystemImpl.range;
+        await addPurchaseTypes(range(10));
+        await addPermissionsDB(range(10));
+        await addPurchaseConditionType(range(10));
+        await addPurchaseConditionOperator(range(10));
+        await addDiscountOperator(range(10));
+        await addDiscountConditionType(range(10));
+        await this.login.createAdmin();
+        return;
     }
 
     private static reloadPurchases(): Promise<void> {
@@ -541,7 +544,8 @@ export class SystemImpl implements System {
             active: true,
             name: name,
         }).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) SystemImpl.rollback().then(r => {
+            })
         })
         return shop.shop_id
     }
@@ -1014,5 +1018,9 @@ export class SystemImpl implements System {
             active: entry.active,
         }
         this.shops.push(ShopImpl.createFromDB(newEntry))
+    }
+
+    connectToDB(): Promise<boolean> {
+        return ConnectToDB();
     }
 }

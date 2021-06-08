@@ -168,7 +168,7 @@ export interface ShopInventory {
 
     hasPurchased(user_id: number, product_id: number): Boolean;
 
-    addInventoryFromDB(inventory: ShopRich): void;
+    addInventoryFromDB(inventory: ShopRich): Promise<void>;
 }
 
 export let id_counter: number = 0;
@@ -249,7 +249,7 @@ export class ShopInventoryImpl implements ShopInventory {
             DiscountHandler.discountsAreEqual(inv1.discount_policies, inv2.discount_policies) &&
             ShopInventoryImpl.purchaseTypesAreEqual(inv1.purchase_types, inv2.purchase_types) &&
             ShopInventoryImpl.purchasePoliciesAreEqual(inv1.purchase_policies, inv2.purchase_policies) &&
-            ProductImpl.productsAreEqual(inv1.products, inv2.products)
+            ProductImpl.productsAreEqual(inv1.products, inv2.products);
     }
 
     private static createPurchasePoliciesFromDB(purchase_condition: number): Promise<PurchaseCondition> {
@@ -257,7 +257,7 @@ export class ShopInventoryImpl implements ShopInventory {
         return GetPurchaseConditions(purchase_condition).then(result =>
             (result.left && result.right) ? this.createPurchasePoliciesFromDB(result.left).then(left => this.createPurchasePoliciesFromDB(result.right).then(right =>
                     new CompositeCondition(purchase_condition, [left, right], result.operator as number))) :
-                new SimpleCondition(purchase_condition, result.operator as number, result.value))
+                new SimpleCondition(purchase_condition, result.type as number, result.value))
     }
 
     private static purchaseTypesAreEqual(p1: Purchase_Type[], p2: Purchase_Type[]) {
@@ -553,14 +553,16 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     //export type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
-    addInventoryFromDB(inventory: ShopRich): void {
+    async addInventoryFromDB(inventory: ShopRich): Promise<void> {
         this._products = inventory.products.map(p => ProductImpl.createFromDB(p))
         this._purchase_types = inventory.purchase_types && inventory.purchase_types.length > 0 ? inventory.purchase_types : [Purchase_Type.Immediate]
-        this.discount_policies.addDiscountsFromDB(inventory.discounts)
-        inventory.purchase_types.map(condition => ShopInventoryImpl.createPurchasePoliciesFromDB(condition)).forEach(result => {
-            result.then(result => this._purchase_policies = this._purchase_policies.concat([result]))
-        })
+        await this.discount_policies.addDiscountsFromDB(inventory.discounts)
+        this._purchase_policies = await Promise.all(
+            inventory.purchase_conditions.map(condition => ShopInventoryImpl.createPurchasePoliciesFromDB(condition))
+        )
+        console.log('temp')
     }
+
 
     private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
         const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}

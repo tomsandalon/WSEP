@@ -179,7 +179,7 @@ export type PurchaseConditionTree = {
     right?: any
 }
 export const GetPurchaseConditions = (policy_id: number): Promise<PurchaseConditionTree> =>{
-    return db.transaction( async (trx: any) =>{
+    return db.transactioan(async (trx: any) => {
         const query = (id: number) => trx.raw(`(SELECT simple_id as first, -1 as second FROM purchase_simple_condition where simple_id = ${id}) union
             (SELECT first, second FROM
                 (SELECT composite_id as p_condition_id FROM purchase_composite_condition WHERE composite_id = ${id}) as Com INNER JOIN purchase_comprised

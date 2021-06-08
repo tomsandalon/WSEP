@@ -12,7 +12,7 @@ export type history_entry = { key: history_key, purchase: Purchase };
 export interface UserPurchaseHistory {
     history: history_entry[]
 
-    addPurchase(user_id: number, purchase: Purchase): void
+    addPurchase(user_id: number, purchase: Purchase): Promise<void>
 
     getUserPurchases(user_id: number): Purchase[] | string
 
@@ -38,9 +38,9 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory {
         return this.instance
     }
 
-    public addPurchase(user_id: number, purchase: Purchase): void {
+    public async addPurchase(user_id: number, purchase: Purchase): Promise<void> {
         this.addPurchaseToHistory(user_id, purchase);
-        PurchaseBasket(user_id, purchase.shop.shop_id, purchase.order_id, purchase.date, purchase.products.map(product => {
+        await PurchaseBasket(user_id, purchase.shop.shop_id, purchase.order_id, purchase.date, purchase.products.map(product => {
             return {
                 product_id: product.product_id,
                 amount: product.amount,
