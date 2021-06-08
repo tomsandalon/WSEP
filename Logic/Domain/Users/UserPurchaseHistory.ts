@@ -121,9 +121,15 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory {
         return key1.user_id == key2.user_id &&
             key1.shop_id == key2.shop_id &&
             p1.shop.shop_id == p2.shop.shop_id &&
-            p1.date == p2.date &&
+            UserPurchaseHistoryImpl.sameDay(p1.date, p2.date) &&
             p1.minimal_user_data.userId == p2.minimal_user_data.userId &&
             p1.products.length == p2.products.length &&
             p1.products.every(p1 => p2.products.some(p2 => ProductPurchaseImpl.productsAreEqual(p1, p2)))
+    }
+
+    private static sameDay = function (d1: Date, d2: Date) {
+        return d1.getFullYear() === d2.getFullYear() &&
+            d1.getDate() == d2.getDate() &&
+            d1.getMonth() == d2.getMonth()
     }
 }

@@ -118,8 +118,7 @@ export class ShoppingBasketImpl implements ShoppingBasket {
     }
 
     static basketsAreEqual(c1: ShoppingBasket, c2: ShoppingBasket) {
-        return c1.shop.shop_id == c2.shop.shop_id &&
-            JSON.stringify(c1.user_data) == JSON.stringify(c2.user_data) &&
+        return JSON.stringify(c1.user_data) == JSON.stringify(c2.user_data) &&
             c1.products.every(p1 => c2.products.some(p2 =>
                 p1.amount == p2.amount &&
                 p1.price_after_discount == p2.price_after_discount &&

@@ -436,7 +436,7 @@ const groupByPurchases = (purchases: any[]): Purchase[] => {
                 date: new Date(purchases[i].timestamp),
                 purchase_id: purchases[i].purchase_id,
                 shop_id: purchases[i].shop_id,
-                user_id: purchases[i].user,
+                user_id: purchases[i].user_id,
                 products: []
             })
         }
