@@ -1,6 +1,6 @@
 const unirest = require('unirest');
-
-const URL = "https://cs-bgu-wsep.herokuapp.com/"
+const {externalServices} = require('../Logic/Config')
+const URL = externalServices
 const POST = 'POST'
 
 export class PaymentAndSupplyAdapter {
