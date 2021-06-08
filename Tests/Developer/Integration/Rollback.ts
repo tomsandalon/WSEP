@@ -2,7 +2,7 @@ import 'mocha';
 import {expect} from 'chai';
 import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
 import {Shop, ShopImpl} from "../../../Logic/Domain/Shop/Shop";
-import {id_counter as user_id_counter, UserImpl} from "../../../Logic/Domain/Users/User";
+import {UserImpl} from "../../../Logic/Domain/Users/User";
 import {describe} from "mocha";
 import {ConditionType} from "../../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {SystemImpl} from "../../../Logic/Domain/System";
@@ -20,7 +20,15 @@ function usersAreRestored(u1: UserImpl[], u2: UserImpl[]) {
 }
 
 function notificationsAreRestored(n1: {[p: number]: Notification[]}, n2: {[p: number]: Notification[]}) {
-    const size = user_id_counter
+    let size = 0
+    for (let i = 0; i < Infinity; i++) {
+        if (n1[i] != undefined) size = Math.max(size, i);
+        else i = Infinity
+    }
+    for (let i = 0; i < Infinity; i++) {
+        if (n2[i] != undefined) size = Math.max(size, i);
+        else i = Infinity
+    }
     for (let i = 0; i < size; i++) {
         if (!Notification.notificationsAreEqual(n1[i], n2[i])) return false
     }
@@ -79,25 +87,20 @@ describe('Rollback', async () => {
             await SystemImpl.rollback()
             expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
         })
-        // it("Check users are restored", async () => {
-        //     await SystemImpl.rollback().then(_ => {
-        //         expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
-        //     })
-        // })
-        // it("Check users are restored", async () => {
-        //     await SystemImpl.rollback().then(_ => {
-        //         expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
-        //     })
-        // })
-        // it("Check notifications are restored", async () => {
-        //     await SystemImpl.rollback().then(_ => {
-        //         expect(notificationsAreRestored(notifications, PublisherImpl.getInstance().notificationQueue)).to.be.true
-        //     })
-        // })
-        // it("Check purchases are restored", async () => {
-        //     await SystemImpl.rollback().then(_ => {
-        //         expect(purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)).to.be.true
-        //     })
-        // })
+        it("Check users are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
+            })
+        })
+        it("Check notifications are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(notificationsAreRestored(notifications, PublisherImpl.getInstance().notificationQueue)).to.be.true
+            })
+        })
+        it("Check purchases are restored", async () => {
+            await SystemImpl.rollback().then(_ => {
+                expect(purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)).to.be.true
+            })
+        })
     })
 })

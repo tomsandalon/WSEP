@@ -560,7 +560,6 @@ export class ShopInventoryImpl implements ShopInventory {
         this._purchase_policies = await Promise.all(
             inventory.purchase_conditions.map(condition => ShopInventoryImpl.createPurchasePoliciesFromDB(condition))
         )
-        console.log('temp')
     }
 
 

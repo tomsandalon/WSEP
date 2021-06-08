@@ -268,7 +268,6 @@ export class SystemImpl implements System {
             return;
         }
         this.isInRollbackProcess = true;
-        console.log('Her -----------------')
         await initTables();
         const users: User[] = await GetUsers()
         this.deleteData();

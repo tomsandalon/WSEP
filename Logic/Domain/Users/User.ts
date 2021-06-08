@@ -120,7 +120,7 @@ export class UserImpl implements User {
 
     static createFromEntry(entry: UserFromDB) {
         if (entry.user_id >= id_counter) id_counter = entry.user_id + 1
-        const ret = new UserImpl(entry.email, entry.password, entry.admin, entry.user_id, false, entry.age != 0, [])
+        const ret = new UserImpl(entry.email, entry.password, entry.admin, entry.user_id, false, entry.age < 18, [])
         entry.cart.forEach(cart => {
             ret.addToBasket(SystemImpl.getInstance().getShopInventoryFromID(cart.shop_id), cart.product_id, cart.amount)
         })
@@ -253,7 +253,7 @@ export class UserImpl implements User {
                     }
                 })
         }
-        this._cart = this._cart.filter((_, index) => index in success);
+        this._cart = this._cart.filter((_, index) => !(index in success));
         return errors.length > 0 ? errors : true;
     }
 
