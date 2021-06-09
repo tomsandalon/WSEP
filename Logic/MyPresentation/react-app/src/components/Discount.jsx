@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "./images/shirt.jpg";
 import "./Product.css";
 const Discount = (props) => {
   const condition = props.condition;
@@ -31,10 +30,10 @@ const Discount = (props) => {
         </div> */}
           <figcaption className="info align-self-center">
             <h4 className="center">Discount ID: {id}</h4>
-            <h4>{"Condition: " + numToCondition[condition]}</h4>
-            <h4>{"parameter: " + parameter}</h4>
             <h4>{"Item ID: " + itemID}</h4>
             <h4>{"discount value: " + value}</h4>
+            <h4>{"Condition: " + numToCondition[condition]}</h4>
+            <h4>{"parameter: " + parameter}</h4>
             <button className="btn btn-outline-primary btn-sm">
               Edit Item <i className="fa fa-edit"></i>
             </button>
@@ -53,6 +52,8 @@ const Discount = (props) => {
             <h4 className="center">Discount ID: {id}</h4>
             <h4>{"Item ID: " + itemID}</h4>
             <h4>{"discount value: " + value}</h4>
+            <h4>{"Condition: NONE"}</h4>
+            <h4>{"parameter: NONE"}</h4>
             <button className="btn btn-outline-primary btn-sm">
               Edit Item <i className="fa fa-edit"></i>
             </button>

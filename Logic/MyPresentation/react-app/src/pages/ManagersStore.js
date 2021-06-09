@@ -7,6 +7,7 @@ import { React } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Divider } from "@material-ui/core";
 import DiscountsBlock from "../components/DiscountsBlock";
+import PurchasePoliciesBlock from "../components/PurchasePoliciesBlock";
 
 const ManagersStore = () => {
   const { storeID, name } = useParams();
@@ -29,6 +30,14 @@ const ManagersStore = () => {
     detailsIsPending,
     detailsError,
   } = useFetch(`/user/details`);
+
+  const {
+    data: unparsed_purchasePolicies,
+    policiesIsPending,
+    policiesError,
+  } = useFetch(`/user/shop/policy?shop_id=${storeID}`);
+  const purchasePolicies = JSON.parse(unparsed_purchasePolicies);
+  console.log(purchasePolicies);
 
   const {
     data: unparsed_discounts,
@@ -136,6 +145,21 @@ const ManagersStore = () => {
               error={discountsError}
               isPending={discountsIsPending}
               discounts={discounts}
+            />
+          )}
+          <hr></hr>
+          <h3>Purchase Policies:</h3>
+          <Link to={`/addpolicy/${storeID}/${name}`}>
+            <button className="btn btn-outline-primary btn-sm ">
+              Add Purchase Policy <i className="fa fa-plus"></i>
+            </button>
+          </Link>
+          {purchasePolicies && (
+            <PurchasePoliciesBlock
+              storeID={storeID}
+              error={policiesError}
+              isPending={policiesIsPending}
+              policies={purchasePolicies}
             />
           )}
         </div>

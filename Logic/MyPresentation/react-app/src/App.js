@@ -25,6 +25,7 @@ import EditProduct from "./pages/Edit_Product";
 import EditPermissionsPre from "./pages/EditPermissionsPre";
 import Notifications from "./components/Notifications/Notifications";
 import Unatho from "./components/Unatho";
+import AddPolicy from "./pages/Add_Policy";
 function App() {
   return (
     <Router>
@@ -46,6 +47,7 @@ function App() {
           <Route path="/addstore"><AddStore/></Route>
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
           <Route path="/addproduct/:storeID/:storeName"><AddProduct /></Route>
+          <Route path="/addpolicy/:storeID/:storeName"><AddPolicy /></Route>
           <Route path="/adddiscount/:storeID/:storeName"><AddDiscount /></Route>
           <Route path="/editproduct/:storeID/:storeName"><EditProduct /></Route>
           <Route path="/editpermissionspre/:storeID/:storeName/:managerID"><EditPermissionsPre /></Route>
