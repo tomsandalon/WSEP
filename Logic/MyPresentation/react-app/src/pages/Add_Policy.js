@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, Button } from "react-bootstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
-import putFetch from "../putFetch.js";
+import postFetch from "../postFetch.js";
 import { useHistory, useParams } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
 import { Alert } from "reactstrap";
@@ -54,22 +54,12 @@ const AddPolicy = (props) => {
 
   var defaultCondition = [];
 
-  //   Object.keys(permissions).forEach((perm) => {
-  //     if (permissions[perm]) {
-  //       const valueAndLabel = {
-  //         label: Action[perm],
-  //         value: ActionToInt[Action[perm]],
-  //       };
-  //       if (!defaultPermissions.includes(valueAndLabel))
-  //         defaultPermissions.push(valueAndLabel);
-  //     }
-  //   });
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
   const submit = (e) => {
     e.preventDefault();
-    putFetch(
+    postFetch(
       "/user/shop/policy",
       { shop_id: storeID, condition: condition, value: value },
       thenFunc

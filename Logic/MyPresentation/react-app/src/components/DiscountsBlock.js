@@ -28,6 +28,7 @@ const DiscountsBlock = (props) => {
                     discount.discount ? discount.discount.value : discount.value
                   }
                   id={discount.id}
+                  storeID={storeID}
                 />
               );
             })}

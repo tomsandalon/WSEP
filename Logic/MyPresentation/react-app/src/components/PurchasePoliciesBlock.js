@@ -17,9 +17,10 @@ const PurchasePoliciesBlock = (props) => {
         <div className="row">
           {policies &&
             policies.map((unparsed_policy) => {
-              const policy = JSON.parse(unparsed_policy)
+              const policy = JSON.parse(unparsed_policy);
               return (
                 <PurchasePolicy
+                  storeID={storeID}
                   condition={policy.condition}
                   value={policy.value}
                   id={policy.id}

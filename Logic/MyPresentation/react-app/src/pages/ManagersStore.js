@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Divider } from "@material-ui/core";
 import DiscountsBlock from "../components/DiscountsBlock";
 import PurchasePoliciesBlock from "../components/PurchasePoliciesBlock";
+import ComposePolicy from "../components/Compose_Purchase_Policy";
 
 const ManagersStore = () => {
   const { storeID, name } = useParams();
@@ -162,6 +163,7 @@ const ManagersStore = () => {
               policies={purchasePolicies}
             />
           )}
+          <ComposePolicy storeID={storeID} storeName={name}></ComposePolicy>
         </div>
         {/* </div> */}
       </div>
