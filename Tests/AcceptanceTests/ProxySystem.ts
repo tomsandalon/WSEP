@@ -9,7 +9,7 @@ import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicComp
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
-import {ClearDB} from "../../Logic/DataAccess/API";
+import {ClearDB, ConnectToDB} from "../../Logic/DataAccess/API";
 
 export class ProxySystem implements System{
     private readonly system: AdapterSystem | undefined
@@ -22,7 +22,8 @@ export class ProxySystem implements System{
         if(this.system == undefined){
             return Promise.resolve(undefined);
         }
-        return this.system.init();
+        // @ts-ignore
+        return ConnectToDB().then(_ => ClearDB().then(() => this.system.init()))
     }
 
     isAdmin(user_id: number): string | boolean {
@@ -425,9 +426,5 @@ export class ProxySystem implements System{
             return false;
         else
             return true;
-    }
-
-    connectToDB(): Promise<boolean> {
-        return ClearDB()
     }
 }

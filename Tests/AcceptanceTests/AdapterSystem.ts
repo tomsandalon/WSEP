@@ -1,10 +1,7 @@
-import {SearchTypes} from "../../Logic/Domain/System";
+import {SearchTypes, System} from "../../Logic/Domain/System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 // import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
-import {TestNotAssociatedWithImplementation} from "./System";
 import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
-import * as Tests from "./System"
-import {System} from "../../Logic/Domain/System";
 import {Condition} from "../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
@@ -12,6 +9,7 @@ import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondit
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 
 export class AdapterSystem implements System {
+
     private system: System;
     public constructor(system: System) {
         this.system = system

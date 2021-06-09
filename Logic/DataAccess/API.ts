@@ -668,6 +668,6 @@ export const addDiscountConditionType = (types: number[]) =>
 
 export const ClearDB = async (): Promise<void> => {
     let builder = getBuilder();
-    const dropRequests = config.reduceRight((acc, table) => acc.concat([builder.dropTable(table.name)]), []);
+    const dropRequests = config.reduceRight((acc, table) => acc.concat([builder.dropTableIfExists(table.name)]), []);
     await dropRequests[0]
 };

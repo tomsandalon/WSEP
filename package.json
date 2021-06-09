@@ -5,7 +5,7 @@
   "main": "index.js",
   "module": "CommonJS",
   "scripts": {
-    "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/*",
+    "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/* --timeout 50000",
     "unit-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Unit/*/*",
     "integ-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Integration/*",
     "roll-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Integration/Rollback.ts --timeout 50000",
