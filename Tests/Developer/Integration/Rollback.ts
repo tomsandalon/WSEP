@@ -9,6 +9,9 @@ import {SystemImpl} from "../../../Logic/Domain/System";
 import {PublisherImpl} from "../../../Logic/Domain/Notifications/PublisherImpl";
 import {Notification} from '../../../Logic/Domain/Notifications/Notification';
 import {history_entry, UserPurchaseHistoryImpl} from "../../../Logic/Domain/Users/UserPurchaseHistory";
+import {DiscountHandler} from "../../../Logic/Domain/Shop/DiscountPolicy/DiscountHandler";
+import {Condition} from "../../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
+import {LogicComposition} from "../../../Logic/Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
 
 
 function shopsAreEquals(shop1: Shop[], shop2: Shop[]): boolean {
@@ -70,6 +73,11 @@ describe('Rollback', async () => {
             tester = system.performLogin("newUser@test.com", "TESTER") as number
 
             system.addDiscount(originOwner, shopID, 0.5)
+            system.addDiscount(originOwner, shopID, 0.6)
+            system.addDiscount(originOwner, shopID, 0.3)
+            system.addConditionToDiscount(originOwner, shopID, DiscountHandler.discountCounter - 1, Condition.Amount, "10")
+            system.addLogicComposeDiscount(originOwner, shopID, LogicComposition.AND, DiscountHandler.discountCounter - 1, DiscountHandler.discountCounter - 3)
+
             system.addPurchasePolicy(originOwner, shopID, ConditionType.NotCategory, "GTX")
 
             system.addItemToBasket(tester, ProductImpl._product_id_specifier - 1, shopID, 2)
@@ -86,7 +94,7 @@ describe('Rollback', async () => {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         it("Check reconnect to db", async () => {
-            expect(false).to.be.true
+            // expect(false).to.be.true
             // TODO uncomment, run the test case, wait for 'Sleeping to be printed', kill DB via terminal,
             //  wait for wake up and expect to see 'Reconnecting', then start up the DB then expect mocha to pass the test
             // console.log('Sleeping')
