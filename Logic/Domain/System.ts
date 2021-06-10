@@ -54,6 +54,7 @@ import {
     User
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
+import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -91,9 +92,9 @@ export interface System {
 
     editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number): string | void
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean>
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
 
-    purchaseCart(user_id: number, payment_info: string): Promise<string | boolean>
+    purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
 
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info: string): number | string
@@ -408,7 +409,7 @@ export class SystemImpl implements System {
             })
     }
 
-    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") return user
         return user.purchaseBasket(shop_id, payment_info)
@@ -421,7 +422,7 @@ export class SystemImpl implements System {
 
     }
 
-    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") {
             return user

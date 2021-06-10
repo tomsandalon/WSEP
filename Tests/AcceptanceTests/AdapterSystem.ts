@@ -7,10 +7,12 @@ import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicComp
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
+import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 export class AdapterSystem implements System {
 
     private system: System;
+
     public constructor(system: System) {
         this.system = system
     }
@@ -43,7 +45,7 @@ export class AdapterSystem implements System {
         return this.system.adminDisplayShopHistory(user_id, shop_id);
     }
 
-    adminDisplayUserHistory(admin:number, target_id:number): string | string[] {
+    adminDisplayUserHistory(admin: number, target_id: number): string | string[] {
         return this.system.adminDisplayUserHistory(admin, target_id)
     }
 
@@ -107,11 +109,11 @@ export class AdapterSystem implements System {
         return this.system.performRegister(user_email, password)
     }
 
-    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         return await this.system.purchaseCart(user_id, payment_info)
     }
 
-    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         return await this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 
@@ -139,7 +141,7 @@ export class AdapterSystem implements System {
         return this.system.removeManager(user_id, shop_id, target)
     }
 
-    spellCheck(input : string) :string | string[]{
+    spellCheck(input: string): string | string[] {
         return ''
     }
 

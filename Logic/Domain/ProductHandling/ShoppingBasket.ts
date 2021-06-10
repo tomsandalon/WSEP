@@ -10,6 +10,7 @@ import {
 } from "./ErrorMessages";
 import {Purchase, PurchaseImpl} from "./Purchase";
 import {User} from "../Users/User";
+import {Purchase_Info} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 type Entry = { product: Product, amount: number, price_after_discount: number }
 export type ShoppingEntry = { productId: number, amount: number }
@@ -58,7 +59,7 @@ export interface ShoppingBasket {
      * @return Error
      * @return Purchase representing items and amount specified in basket
      */
-    purchase(payment_info: string, coupons: any  []): Promise<string | Purchase>
+    purchase(payment_info: string | Purchase_Info, coupons: any  []): Promise<string | Purchase>
 
     toString(): string[]
 
@@ -186,7 +187,7 @@ export class ShoppingBasketImpl implements ShoppingBasket {
         return this._products.length == 0
     }
 
-    async purchase(payment_info: string, coupons: any[]): Promise<string | Purchase> {
+    async purchase(payment_info: string | Purchase_Info, coupons: any[]): Promise<string | Purchase> {
         const order = PurchaseImpl.create(new Date(), this, [], this.shop, this._user_data);
         if (typeof order == "string")
             return order

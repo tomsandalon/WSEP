@@ -10,6 +10,7 @@ import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCo
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 import {ClearDB, ConnectToDB} from "../../Logic/DataAccess/API";
+import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 export class ProxySystem implements System{
     private readonly system: AdapterSystem | undefined
@@ -200,25 +201,25 @@ export class ProxySystem implements System{
         return this.system.performRegister(user_email, password)
     }
 
-    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         return await this.system.purchaseCart(user_id, payment_info)
     }
 
-    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         //for payment service mock
-        if (payment_info.includes('MOCK')) {
-            if (payment_info.includes('CRASH'))
-                return "Payment service has been crashed";
-            if (payment_info.includes('FAIL'))
-                return false;
-            return true;
-        }
+        // if (payment_info.includes('MOCK')) {
+        //     if (payment_info.includes('CRASH'))
+        //         return "Payment service has been crashed";
+        //     if (payment_info.includes('FAIL'))
+        //         return false;
+        //     return true;
+        // }
         //end mock
 
         return await this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)

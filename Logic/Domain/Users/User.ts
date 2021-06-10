@@ -8,6 +8,7 @@ import {UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {BasketDoesntExists} from "../ProductHandling/ErrorMessages";
 import {User as UserFromDB} from "../../DataAccess/Getters"
 import {SystemImpl} from "../System";
+import {Purchase_Info} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 const LEGAL_DRINKING_AGE = 18
 export let id_counter: number = 0;
@@ -216,7 +217,7 @@ export class UserImpl implements User {
      * @param payment_method
      * @return true if the purchase is a success otherwise a string representing th error
      */
-    async purchaseBasket(shop_id: number, payment_method: string): Promise<string | boolean> {
+    async purchaseBasket(shop_id: number, payment_method: string | Purchase_Info): Promise<string | boolean> {
         let shopping_basket = this._cart.filter(element => element.shop.shop_id == shop_id);
         if (shopping_basket.length == 0) { //trying to purchase a basket that doesnt exist
             logger.Error(BasketDoesntExists);
@@ -237,8 +238,7 @@ export class UserImpl implements User {
      * @param payment_method
      * @return true if all baskets could be purchased
      */
-    async purchaseCart(payment_method: string): Promise<string[] | boolean> {
-        // const coupon_per_basket = [[], []]
+    async purchaseCart(payment_method: string | Purchase_Info): Promise<string[] | boolean> {
         let success: number[] = []
         let errors: string[] = []
         for (const basket of this._cart) {

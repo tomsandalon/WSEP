@@ -6,6 +6,7 @@ import {LogicComposition} from "../Domain/Shop/DiscountPolicy/LogicCompositionDi
 import {NumericOperation} from "../Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../Domain/Shop/PurchasePolicy/CompositeCondition";
+import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 
@@ -200,15 +201,40 @@ export class Service {
     }
 
     performRegister(user_email: string, password: string, age: string): boolean {
-        return this._system.performRegister(user_email, password, age.length == 0 || isNaN(Number(age))? undefined : Number(age))
+        return this._system.performRegister(user_email, password, age.length == 0 || isNaN(Number(age)) ? undefined : Number(age))
+    }
+
+    private static isValidPurchaseInfo(info: Purchase_Info): boolean {
+        return info.payment_info != undefined &&
+            info.payment_info.ccv != undefined &&
+            info.payment_info.year != undefined &&
+            info.payment_info.month != undefined &&
+            info.payment_info.card_number != undefined &&
+            info.payment_info.holder_id != undefined &&
+            info.payment_info.holder_name != undefined &&
+            info.delivery_info.name != undefined &&
+            info.delivery_info.zip != undefined &&
+            info.delivery_info.city != undefined &&
+            info.delivery_info.address != undefined &&
+            info.delivery_info.country != undefined
+    }
+
+    private static getPurchaseInfoOrString(payment_info: string): string | Purchase_Info {
+        try {
+            const parsed_info: Purchase_Info = JSON.parse(payment_info);
+            if (Service.isValidPurchaseInfo(parsed_info)) return parsed_info
+            return payment_info
+        } catch (e) {
+            return payment_info
+        }
     }
 
     purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
-        return this._system.purchaseCart(user_id, payment_info)
+        return this._system.purchaseCart(user_id, Service.getPurchaseInfoOrString(payment_info)
     }
 
     purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
-        return this._system.purchaseShoppingBasket(user_id, shop_id, payment_info)
+        return this._system.purchaseShoppingBasket(user_id, shop_id, Service.getPurchaseInfoOrString(payment_info))
     }
 
     removeManager(user_id: number, shop_id: number, target: string): string | boolean {

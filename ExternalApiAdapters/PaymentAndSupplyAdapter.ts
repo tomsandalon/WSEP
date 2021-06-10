@@ -3,6 +3,25 @@ const {externalServices} = require('../Logic/Config')
 const URL = externalServices
 const POST = 'POST'
 
+export type Purchase_Info = {
+    payment_info: {
+        holder_id: string
+        holder_name: string,
+        card_number: string,
+        month: string,
+        year: string,
+        ccv: string,
+    }
+    delivery_info: {
+        name: string,
+        address: string,
+        city: string,
+        country: string,
+        zip: string
+    }
+}
+
+
 export class PaymentAndSupplyAdapter {
 
     private static instance: PaymentAndSupplyAdapter | undefined
