@@ -68,4 +68,4 @@ app.use(route_shop_policy, require('./User/Registered/Policy'));
 app.use(route_shop_discount, require('./User/Registered/Discount'));
 //* For debug TODO delete this
 
-service.initData();
+service.init().then(_ => service.initData()).then(_ => console.log('Ready'));
