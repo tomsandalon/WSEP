@@ -1,9 +1,14 @@
-import {OK, service, Session, sid} from "../Config/Config";
+import {OK, service, ServiceUnavailable, Session, sid} from "../Config/Config";
 
 const express = require('express');
 const router = express.Router();
 module.exports = router;
 router.get('/',(request: any, response: any) => {
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const session_data = Session.sessions[request.cookies[sid]];
     let session_id = request.cookies[sid];
     response.status(OK);

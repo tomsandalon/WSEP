@@ -1,4 +1,4 @@
-import {OK, ServerNotFound, service, Session, sid, Unauthorized} from "../../Config/Config";
+import {OK, ServerNotFound, service, ServiceUnavailable, Session, sid, Unauthorized} from "../../Config/Config";
 import {acknowledge_for_notifications} from "../../WSEvents";
 const express = require('express');
 const router = express.Router();
@@ -11,6 +11,11 @@ router.post('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id_new = service.performLogin(request.body.email, request.body.password);
     response.setHeader("Content-Type", "text/html");

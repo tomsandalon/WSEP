@@ -14,16 +14,22 @@ import {Condition} from "./Shop/DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "./Shop/DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NotificationAdapter} from "./Notifications/NotificationAdapter";
-import {logger} from "./Logger";
-import {Authentication} from "./Users/Authentication";
+import {logger, panicLogger} from "./Logger";
 import {
     AddDiscount,
+    addDiscountConditionType,
+    addDiscountOperator,
     AddItemToBasket,
+    addPermissions,
     AddProduct,
+    addPurchaseConditionOperator,
+    addPurchaseConditionType,
     AddPurchasePolicy,
+    addPurchaseTypes,
     AddShop,
     AppointManager,
     AppointOwner,
+    ConnectToDB,
     DeleteItemInBasket,
     RateProduct,
     RegisterUser,
@@ -44,9 +50,13 @@ import {
     GetShopsManagement,
     GetShopsRaw,
     GetUsers,
+    ShopRaw,
     User
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
+import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+
+const {initTables} = require('../DataAccess/Init');
 
 export enum SearchTypes {
     name,
@@ -82,9 +92,9 @@ export interface System {
 
     editShoppingCart(user_id: number, shop_id: number, product_id: number, amount: number): string | void
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean>
+    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
 
-    purchaseCart(user_id: number, payment_info: string): Promise<string | boolean>
+    purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
 
     addShop(user_id: number, name: string, description: string,
             location: string, bank_info: string): number | string
@@ -167,11 +177,12 @@ export interface System {
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
 
+    init(): Promise<void>
 }
 
 export class SystemImpl implements System {
     private static instance: SystemImpl;
-
+    private static isInRollbackProcess: boolean = false;
     private constructor(reset?: boolean) {
         if (reset) SystemImpl.reset()
         this._login = LoginImpl.getInstance(reset);
@@ -216,18 +227,57 @@ export class SystemImpl implements System {
         return this.instance;
     }
 
+    private static range(end: number): number[] {
+        const output: number[] = []
+        for (let i = 0; i < end; i++) {
+            output.push(i)
+        }
+        return output
+    }
+
+    private static reloadShopPersonnel(users: User[]): Promise<void> {
+        return GetShopsManagement().then(result => {
+            result.map(s => {
+                return {
+                    shop_id: s.shop_id,
+                    owners: s.owners.map(o => {
+                        return {
+                            owner_email: this.getEmailFromIDFromList(users, o.owner_id),
+                            appointer_email: this.getEmailFromIDFromList(users, o.appointer_id)
+                        };
+                    }),
+                    managers: s.managers.map(m => {
+                        return {
+                            manager_email: this.getEmailFromIDFromList(users, m.manager_id),
+                            appointer_email: this.getEmailFromIDFromList(users, m.appointer_id),
+                            permissions: m.permissions
+                        };
+                    })
+                };
+            }).forEach(entry => {
+                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == entry.shop_id) as ShopImpl;
+                shop.addManagement(entry.owners, entry.managers);
+            });
+        });
+    }
+
     static async rollback() {
-        await GetUsers().then(users => {
-                this.deleteData();
-                this.reloadShop(users);
-                this.reloadShopPersonnel(users);
-                this.reloadItems();
-                this.reloadPurchases();
-                this.reloadUsers(users);
-                this.reloadNotifications();
-                this.terminateAllConnections();
-            }
-        )
+        if (this.isInRollbackProcess) {
+            return;
+        }
+        this.isInRollbackProcess = true;
+        await ConnectToDB();
+        await initTables();
+        const users: User[] = await GetUsers()
+        this.deleteData();
+        await this.reloadShop(users);
+        await this.reloadShopPersonnel(users);
+        await this.reloadItems();
+        await this.reloadPurchases();
+        this.reloadUsers(users);
+        await this.reloadNotifications();
+        await this.terminateAllConnections();
+        this.isInRollbackProcess = false;
     }
 
     private static deleteData() {
@@ -249,60 +299,46 @@ export class SystemImpl implements System {
         })
     }
 
-    private static reloadShop(users) {
-        GetShopsRaw().then(result =>
-            result.forEach(entry => {
-                SystemImpl.getInstance().addShopFromDB(entry, users)
-            }))
+    private static reloadShop(users: User[]): Promise<void> {
+        return GetShopsRaw().then(result => result.forEach(entry => {
+            SystemImpl.getInstance().addShopFromDB(entry, users);
+        }));
     }
 
-    private static getEmailFromIDFromList(users, target_id) {
-        return users.find(u => u.user_id == target_id).email as string
+    private static getEmailFromIDFromList(users: User[], target_id: number) {
+        return (users.find(u => u.user_id == target_id) as User).email
     }
 
-    private static reloadShopPersonnel(users: User[]) {
-        GetShopsManagement().then(result => {
-            result.map(s => {
-                return {
-                    shop_id: s.shop_id,
-                    owners: s.owners.map(o => {
-                        return {
-                            owner_email: this.getEmailFromIDFromList(users, o.owner_id),
-                            appointer_email: this.getEmailFromIDFromList(users, o.appointer_id)
-                        }
-                    }),
-                    managers: s.managers.map(m => {
-                        return {
-                            manager_email: this.getEmailFromIDFromList(users, m.manager_id),
-                            appointer_id: this.getEmailFromIDFromList(users, m.appointer_id),
-                            permissions: m.permissions
-                        }
-                    })
-                }
-            }).forEach(entry => {
-                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == entry.shop_id) as ShopImpl
-                shop.addManagement(entry.owners, entry.managers)
-            })
-        })
+    private static reloadItems(): Promise<void[]> {
+        return GetShopsInventory().then(inventory =>
+            Promise.all(inventory.map(async i => {
+                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl;
+                return await shop.addInventoryFromDB(i);
+            })))
     }
 
-    private static reloadNotifications() {
-        GetNotifications().then(result => {
-            PublisherImpl.getInstance().addNotificationsFromDB(result)
-        })
+    private static reloadNotifications(): Promise<void> {
+        return GetNotifications().then(result => {
+            PublisherImpl.getInstance().addNotificationsFromDB(result);
+        });
     }
 
-    private static reloadItems() {
-        GetShopsInventory().then(inventory => {
-            inventory.forEach(i => {
-                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl
-                shop.addInventoryFromDB(i)
-            })
-        })
+    async init(): Promise<void> {
+        await ConnectToDB();
+        await initTables();
+        let range = SystemImpl.range;
+        await addPurchaseTypes(range(10));
+        await addPermissions(range(10));
+        await addPurchaseConditionType(range(10));
+        await addPurchaseConditionOperator(range(10));
+        await addDiscountOperator(range(10));
+        await addDiscountConditionType(range(10));
+        // await this.login.createAdmin();
+        return;
     }
 
-    private static reloadPurchases() {
-        GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases))
+    private static reloadPurchases(): Promise<void> {
+        return GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases));
     }
 
     private static terminateAllConnections() {
@@ -359,7 +395,10 @@ export class SystemImpl implements System {
                 product_id: product_id,
                 amount: amount
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to edit shopping cart for user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         else
             DeleteItemInBasket({
@@ -368,11 +407,14 @@ export class SystemImpl implements System {
                 product_id: product_id,
                 amount: amount
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to delete item from cart for user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
     }
 
-    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") return user
         return user.purchaseBasket(shop_id, payment_info)
@@ -385,7 +427,7 @@ export class SystemImpl implements System {
 
     }
 
-    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") {
             return user
@@ -419,7 +461,10 @@ export class SystemImpl implements System {
                 product_id: shop.getAllItems()
                     .reduce((acc, cur) => acc.product_id > cur.product_id ? acc : cur).product_id
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to add new product by ${user_id} in shop ${shop}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return result
     }
@@ -468,7 +513,10 @@ export class SystemImpl implements System {
             product_id: product_id,
             amount: amount
         }).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to add item ${product_id} to basket of user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
     }
 
@@ -495,6 +543,7 @@ export class SystemImpl implements System {
         if (typeof user == "string")
             return user
         if (!this._register.verifyUserEmail(user.user_email)) return "User is not registered"
+        if (name.length == 0) return "Name cannot be empty"
         const shop = ShopImpl.create(user.user_email, bank_info, description, location, name)
         if (typeof shop == "string") return shop
         this._shops = this._shops.concat(shop)
@@ -507,7 +556,10 @@ export class SystemImpl implements System {
             active: true,
             name: name,
         }).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to add new shop by ${user_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return shop.shop_id
     }
@@ -535,19 +587,21 @@ export class SystemImpl implements System {
     }
 
     performRegister(user_email: string, password: string, age?: number): boolean {
-        const result = this._register.register(user_email, password, age)
-        if (!result) return result
-        const hashed_pass = Authentication.getInstance().hash(password)
-        this.performLogin(user_email, hashed_pass)
+        const hashed_password = this._register.register(user_email, password, age)
+        if (!hashed_password) return false
+        this.performLogin(user_email, password)
         const user_id = this.login.getUserId(user_email) as number
         this.logout(user_id)
         RegisterUser({
             user_id: user_id,
             email: user_email,
-            password: hashed_pass,
-            age: age ? age : -1
+            password: (hashed_password) as string,
+            age: age ? age : 999
         }).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to register new user for user email ${user_email}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return true
     }
@@ -571,7 +625,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to update permissions by user ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -586,7 +643,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to remove permissions by user ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -601,7 +661,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             AppointManager(appointee_user_email, user_email, shop_id, permission_to_numbers(new ManagerPermissions()))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to appoint a manager by ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -614,7 +677,10 @@ export class SystemImpl implements System {
             return `Target email ${appointee_user_email} doesnt belong to a registered user`
         const ret = shop.appointNewOwner(user_email, appointee_user_email)
         if (typeof ret != 'string') AppointOwner(appointee_user_email, user_email, shop_id).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to appoint as owner by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -636,7 +702,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to edit permissions for user ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -654,7 +723,10 @@ export class SystemImpl implements System {
         const {shop, user_email} = result
         const ret = shop.removeItem(user_email, product_id)
         if (typeof ret != 'string') RemoveProduct(product_id).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to remove product by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -681,7 +753,10 @@ export class SystemImpl implements System {
             return `Target email ${target} doesnt belong to a registered user`
         const ret = shop.removeManager(user_email, target)
         if (typeof ret != 'string') RemoveManager(target, shop_id).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to remove manager by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -706,7 +781,10 @@ export class SystemImpl implements System {
                 value: value,
                 purchase_condition: condition
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to add purchase policy by user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return ret
     }
@@ -721,7 +799,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string') RemainingManagement(
             shop.getAllManagementEmail(), shop_id
         ).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to remove owner by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -733,7 +814,10 @@ export class SystemImpl implements System {
         const ret = shop.removePolicy(user_email, policy_id)
         if (typeof ret == 'string')
             removePurchasePolicy(shop_id, policy_id).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to remove purchase policy by ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return ret
     }
@@ -749,7 +833,10 @@ export class SystemImpl implements System {
                 second_policy: policy_id2,
                 operator: operator
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to compose purchase policy user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return ret
     }
@@ -784,7 +871,12 @@ export class SystemImpl implements System {
                 discount_param: condition_param,
                 discount_condition: condition,
                 operand_discount: id
-            }).then(r => r ? {} : SystemImpl.rollback())
+            }).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to add condition to discount user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -798,7 +890,12 @@ export class SystemImpl implements System {
                 first_policy: d_id1,
                 second_policy: d_id2,
                 operator: operation
-            }).then(r => r ? {} : SystemImpl.rollback())
+            }).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to compose conditions to discount user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -812,7 +909,12 @@ export class SystemImpl implements System {
                 first_policy: d_id1,
                 second_policy: d_id2,
                 operator: NumericOperation.__LENGTH + operation
-            }).then(r => r ? {} : SystemImpl.rollback())
+            }).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to compose discount by user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -822,7 +924,12 @@ export class SystemImpl implements System {
         const {shop, user_email} = result
         const ret = shop.removeDiscount(user_email, id)
         if (typeof ret != 'string')
-            removeDiscount(shop_id, id).then(r => r ? {} : SystemImpl.rollback())
+            removeDiscount(shop_id, id).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to remove discount by user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -944,7 +1051,12 @@ export class SystemImpl implements System {
         const ret = shop.rateProduct(user_email, user_id, product_id, rating)
         if (typeof ret == "string") return ret
         user.logRating(product_id, shop_id, rating)
-        RateProduct({user_id: user_id, product_id: product_id, rate: rating}).then(r => r ? {} : SystemImpl.rollback())
+        RateProduct({user_id: user_id, product_id: product_id, rate: rating}).then(r => {
+            if (!r) {
+                panicLogger.Error(`Failed to rate product by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
+        })
         return true
     }
 
@@ -970,18 +1082,16 @@ export class SystemImpl implements System {
         return {shop, user_email}
     }
 
-    private addShopFromDB(entry, users) {
-        const newEntry = entry.map(e => {
-            return {
-                shop_id: e._shop_id,
-                original_owner: SystemImpl.getEmailFromIDFromList(users, e.original_owner),
-                name: e.name,
-                description: e.description,
-                location: e.location,
-                bank_info: e.bank_info,
-                active: e.is_active
-            }
-        })
+    private addShopFromDB(entry: ShopRaw, users: User[]) {
+        const newEntry = {
+            shop_id: entry.shop_id,
+            original_owner: SystemImpl.getEmailFromIDFromList(users, entry.original_owner),
+            name: entry.name,
+            description: entry.description,
+            location: entry.location,
+            bank_info: entry.bank_info,
+            active: entry.active,
+        }
         this.shops.push(ShopImpl.createFromDB(newEntry))
     }
 }

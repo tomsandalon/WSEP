@@ -1,4 +1,4 @@
-import {OK, ServerNotFound, service, Session, sid, Unauthorized} from "../../Config/Config";
+import {OK, ServerNotFound, service, ServiceUnavailable, Session, sid, Unauthorized} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -9,6 +9,11 @@ router.get('/history/user', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     response.setHeader("Content-Type", "application/json");
@@ -32,6 +37,11 @@ router.get('/history/shop', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     response.setHeader("Content-Type", "application/json");
     const result = service.adminDisplayShopHistory(user_id, request.query.shop_id);
@@ -53,6 +63,11 @@ router.get('/users', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.getAllUsers(user_id)

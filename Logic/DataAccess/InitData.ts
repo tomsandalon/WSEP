@@ -1,14 +1,30 @@
-import {db} from './DB.config';
+import {connectToDB} from './DB.config';
 import {
-    AddDiscount, AddDiscountConditionType, AddDiscountOperator, AddItemToBasket,
+    AddDiscount, addDiscountConditionType,
+    AddDiscountConditionType, addDiscountOperator,
+    AddDiscountOperator,
+    AddItemToBasket,
     AddPermission,
-    AddProduct, AddPurchaseConditionOperator, AddPurchaseConditionType, AddPurchasePolicy,
+    addPermissions,
+    AddProduct,
+    addPurchaseConditionOperator,
+    AddPurchaseConditionOperator,
+    addPurchaseConditionType,
+    AddPurchaseConditionType,
+    AddPurchasePolicy,
     AddPurchaseType,
+    addPurchaseTypes,
     AddShop,
     AppointManager,
-    AppointOwner, PurchaseBasket, RateProduct,
-    RegisterUser, RemainingManagement, removeDiscount,
-    RemoveManager, removePurchasePolicy, UpdatePermissions
+    AppointOwner,
+    PurchaseBasket,
+    RateProduct,
+    RegisterUser,
+    RemainingManagement,
+    removeDiscount,
+    RemoveManager,
+    removePurchasePolicy,
+    UpdatePermissions
 } from "./API";
 import {
     GetDiscount, GetNotifications,
@@ -195,7 +211,26 @@ export const initData = () =>
 //             categories: first_product.categories,
 //         }
 //     ])
-GetUsers()
-    .then((result: any) => console.log(`Finish ${result[0].admin} -- ${typeof result[0].admin} \n${JSON.stringify(result, null, 2)}`))
+// addPurchaseTypes([1,2,3,4,5])
+//     .then(_ => addPermissionsDB([1,2,3,4,5]))
+//     .then(_ => addPurchaseConditionType([1,2,3,4,5]))
+//     .then(_ => addPurchaseConditionOperator([1,2,3,4,5]))
+//     .then(_ => addDiscountOperator([1,2,3,4,5]))
+//     .then(_ => addDiscountConditionType([1,2,3,4,5]))
+//     .then((result: any) => console.log(`Finish`))
+
+// AddProduct(first_product)
+//         .then((result: any) => console.log(`Finish ${result}`))
+connectToDB();
+PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, new Date(), [{
+            product_id: first_product.product_id,
+            amount: 20,
+            actual_price: 14,
+            name: first_product.name,
+            base_price: first_product.base_price,
+            description: first_product.description,
+            categories: first_product.categories,
+        }
+    ]).then((result: any) => console.log(`Finish ${result}`))
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

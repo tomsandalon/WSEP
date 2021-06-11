@@ -319,9 +319,9 @@ export class ShopImpl implements Shop {
         return new ShopImpl(_shop_id, _bank_info, _description, _location, _name, _management, _inventory, _is_active)
     }
 
-    static createFromDB(entry) {
+    static createFromDB(entry: { shop_id: any; bank_info: string; name: string; description: string; active: any; location: string; original_owner: string }) {
         id_counter = Math.max(id_counter, entry.shop_id + 1)
-        let _management = new ShopManagementImpl(entry.shop_id, entry.user_email)
+        let _management = new ShopManagementImpl(entry.shop_id, entry.original_owner)
         let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info)
         return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active);
     }
@@ -708,11 +708,18 @@ export class ShopImpl implements Shop {
         return this.management.getRealPermissions(user_email);
     }
 
-    addManagement(owners, managers) {
+    addManagement(owners: {
+        owner_email: string,
+        appointer_email: string
+    }[], managers: {
+        manager_email: string,
+        appointer_email: string,
+        permissions: number[]
+    }[]) {
         this.management.addManagement(owners, managers)
     }
 
-    addInventoryFromDB(inventory: ShopRich) {
-        this.inventory.addInventoryFromDB(inventory)
+    async addInventoryFromDB(inventory: ShopRich): Promise<void> {
+        await this.inventory.addInventoryFromDB(inventory)
     }
 }

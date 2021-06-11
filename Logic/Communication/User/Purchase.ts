@@ -1,4 +1,13 @@
-import {BadRequest, OK, purchase_cart, ServerNotFound, service, Session, sid} from "../Config/Config";
+import {
+    BadRequest,
+    OK,
+    purchase_cart,
+    ServerNotFound,
+    service,
+    ServiceUnavailable,
+    Session,
+    sid
+} from "../Config/Config";
 import {request, response} from "express";
 const express = require('express');
 const router = express.Router();
@@ -11,6 +20,11 @@ router.get('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.userOrderHistory(user_id);
@@ -38,6 +52,11 @@ router.post('/', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.purchaseShoppingBasket(user_id, request.body.shop_id, request.body.payment);
     if (typeof result === 'string') {
@@ -58,6 +77,11 @@ router.post(purchase_cart, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.purchaseCart(user_id, request.body.payment);

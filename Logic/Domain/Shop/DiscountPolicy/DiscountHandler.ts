@@ -30,9 +30,24 @@ export class DiscountHandler {
         return Math.round(num * 2) / 2;
     }
 
-    private static discountIsEqual(d1: Discount, d2: Discount) {
-        return d1.id == d2.id && typeof d1 == typeof d2 &&
-            JSON.stringify(d1) == JSON.stringify(d2)
+    private static discountIsEqual(d1: Discount, d2: Discount): boolean {
+        if (d1.id != d2.id) return false
+        if (d1 instanceof SimpleDiscount && d2 instanceof SimpleDiscount) {
+            return d1.value == d2.value
+        }
+        if (d1 instanceof ConditionalDiscount && d2 instanceof ConditionalDiscount) {
+            return d1.condition == d2.condition && d1.condition_param == d2.condition_param &&
+                DiscountHandler.discountIsEqual(d1.discount, d2.discount)
+        }
+        if (d1 instanceof LogicCompositionDiscount && d2 instanceof LogicCompositionDiscount) {
+            return d1.logic_composition == d2.logic_composition && DiscountHandler.discountIsEqual(d1.firstDiscount, d2.firstDiscount) &&
+                DiscountHandler.discountIsEqual(d1.secondDiscount, d2.secondDiscount)
+        }
+        if (d1 instanceof NumericCompositionDiscount && d2 instanceof NumericCompositionDiscount) {
+            return d1.operation == d2.operation && DiscountHandler.discountIsEqual(d1.discounts[0], d2.discounts[0]) &&
+                DiscountHandler.discountIsEqual(d1.discounts[1], d2.discounts[1])
+        }
+        return false
     }
 
     addDiscount(discount: Discount): void {
@@ -89,22 +104,20 @@ export class DiscountHandler {
     }
 
     async discountFromDTO(discount: DiscountTree): Promise<Discount> {
-        return discount.left && discount.right ? new SimpleDiscount(discount.id, discount.value) :
-            discount.left ? GetDiscount(discount.left).then(left => this.discountFromDTO(left).then(other => new ConditionalDiscount(discount.id, discount.operator, other, discount.value))) :
-                GetDiscount(discount.left).then(left => this.discountFromDTO(left).then(left =>
-                    GetDiscount(discount.right).then(right => this.discountFromDTO(right).then(right => {
-                        if (discount.operator >= NumericOperation.__LENGTH) return new LogicCompositionDiscount(discount.id, discount.operator + NumericOperation.__LENGTH, left, right)
+        return !discount.left && !discount.right ? new SimpleDiscount(discount.id, discount.value) :
+            !discount.right ? GetDiscount(discount.left.id).then(left => this.discountFromDTO(left).then(other => new ConditionalDiscount(discount.id, discount.type, other, discount.param))) :
+                GetDiscount(discount.left.id).then(left => this.discountFromDTO(left).then(left =>
+                    GetDiscount(discount.right.id).then(right => this.discountFromDTO(right).then(right => {
+                        if (discount.operator >= NumericOperation.__LENGTH) return new LogicCompositionDiscount(discount.id, discount.operator - NumericOperation.__LENGTH, left, right)
                         else return new NumericCompositionDiscount(discount.id, discount.operator, [left, right])
                     })))
                 );
     }
 
-    addDiscountsFromDB(discounts) {
-        discounts.forEach(discountId => {
-            DiscountHandler.discountCounter = Math.max(DiscountHandler.discountCounter, discountId + 1)
-            GetDiscount(discountId).then(discount => {
-                this.discountFromDTO(discount).then(result => this._discounts.push(result))
-            })
-        })
+    async addDiscountsFromDB(discounts): Promise<void> {
+        this._discounts = await Promise.all(discounts.map(discount => {
+            DiscountHandler.discountCounter = Math.max(DiscountHandler.discountCounter, discount + 1)
+            return GetDiscount(discount).then(res => this.discountFromDTO(res))
+        }))
     }
 }

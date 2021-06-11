@@ -1,15 +1,9 @@
 // Update with your config settings.
-
+const {client, connection} = require('../Config')
 module.exports = {
   development: {
-    client: 'mysql',
-    connection: {
-      host: '127.0.0.1',
-      database: 'wsep',
-      user:     'Mark',
-      password: 'FuckUniv2021',
-      charset: 'utf8'
-    },
+    client: client,
+    connection: connection,
     pool: {
       min: 2,
       max: 10

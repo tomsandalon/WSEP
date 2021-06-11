@@ -5,7 +5,7 @@ import {logger} from "../Logger";
 export interface Register {
     registered_users: UserInfoTrio[]
 
-    register(user_email: string, password: string, age?: number): boolean
+    register(user_email: string, password: string, age?: number): boolean | string
 
     loginVerification(user_email: string, hashed_password: string): boolean
 }
@@ -56,11 +56,11 @@ export class RegisterImpl implements Register {
      * @param age
      * @return true if the user's email password is unique and valid.
      */
-    register(user_email: string, password: string, age?: number): boolean {
+    register(user_email: string, password: string, age?: number): boolean | string {
         if (this.validateEmail(user_email)) {
             const hashed_password = this._password_handler.hash(password);
             this._registered_users.push(new UserInfoTrio(user_email, hashed_password, age))
-            return true;
+            return hashed_password;
         }
         return false;
     }

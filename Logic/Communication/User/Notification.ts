@@ -55,3 +55,15 @@ export const notify = (user_id: number, amount: number) => {
         }
     }
 }
+
+export const disconnectAllUsers = () => {
+    for (let sid in Session.sessions) {
+        const entry = Session.sessions[sid]
+        if (entry != null && entry.socket != null) {
+            // entry.socket.close()
+        }
+        //close the session
+        delete Session.sessions[sid]
+    }
+}
+

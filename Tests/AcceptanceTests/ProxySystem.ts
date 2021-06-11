@@ -9,12 +9,22 @@ import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicComp
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
+import {ClearDB, ConnectToDB} from "../../Logic/DataAccess/API";
+import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 export class ProxySystem implements System{
     private readonly system: AdapterSystem | undefined
 
     constructor(system: AdapterSystem | undefined) {
         this.system = system;
+    }
+
+    init(): Promise<void> {
+        if(this.system == undefined){
+            return Promise.resolve(undefined);
+        }
+        // @ts-ignore
+        return ConnectToDB().then(_ => ClearDB().then(() => this.system.init()))
     }
 
     isAdmin(user_id: number): string | boolean {
@@ -191,25 +201,25 @@ export class ProxySystem implements System{
         return this.system.performRegister(user_email, password)
     }
 
-    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         return await this.system.purchaseCart(user_id, payment_info)
     }
 
-    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         //for payment service mock
-        if (payment_info.includes('MOCK')) {
-            if (payment_info.includes('CRASH'))
-                return "Payment service has been crashed";
-            if (payment_info.includes('FAIL'))
-                return false;
-            return true;
-        }
+        // if (payment_info.includes('MOCK')) {
+        //     if (payment_info.includes('CRASH'))
+        //         return "Payment service has been crashed";
+        //     if (payment_info.includes('FAIL'))
+        //         return false;
+        //     return true;
+        // }
         //end mock
 
         return await this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
@@ -412,8 +422,8 @@ export class ProxySystem implements System{
     }
 
     //mock
-    deliverItem(product_id : number, amount: number, shop_id: number, to: string ,transaction_id : boolean | string): boolean {
-        if (product_id < 0 || amount < 0 || shop_id < 0 || to.includes("Drop table") || (typeof transaction_id == 'string') )
+    deliverItem(product_id: number, amount: number, shop_id: number, to: string, transaction_id: boolean | string): boolean {
+        if (product_id < 0 || amount < 0 || shop_id < 0 || to.includes("Drop table") || (typeof transaction_id == 'string'))
             return false;
         else
             return true;

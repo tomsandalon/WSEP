@@ -2,7 +2,7 @@ import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
 import {MinimalUserData, ShoppingBasket} from "./ShoppingBasket";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {DeliveryDenied, DiscountNotExists, PaymentDenied} from "./ErrorMessages";
-import {PaymentAndSupplyAdapter} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+import {PaymentAndSupplyAdapter, Purchase_Info} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 export interface Purchase {
     order_id: number,
@@ -21,7 +21,7 @@ export interface Purchase {
      *                  3. Saving the order in DB was successful
      * @return ErrorMessage otherwise
      */
-    purchase_self(payment_info: string): Promise<boolean | string>
+    purchase_self(payment_info: string | Purchase_Info): Promise<boolean | string>
 
     toString(): string;
 }
@@ -79,7 +79,7 @@ export class PurchaseImpl implements Purchase {
         return new PurchaseImpl(date, minimal_user_data, products as ProductPurchase[], basket.shop, id)
     }
 
-    async purchase_self(payment_info: string): Promise<string | boolean> {
+    async purchase_self(payment_info: string | Purchase_Info): Promise<string | boolean> {
         const s = PaymentAndSupplyAdapter.getInstance()
         return s.handshake()
             .then(res => {
@@ -90,13 +90,24 @@ export class PurchaseImpl implements Purchase {
                     return result_of_purchase
                 }
                 // const result_payment = PaymentHandlerImpl.getInstance().charge(payment_info, total_price, this._shop.bank_info);
-                return s.pay(payment_info, payment_info, payment_info, payment_info, payment_info, payment_info) //TODO fill real info
+                return (typeof payment_info == "string" ? s.pay(payment_info, payment_info, payment_info, payment_info, payment_info, payment_info) :
+                    s.pay(payment_info.payment_info.card_number,
+                        payment_info.payment_info.month,
+                        payment_info.payment_info.year,
+                        payment_info.payment_info.holder_name,
+                        payment_info.payment_info.ccv,
+                        payment_info.payment_info.holder_id))
                     .then(payment_transaction_id => {
                         if (payment_transaction_id == -1) {
                             this._shop.returnItems(this._products)
                             return PaymentDenied
                         }
-                        return s.supply("this is temp", "this is temp", "this is temp", "this is temp", "this is temp") //TODO fill real info
+                        return (typeof payment_info == "string" ? s.supply(payment_info, payment_info, payment_info, payment_info, payment_info) :
+                            s.supply(payment_info.delivery_info.name,
+                                payment_info.delivery_info.address,
+                                payment_info.delivery_info.city,
+                                payment_info.delivery_info.country,
+                                payment_info.delivery_info.zip))
                             .then(supply_transaction_id => {
                                 if (supply_transaction_id == -1) {
                                     s.cancel_pay(payment_transaction_id.toString())
