@@ -240,19 +240,16 @@ export class UserImpl implements User {
         // const coupon_per_basket = [[], []]
         let success: number[] = []
         let errors: string[] = []
-        for (const basket of this._cart) {
-            const index: number = this._cart.indexOf(basket);
-            await basket.purchase(payment_method, [])
-                .then(result => {
-                    if (typeof result === "string")
-                        errors.push(result)
-                    else {
-                        this._order_history.addPurchase(this._user_id, result)
-                        success.push(index)
-                    }
-                })
-        }
-        this._cart = this._cart.filter((_, index) => index in success);
+        this._cart.forEach((basket, index: number) =>{
+            const result = basket.purchase(payment_method, []);
+            if (typeof result === "string")
+                errors.push(result)
+            else {
+                this._order_history.addPurchase(this._user_id, result)
+                success.push(index)
+            }
+        });
+        this._cart = this._cart.filter((_, index) => !(index in success));
         return errors.length > 0 ? errors : true;
     }
 

@@ -280,8 +280,12 @@ input[type=email]:placeholder {
   width:100px;
   height:20px;
 }
+.buyCart{
+  width:150px;
+  height:40px;
+}
 .pay2{
-  width: 100px;
+  width: 130px;
   height:40px;
   margin-bottom: 10px; 
   margin-top: 10px;
@@ -365,7 +369,7 @@ input[type=email]:placeholder {
 }
 .cartButton3{
   background-color: #56baed;
-  width:160px;
+  width:185px;
   height:35px;
   margin-top:10px;
 }
@@ -376,6 +380,12 @@ input[type=email]:placeholder {
   background-color: #56baed;
   width:150px;
   height:35px;
+  margin-top:10px;
+}
+.cartButton10{
+  background-color: #56baed;
+  width:300px;
+  height:40px;
   margin-top:10px;
 }
 .cartButton{
