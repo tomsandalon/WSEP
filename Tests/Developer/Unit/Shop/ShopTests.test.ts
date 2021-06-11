@@ -1,10 +1,11 @@
 import 'mocha';
 import {assert, expect} from 'chai';
-import {Shop, ShopImpl} from "../../../Logic/Domain/Shop/Shop";
-import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
+import {Shop, ShopImpl} from "../../../../Logic/Domain/Shop/Shop";
+import {ProductImpl} from "../../../../Logic/Domain/ProductHandling/Product";
 // import {PurchaseType} from "../../../Logic/Domain/PurchaseProperties/PurchaseType";
-import {Filter_Type, Purchase_Type} from "../../../Logic/Domain/Shop/ShopInventory";
-import {Action} from "../../../Logic/Domain/ShopPersonnel/Permissions";
+import {Filter_Type, Purchase_Type} from "../../../../Logic/Domain/Shop/ShopInventory";
+import {Action} from "../../../../Logic/Domain/ShopPersonnel/Permissions";
+import {SystemImpl} from "../../../../Logic/Domain/System";
 
 
 const createProduct = () => {
@@ -18,7 +19,7 @@ const createProduct = () => {
 
 describe('Correctness Requirements', () => {
     it('4 - Open store must have at least one owner', () => {
-        const shop = new ShopImpl("some email", "bank info", "some description",
+        const shop = ShopImpl.create("some email", "bank info", "some description",
             "the big city", "The best test shop ever")
         expect(shop.is_active ? shop.management.owners.concat(shop.management.original_owner).length > 0 :
                                     true).to.be.true;
@@ -26,7 +27,7 @@ describe('Correctness Requirements', () => {
 
 describe('Test Shop', () => {
     it('Test create shop - requirement 3.2', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(shop.name).to.be.equals("shopie")
         expect(shop.location).to.be.equals("town")
         expect(shop.description).to.be.equals("best shop in town")
@@ -35,7 +36,7 @@ describe('Test Shop', () => {
     })
 
     it('Test add product - requirement 4.1', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(shop.getAllItems().length).to.be.eq(0)
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
             1000, ["monitors"],1000,  Purchase_Type.Immediate) === 'boolean').to.be.true
@@ -49,7 +50,7 @@ describe('Test Shop', () => {
     })
 
     it('Test remove product - requirement 4.1', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(shop.getAllItems().length).to.be.eq(0)
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
             1000, ["monitors"],1000,  Purchase_Type.Immediate) === 'boolean').to.be.true
@@ -60,7 +61,7 @@ describe('Test Shop', () => {
     })
 
     it('Test search - requirement 2.6', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 centimeter", "Best desc",
             1000, ["monitors"],1000,  Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
@@ -84,7 +85,7 @@ describe('Test Shop', () => {
     })
 
     it('Test filter - requirement 2.6', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 centimeter", "Best desc",
             1000, ["monitors"],1500,  Purchase_Type.Immediate) === 'boolean').to.be.true
         expect(typeof shop.addItem("tomsand@post.bgu.ac.il", "Best 29 inch", "Best desc",
@@ -102,7 +103,7 @@ describe('Test Shop', () => {
     })
 
     it('Test add owner - requirement 4.3', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         let result = shop.appointNewOwner("wrong@mail.com", "new@bgu.ac.il")
         expect(typeof result == "string").to.be.true
         expect(shop.management.owners.some(o => o.user_email == "new@bgu.ac.il")).to.be.false
@@ -112,7 +113,7 @@ describe('Test Shop', () => {
     })
 
     it('Test remove owner - requirement 4.4', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner1@bgu.ac.il")
         shop.appointNewOwner("owner1@bgu.ac.il", "owner2@bgu.ac.il")
         shop.appointNewOwner("owner1@bgu.ac.il", "owner3@bgu.ac.il")
@@ -123,6 +124,9 @@ describe('Test Shop', () => {
         expect(typeof shop.removeOwner("tomsand@post.bgu.ac.il", "owner1@bgu.ac.il") != "string").to.be.true
         expect(shop.getStaffInfo("tomsand@post.bgu.ac.il").length).to.be.eq(1)
 
+        SystemImpl.rollback()
+        // SystemImpl.getInstance().getAllShops(0)
+
         // expect(typeof shop.removeManager("tomsand@post.bgu.ac.il", "anothermanager@bgu.ac.il") == "string").to.be.true
         // expect(typeof shop.removeManager("owner@bgu.ac.il", "anothermanager@bgu.ac.il") == "string").to.be.false
         // expect(typeof shop.removeManager("tomsand@post.bgu.ac.il", "manager@bgu.ac.il") == "string").to.be.false
@@ -130,7 +134,7 @@ describe('Test Shop', () => {
     })
 
     it('Test add manager - requirement 4.5', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         let result = shop.appointNewManager("wrong@mail.com", "new@bgu.ac.il")
         expect(typeof result == "string").to.be.true
         shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner@bgu.ac.il")
@@ -144,7 +148,7 @@ describe('Test Shop', () => {
     })
 
     it('Test edit manager permissions - requirement 4.6', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner@bgu.ac.il")
         shop.appointNewManager("tomsand@post.bgu.ac.il", "manager@bgu.ac.il")
         shop.appointNewManager("owner@bgu.ac.il", "anothermanager@bgu.ac.il")
@@ -162,7 +166,7 @@ describe('Test Shop', () => {
     })
 
     it('Test remove manager - requirement 4.7', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         shop.appointNewOwner("tomsand@post.bgu.ac.il", "owner@bgu.ac.il")
         shop.appointNewManager("tomsand@post.bgu.ac.il", "manager@bgu.ac.il")
         shop.appointNewManager("owner@bgu.ac.il", "anothermanager@bgu.ac.il")
@@ -177,7 +181,7 @@ describe('Test Shop', () => {
     })
 
     it('Test get info - requirement 4.9', () => {
-        const shop: Shop = new ShopImpl("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
+        const shop: Shop = ShopImpl.create("tomsand@post.bgu.ac.il", "496351", "best shop in town", "town", "shopie")
         expect(typeof shop.getStaffInfo("wrong@post.bgu.ac.il") == "string").to.be.true
         expect(typeof shop.getStaffInfo("tomsand@post.bgu.ac.il") == "string").to.be.false
     })

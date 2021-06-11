@@ -11,7 +11,7 @@ import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCo
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 
-export class AdapterSystem implements System{
+export class AdapterSystem implements System {
     private system: System;
     public constructor(system: System) {
         this.system = system
@@ -105,12 +105,12 @@ export class AdapterSystem implements System{
         return this.system.performRegister(user_email, password)
     }
 
-    purchaseCart(user_id: number, payment_info: string): string | boolean {
-        return this.system.purchaseCart(user_id, payment_info)
+    async purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
+        return await this.system.purchaseCart(user_id, payment_info)
     }
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): string | boolean {
-        return this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+        return await this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string {
@@ -219,5 +219,17 @@ export class AdapterSystem implements System{
 
     removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
         return this.system.removePurchasePolicy(user_id, shop_id, policy_id)
+    }
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean {
+        return this.system.rateProduct(user_id, shop_id, product_id, rating);
+    }
+
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        return this.system.removePermission(user_id, shop_id, target_email, action);
+    }
+
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        return this.system.getUserEmailFromUserId(user_id);
     }
 }

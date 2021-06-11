@@ -1,7 +1,7 @@
 import {ShopInventory, ShopInventoryImpl} from "./ShopInventory";
 import {Manager, ManagerImpl} from "../ShopPersonnel/Manager";
 import {Owner, OwnerImpl} from "../ShopPersonnel/Owner";
-import {Action, ManagerPermissions, TotalNumberOfPermissions} from "../ShopPersonnel/Permissions";
+import {Action, ManagerPermissions, Permissions, TotalNumberOfPermissions} from "../ShopPersonnel/Permissions";
 import {logger} from "../Logger";
 import {NotificationAdapter} from "../Notifications/NotificationAdapter";
 
@@ -99,20 +99,31 @@ export interface ShopManagement {
     getPermissions(user_email: string): string | string[];
 
     removePermission(appointer_email: string, appointee_email: string, permission: Action): string | boolean;
+
+    getAllManagementEmails(): string[];
+
+    getRealPermissions(user_email: string): Permissions;
+
+    addManagement(owners, managers): void;
 }
 
 
 export class ShopManagementImpl implements ShopManagement {
-    private readonly _original_owner: Owner;
     private readonly _shop_id: number;
 
     constructor(shop_id: number, original_owner: string, shop_inventory?: ShopInventory) {
         this._shop_id = shop_id;
         //placing a temporary value which is immediately replaced
         this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "");
-        this._original_owner = new OwnerImpl(original_owner);
+        this._original_owner = OwnerImpl.create(original_owner);
         this._managers = [];
         this._owners = [];
+    }
+
+    private _original_owner: Owner;
+
+    get original_owner(): Owner {
+        return this._original_owner;
     }
 
     private _managers: Manager[];
@@ -127,10 +138,6 @@ export class ShopManagementImpl implements ShopManagement {
         return this._owners;
     }
 
-    allowedEditPolicy(user_email: string): boolean {
-        return this.isAllowed(user_email, Action.EditPolicies);
-    }
-
     private _shop_inventory: ShopInventory;
 
     get shop_inventory(): ShopInventory {
@@ -141,12 +148,19 @@ export class ShopManagementImpl implements ShopManagement {
         this._shop_inventory = value;
     }
 
-    get original_owner(): Owner {
-        return this._original_owner;
-    }
-
     get shop_id(): number {
         return this._shop_id;
+    }
+
+    static shopsAreEqual(m1: ShopManagement, m2: ShopManagement) {
+        return m1.shop_id == m2.shop_id &&
+            JSON.stringify(m1.original_owner) == JSON.stringify(m2.original_owner) &&
+            m1.managers.length == m2.managers.length && m1.managers.every(m1 => m2.managers.some(m2 => JSON.stringify(m1) == JSON.stringify(m2))) &&
+            m1.owners.length == m2.owners.length && m1.owners.every(m1 => m2.owners.some(m2 => OwnerImpl.ownersAreEqual(m1, m2)))
+    }
+
+    allowedEditPolicy(user_email: string): boolean {
+        return this.isAllowed(user_email, Action.EditPolicies);
     }
 
     addPermissions(appointer_email: string, appointee_email: string, permissions: Action[]): boolean | string {
@@ -203,7 +217,7 @@ export class ShopManagementImpl implements ShopManagement {
             return "Appointer is not an owner"
         }
 
-        this._managers = this._managers.concat([new ManagerImpl(appointee_email, appointer_email)])
+        this._managers = this._managers.concat([ManagerImpl.create(appointee_email, appointer_email)])
         const original = this.owners.find(o => o.user_email == appointer_email)
         if (original && original.appointees_emails().every(mail => mail != appointee_email)) {
             original.appointed_managers = original.appointed_managers.concat([appointee_email])
@@ -220,7 +234,7 @@ export class ShopManagementImpl implements ShopManagement {
             logger.Error(`${appointer_email} attempted to appoint ${appointee_email} but the appointer is not a owner`)
             return "Appointer is not an owner"
         }
-        this._owners = this._owners.concat([new OwnerImpl(appointee_email, appointer_email)])
+        this._owners = this._owners.concat([OwnerImpl.create(appointee_email, appointer_email)])
         this._managers = this._managers.filter(m => m.user_email != appointee_email)
         const original = this.owners.find(o => o.user_email == appointer_email)
         if (original) {
@@ -282,19 +296,19 @@ export class ShopManagementImpl implements ShopManagement {
     removeManagerByRecursion(user_email: string, target: string) {
         const manager = this.getManagerByEmail(target);
         if (!manager) return
-        this._managers = this._managers.filter(m => m.user_email != target)
         NotificationAdapter.getInstance().notify(target,
             `You have been demoted by ${user_email}`
         )
+        this._managers = this._managers.filter(m => m.user_email != target)
     }
 
     removeOwnerByRecursion(user_email: string, target: string) {
         const ownerToRemove = this.getOwnerByEmail(target);
         if (!ownerToRemove) return;
         this._owners = this.owners.filter(o => o.user_email != target)
-        this.removeAllSubordinates(target, user_email)
         NotificationAdapter.getInstance().notify(target,
             `You have been demoted by ${user_email}`)
+        this.removeAllSubordinates(target, user_email)
     }
 
     toString(): string {
@@ -320,21 +334,6 @@ export class ShopManagementImpl implements ShopManagement {
         return [this._original_owner].concat(this._owners).some((o: Owner) => o.user_email == user_email)
     }
 
-    private getOwnerByEmail(user_email: string) {
-        return [this._original_owner].concat(this._owners).find((o: Owner) => o.user_email == user_email)
-    }
-
-    private isAllowed(user_email: string, action: Action) {
-        return this.isOwner(user_email) ||
-            this._managers.some((m: Manager) => m.user_email == user_email && m.permissions?.isAllowed(action));
-    }
-
-    private getManagerByEmail(manager_email: string): Manager | null {
-        const result = this._managers.find(m => m.user_email == manager_email);
-        if (!result) return null;
-        return result;
-    }
-
     isManager(manager_email: string): boolean {
         return this.getManagerByEmail(manager_email) != null
     }
@@ -350,5 +349,57 @@ export class ShopManagementImpl implements ShopManagement {
         const manager = this.getManagerByEmail(user_email)
         if (manager) return [JSON.stringify(manager.permissions)]
         return `${user_email} is not in shop ${this.shop_id} management`
+    }
+
+    getAllManagementEmails(): string[] {
+        return [this.original_owner].concat(this.owners).map(o => o.user_email)
+            .concat(this.managers.map(m => m.user_email));
+    }
+
+    getRealPermissions(user_email: string): Permissions {
+        if (!this.isManager(user_email)) return new ManagerPermissions()
+        return (this.getManagerByEmail(user_email) as Manager).permissions
+    }
+
+    addManagement(owners, managers): void {
+        this.updateOriginalOwner(owners, managers)
+        this._owners = owners.forEach(o => OwnerImpl.createFromDB(
+            managers.filter(m => m.appointer_email == o.user_email).map(m => m.user_email),
+            owners.filter(o => o.appointer_email == o.user_email).map(o => o.user_email),
+            o.appointer_email,
+            o.user_email
+        ))
+        this._managers = managers.forEach(m => ManagerImpl.createFromDB(
+            m.appointer_email,
+            m.permissions,
+            m.user_email
+        ))
+    }
+
+    private removeAllSubordinates(user_email: string, original: string) {
+        this.managers.filter(m => m.appointer_user_email == user_email)
+            .forEach(m => this.removeManagerByRecursion(original, m.user_email))
+        this.owners.filter(o => o.appointer_email == user_email)
+            .forEach(o => this.removeOwnerByRecursion(original, o.user_email))
+    }
+
+    private getOwnerByEmail(user_email: string) {
+        return [this._original_owner].concat(this._owners).find((o: Owner) => o.user_email == user_email)
+    }
+
+    private isAllowed(user_email: string, action: Action) {
+        return this.isOwner(user_email) ||
+            this._managers.some((m: Manager) => m.user_email == user_email && m.permissions?.isAllowed(action));
+    }
+
+    private getManagerByEmail(manager_email: string): Manager | null {
+        const result = this._managers.find(m => m.user_email == manager_email);
+        if (!result) return null;
+        return result;
+    }
+
+    private updateOriginalOwner(owners, managers) {
+        this._original_owner.appointed_owners = owners.filter(o => o.appointer_email == this._original_owner.user_email).map(o => o.user_email)
+        this._original_owner.appointed_managers = managers.filter(m => m.appointer_email == this._original_owner.user_email).map(m => m.user_email)
     }
 }
