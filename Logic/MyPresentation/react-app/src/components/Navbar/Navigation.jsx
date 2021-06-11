@@ -6,13 +6,18 @@ import '../../index.css';
 import './Navbar.css'
 
 class Navigation extends Component {
-    state ={
-        clicked:false,
-        index:MenuItems.length,
-        errorMsg:'',
-        visible:false,
-        successVisible:false,
-        loggedUser:false,
+    constructor(props) {
+        super(props);
+        this.state ={
+            clicked:false,
+            index:MenuItems.length,
+            errorMsg:'',
+            visible:false,
+            successVisible:false,
+            loggedUser:false,
+            socket:props.socket,
+            notifications:0
+        };
     }
 handleLogout = () => {
     const requestOptions = {
@@ -66,8 +71,20 @@ isUser = () => {
             }
         });
 }
+socketFunc = () => {
+    this.state.socket.emit("Hello", document.cookie);
+    this.state.socket.emit("Get pending notifications",document.cookie);
+    this.state.socket.on("Get pending notifications", (amount) => {
+        if(amount >= 0)
+            this.setState({notifications:amount});
+    });
+}
 componentDidMount() {
     this.isUser();
+    this.interval = setInterval(() => this.socketFunc(), 1000);
+}
+componentWillUnmount() {
+    clearInterval(this.interval);
 }
 handleClick = () =>{
     this.setState({clicked:!this.state.clicked})
@@ -91,7 +108,7 @@ toggle(){
                 </div>
                 <ul className={this.state.clicked ? 'nav-menu active':'nav-menu'}>
                  {this.state.loggedUser && <li key={104}><a className="nav-links cartButton3 btn-primary btn-sm" href="/notifications">
-                            Notifications<i className="icon3 far fa-bell"></i>
+                            Notifications ({this.state.notifications})<i className="icon3 far fa-bell"></i>
                             </a>
                         </li>}
                     {!this.state.loggedUser && MenuItems.map((item,index) => {
