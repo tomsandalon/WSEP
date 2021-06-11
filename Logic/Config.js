@@ -5,7 +5,7 @@ exports.client = 'mysql'
 exports.connection =  {
     host: '127.0.0.1',
     database: 'wsep',
-    user:     'Mark',
-    password: 'FuckUniv2021',
+    user:     'lior',
+    password: '123456',
     charset: 'utf8'
 }

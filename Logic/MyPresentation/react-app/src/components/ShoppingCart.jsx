@@ -8,18 +8,52 @@ class ShoppingCart extends Component {
 		alertMsg:'',
 		visible:false,
 		showPayment:false,
+		id:'',
 		name:'',
 		cardNo:'',
-		data:'',
+		month:'',
+		year:'',
+		ccv:'',
+		delivery_name:'',
+		address:'',
+		city:'',
+		country:'',
+		zip:''
+		
+
+	}
+	handleDeliveryName = (event) => {
+		this.setState({delivery_name:event.target.value})
+	}
+	handleAddress = (event) => {
+		this.setState({address:event.target.value})
+	}
+	handleCity = (event) => {
+		this.setState({city:event.target.value})
+	}
+	handleCountry = (event) => {
+		this.setState({country:event.target.value})
+	}
+	handleZip = (event) => {
+		this.setState({zip:event.target.value})
+	}
+	handleCCV = (event) => {
+		this.setState({ccv:event.target.value})
+	}
+	handleYear = (event) => {
+		this.setState({year:event.target.value})
+	}
+	handleMonth = (event) => {
+		this.setState({month:event.target.value})
+	}
+	handleId = (event) => {
+		this.setState({id:event.target.value})
 	}
 	handleName = (event) => {
 		this.setState({name:event.target.value})
 	}
     handleCard = (event) => {
 		this.setState({cardNo:event.target.value})
-	}
-    handleData = (event) => {
-		this.setState({data:event.target.value})
 	}
 	cancelPayment = () => {
 		this.setState({showPayment:false})
@@ -77,7 +111,22 @@ class ShoppingCart extends Component {
                 'Cookie': document.cookie
             },
             body: JSON.stringify({
-                payment:this.state.name+this.state.cardNo +this.state.data
+					payment_info:{
+						holder_id:this.state.id,
+						holder_name:this.state.name,
+						card_number:this.state.cardNo,
+						month:this.state.month,
+						year:this.state.year,
+						ccv:this.state.ccv
+					},
+					delivery_info:{
+						name:this.state.delivery_name,
+						address:this.state.address,
+						city:this.state.city,
+						country:this.state.country,
+						zip:this.state.zip,
+
+					},
             })
         };
         fetch('/purchase/all',requestOptions)
@@ -154,9 +203,20 @@ class ShoppingCart extends Component {
 						  <img src={Image} id="icon" alt="User Icon" />
 						  </div>
 						  <form>
+						  	  <h1>Payment Info</h1>	
+						  	  <input type="text" className="pay fadeIn second" placeholder="ID" onChange={this.handleId}/>
 							  <input type="text" className="pay fadeIn second" placeholder="Ex. John Smith" onChange={this.handleName}/>
 							  <input type="text" className="pay fadeIn third" placeholder="Card No." onChange={this.handleCard}/>
-							  <input type="text" className="pay fadeIn third" placeholder="MM/YY/CVV" onChange={this.handleData}/>
+							  <input type="text" className="pay fadeIn third" placeholder="MM" onChange={this.handleMonth}/>
+							  <input type="text" className="pay fadeIn second" placeholder="YY" onChange={this.handleYear}/>
+							  <input type="text" className="pay fadeIn second" placeholder="CCV" onChange={this.handleCCV}/>
+							  <h1>Delivery Info</h1>
+							  <input type="text" className="pay fadeIn second" placeholder="Ex. John Smith" onChange={this.handleDeliveryName}/>
+							  <input type="text" className="pay fadeIn second" placeholder="Address" onChange={this.handleAddress}/>
+							  <input type="text" className="pay fadeIn second" placeholder="City" onChange={this.handleCity}/>
+							  <input type="text" className="pay fadeIn second" placeholder="Country" onChange={this.handleCountry}/>
+							  <input type="text" className="pay fadeIn second" placeholder="Zip" onChange={this.handleZip}/>
+
 							  <button type="button" class="pay2 btn btn-primary" onClick={this.purchaseCart}>Pay</button>
 							  <button type="button" class="pay2 btn btn-primary" onClick={this.cancelPayment}>Cancel</button>
 							</form>

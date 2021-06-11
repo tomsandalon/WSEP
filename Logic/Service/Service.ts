@@ -232,8 +232,9 @@ export class Service {
     purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
         return this._system.purchaseCart(user_id, Service.getPurchaseInfoOrString(payment_info))
     }
-
+    
     purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): Promise<string | boolean> {
+        console.log(typeof Service.getPurchaseInfoOrString(payment_info));
         return this._system.purchaseShoppingBasket(user_id, shop_id, Service.getPurchaseInfoOrString(payment_info))
     }
 
