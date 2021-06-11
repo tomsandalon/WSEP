@@ -17,7 +17,8 @@ import {Operator} from "../../../Logic/Domain/Shop/PurchasePolicy/CompositeCondi
 
 
 function shopsAreEquals(shop1: Shop[], shop2: Shop[]): boolean {
-    return shop1.length == shop2.length && shop1.every(s1 => shop2.some(s2 => ShopImpl.shopsAreEquals(s1, s2)))
+    const res = shop1.length == shop2.length && shop1.every(s1 => shop2.some(s2 => ShopImpl.shopsAreEquals(s1, s2)))
+    return res
 }
 
 function usersAreRestored(u1: UserImpl[], u2: UserImpl[]) {
@@ -111,22 +112,23 @@ describe('Rollback', async () => {
         })
         it("Check shops are restored", async () => {
             await SystemImpl.rollback()
-            expect(shopsAreEquals(shops, SystemImpl.getInstance().shops)).to.be.true
+            const res = shopsAreEquals(shops, SystemImpl.getInstance().shops)
+            expect(res).to.be.true
         })
         it("Check users are restored", async () => {
-            await SystemImpl.rollback().then(_ => {
-                expect(usersAreRestored(users, SystemImpl.getInstance().login.existing_users)).to.be.true
-            })
+            await SystemImpl.rollback()
+            const res = usersAreRestored(users, SystemImpl.getInstance().login.existing_users)
+            expect(res).to.be.true
         })
         it("Check notifications are restored", async () => {
-            await SystemImpl.rollback().then(_ => {
-                expect(notificationsAreRestored(notifications, PublisherImpl.getInstance().notificationQueue)).to.be.true
-            })
+            await SystemImpl.rollback()
+            const res = notificationsAreRestored(notifications, PublisherImpl.getInstance().notificationQueue)
+            expect(res).to.be.true
         })
         it("Check purchases are restored", async () => {
-            await SystemImpl.rollback().then(_ => {
-                expect(purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)).to.be.true
-            })
+            await SystemImpl.rollback()
+            const res = purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)
+            expect(res).to.be.true
         })
     })
 })

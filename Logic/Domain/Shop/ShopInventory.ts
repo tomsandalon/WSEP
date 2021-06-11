@@ -193,17 +193,19 @@ export interface ShopInventory {
     denyOfferAsManagement(user_email: string, offer_id: number): string | boolean;
 
     counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
+
+    addManagementToExistingOffers(appointee_email: string): void;
 }
 
 export let id_counter: number = 0;
 export const generateId = () => id_counter++;
 
 export class ShopInventoryImpl implements ShopInventory {
+    active_offers: OfferAcceptance[]
     private readonly _discount_policies: DiscountHandler;
     private readonly _shop_id: number;
     private readonly _bank_info: string;
     private readonly _shop_name: string;
-    active_offers: OfferAcceptance[]
 
     constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string, purchase_type: Purchase_Type[], active_offers: OfferAcceptance[]) {
         this._shop_id = shop_id;
@@ -292,6 +294,16 @@ export class ShopInventoryImpl implements ShopInventory {
 
     private static purchasePoliciesAreEqual(p1: PurchaseCondition[], p2: PurchaseCondition[]) {
         return p1.length == p2.length && p1.every(p1 => p2.some(p2 => ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1, p2)));
+    }
+
+    private static twoPurchasePoliciesAreEqual(p1: PurchaseCondition, p2: PurchaseCondition): boolean {
+        if (p1.id != p2.id) return false
+        if (p1 instanceof SimpleCondition && p2 instanceof SimpleCondition)
+            return p1.condition == p2.condition && p1.value == p2.value
+        if (p1 instanceof CompositeCondition && p2 instanceof CompositeCondition)
+            return p1.action == p2.action && ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[0], p2.conditions[0]) &&
+                ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[1], p2.conditions[1])
+        return false
     }
 
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
@@ -483,16 +495,6 @@ export class ShopInventoryImpl implements ShopInventory {
         return length != this._purchase_policies.length
     }
 
-    private static twoPurchasePoliciesAreEqual(p1: PurchaseCondition, p2: PurchaseCondition): boolean {
-        if (p1.id != p2.id) return false
-        if (p1 instanceof SimpleCondition && p2 instanceof SimpleCondition)
-            return p1.condition == p2.condition && p1.value == p2.value
-        if (p1 instanceof CompositeCondition && p2 instanceof CompositeCondition)
-            return p1.action == p2.action && ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[0], p2.conditions[0]) &&
-                ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[1], p2.conditions[1])
-        return false
-    }
-
     addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string) {
         const result = this.discount_policies.addConditionToDiscount(discount_id, condition, condition_param)
         if (!result) {
@@ -553,16 +555,6 @@ export class ShopInventoryImpl implements ShopInventory {
         this._purchase_policies = await Promise.all(
             inventory.purchase_conditions.map(condition => ShopInventoryImpl.createPurchasePoliciesFromDB(condition))
         )
-    }
-
-
-    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
-        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
-        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
-            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
-            return `Purchase policy doesn't allow this purchase`
-        }
-        return true
     }
 
     composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
@@ -639,8 +631,33 @@ export class ShopInventoryImpl implements ShopInventory {
         offer.managers_not_accepted.map(m => m.user_email).concat(offer.owners_not_accepted.map(o => o.user_email))
             .forEach(email => NotificationAdapter.getInstance().notify(email, `Offer request id ${offer_id}: new offer to accept from ${user_email}`))
         offer.offer.price_per_unit = new_price_per_unit
-        offer.offer.management_replied = true
         NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
+        return true
+    }
+
+    addManagementToExistingOffers(appointee_email: string): void {
+        const isOwner = this.shop_management.isOwner(appointee_email)
+        const isManager = !isOwner
+        this.active_offers = this.active_offers.map(o => {
+            return {
+                offer: o.offer,
+                managers_not_accepted: isManager ?
+                    o.managers_not_accepted.concat([this.shop_management.managers.find(m => m.user_email == appointee_email) as Manager]) :
+                    o.managers_not_accepted.filter(m => m.user_email != appointee_email),
+                owners_not_accepted: isOwner ?
+                    o.owners_not_accepted :
+                    o.owners_not_accepted.concat([this.shop_management.owners.concat([this.shop_management.original_owner]).find(o => o.user_email == appointee_email) as Owner])
+            }
+        })
+
+    }
+
+    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
+        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
+        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
+            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
+            return `Purchase policy doesn't allow this purchase`
+        }
         return true
     }
 }

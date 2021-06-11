@@ -155,11 +155,10 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     static shopsAreEqual(m1: ShopManagement, m2: ShopManagement) {
-        const result = m1.shop_id == m2.shop_id &&
+        return m1.shop_id == m2.shop_id &&
             JSON.stringify(m1.original_owner) == JSON.stringify(m2.original_owner) &&
             m1.managers.length == m2.managers.length && m1.managers.every(m1 => m2.managers.some(m2 => JSON.stringify(m1) == JSON.stringify(m2))) &&
             m1.owners.length == m2.owners.length && m1.owners.every(m1 => m2.owners.some(m2 => OwnerImpl.ownersAreEqual(m1, m2)))
-        return result
     }
 
     allowedEditPolicy(user_email: string): boolean {

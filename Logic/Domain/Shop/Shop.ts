@@ -464,8 +464,10 @@ export class ShopImpl implements Shop {
 
     appointNewManager(appointer_email: string, appointee_email: string): boolean | string {
         const ret = this._management.appointNewManager(appointer_email, appointee_email);
-        if (typeof ret == "boolean") logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
-        else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
+        if (typeof ret == "boolean") {
+            logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
+            this.inventory.addManagementToExistingOffers(appointee_email)
+        } else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
         return ret;
     }
 

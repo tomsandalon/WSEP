@@ -177,22 +177,86 @@ export interface System {
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
 
+    /**
+     * Make a new offer by a user
+     * @param user_id
+     * @param shop_id
+     * @param product_id
+     * @param amount
+     * @param price_per_unit
+     * @return true iff the offer was successfully logged, string representing the error otherwise
+     */
     makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number): string | boolean
 
+    /**
+     * get all the active offers of a user
+     * @param user_id
+     * @return string array containing a JSON representation of the offer. See Offer.ts#toString() for the format
+     */
     getActiveOffersAsUser(user_id: number): string | string[]
 
+    /**
+     * get all the active offers of a shop as its management
+     * @param user_id
+     * @param shop_id
+     * @return string array containing a JSON representation of the offer. See Offer.ts#toString() for the format
+     */
     getActiveOfferForShop(user_id: number, shop_id: number): string | string[]
 
+    /**
+     * accept an offer part of a shop's management
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @return true iff accepted the offer successfully. error as a string otherwise
+     */
     acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean
 
+    /**
+     * deny an offer part of a shop's management
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @return true iff denied the offer successfully. error as a string otherwise
+     */
     denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean
 
+    /**
+     * counteroffer an offer part of a shop's management
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @param new_price_per_unit
+     * @return true iff countered the offer successfully. error as a string otherwise
+     */
     counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean
 
+    /**
+     * Deny an offer as a user who received a counter offer
+     * @param user_id
+     * @param offer_id
+     * @return true iff the denial was successful, error string otherwise
+     */
     denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean
 
+    /**
+     * check if an offer is ready to be purchased by the user
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @return true if the offer is purchasable
+     * @return false if the offer is not purchasable
+     * @return string_error otherwise
+     */
     offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean
 
+    /**
+     * Purchase as offer a user
+     * @param user_id
+     * @param offer_id
+     * @param payment_info
+     * @return Promise containing true if the purchase was successful, string representing an error otherwise
+     */
     purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
 
     init(): Promise<void>

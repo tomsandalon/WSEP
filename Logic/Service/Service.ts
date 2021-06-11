@@ -359,7 +359,7 @@ export class Service {
         return SystemImpl.getInstance().offerIsPurchasable(user_id, shop_id, offer_id)
     }
 
-    purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
-        return SystemImpl.getInstance().purchaseOffer(user_id, offer_id, payment_info)
+    purchaseOffer(user_id: number, offer_id: number, payment_info: string): Promise<string | boolean> {
+        return SystemImpl.getInstance().purchaseOffer(user_id, offer_id, Service.getPurchaseInfoOrString(payment_info))
     }
 }

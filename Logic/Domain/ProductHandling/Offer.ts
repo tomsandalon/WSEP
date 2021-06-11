@@ -10,16 +10,14 @@ export class Offer {
     product: Product
     amount: number
     price_per_unit: number
-    management_replied: boolean
     user: User
 
-    constructor(shop: ShopInventory, id: number, product: Product, amount: number, price_per_unit: number, management_replied: boolean, user: User) {
+    constructor(shop: ShopInventory, id: number, product: Product, amount: number, price_per_unit: number, user: User) {
         this.shop = shop;
         this.id = id;
         this.product = product;
         this.amount = amount;
         this.price_per_unit = price_per_unit;
-        this.management_replied = management_replied
         this.user = user
     }
 
@@ -28,7 +26,7 @@ export class Offer {
         if (product == undefined) return "Product doesn't exist"
         if (product.purchase_type != Purchase_Type.Offer) return "Purchase type doesn't match"
         if (amount <= 0 || price_per_unit < 0) return "Can't offer negative numbers"
-        return new Offer(shop, offer_id_counter++, product, amount, price_per_unit, false, user)
+        return new Offer(shop, offer_id_counter++, product, amount, price_per_unit, user)
     }
 
     addToShop(): string | boolean {
@@ -46,7 +44,6 @@ export class Offer {
             product_name: this.product.name,
             amount: this.amount,
             price_per_unit: this.price_per_unit,
-            management_replied: this.management_replied,
             is_purchasable: this.isPurchasable()
         })
     }

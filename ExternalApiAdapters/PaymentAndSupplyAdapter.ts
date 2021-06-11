@@ -21,6 +21,7 @@ export type Purchase_Info = {
     }
 }
 
+const TIME_OUT_VALUE = 1500
 
 export class PaymentAndSupplyAdapter {
 
@@ -35,56 +36,91 @@ export class PaymentAndSupplyAdapter {
     }
 
     async handshake(): Promise<boolean> {
-        return unirest(POST, URL)
-            .field('action_type', 'handshake')
-            .end((res: { error: string | undefined; raw_body: any; }) => {
-                if (res.error) return false;
-                return res.raw_body == "OK"
-            });
+        return new Promise((resolve, reject) =>
+
+            unirest(POST, URL)
+                .field('action_type', 'handshake')
+                .timeout(TIME_OUT_VALUE)
+                .end(function (response) {
+                    if (response.error) return false
+                    return resolve(response.raw_body.toLowerCase() == "OK".toLowerCase())
+                })
+        )
     }
 
     async pay(card_number: string, month: string, year: string, holder: string, ccv: string, id: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'pay')
-            .field('card_number', card_number)
-            .field('month', month)
-            .field('year', year)
-            .field('holder', holder)
-            .field('ccv', ccv)
-            .field('id', id)
-            .end(this.getResult());
+        return new Promise((resolve, reject) =>
+            unirest(POST, URL)
+                .field('action_type', 'pay')
+                .field('card_number', card_number)
+                .field('month', month)
+                .field('year', year)
+                .field('holder', holder)
+                .field('ccv', ccv)
+                .field('id', id)
+                .timeout(TIME_OUT_VALUE)
+                .end(function (response) {
+                    if (response.error) return false
+                    const ret = Number(response.raw_body);
+                    console.log(ret)
+                    return resolve(isNaN(ret) ? -1 : ret)
+                })
+        )
     }
 
     async cancel_pay(transaction_id: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'cancel_pay')
-            .field('transaction_id', transaction_id)
-            .end(this.getResult());
+        return new Promise((resolve, reject) =>
+            unirest(POST, URL)
+                .field('action_type', 'cancel_pay')
+                .field('transaction_id', transaction_id)
+                .timeout(TIME_OUT_VALUE)
+                .end(function (response) {
+                    if (response.error) return false
+                    const ret = Number(response.raw_body);
+                    console.log(ret)
+                    return resolve(isNaN(ret) ? -1 : ret)
+                })
+        )
     }
 
     async supply(name: string, address: string, city: string, country: string, zip: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'supply')
-            .field('name', name)
-            .field('address', address)
-            .field('city', city)
-            .field('country', country)
-            .field('zip', zip)
-            .end(this.getResult());
+        return new Promise((resolve, reject) =>
+            unirest(POST, URL)
+                .field('action_type', 'supply')
+                .field('name', name)
+                .field('address', address)
+                .field('city', city)
+                .field('country', country)
+                .field('zip', zip)
+                .timeout(TIME_OUT_VALUE)
+                .end(function (response) {
+                    if (response.error) return false
+                    const ret = Number(response.raw_body);
+                    console.log(ret)
+                    return resolve(isNaN(ret) ? -1 : ret)
+                })
+        )
     }
 
     async cancel_supply(transaction_id: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'cancel_supply')
-            .field('transaction_id', transaction_id)
-            .end(this.getResult());
+        return new Promise((resolve, reject) =>
+            unirest(POST, URL)
+                .field('action_type', 'cancel_supply')
+                .field('transaction_id', transaction_id)
+                .timeout(TIME_OUT_VALUE)
+                .end(function (response) {
+                    if (response.error) return false
+                    const ret = Number(response.raw_body);
+                    console.log(ret)
+                    return resolve(isNaN(ret) ? -1 : ret)
+                })
+        )
     }
 
-    private getResult() {
-        return (res: { error: string | undefined; raw_body: any; }) => {
-            if (res.error) return -1;
-            const ret = Number(res.raw_body);
-            return isNaN(ret) ? -1 : ret
-        };
+    getResult = function (res) {
+        if (res.error) return -1;
+        const ret = Number(res.raw_body);
+        console.log(ret)
+        return isNaN(ret) ? -1 : ret
     }
 }
