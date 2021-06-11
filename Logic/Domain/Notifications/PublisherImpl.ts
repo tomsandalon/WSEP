@@ -17,6 +17,13 @@ export class PublisherImpl implements Publisher {
         this.notificationQueue = {};
     }
 
+    disconnectAllUsers() {
+        P.Publisher.getInstance().disconnectAllUsers()
+    }
+    reconnectAllUsers() {
+        P.Publisher.getInstance().reconnectAllUsers()
+    }
+
     public static getInstance(reset?: boolean): PublisherImpl {
         if (PublisherImpl.instance == undefined || reset) {
             PublisherImpl.instance = new PublisherImpl();

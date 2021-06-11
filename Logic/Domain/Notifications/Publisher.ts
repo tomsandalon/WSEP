@@ -18,4 +18,8 @@ export interface Publisher {
     fetchAllNotifications(): { user_id: number, notifications: Notification[] }[]
 
     hasNotifications(user_id: number): boolean
+
+    disconnectAllUsers()
+
+    reconnectAllUsers()
 }

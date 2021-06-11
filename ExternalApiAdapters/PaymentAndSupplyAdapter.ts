@@ -1,6 +1,6 @@
 const unirest = require('unirest');
-const {externalServices} = require('../Logic/Config')
-const URL = externalServices
+import {getExternalServices} from '../Logic/Config';
+const URL = getExternalServices();
 const POST = 'POST'
 
 export type Purchase_Info = {
