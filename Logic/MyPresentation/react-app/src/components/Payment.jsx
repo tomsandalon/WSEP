@@ -5,20 +5,55 @@ class Payment extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name:'',
-            cardNo:'',
-            data:'',
             successVisible:false,
-            errorMsg:''
+            errorMsg:'',
+            id:'',
+		name:'',
+		cardNo:'',
+		month:'',
+		year:'',
+		ccv:'',
+		delivery_name:'',
+		address:'',
+		city:'',
+		country:'',
+		zip:''
         };
     }
 
     //purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string)
-    handleName = (event) => {this.setState({name:event.target.value})};
-    handleCard = (event) => {this.setState({cardNo:event.target.value});}
-    handleData = (event) => {this.setState({data:event.target.value});
-    console.log(this.state.name+this.state.cardNo +this.state.data);
-}
+  
+    handleDeliveryName = (event) => {
+		this.setState({delivery_name:event.target.value})
+	}
+	handleAddress = (event) => {
+		this.setState({address:event.target.value})
+	}
+	handleCity = (event) => {
+		this.setState({city:event.target.value})
+	}
+	handleCountry = (event) => {
+		this.setState({country:event.target.value})
+	}
+	handleZip = (event) => {
+		this.setState({zip:event.target.value})
+	}
+	handleCCV = (event) => {
+		this.setState({ccv:event.target.value})
+	}
+	handleYear = (event) => {
+		this.setState({year:event.target.value})
+	}
+	handleMonth = (event) => {
+		this.setState({month:event.target.value})
+	}
+	handleId = (event) => {
+		this.setState({id:event.target.value})
+	}
+	handleName = (event) => {
+		this.setState({name:event.target.value})
+	}
+    
     handleSubmit = (event) => {
         const requestOptions = {
             method: 'POST',
@@ -28,7 +63,24 @@ class Payment extends Component {
             },
             body: JSON.stringify({
                 shop_id:this.props.shop_id,
-                payment:this.state.name+this.state.cardNo +this.state.data
+                payment:{
+                    payment_info:{
+						holder_id:this.state.id,
+						holder_name:this.state.name,
+						card_number:this.state.cardNo,
+						month:this.state.month,
+						year:this.state.year,
+						ccv:this.state.ccv
+					},
+					delivery_info:{
+						name:this.state.delivery_name,
+						address:this.state.address,
+						city:this.state.city,
+						country:this.state.country,
+						zip:this.state.zip,
+
+					},
+                }
             })
         };
         fetch('/purchase',requestOptions)
@@ -57,9 +109,19 @@ class Payment extends Component {
                 <img src={Reactlogo} id="icon" alt="User Icon" />
                 </div>
                 <form>
-                    <input type="text" className="pay fadeIn second" placeholder="Ex. John Smith" onChange={this.handleName}/>
-                    <input type="text" className="pay fadeIn third" placeholder="Card No." onChange={this.handleCard}/>
-                    <input type="text" className="pay fadeIn third" placeholder="MM/YY/CVV" onChange={this.handleData}/>
+                <h1>Payment Info</h1>	
+						  	  <input type="text" className="pay fadeIn second" placeholder="ID" onChange={this.handleId}/>
+							  <input type="text" className="pay fadeIn second" placeholder="Ex. John Smith" onChange={this.handleName}/>
+							  <input type="text" className="pay fadeIn third" placeholder="Card No." onChange={this.handleCard}/>
+							  <input type="text" className="pay fadeIn third" placeholder="MM" onChange={this.handleMonth}/>
+							  <input type="text" className="pay fadeIn second" placeholder="YY" onChange={this.handleYear}/>
+							  <input type="text" className="pay fadeIn second" placeholder="CCV" onChange={this.handleCCV}/>
+							  <h1>Delivery Info</h1>
+							  <input type="text" className="pay fadeIn second" placeholder="Ex. John Smith" onChange={this.handleDeliveryName}/>
+							  <input type="text" className="pay fadeIn second" placeholder="Address" onChange={this.handleAddress}/>
+							  <input type="text" className="pay fadeIn second" placeholder="City" onChange={this.handleCity}/>
+							  <input type="text" className="pay fadeIn second" placeholder="Country" onChange={this.handleCountry}/>
+							  <input type="text" className="pay fadeIn second" placeholder="Zip" onChange={this.handleZip}/>
                     <button type="button" class="pay2 btn btn-primary" onClick={this.handleSubmit}>Pay</button>
                     <button type="button" class="pay2 btn btn-primary" onClick={() => this.props.cancelPayment()}>Cancel</button>
                   </form>

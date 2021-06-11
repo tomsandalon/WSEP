@@ -62,6 +62,7 @@ router.post('/', (request: any, response: any) => {
     if (typeof result === 'string') {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
+        console.log("payment failed basket",result);
         response.send(result);
         response.end()
     } else {
@@ -84,7 +85,8 @@ router.post(purchase_cart, (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    const result = service.purchaseCart(user_id, request.body.payment);
+    const result = service.purchaseCart(user_id, request.body);
+    // console.log("payment",request.body);
     if (typeof result === 'string') {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");

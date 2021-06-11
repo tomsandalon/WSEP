@@ -15,3 +15,4 @@ const initTables = async () => {
     }
 };
 exports.initTables = initTables;
+

@@ -1,9 +1,9 @@
 // Update with your config settings.
-const {client, connection} = require('../Config')
+const {getDB_Client, getDB_Connection} = require('../Config')
 module.exports = {
   development: {
-    client: client,
-    connection: connection,
+    client: getDB_Client(),
+    connection: getDB_Connection(),
     pool: {
       min: 2,
       max: 10

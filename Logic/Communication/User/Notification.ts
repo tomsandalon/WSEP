@@ -4,7 +4,7 @@ import {
     get_acknowledge_for_notifications,
     get_notifications,
     hello,
-    send_notifications
+    send_notifications, Service_available, Service_unavailable
 } from "../WSEvents";
 
 export const configWebSocket = (io: any) =>
@@ -60,10 +60,16 @@ export const disconnectAllUsers = () => {
     for (let sid in Session.sessions) {
         const entry = Session.sessions[sid]
         if (entry != null && entry.socket != null) {
-            // entry.socket.close()
+            entry.socket.emit(Service_unavailable, true)
         }
-        //close the session
-        delete Session.sessions[sid]
     }
 }
 
+export const reconnectAllUsers = () => {
+    for (let sid in Session.sessions) {
+        const entry = Session.sessions[sid]
+        if (entry != null && entry.socket != null) {
+            entry.socket.emit(Service_available, true)
+        }
+    }
+}
