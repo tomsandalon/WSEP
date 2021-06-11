@@ -255,17 +255,17 @@ export class ShopInventoryImpl implements ShopInventory {
     private static createPurchasePoliciesFromDB(purchase_condition: number): Promise<PurchaseCondition> {
         if (id_counter + 1 <= purchase_condition) id_counter = purchase_condition + 1
         return GetPurchaseConditions(purchase_condition).then(result =>
-            (result.left && result.right) ? this.createPurchasePoliciesFromDB(result.left).then(left => this.createPurchasePoliciesFromDB(result.right).then(right =>
+            (result.left && result.right) ? this.createPurchasePoliciesFromDB(result.left.id).then(left => this.createPurchasePoliciesFromDB(result.right.id).then(right =>
                     new CompositeCondition(purchase_condition, [left, right], result.operator as number))) :
                 new SimpleCondition(purchase_condition, result.type as number, result.value))
     }
 
     private static purchaseTypesAreEqual(p1: Purchase_Type[], p2: Purchase_Type[]) {
-        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => JSON.stringify(p1) == JSON.stringify(p2)))
+        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => p1 == p2))
     }
 
     private static purchasePoliciesAreEqual(p1: PurchaseCondition[], p2: PurchaseCondition[]) {
-        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => JSON.stringify(p1) == JSON.stringify(p2)));
+        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1, p2)));
     }
 
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
@@ -443,38 +443,6 @@ export class ShopInventoryImpl implements ShopInventory {
         );
     }
 
-    //temp
-
-    // public addDiscountType(discountType: DiscountType): string | boolean{
-    //     if (this._discount_types.indexOf(discountType) < 0) {
-    //         return DiscountExists
-    //     }
-    //     this._discount_types.push(discountType);
-    //     return true;
-    // }
-    // public removeDiscountType(discountType: DiscountType): string | boolean{
-    //     if (this._discount_types.indexOf(discountType) < 0){
-    //         return DiscountNotExists
-    //     }
-    //     this._discount_types.splice(this._discount_types.indexOf(discountType), 1);
-    //     return true;
-    // }
-    //
-    // /**
-    //  * @Requirement - 4.1 and Quality assurance No. 5b
-    //  * @param discountType
-    //  * @return true iff this.discount_types.contains(discountType)
-    //  * @return DiscountNotExists otherwise
-    //  */
-    // removeDiscountType(discountType: DiscountType): string | boolean
-    //
-    //
-    // /**
-    //  * @Requirement - Quality assurance No. 5b
-    //  * @param discountType
-    //  */
-    // addDiscountType(discountType: DiscountType): string | boolean
-
     addPurchasePolicy(condition: PurchaseCondition): void {
         this._purchase_policies = this.purchase_policies.concat([condition])
     }
@@ -485,19 +453,14 @@ export class ShopInventoryImpl implements ShopInventory {
         return length != this._purchase_policies.length
     }
 
-    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
-        if (this._purchase_policies.every(p => p.id != id1) ||
-            this._purchase_policies.every(p => p.id != id2)) {
-            logger.Error(`Policies not found`)
-            return "Policies not found"
-        }
-        const new_policy = CompositeCondition.create([
-            this._purchase_policies.find(p => p.id == id1) as PurchaseCondition,
-            this._purchase_policies.find(p => p.id == id2) as PurchaseCondition
-        ], operator)
-        this._purchase_policies = this._purchase_policies.filter(p => p.id == id1 || p.id == id2)
-        this._purchase_policies = this._purchase_policies.concat([new_policy])
-        return true
+    private static twoPurchasePoliciesAreEqual(p1: PurchaseCondition, p2: PurchaseCondition): boolean {
+        if (p1.id != p2.id) return false
+        if (p1 instanceof SimpleCondition && p2 instanceof SimpleCondition)
+            return p1.condition == p2.condition && p1.value == p2.value
+        if (p1 instanceof CompositeCondition && p2 instanceof CompositeCondition)
+            return p1.action == p2.action && ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[0], p2.conditions[0]) &&
+                ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[1], p2.conditions[1])
+        return false
     }
 
     addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string) {
@@ -569,6 +532,21 @@ export class ShopInventoryImpl implements ShopInventory {
             logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
             return `Purchase policy doesn't allow this purchase`
         }
+        return true
+    }
+
+    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
+        if (this._purchase_policies.every(p => p.id != id1) ||
+            this._purchase_policies.every(p => p.id != id2)) {
+            logger.Error(`Policies not found`)
+            return "Policies not found"
+        }
+        const new_policy = CompositeCondition.create([
+            this._purchase_policies.find(p => p.id == id1) as PurchaseCondition,
+            this._purchase_policies.find(p => p.id == id2) as PurchaseCondition
+        ], operator)
+        this._purchase_policies = this._purchase_policies.filter(p => p.id != id1 && p.id != id2)
+        this._purchase_policies = this._purchase_policies.concat([new_policy])
         return true
     }
 }

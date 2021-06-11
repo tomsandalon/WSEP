@@ -12,6 +12,8 @@ import {history_entry, UserPurchaseHistoryImpl} from "../../../Logic/Domain/User
 import {DiscountHandler} from "../../../Logic/Domain/Shop/DiscountPolicy/DiscountHandler";
 import {Condition} from "../../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "../../../Logic/Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
+import {id_counter} from "../../../Logic/Domain/Shop/ShopInventory";
+import {Operator} from "../../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 
 
 function shopsAreEquals(shop1: Shop[], shop2: Shop[]): boolean {
@@ -79,6 +81,8 @@ describe('Rollback', async () => {
             system.addLogicComposeDiscount(originOwner, shopID, LogicComposition.AND, DiscountHandler.discountCounter - 1, DiscountHandler.discountCounter - 3)
 
             system.addPurchasePolicy(originOwner, shopID, ConditionType.NotCategory, "GTX")
+            system.addPurchasePolicy(originOwner, shopID, ConditionType.GreaterAmount, "19")
+            system.composePurchasePolicy(originOwner, shopID, id_counter - 1, id_counter - 2, Operator.And)
 
             system.addItemToBasket(tester, ProductImpl._product_id_specifier - 1, shopID, 2)
             system.purchaseCart(tester, "something")

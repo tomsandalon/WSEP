@@ -14,7 +14,7 @@ import {Condition} from "./Shop/DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "./Shop/DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./Shop/DiscountPolicy/LogicCompositionDiscount";
 import {NotificationAdapter} from "./Notifications/NotificationAdapter";
-import {logger} from "./Logger";
+import {logger, panicLogger} from "./Logger";
 import {
     AddDiscount,
     addDiscountConditionType,
@@ -266,7 +266,6 @@ export class SystemImpl implements System {
             return;
         }
         this.isInRollbackProcess = true;
-        console.log('Her -----------------')
         await ConnectToDB();
         await initTables();
         const users: User[] = await GetUsers()
@@ -396,7 +395,10 @@ export class SystemImpl implements System {
                 product_id: product_id,
                 amount: amount
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to edit shopping cart for user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         else
             DeleteItemInBasket({
@@ -405,7 +407,10 @@ export class SystemImpl implements System {
                 product_id: product_id,
                 amount: amount
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to delete item from cart for user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
     }
 
@@ -456,7 +461,10 @@ export class SystemImpl implements System {
                 product_id: shop.getAllItems()
                     .reduce((acc, cur) => acc.product_id > cur.product_id ? acc : cur).product_id
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to add new product by ${user_id} in shop ${shop}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return result
     }
@@ -505,7 +513,10 @@ export class SystemImpl implements System {
             product_id: product_id,
             amount: amount
         }).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to add item ${product_id} to basket of user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
     }
 
@@ -545,8 +556,10 @@ export class SystemImpl implements System {
             active: true,
             name: name,
         }).then(r => {
-            if (!r) SystemImpl.rollback().then(r => {
-            })
+            if (!r) {
+                panicLogger.Error(`Failed to add new shop by ${user_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return shop.shop_id
     }
@@ -585,7 +598,10 @@ export class SystemImpl implements System {
             password: (hashed_password) as string,
             age: age ? age : 999
         }).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to register new user for user email ${user_email}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return true
     }
@@ -609,7 +625,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to update permissions by user ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -624,7 +643,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to remove permissions by user ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -639,7 +661,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             AppointManager(appointee_user_email, user_email, shop_id, permission_to_numbers(new ManagerPermissions()))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to appoint a manager by ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -652,7 +677,10 @@ export class SystemImpl implements System {
             return `Target email ${appointee_user_email} doesnt belong to a registered user`
         const ret = shop.appointNewOwner(user_email, appointee_user_email)
         if (typeof ret != 'string') AppointOwner(appointee_user_email, user_email, shop_id).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to appoint as owner by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -674,7 +702,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string')
             UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
-                    if (!r) SystemImpl.rollback()
+                    if (!r) {
+                        panicLogger.Error(`Failed to edit permissions for user ${user_id} in ${shop_id}. Performing a rollback`)
+                        SystemImpl.rollback()
+                    }
                 })
         return ret
     }
@@ -692,7 +723,10 @@ export class SystemImpl implements System {
         const {shop, user_email} = result
         const ret = shop.removeItem(user_email, product_id)
         if (typeof ret != 'string') RemoveProduct(product_id).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to remove product by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -719,7 +753,10 @@ export class SystemImpl implements System {
             return `Target email ${target} doesnt belong to a registered user`
         const ret = shop.removeManager(user_email, target)
         if (typeof ret != 'string') RemoveManager(target, shop_id).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to remove manager by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -744,7 +781,10 @@ export class SystemImpl implements System {
                 value: value,
                 purchase_condition: condition
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to add purchase policy by user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return ret
     }
@@ -759,7 +799,10 @@ export class SystemImpl implements System {
         if (typeof ret != 'string') RemainingManagement(
             shop.getAllManagementEmail(), shop_id
         ).then(r => {
-            if (!r) SystemImpl.rollback()
+            if (!r) {
+                panicLogger.Error(`Failed to remove owner by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
         })
         return ret
     }
@@ -771,7 +814,10 @@ export class SystemImpl implements System {
         const ret = shop.removePolicy(user_email, policy_id)
         if (typeof ret == 'string')
             removePurchasePolicy(shop_id, policy_id).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to remove purchase policy by ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return ret
     }
@@ -787,7 +833,10 @@ export class SystemImpl implements System {
                 second_policy: policy_id2,
                 operator: operator
             }).then(r => {
-                if (!r) SystemImpl.rollback()
+                if (!r) {
+                    panicLogger.Error(`Failed to compose purchase policy user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
             })
         return ret
     }
@@ -822,7 +871,12 @@ export class SystemImpl implements System {
                 discount_param: condition_param,
                 discount_condition: condition,
                 operand_discount: id
-            }).then(r => r ? {} : SystemImpl.rollback())
+            }).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to add condition to discount user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -836,7 +890,12 @@ export class SystemImpl implements System {
                 first_policy: d_id1,
                 second_policy: d_id2,
                 operator: operation
-            }).then(r => r ? {} : SystemImpl.rollback())
+            }).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to compose conditions to discount user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -850,7 +909,12 @@ export class SystemImpl implements System {
                 first_policy: d_id1,
                 second_policy: d_id2,
                 operator: NumericOperation.__LENGTH + operation
-            }).then(r => r ? {} : SystemImpl.rollback())
+            }).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to compose discount by user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -860,7 +924,12 @@ export class SystemImpl implements System {
         const {shop, user_email} = result
         const ret = shop.removeDiscount(user_email, id)
         if (typeof ret != 'string')
-            removeDiscount(shop_id, id).then(r => r ? {} : SystemImpl.rollback())
+            removeDiscount(shop_id, id).then(r => {
+                if (!r) {
+                    panicLogger.Error(`Failed to remove discount by user ${user_id} in ${shop_id}. Performing a rollback`)
+                    SystemImpl.rollback()
+                }
+            })
         return ret
     }
 
@@ -982,7 +1051,12 @@ export class SystemImpl implements System {
         const ret = shop.rateProduct(user_email, user_id, product_id, rating)
         if (typeof ret == "string") return ret
         user.logRating(product_id, shop_id, rating)
-        RateProduct({user_id: user_id, product_id: product_id, rate: rating}).then(r => r ? {} : SystemImpl.rollback())
+        RateProduct({user_id: user_id, product_id: product_id, rate: rating}).then(r => {
+            if (!r) {
+                panicLogger.Error(`Failed to rate product by user ${user_id} in ${shop_id}. Performing a rollback`)
+                SystemImpl.rollback()
+            }
+        })
         return true
     }
 
