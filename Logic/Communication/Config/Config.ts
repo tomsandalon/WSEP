@@ -1,10 +1,10 @@
 import {Service} from "../../Service/Service";
 import {Publisher} from "../../Service/Publisher";
-const {server_host, server_port} = require('../../Config')
+import { getServerHost, getServerPort } from "../../Config";
 const path = require('path')
 const fs = require('fs')
-export const host = server_host
-export const port = server_port
+export const host = getServerHost()
+export const port = getServerPort();
 export const config_path = "./Logic/Communication/Config/";
 export const key_file = "server_key.pem";
 export const cert_file = "server_cert.pem";

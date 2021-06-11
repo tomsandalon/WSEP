@@ -1,6 +1,6 @@
 import * as P from "../Domain/Notifications/Publisher";
 import {PublisherImpl} from "../Domain/Notifications/PublisherImpl";
-import {disconnectAllUsers, notify} from "../Communication/User/Notification";
+import {disconnectAllUsers, notify, reconnectAllUsers} from "../Communication/User/Notification";
 import {Notification} from "../Domain/Notifications/Notification";
 
 export class Publisher {
@@ -41,5 +41,9 @@ export class Publisher {
 
     public disconnectAllUsers(){
         disconnectAllUsers()
+    }
+
+    public reconnectAllUsers(){
+        reconnectAllUsers()
     }
 }
