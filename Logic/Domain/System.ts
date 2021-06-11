@@ -265,7 +265,6 @@ export class SystemImpl implements System {
         if (this.isInRollbackProcess) {
             return;
         }
-        this.isInRollbackProcess = true;
         await ConnectToDB();
         await initTables();
         const users: User[] = await GetUsers()
@@ -340,7 +339,6 @@ export class SystemImpl implements System {
     private static reloadPurchases(): Promise<void> {
         return GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases));
     }
-
     private static terminateAllConnections() {
         //TODO with mark
     }
