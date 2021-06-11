@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-exports.server_host = 'localhost'
-exports.server_port = 8000
-exports.externalServices = "https://cs-bgu-wsep.herokuapp.com/"
-exports.client = 'mysql'
-exports.connection =  {
-    host: '127.0.0.1',
-    database: 'wsep',
-    user:     'lior',
-    password: '123456',
-    charset: 'utf8'
-}
-=======
 const fs = require('fs');
 const path = require('path');
 
@@ -105,4 +92,3 @@ exports.clearCache = () => {
   }
 }
  */
->>>>>>> caab0bb2498dbf31cc23c298b2bba74e4ba16a3c

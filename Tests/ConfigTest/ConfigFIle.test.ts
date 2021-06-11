@@ -36,6 +36,9 @@ describe('Config file tests', () => {
     beforeEach(() => {
         clearCache()
     })
+    after(() => {
+        writeToConfig(validInput)
+    })
     it('Load config file with good JSON syntax', () => {
         try{
             writeToConfig(validInput)
