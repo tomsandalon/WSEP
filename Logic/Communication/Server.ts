@@ -1,16 +1,10 @@
 import * as https from 'https';
-import {
-    assign_manager,
-    assign_owner,
-    options,
-    permissions,
-    port,
-    service,
-} from "./Config/Config";
+import {options, port, service,} from "./Config/Config";
 import {
     route_admin,
     route_cart,
-    route_filter, route_guest,
+    route_filter,
+    route_guest,
     route_home,
     route_login,
     route_logout,
@@ -25,6 +19,7 @@ import {
     route_user_management
 } from "./Routes";
 import {configWebSocket} from "./User/Notification";
+
 const socket_io = require('socket.io');
 const fs = require('fs')
 const path = require('path');
@@ -43,8 +38,10 @@ export const io = socket_io(server,
       });
 configWebSocket(io)
 //start our server
-server.listen( port,() => {
-    console.log(`Server is running on port ${port}`);
+service.initData().then(_ => {
+    server.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    })
 })
 // expressWs(app, server);
 app.use(cookieParser());
@@ -68,4 +65,3 @@ app.use(route_shop_policy, require('./User/Registered/Policy'));
 app.use(route_shop_discount, require('./User/Registered/Discount'));
 //* For debug TODO delete this
 
-service.initData();
