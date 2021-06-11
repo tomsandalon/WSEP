@@ -12,8 +12,8 @@ import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 export class Service {
 
-    constructor(reset?: boolean) {
-        SystemImpl.getInstance(reset)
+    constructor() {
+        // SystemImpl.getInstance(reset)
     }
 
     init(): Promise<void> {
@@ -21,7 +21,9 @@ export class Service {
     }
 
     public initData(): Promise<void> {
-        return SystemImpl.rollback()
+        return Promise.resolve()
+        // SystemImpl.getInstance()
+        // return SystemImpl.rollback()
         // const no_to_all: DiscountType = {
         //     percent: 0.5, // 0 <= percent <= 1
         //     expiration_date: new Date(),
@@ -317,11 +319,47 @@ export class Service {
         return SystemImpl.getInstance().getUserEmailFromUserId(user_id);
     }
 
-    isAvailable(): boolean{
+    isAvailable(): boolean {
         return true
     }
 
     connectToDB() {
 
+    }
+
+    makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number): string | boolean {
+        return SystemImpl.getInstance().makeOffer(user_id, shop_id, product_id, amount, price_per_unit)
+    }
+
+    getActiveOffersAsUser(user_id: number): string | string[] {
+        return SystemImpl.getInstance().getActiveOffersAsUser(user_id)
+    }
+
+    getActiveOfferForShop(user_id: number, shop_id: number): string | string[] {
+        return SystemImpl.getInstance().getActiveOfferForShop(user_id, shop_id)
+    }
+
+    acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        return SystemImpl.getInstance().acceptOfferAsManagement(user_id, shop_id, offer_id)
+    }
+
+    denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        return SystemImpl.getInstance().denyOfferAsManagement(user_id, shop_id, offer_id)
+    }
+
+    counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        return SystemImpl.getInstance().counterOfferAsManager(user_id, shop_id, offer_id, new_price_per_unit)
+    }
+
+    denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean {
+        return SystemImpl.getInstance().denyCounterOfferAsUser(user_id, offer_id)
+    }
+
+    offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        return SystemImpl.getInstance().offerIsPurchasable(user_id, shop_id, offer_id)
+    }
+
+    purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        return SystemImpl.getInstance().purchaseOffer(user_id, offer_id, payment_info)
     }
 }

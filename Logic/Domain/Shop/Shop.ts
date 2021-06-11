@@ -207,6 +207,16 @@ export interface Shop {
     getAllManagementEmail(): string[];
 
     getRealPermissions(user_email: string): Permissions;
+
+    addPurchaseType(user_email: string, purchase_type: Purchase_Type): string | boolean;
+
+    getActiveOffers(user_email: string): string | string[];
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
 }
 
 export class ShopImpl implements Shop {
@@ -313,7 +323,7 @@ export class ShopImpl implements Shop {
         let _location = location;
         let _name = name;
         let _management = new ShopManagementImpl(_shop_id, user_email)
-        let _inventory = new ShopInventoryImpl(_shop_id, _management, name, bank_info)
+        let _inventory = new ShopInventoryImpl(_shop_id, _management, name, bank_info, [Purchase_Type.Immediate], [])
         _management.shop_inventory = _inventory;
         let _is_active = true;
         return new ShopImpl(_shop_id, _bank_info, _description, _location, _name, _management, _inventory, _is_active)
@@ -322,7 +332,7 @@ export class ShopImpl implements Shop {
     static createFromDB(entry: { shop_id: any; bank_info: string; name: string; description: string; active: any; location: string; original_owner: string }) {
         id_counter = Math.max(id_counter, entry.shop_id + 1)
         let _management = new ShopManagementImpl(entry.shop_id, entry.original_owner)
-        let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info)
+        let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info, [Purchase_Type.Immediate], []) //TODO replace [] with real offer
         return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active);
     }
 
@@ -568,6 +578,21 @@ export class ShopImpl implements Shop {
         return ret;
     }
 
+    addPurchaseType(user_email: string, purchase_type: Purchase_Type) {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            const error = `${user_email} tried to add purchase type but doesn't have permissions to do so`
+            logger.Error(error);
+            return error
+        }
+        const ret = this.inventory.addPurchaseType(purchase_type)
+        if (typeof ret == "string") {
+            logger.Error(`${user_email} failed to add purchase type as ${ret}`)
+            return ret
+        }
+        logger.Info(`${user_email} added purchase type successfully`)
+        return true
+    }
+
     removeOwner(user_email: string, target: string): string | boolean {
         const ret = this._management.removeOwner(user_email, target);
         if (ret) {
@@ -721,5 +746,25 @@ export class ShopImpl implements Shop {
 
     async addInventoryFromDB(inventory: ShopRich): Promise<void> {
         await this.inventory.addInventoryFromDB(inventory)
+    }
+
+    getActiveOffers(user_email: string): string | string[] {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot get active offers`
+        return this.inventory.getActiveOffers()
+    }
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot accept active offers`
+        return this.inventory.acceptOfferAsManagement(user_email, offer_id)
+    }
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot decline active offers`
+        return this.inventory.denyOfferAsManagement(user_email, offer_id)
+    }
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot make counter offers`
+        return this.inventory.counterOfferAsManagement(user_email, offer_id, new_price_per_unit)
     }
 }

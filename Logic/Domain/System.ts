@@ -172,10 +172,28 @@ export interface System {
 
     rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean
 
-    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
+    addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
 
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
+
+    makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number): string | boolean
+
+    getActiveOffersAsUser(user_id: number): string | string[]
+
+    getActiveOfferForShop(user_id: number, shop_id: number): string | string[]
+
+    acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean
+
+    denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean
+
+    counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean
+
+    denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean
+
+    offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean
+
+    purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
 
     init(): Promise<void>
 }
@@ -422,7 +440,6 @@ export class SystemImpl implements System {
                     return purchase_basket
                 }
             )
-
     }
 
     async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
@@ -994,15 +1011,6 @@ export class SystemImpl implements System {
         return shop.getPermissions(user_email)
     }
 
-    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
-    //     const result = this.getShopAndUser(user_id, shop_id)
-    //     if (typeof result == "string") return result
-    //     const {shop, user_email} = result
-    //     const user = this._login.retrieveUser(user_id);
-    //     if (typeof user == "string")
-    //         return user
-    // }
-
     getManagingShops(user_id: number): string | string[] {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string")
@@ -1091,5 +1099,98 @@ export class SystemImpl implements System {
             active: entry.active,
         }
         this.shops.push(ShopImpl.createFromDB(newEntry))
+    }
+
+    addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret = shop.addPurchaseType(user_email, purchase_type)
+        if (typeof ret == "string") {
+            //TODO change in DB
+        }
+        return ret
+    }
+
+    makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number) {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret: string | boolean = user.makeOffer(shop.inventory, product_id, amount, price_per_unit)
+        if (typeof ret == "string") {
+            //TODO insert to db
+        }
+        return ret
+    }
+
+    getActiveOffersAsUser(user_id: number): string | string[] {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        return user.getActiveOffers()
+    }
+
+    getActiveOfferForShop(user_id: number, shop_id: number): string | string[] {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.getActiveOffers(user_email)
+    }
+
+    acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const ret = shop.acceptOfferAsManagement(user_email, offer_id)
+        //todo add to db
+        return ret
+    }
+
+    denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const ret = shop.denyOfferAsManagement(user_email, offer_id)
+        //todo add to db
+        return ret
+    }
+
+    counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const ret = shop.counterOfferAsManagement(user_email, offer_id, new_price_per_unit)
+        //todo add to db
+        return ret
+    }
+
+    denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret = user.denyCounterOfferAsUser(offer_id)
+        //todo add to db
+        return ret
+    }
+
+    offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        return user.offerIsPurchasable(offer_id)
+    }
+
+    async purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string") return user
+        const ret = user.purchaseOffer(offer_id, payment_info)
+        //todo db
+        return ret
     }
 }

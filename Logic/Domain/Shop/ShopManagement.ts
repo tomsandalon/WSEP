@@ -105,6 +105,8 @@ export interface ShopManagement {
     getRealPermissions(user_email: string): Permissions;
 
     addManagement(owners: { owner_email: string; appointer_email: string }[], managers: { manager_email: string; appointer_email: string; permissions: number[] }[]): void;
+
+    notifyForOffer(offer_message: string): string | boolean;
 }
 
 
@@ -114,7 +116,7 @@ export class ShopManagementImpl implements ShopManagement {
     constructor(shop_id: number, original_owner: string, shop_inventory?: ShopInventory) {
         this._shop_id = shop_id;
         //placing a temporary value which is immediately replaced
-        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "");
+        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "", [], []);
         this._original_owner = OwnerImpl.create(original_owner);
         this._managers = [];
         this._owners = [];
@@ -396,5 +398,13 @@ export class ShopManagementImpl implements ShopManagement {
     private updateOriginalOwner(owners, managers) {
         this._original_owner.appointed_owners = owners.filter(o => o.appointer_email == this._original_owner.user_email).map(o => o.owner_email)
         this._original_owner.appointed_managers = managers.filter(m => m.appointer_email == this._original_owner.user_email).map(m => m.manager_email)
+    }
+
+    notifyForOffer(offer_message: string): string | boolean {
+        this.owners.concat([this.original_owner]).map(o => o.user_email).concat(this.managers.map(m => m.user_email))
+            .forEach(user_email => {
+                NotificationAdapter.getInstance().notify(user_email, offer_message)
+            })
+        return true
     }
 }

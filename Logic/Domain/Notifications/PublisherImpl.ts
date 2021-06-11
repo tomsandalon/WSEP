@@ -111,4 +111,12 @@ export class PublisherImpl implements Publisher {
             PublisherImpl.id_counter = Math.max(PublisherImpl.id_counter, notification.notification_id + 1)
         })
     }
+
+    removeNotificationsOfOffer(offer_id: number) {
+        for (let i = 0; i < Infinity; i++) {
+            if (this.notificationQueue[i] == undefined) i = Infinity
+            this.notificationQueue[i] = this.notificationQueue[i].filter(n => !n.message.startsWith(`Offer request id ${offer_id}:`))
+        }
+        //TOdo remove from db
+    }
 }
