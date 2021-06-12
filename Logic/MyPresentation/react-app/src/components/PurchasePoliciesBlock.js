@@ -24,6 +24,8 @@ const PurchasePoliciesBlock = (props) => {
                   condition={policy.condition}
                   value={policy.value}
                   id={policy.id}
+                  conditions={policy.conditions}
+                  key={policy.id}
                 />
               );
             })}

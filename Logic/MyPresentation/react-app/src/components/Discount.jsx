@@ -4,6 +4,7 @@ import "./Product.css";
 import serverResponse from "../components/ServerResponse.js";
 import { useState } from "react";
 import { Alert } from "reactstrap";
+import { Link } from "react-router-dom";
 
 const Discount = (props) => {
   const storeID = props.storeID;
@@ -11,6 +12,7 @@ const Discount = (props) => {
   const parameter = props.parameter;
   const id = props.id;
   const itemID = props.itemID;
+  const storeName = props.storeName;
   const value = props.value;
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
@@ -59,10 +61,10 @@ const Discount = (props) => {
         </div> */}
           <figcaption className="info align-self-center">
             <h4 className="center">Discount ID: {id}</h4>
-            <h4>{"Item ID: " + itemID}</h4>
-            <h4>{"discount value: " + value}</h4>
-            <h4>{"Condition: " + numToCondition[condition]}</h4>
-            <h4>{"parameter: " + parameter}</h4>
+            <p>{"Item ID: " + itemID}</p>
+            <p>{"discount value: " + value}</p>
+            <p>{"Condition: " + numToCondition[condition]}</p>
+            <p>{"parameter: " + parameter}</p>
             <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
               {error}
             </Alert>
@@ -88,10 +90,10 @@ const Discount = (props) => {
       </div> */}
           <figcaption className="info align-self-center">
             <h4 className="center">Discount ID: {id}</h4>
-            <h4>{"Item ID: " + itemID}</h4>
-            <h4>{"discount value: " + value}</h4>
-            <h4>{"Condition: NONE"}</h4>
-            <h4>{"parameter: NONE"}</h4>
+            <p>{"Item ID: " + itemID}</p>
+            <p>{"discount value: " + value}</p>
+            <p>{"Condition: NONE"}</p>
+            <p>{"parameter: NONE"}</p>
             <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
               {error}
             </Alert>
@@ -101,9 +103,11 @@ const Discount = (props) => {
             >
               Delete Discount <i className="fa fa-trash"></i>
             </button>
-            <button className="btn btn-outline-primary btn-sm">
-              Add Condition <i className="fa fa-plus"></i>
-            </button>
+            <Link to={`/addcondition/${storeID}/${storeName}/${id}`}>
+              <button className="btn btn-outline-primary btn-sm">
+                Add Condition <i className="fa fa-plus"></i>
+              </button>
+            </Link>
           </figcaption>
         </figure>
       </div>

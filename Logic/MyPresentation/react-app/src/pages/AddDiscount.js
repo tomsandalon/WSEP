@@ -44,13 +44,13 @@ const AddDiscount = (props) => {
   };
   const onDismiss = () => setVisible(false);
   return (
-    <Card className="h-100 shadow-sm bg-white rounded">
+    <Card className="add-manager">
       <Card.Body className="d-flex flex-column">
         <div className="d-flex mb-2 justify-content-between">
-          <Card.Title className="mb-0 font-weight-bold">Add Policy</Card.Title>
+          <Card.Title className="mb-0 font-weight-bold">Add Discount</Card.Title>
         </div>
         <Card.Text className="text-secondary">
-          Add a new Purchase Policy
+          Add a new discount
         </Card.Text>
         <form onSubmit={submit}>
           <label>value: </label>

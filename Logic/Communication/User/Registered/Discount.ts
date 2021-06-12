@@ -66,13 +66,13 @@ router.post('/', (request: any, response: any) => {
             result = service.addDiscount(user_id,  request.body.shop_id, request.body.value);
             break;
         case 2:
-            result = service.addConditionToDiscount(user_id, request.body.shop_id, request.body.id, request.body.condition, request.condition_param);
+            result = service.addConditionToDiscount(user_id, request.body.shop_id, request.body.id, request.body.condition, request.body.condition_param);
             break;
         case 3:
-            result = service.addNumericComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.discount_id_two);
+            result = service.addNumericComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.body.discount_id_two);
             break;
         case 4:
-            result = service.addLogicComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.discount_id_two);
+            result = service.addLogicComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.body.discount_id_two);
             break;
         default:
             result = 'bad request'

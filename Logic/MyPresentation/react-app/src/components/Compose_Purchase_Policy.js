@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import putFetch from "../putFetch.js";
-import { useHistory } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
 import { Alert } from "reactstrap";
 import Select from "react-select";
@@ -13,9 +12,8 @@ const ComposePolicy = (props) => {
   const [error, setError] = useState("");
   const [errorColor, setErrorColor] = useState("success");
   const [visible, setVisible] = useState(false);
-  const history = useHistory();
   const storeID = props.storeID;
-  const storeName = props.storeName;
+
 
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -26,20 +24,18 @@ const ComposePolicy = (props) => {
   ];
   const submit = (e) => {
     e.preventDefault();
-    putFetch(
-      "/user/shop/policy",
-      {
-        shop_id: storeID,
-        policy_id_first: id1,
-        policy_id_second: id2,
-        operator: operator,
-      },
-      thenFunc
-    );
+    const args = {
+      shop_id: storeID,
+      policy_id_first: id1,
+      policy_id_second: id2,
+      operator: operator.value,
+    };
+    console.log(args);
+    putFetch("/user/shop/policy", args, thenFunc);
   };
   const success = async () => {
     setErrorColor("success");
-    setError("Discount added successfully");
+    setError("Policies composed successfully");
     setVisible(true);
     await sleep(2000);
     window.location.reload();

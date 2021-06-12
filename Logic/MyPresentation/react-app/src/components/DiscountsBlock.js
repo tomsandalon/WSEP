@@ -7,6 +7,7 @@ const DiscountsBlock = (props) => {
   const error = props.error;
   const isPending = props.isPending;
   const storeID = props.storeID;
+  const storeName = props.storeName;
   console.log(discounts);
 
   return (
@@ -19,6 +20,8 @@ const DiscountsBlock = (props) => {
             discounts.map((discount) => {
               return (
                 <Discount
+                  storeName={storeName}
+                  key={discount.id}
                   condition={discount.condition}
                   parameter={discount.condition_param}
                   itemID={

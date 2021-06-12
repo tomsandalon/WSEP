@@ -58,10 +58,11 @@ const AddPolicy = (props) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
   const submit = (e) => {
+    console.log(condition);
     e.preventDefault();
     postFetch(
       "/user/shop/policy",
-      { shop_id: storeID, condition: condition, value: value },
+      { shop_id: storeID, condition: condition.value, value: value },
       thenFunc
     );
   };
@@ -82,7 +83,7 @@ const AddPolicy = (props) => {
   };
   const onDismiss = () => setVisible(false);
   return (
-    <Card className="h-100 shadow-sm bg-white rounded">
+    <Card className="add-manager">
       <Card.Body className="d-flex flex-column">
         <div className="d-flex mb-2 justify-content-between">
           <Card.Title className="mb-0 font-weight-bold">Add Policy</Card.Title>
