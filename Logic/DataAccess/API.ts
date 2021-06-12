@@ -73,50 +73,11 @@ const returnFalse = (err: any) => {
     return false;
 }
 type TryAgain = (_: any, attemps: number) => any
-export const AddPermission = (perm: Permission) =>
-    getDB().transaction((trx: any) =>
-        trx.insert({permission_id: perm}).into(permission.name)
-            .then(success)
-            .catch(returnFalse)
-    )
 
-export const AddPurchaseConditionOperator = (operator: number) =>
-    getDB().transaction((trx: any) =>
-        trx.insert({operator_id: operator}).into(purchase_condition_operator.name)
-            .then(success)
-            .catch(returnFalse)
-    )
+export const RegisterUser = (data: User) => _RegisterUser(data, 3)
 
-export const AddPurchaseConditionType = (type: number) =>
+const _RegisterUser = (data: User, attempts: number) =>
     getDB().transaction((trx: any) =>
-        trx.insert({type_id: type}).into(purchase_condition_type.name)
-            .then(success)
-            .catch(returnFalse)
-    )
-
-export const AddDiscountOperator = (operator: number) =>
-    getDB().transaction((trx: any) =>
-        trx.insert({discount_operator_id: operator}).into(discount_operator.name)
-            .then(success)
-            .catch(returnFalse)
-    )
-
-export const AddDiscountConditionType = (type: number) =>
-    getDB().transaction((trx: any) =>
-        trx.insert({discount_condition_type_id: type}).into(discount_condition_type.name)
-            .then(success)
-            .catch(returnFalse)
-    )
-
-export const AddPurchaseType = (type: number) =>
-    getDB().transaction((trx: any) =>
-        trx.insert({purchase_type_id: type}).into(purchase_type.name)
-            .then(success)
-            .catch(returnFalse)
-    )
-export const RegisterUser = (data: User) => {
-    // console.log(`Date ${JSON.stringify(data, null, 2)}`)
-    return getDB().transaction((trx: any) =>
         trx.insert({
             user_id: data.user_id,
             email: data.email,
@@ -124,10 +85,9 @@ export const RegisterUser = (data: User) => {
             age: data.age,
             admin: data.admin,
         }).into(user.name)
-            .then(success)
-            .catch(returnFalse)
     )
-}
+        .then(success)
+        .catch(new_err => handler(new_err, _RegisterUser, data, attempts))
 
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -154,18 +114,29 @@ export const ConnectToDB = async (): Promise<boolean> => {
         await reconnect();
         return true;
     }
+    console.log('\n\nReconnected!');
     return true;
 }
 
-export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => {
-    return new Promise<void>(() => {
-    })
-}
+export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => _CreateAdminIfNotExist([user_id, user_email, hashed_pass, age], 3)
 
-export const AddShop = (data: Shop) => {
-    // console.log(`Add shop ${data.shop_id} -- ${typeof data.shop_id}`)
-    return _AddShop(data, 3)
-}
+const _CreateAdminIfNotExist = ([user_id, user_email, hashed_pass, age]: [number, string, string, number], attempts: number): Promise<void> =>
+    getDB().transaction(async (trx: any) =>{
+        const result = await trx.select().from(user.name).where({user_id: user_id})
+        if (result.length == 0){
+            await trx.insert({
+                user_id: user_id,
+                email: user_email,
+                password: hashed_pass,
+                age: age,
+                admin: 1,
+            }).into(user.name)
+        }
+    })
+        .then(success)
+        .catch(new_err => handler(new_err, _CreateAdminIfNotExist, [user_id, user_email, hashed_pass, age], attempts))
+
+export const AddShop = (data: Shop) => _AddShop(data, 3)
 
 const _AddShop = (data: Shop, attempts: number) =>
     getDB().transaction((trx: any) =>
@@ -210,10 +181,7 @@ const _DeleteItemInBasket = (data: Basket, attempts: number) =>
         .then(success)
         .catch(new_err => handler(new_err, _DeleteItemInBasket, data, attempts))
 
-export const AddProduct = (data: Product) =>{
-    // console.log(`data ${JSON.stringify(data, null, 2)}`)
-    return _AddProduct(data, 3)
-}
+export const AddProduct = (data: Product) => _AddProduct(data, 3)
 
 const _AddProduct: TryAgain = (data: Product, attempts: number) =>{
     return getDB().transaction((trx: any) =>
@@ -599,72 +567,95 @@ const _PurchaseBasket = ([user_id, shop_id, purchase_id, date,  items]: [number,
         .then(success)
         .catch(new_err => handler(new_err, _PurchaseBasket, [user_id, shop_id, purchase_id, date,  items], attempts))
 
+export const addPurchaseTypes = (types: number[]) => _addPurchaseTypes(types, 3)
 
-export const addPurchaseTypes = (types: number[]) =>
-    getDB().transaction((trx: any) =>
-        trx(purchase_type.name).insert(types.map(t => {
+const _addPurchaseTypes = (types: number[], attempts: number) =>
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(purchase_type.name)).map(r => r.purchase_type_id)
+        const types_to_add = types.filter(t => !(result.includes(t)));
+        await trx(purchase_type.name).insert(types_to_add.map(t => {
             return {
                 purchase_type_id: t
             }
         }))
-            .then(success)
-            //.catch(failure)
-    )
+    })
+        .then(success)
+        .catch(new_err => handler(new_err, _addPurchaseTypes, types, attempts))
 
-export const addPermissions = (permissions: number[]) =>
-    getDB().transaction((trx: any) =>
-        trx(permission.name).insert(permissions.map(p => {
+export const addPermissions = (permissions: number[]) => _addPermissions(permissions, 3)
+
+const _addPermissions = (permissions: number[], attempts: number) =>
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(permission.name)).map(r => r.permission_id)
+        const permissions_to_add = permissions.filter(p => !(result.includes(p)));
+        await trx(permission.name).insert(permissions_to_add.map(p => {
             return {
                 permission_id: p
             }
         }))
-            .then(success)
-            //.catch(failure)
-    )
+    })
+        .then(success)
+        .catch(new_err => handler(new_err, _addPermissions, permissions, attempts))
 
-export const addPurchaseConditionType = (types: number[]) =>
-    getDB().transaction((trx: any) =>
-        trx(purchase_condition_type.name).insert(types.map(t => {
+export const addPurchaseConditionType = (types: number[]) => _addPurchaseConditionType(types, 3)
+
+const _addPurchaseConditionType = (types: number[], attempts: number) =>
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(purchase_condition_type.name)).map(r => r.type_id)
+        const types_to_add = types.filter(t => !(result.includes(t)));
+        await trx(purchase_condition_type.name).insert(types_to_add.map(t => {
             return {
                 type_id: t
             }
         }))
-            .then(success)
-            //.catch(failure)
-    )
+    })
+        .then(success)
+        .catch(new_err => handler(new_err, _addPurchaseConditionType, types, attempts))
 
-export const addPurchaseConditionOperator = (operators: number[]) =>
-    getDB().transaction((trx: any) =>
-        trx(purchase_condition_operator.name).insert(operators.map(o => {
+export const addPurchaseConditionOperator = (operators: number[]) => _addPurchaseConditionOperator(operators, 3)
+
+const _addPurchaseConditionOperator = (operators: number[], attempts: number) =>
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(purchase_condition_operator.name)).map(r => r.operator_id)
+        const operators_to_add = operators.filter(o => !(result.includes(o)));
+        await trx(purchase_condition_operator.name).insert(operators_to_add.map(o => {
             return {
                 operator_id: o
             }
         }))
-            .then(success)
-            //.catch(failure)
-    )
+    })
+        .then(success)
+        .catch(new_err => handler(new_err, _addPurchaseConditionOperator, operators, attempts))
 
-export const addDiscountOperator = (operators: number[]) =>
-    getDB().transaction((trx: any) =>
-        trx(discount_operator.name).insert(operators.map(o => {
+export const addDiscountOperator = (operators: number[]) => _addDiscountOperator(operators, 3)
+
+const _addDiscountOperator = (operators: number[], attempts: number) =>
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(discount_operator.name)).map(r => r.discount_operator_id)
+        const operators_to_add = operators.filter(o => !(result.includes(o)));
+        await trx(discount_operator.name).insert(operators_to_add.map(o => {
             return {
                 discount_operator_id: o
             }
         }))
-            .then(success)
-            //.catch(failure)
-    )
+    })
+        .then(success)
+        .catch(new_err => handler(new_err, _addDiscountOperator, operators, attempts))
 
-export const addDiscountConditionType = (types: number[]) =>
-    getDB().transaction((trx: any) =>
-        trx(discount_condition_type.name).insert(types.map(t => {
+export const addDiscountConditionType = (types: number[]) => _addDiscountConditionType(types, 3)
+
+const _addDiscountConditionType = (types: number[], attempts: number) =>
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(discount_condition_type.name)).map(r => r.discount_condition_type_id)
+        const types_to_add = types.filter(t => !(result.includes(t)));
+        await trx(discount_condition_type.name).insert(types_to_add.map(t => {
             return {
                 discount_condition_type_id: t
             }
         }))
-            .then(success)
-            //.catch(failure)
-    )
+    })
+        .then(success)
+        .catch(new_err => handler(new_err, _addDiscountConditionType, types, attempts))
 
 export const ClearDB = async (): Promise<void> => {
     let builder = getBuilder();

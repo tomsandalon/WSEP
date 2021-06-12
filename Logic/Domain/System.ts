@@ -347,6 +347,8 @@ export class SystemImpl implements System {
         if (this.isInRollbackProcess) {
             return;
         }
+        this.isInRollbackProcess = true;
+        await this.terminateAllConnections();
         await ConnectToDB();
         await initTables();
         const users: User[] = await GetUsers()
@@ -357,12 +359,13 @@ export class SystemImpl implements System {
         await this.reloadPurchases();
         this.reloadUsers(users);
         await this.reloadNotifications();
-        await this.terminateAllConnections();
+        await this.reconnectAllConnections();
+        console.log('\nSystem was rolled back!');
         this.isInRollbackProcess = false;
     }
 
     private static deleteData() {
-        PublisherImpl.getInstance(true)
+        PublisherImpl.getInstance().removeAllNotifications()
         SystemImpl.getInstance(true)
     }
 
@@ -414,15 +417,16 @@ export class SystemImpl implements System {
         await addPurchaseConditionOperator(range(10));
         await addDiscountOperator(range(10));
         await addDiscountConditionType(range(10));
-        // await this.login.createAdmin();
+        await this.login.createAdmin();
         return;
     }
 
     private static reloadPurchases(): Promise<void> {
         return GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases));
     }
+
     private static terminateAllConnections() {
-        //TODO with mark
+        PublisherImpl.getInstance().disconnectAllUsers()
     }
 
     adminDisplayShopHistory(admin_id: number, shop_id: number): string | string[] {
@@ -504,6 +508,7 @@ export class SystemImpl implements System {
                     return purchase_basket
                 }
             )
+
     }
 
     async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
@@ -1163,6 +1168,10 @@ export class SystemImpl implements System {
             active: entry.active,
         }
         this.shops.push(ShopImpl.createFromDB(newEntry))
+    }
+
+    private static async reconnectAllConnections() {
+        PublisherImpl.getInstance().reconnectAllUsers()
     }
 
     addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {

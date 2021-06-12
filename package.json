@@ -5,7 +5,7 @@
   "main": "index.js",
   "module": "CommonJS",
   "scripts": {
-    "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/* --timeout 50000",
+    "acc-test": "ts-mocha -p tsconfig.testing.json Tests/AcceptanceTests/* --timeout 400000",
     "unit-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Unit/*/*",
     "integ-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Integration/*",
     "config-test": "ts-mocha -p tsconfig.testing.json Tests/ConfigTest/* --timeout 2000",

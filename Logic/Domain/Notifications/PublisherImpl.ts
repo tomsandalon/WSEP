@@ -31,6 +31,8 @@ export class PublisherImpl implements Publisher {
         return PublisherImpl.instance;
     }
 
+
+
     static terminateAllConnections() {
 
     }
@@ -80,7 +82,7 @@ export class PublisherImpl implements Publisher {
         ClearNotifications(user_id).then(r => r ? {} : SystemImpl.rollback())
     }
 
-    removeAllNotificationsForTests(): void {
+    removeAllNotifications(): void {
         this.notificationQueue = {}
     }
 

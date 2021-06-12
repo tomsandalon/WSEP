@@ -22,4 +22,6 @@ export interface Publisher {
     disconnectAllUsers()
 
     reconnectAllUsers()
+
+    removeAllNotifications()
 }
