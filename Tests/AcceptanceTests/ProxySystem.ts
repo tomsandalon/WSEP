@@ -502,4 +502,11 @@ export class ProxySystem implements System{
         }
         return this.system.purchaseOffer(user_id, offer_id, payment_info)
     }
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removePurchaseType(user_id, shop_id, purchase_type)
+    }
 }

@@ -11,8 +11,7 @@ export class Offer {
     product: Product
     amount: number
     price_per_unit: number
-
-    //is_counter_offer: boolean
+    //is_counter_offer: boolean TODO
 
     constructor(shop: ShopInventory, id: number, product: Product, amount: number, price_per_unit: number, user: User) {
         this.shop = shop;

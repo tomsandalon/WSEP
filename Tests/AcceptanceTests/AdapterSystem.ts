@@ -276,4 +276,8 @@ export class AdapterSystem implements System {
     purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         return this.system.purchaseOffer(user_id, offer_id, payment_info)
     }
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+        return this.system.removePurchaseType(user_id, shop_id, purchase_type)
+    }
 }

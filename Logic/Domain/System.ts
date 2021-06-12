@@ -43,6 +43,7 @@ import {
     RemoveOffer,
     RemoveProduct,
     removePurchasePolicy,
+    RemovePurchaseTypeFromShop,
     UpdateItemInBasket,
     UpdatePermissions
 } from "../DataAccess/API";
@@ -178,6 +179,8 @@ export interface System {
     rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean
 
     addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
 
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
@@ -1198,7 +1201,22 @@ export class SystemImpl implements System {
         return ret
     }
 
-    //TODO remove purchase type of shop
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret = shop.removePurchaseType(user_email, purchase_type)
+        if (typeof ret != "string") {
+            RemovePurchaseTypeFromShop(shop_id, purchase_type)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
 
     makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number) {
         const result = this.getShopAndUser(user_id, shop_id)

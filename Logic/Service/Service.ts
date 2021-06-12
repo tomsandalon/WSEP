@@ -13,7 +13,8 @@ import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 export class Service {
 
     init(): Promise<void> {
-        return SystemImpl.getInstance().init();
+        return Promise.resolve()
+        // return SystemImpl.getInstance().init();
     }
 
     public initData() {
@@ -354,5 +355,13 @@ export class Service {
 
     purchaseOffer(user_id: number, offer_id: number, payment_info: string): Promise<string | boolean> {
         return SystemImpl.getInstance().purchaseOffer(user_id, offer_id, Service.getPurchaseInfoOrString(payment_info))
+    }
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
+        return SystemImpl.getInstance().removePurchaseType(user_id, shop_id, purchase_type)
+    }
+
+    addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
+        return SystemImpl.getInstance().addPurchaseType(user_id, shop_id, purchase_type)
     }
 }
