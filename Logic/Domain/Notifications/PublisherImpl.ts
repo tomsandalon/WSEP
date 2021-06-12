@@ -1,12 +1,12 @@
 import {Notification} from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
-// import * as P from "../../Service/Publisher"
+import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
-import {ClearNotifications, Notify} from "../../DataAccess/API";
+import {ClearNotifications, Notify, RemoveNotificationsByPrefix} from "../../DataAccess/API";
 import {SystemImpl} from "../System";
 
-let P: any
+// let P: any
 
 export class PublisherImpl implements Publisher {
     private static instance: PublisherImpl;
@@ -18,10 +18,10 @@ export class PublisherImpl implements Publisher {
     }
 
     disconnectAllUsers() {
-        P.Publisher.getInstance().disconnectAllUsers()
+        if (P != undefined) P.Publisher.getInstance().disconnectAllUsers()
     }
     reconnectAllUsers() {
-        P.Publisher.getInstance().reconnectAllUsers()
+        if (P != undefined) P.Publisher.getInstance().reconnectAllUsers()
     }
 
     public static getInstance(reset?: boolean): PublisherImpl {
@@ -119,5 +119,14 @@ export class PublisherImpl implements Publisher {
                 [newNotification]
             PublisherImpl.id_counter = Math.max(PublisherImpl.id_counter, notification.notification_id + 1)
         })
+    }
+
+    removeNotificationsOfOffer(offer_id: number) {
+        const string_to_remove = `Offer request id ${offer_id}:`
+        for (let i = 0; i < Infinity; i++) {
+            if (this.notificationQueue[i] == undefined) i = Infinity
+            this.notificationQueue[i] = this.notificationQueue[i].filter(n => !n.message.startsWith(string_to_remove))
+        }
+        RemoveNotificationsByPrefix(string_to_remove).then(_ => _)
     }
 }

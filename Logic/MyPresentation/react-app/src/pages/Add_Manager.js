@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import {useState} from "react";
+import {useHistory, useParams} from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
 import postFetch from "../postFetch.js";
-import { Alert } from "reactstrap";
+import {Alert} from "reactstrap";
 
 const AddManager = () => {
-  const { storeID, managerOwner, storeName } = useParams();
+  const {storeID, managerOwner, storeName} = useParams();
   const [newManagerEmail, setNewManagerEmail] = useState();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");

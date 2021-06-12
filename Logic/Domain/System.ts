@@ -20,24 +20,30 @@ import {
     addDiscountConditionType,
     addDiscountOperator,
     AddItemToBasket,
+    AddOffer,
     addPermissions,
     AddProduct,
     addPurchaseConditionOperator,
     addPurchaseConditionType,
     AddPurchasePolicy,
     addPurchaseTypes,
+    AddPurchaseTypeToShop,
     AddShop,
     AppointManager,
     AppointOwner,
     ConnectToDB,
+    CounterOffer,
     DeleteItemInBasket,
+    OfferAcceptedByManagement,
     RateProduct,
     RegisterUser,
     RemainingManagement,
     removeDiscount,
     RemoveManager,
+    RemoveOffer,
     RemoveProduct,
     removePurchasePolicy,
+    RemovePurchaseTypeFromShop,
     UpdateItemInBasket,
     UpdatePermissions
 } from "../DataAccess/API";
@@ -55,6 +61,7 @@ import {
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
 import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+import {offer_id_counter} from "./ProductHandling/Offer";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -172,10 +179,104 @@ export interface System {
 
     rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean
 
-    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
+    addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
 
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
+
+    /**
+     * Make a new offer by a user
+     * @param user_id
+     * @param shop_id
+     * @param product_id
+     * @param amount
+     * @param price_per_unit
+     * @return true iff the offer was successfully logged, string representing the error otherwise
+     */
+    makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number): string | boolean
+
+    /**
+     * get all the active offers of a user
+     * @param user_id
+     * @return string array containing a JSON representation of the offer. See Offer.ts#toString() for the format
+     */
+    getActiveOffersAsUser(user_id: number): string | string[]
+
+    /**
+     * get all the active offers of a shop as its management
+     * @param user_id
+     * @param shop_id
+     * @return string array containing a JSON representation of the offer. See Offer.ts#toString() for the format
+     */
+    getActiveOfferForShop(user_id: number, shop_id: number): string | string[]
+
+    /**
+     * accept an offer part of a shop's management
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @return true iff accepted the offer successfully. error as a string otherwise
+     */
+    acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean
+
+    /**
+     * deny an offer part of a shop's management
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @return true iff denied the offer successfully. error as a string otherwise
+     */
+    denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean
+
+    /**
+     * counteroffer an offer part of a shop's management
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @param new_price_per_unit
+     * @return true iff countered the offer successfully. error as a string otherwise
+     */
+    counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean
+
+    /**
+     * Deny an offer as a user who received a counter offer
+     * @param user_id
+     * @param offer_id
+     * @return true iff the denial was successful, error string otherwise
+     */
+    denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean
+
+    /**
+     * check if an offer is ready to be purchased by the user
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @return true if the offer is purchasable
+     * @return false if the offer is not purchasable
+     * @return string_error otherwise
+     */
+    offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean
+
+    /**
+     * Purchase as offer a user
+     * @param user_id
+     * @param offer_id
+     * @param payment_info
+     * @return Promise containing true if the purchase was successful, string representing an error otherwise
+     */
+    purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
+
+    /**
+     * counteroffer an offer as user
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @param new_price_per_unit
+     * @return true iff countered the offer successfully. error as a string otherwise
+     */
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean
 
     init(): Promise<void>
 }
@@ -336,6 +437,7 @@ export class SystemImpl implements System {
         await addDiscountOperator(range(10));
         await addDiscountConditionType(range(10));
         await this.login.createAdmin();
+        await SystemImpl.rollback()
         return;
     }
 
@@ -557,6 +659,7 @@ export class SystemImpl implements System {
             location: location,
             active: true,
             name: name,
+            purchase_type: [Purchase_Type.Immediate]
         }).then(r => {
             if (!r) {
                 panicLogger.Error(`Failed to add new shop by ${user_id}. Performing a rollback`)
@@ -998,15 +1101,6 @@ export class SystemImpl implements System {
         return shop.getPermissions(user_email)
     }
 
-    // addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
-    //     const result = this.getShopAndUser(user_id, shop_id)
-    //     if (typeof result == "string") return result
-    //     const {shop, user_email} = result
-    //     const user = this._login.retrieveUser(user_id);
-    //     if (typeof user == "string")
-    //         return user
-    // }
-
     getManagingShops(user_id: number): string | string[] {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string")
@@ -1099,5 +1193,150 @@ export class SystemImpl implements System {
 
     private static async reconnectAllConnections() {
         PublisherImpl.getInstance().reconnectAllUsers()
+    }
+
+    addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret = shop.addPurchaseType(user_email, purchase_type)
+        if (typeof ret != "string") {
+            AddPurchaseTypeToShop(shop_id, purchase_type)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret = shop.removePurchaseType(user_email, purchase_type)
+        if (typeof ret != "string") {
+            RemovePurchaseTypeFromShop(shop_id, purchase_type)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
+
+    makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number) {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret: string | boolean = user.makeOffer(shop.inventory, product_id, amount, price_per_unit)
+        if (typeof ret != "string") {
+            AddOffer(user_id, shop_id, offer_id_counter - 1, product_id, amount, price_per_unit)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
+
+    getActiveOffersAsUser(user_id: number): string | string[] {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        return user.getActiveOffers()
+    }
+
+    getActiveOfferForShop(user_id: number, shop_id: number): string | string[] {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        return shop.getActiveOffers(user_email)
+    }
+
+    acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const ret = shop.acceptOfferAsManagement(user_email, offer_id)
+        if (typeof ret != "string") {
+            OfferAcceptedByManagement(user_id, offer_id)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
+
+    denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const ret = shop.denyOfferAsManagement(user_email, offer_id)
+        if (typeof ret != "string") {
+            RemoveOffer(offer_id)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
+
+    counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const ret = shop.counterOfferAsManagement(user_email, offer_id, new_price_per_unit)
+        if (typeof ret != "string") {
+            CounterOffer(offer_id, user_id, new_price_per_unit)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
+
+    denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret = user.denyCounterOfferAsUser(offer_id)
+        if (typeof ret != "string") {
+            RemoveOffer(offer_id)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
+
+    offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        return user.offerIsPurchasable(offer_id)
+    }
+
+    async purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string") return user
+        return user.purchaseOffer(offer_id, payment_info)
+    }
+
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        let offers_info = this.getActiveOffersAsUser(user_id)
+        if (typeof offers_info == "string") return offers_info
+        let offers_info_as_obj = offers_info.map(s => JSON.parse(s))
+        let offer = offers_info_as_obj.find(o => o.offer_id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} not found`
+        let ret = this.denyCounterOfferAsUser(user_id, offer_id)
+        if (typeof ret == "string") return ret
+        return this.makeOffer(user_id, shop_id, offer.product_id, offer.amount, new_price_per_unit)
     }
 }

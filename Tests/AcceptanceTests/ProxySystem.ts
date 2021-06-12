@@ -432,4 +432,88 @@ export class ProxySystem implements System{
         else
             return true;
     }
+
+    acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.acceptOfferAsManagement(user_id, shop_id, offer_id)
+    }
+
+    addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addPurchaseType(user_id, shop_id, purchase_type)
+    }
+
+    counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.counterOfferAsManager(user_id, shop_id, offer_id, new_price_per_unit)
+    }
+
+    denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.denyCounterOfferAsUser(user_id, offer_id)
+    }
+
+    denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.denyOfferAsManagement(user_id, shop_id, offer_id)
+    }
+
+    getActiveOfferForShop(user_id: number, shop_id: number): string | string[] {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getActiveOfferForShop(user_id, shop_id)
+    }
+
+    getActiveOffersAsUser(user_id: number): string | string[] {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getActiveOffersAsUser(user_id)
+    }
+
+    makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.makeOffer(user_id, shop_id, product_id, amount, price_per_unit)
+    }
+
+    offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.offerIsPurchasable(user_id, shop_id, offer_id)
+    }
+
+    purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        if (this.system == undefined) {
+            return Promise.resolve(TestNotAssociatedWithImplementation)
+        }
+        return this.system.purchaseOffer(user_id, offer_id, payment_info)
+    }
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removePurchaseType(user_id, shop_id, purchase_type)
+    }
+
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
+    }
 }

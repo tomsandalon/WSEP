@@ -17,8 +17,18 @@ import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 import {GetPurchaseConditions, ShopRich} from "../../DataAccess/Getters";
 import {SimpleCondition} from "./PurchasePolicy/SimpleCondition";
+import {Offer} from "../ProductHandling/Offer";
+import {Manager} from "../ShopPersonnel/Manager";
+import {Owner} from "../ShopPersonnel/Owner";
+import {NotificationAdapter} from "../Notifications/NotificationAdapter";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
+
+export type OfferAcceptance = {
+    offer: Offer,
+    managers_not_accepted: Manager[],
+    owners_not_accepted: Owner[]
+}
 
 export enum Filter_Type {
     BelowPrice,
@@ -39,6 +49,7 @@ export enum Item_Action {
 
 export enum Purchase_Type {
     Immediate,
+    Offer,
 }
 
 export interface ShopInventory {
@@ -54,6 +65,7 @@ export interface ShopInventory {
     purchase_types: Purchase_Type[]
     purchase_history: UserPurchaseHistory
     bank_info: string
+    active_offers: OfferAcceptance[]
 
     /**
      * @Requirement 2.5
@@ -169,18 +181,33 @@ export interface ShopInventory {
     hasPurchased(user_id: number, product_id: number): Boolean;
 
     addInventoryFromDB(inventory: ShopRich): Promise<void>;
+
+    addPurchaseType(purchase_type: Purchase_Type): string | boolean;
+
+    addOffer(param: Offer): string | boolean;
+
+    getActiveOffers(): string[];
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
+
+    addManagementToExistingOffers(appointee_email: string): void;
 }
 
 export let id_counter: number = 0;
 export const generateId = () => id_counter++;
 
 export class ShopInventoryImpl implements ShopInventory {
+    active_offers: OfferAcceptance[]
     private readonly _discount_policies: DiscountHandler;
     private readonly _shop_id: number;
     private readonly _bank_info: string;
     private readonly _shop_name: string;
 
-    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string, purchase_type?: Purchase_Type[]) {
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string, purchase_type: Purchase_Type[], active_offers: OfferAcceptance[]) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
         this._purchase_types = purchase_type ? purchase_type : [Purchase_Type.Immediate];
@@ -190,6 +217,7 @@ export class ShopInventoryImpl implements ShopInventory {
         this._purchase_history = UserPurchaseHistoryImpl.getInstance();
         this._discount_policies = new DiscountHandler();
         this._purchase_policies = Array<PurchaseCondition>();
+        this.active_offers = active_offers
     }
 
     private _purchase_policies: PurchaseCondition[];
@@ -268,7 +296,20 @@ export class ShopInventoryImpl implements ShopInventory {
         return p1.length == p2.length && p1.every(p1 => p2.some(p2 => ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1, p2)));
     }
 
+    private static twoPurchasePoliciesAreEqual(p1: PurchaseCondition, p2: PurchaseCondition): boolean {
+        if (p1.id != p2.id) return false
+        if (p1 instanceof SimpleCondition && p2 instanceof SimpleCondition)
+            return p1.condition == p2.condition && p1.value == p2.value
+        if (p1 instanceof CompositeCondition && p2 instanceof CompositeCondition)
+            return p1.action == p2.action && ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[0], p2.conditions[0]) &&
+                ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[1], p2.conditions[1])
+        return false
+    }
+
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
+        if (purchase_type == undefined && !this.purchase_types.includes(Purchase_Type.Immediate) ||
+            purchase_type != undefined && !this.purchase_types.includes(purchase_type))
+            return "Purchase type is not allowed in the shop"
         const item: Product | string = ProductImpl.create(base_price, description, name, purchase_type);
         if (typeof item === "string") {
             return item
@@ -412,7 +453,8 @@ export class ShopInventoryImpl implements ShopInventory {
             shop_name: this.shop_name,
             purchase_history: this._purchase_history.toString(),
             discount_policies: this.discount_policies,
-            purchase_policies: this.purchase_policies
+            purchase_policies: this.purchase_policies,
+            active_offers: this.active_offers
         })
     }
 
@@ -453,16 +495,6 @@ export class ShopInventoryImpl implements ShopInventory {
         return length != this._purchase_policies.length
     }
 
-    private static twoPurchasePoliciesAreEqual(p1: PurchaseCondition, p2: PurchaseCondition): boolean {
-        if (p1.id != p2.id) return false
-        if (p1 instanceof SimpleCondition && p2 instanceof SimpleCondition)
-            return p1.condition == p2.condition && p1.value == p2.value
-        if (p1 instanceof CompositeCondition && p2 instanceof CompositeCondition)
-            return p1.action == p2.action && ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[0], p2.conditions[0]) &&
-                ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[1], p2.conditions[1])
-        return false
-    }
-
     addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string) {
         const result = this.discount_policies.addConditionToDiscount(discount_id, condition, condition_param)
         if (!result) {
@@ -491,11 +523,13 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     notifyOwners(order: Purchase): void {
-        this._shop_management.notifyOwners(`New successful order:\n` +
+        const message = `New successful order:\n` +
             `Order number: ${order.order_id}\n` +
             `Items: ${order.products.reduce(
                 (acc, cur) => acc + "\n" + cur.name, ""
-            )}`)
+            )}`
+        this._shop_management.notifyOwners(message)
+        NotificationAdapter.getInstance().notifyForUserId(order.minimal_user_data.userId, message)
     }
 
     rateProduct(product_id: number, rating: number, rater: string): void {
@@ -525,16 +559,6 @@ export class ShopInventoryImpl implements ShopInventory {
         )
     }
 
-
-    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
-        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
-        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
-            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
-            return `Purchase policy doesn't allow this purchase`
-        }
-        return true
-    }
-
     composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
         if (this._purchase_policies.every(p => p.id != id1) ||
             this._purchase_policies.every(p => p.id != id2)) {
@@ -547,6 +571,96 @@ export class ShopInventoryImpl implements ShopInventory {
         ], operator)
         this._purchase_policies = this._purchase_policies.filter(p => p.id != id1 && p.id != id2)
         this._purchase_policies = this._purchase_policies.concat([new_policy])
+        return true
+    }
+
+    addPurchaseType(purchase_type: Purchase_Type) {
+        if (this._purchase_types.includes(purchase_type)) return "Purchase type already exists"
+        this._purchase_types = this.purchase_types.concat(purchase_type)
+        return true
+    }
+
+    addOffer(offer: Offer): string | boolean {
+        this.active_offers = this.active_offers.concat([{
+            offer: offer,
+            managers_not_accepted: this.shop_management.managers,
+            owners_not_accepted: this.shop_management.owners.concat([this.shop_management.original_owner]),
+        }])
+        return this.shop_management.notifyForOffer(`Offer request id ${offer.id}: a new offer for product ${offer.product.name}`)
+    }
+
+    getActiveOffers(): string[] {
+        return this.active_offers.map(offer => {
+            return JSON.stringify({
+                offer: JSON.parse(offer.offer.toString()),
+                managers_not_responded: offer.managers_not_accepted,
+                owners_not_responded: offer.owners_not_accepted
+            })
+        });
+    }
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        const offer = this.active_offers.find(offer => offer.offer.id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        if (!offer.managers_not_accepted.map(m => m.user_email)
+            .concat(offer.owners_not_accepted.map(o => o.user_email))
+            .includes(user_email)) return `${user_email} already accepted this offer`
+        offer.owners_not_accepted = offer.owners_not_accepted.filter(o => o.user_email != user_email)
+        offer.managers_not_accepted = offer.managers_not_accepted.filter(m => m.user_email != user_email)
+        if (offer.managers_not_accepted.length + offer.owners_not_accepted.length == 0)
+            NotificationAdapter.getInstance().notify(offer.offer.user.user_email, `Offer ${offer_id} is accepted, you can now purchase the item`)
+        return true
+    }
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        const offer = this.active_offers.find(offer => offer.offer.id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        offer.offer.denied()
+        NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
+        NotificationAdapter.getInstance().notify(offer.offer.user.user_email, `${user_email} denied your offer id ${offer_id}`)
+        return true
+    }
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean {
+        const offer = this.active_offers.find(offer => offer.offer.id == offer_id)
+        if (new_price_per_unit < 0) return "Cannot offer a negative price"
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        if (!offer.managers_not_accepted.map(m => m.user_email)
+            .concat(offer.owners_not_accepted.map(o => o.user_email))
+            .includes(user_email)) return `${user_email} already accepted this offer`
+        offer.managers_not_accepted = this.shop_management.managers.filter(m => m.user_email != user_email)
+        offer.owners_not_accepted = this.shop_management.owners.concat([this.shop_management.original_owner]).filter(o => o.user_email != user_email)
+        offer.managers_not_accepted.map(m => m.user_email).concat(offer.owners_not_accepted.map(o => o.user_email))
+            .forEach(email => NotificationAdapter.getInstance().notify(email, `Offer request id ${offer_id}: new offer to accept from ${user_email}`))
+        offer.offer.price_per_unit = new_price_per_unit
+        offer.offer.assignAsCounterOffer()
+        NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
+        return true
+    }
+
+    addManagementToExistingOffers(appointee_email: string): void {
+        const isOwner = this.shop_management.isOwner(appointee_email)
+        const isManager = !isOwner
+        this.active_offers = this.active_offers.map(o => {
+            return {
+                offer: o.offer,
+                managers_not_accepted: isManager ?
+                    o.managers_not_accepted.concat([this.shop_management.managers.find(m => m.user_email == appointee_email) as Manager]) :
+                    o.managers_not_accepted.filter(m => m.user_email != appointee_email),
+                owners_not_accepted: isOwner ?
+                    o.owners_not_accepted :
+                    o.owners_not_accepted.concat([this.shop_management.owners.concat([this.shop_management.original_owner]).find(o => o.user_email == appointee_email) as Owner])
+            }
+        })
+
+    }
+
+    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
+        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
+        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
+            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
+            return `Purchase policy doesn't allow this purchase`
+        }
         return true
     }
 }
