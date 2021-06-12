@@ -114,6 +114,7 @@ export const ConnectToDB = async (): Promise<boolean> => {
         await reconnect();
         return true;
     }
+    console.log('\n\nReconnected!');
     return true;
 }
 
