@@ -32,7 +32,6 @@ export class LoginImpl implements Login {
         this._existing_users = []
         this._password_handler = Authentication.getInstance();
         this._register = RegisterImpl.getInstance(reset);
-        this.createAdmin()
         UserPurchaseHistoryImpl.getInstance(reset)
     }
 

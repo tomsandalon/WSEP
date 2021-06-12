@@ -326,6 +326,7 @@ export class SystemImpl implements System {
     async init(): Promise<void> {
         await ConnectToDB();
         await initTables();
+        // LoginImpl.getInstance().createAdmin();
         let range = SystemImpl.range;
         await addPurchaseTypes(range(10));
         await addPermissions(range(10));
@@ -333,7 +334,7 @@ export class SystemImpl implements System {
         await addPurchaseConditionOperator(range(10));
         await addDiscountOperator(range(10));
         await addDiscountConditionType(range(10));
-        // await this.login.createAdmin();
+        // await this.login.createAdmin(); 
         return;
     }
 
