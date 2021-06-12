@@ -1,12 +1,12 @@
 import {Notification} from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
-// import * as P from "../../Service/Publisher"
+import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
 import {ClearNotifications, Notify} from "../../DataAccess/API";
 import {SystemImpl} from "../System";
 
-let P: any
+// let P: any
 
 export class PublisherImpl implements Publisher {
     private static instance: PublisherImpl;
