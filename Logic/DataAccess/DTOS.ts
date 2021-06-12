@@ -17,6 +17,7 @@ export type Shop = {
     location: string,
     bank_info: string,
     active: boolean,
+    purchase_type: number[],
 }
 
 export type Product = {

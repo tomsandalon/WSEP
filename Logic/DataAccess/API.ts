@@ -104,17 +104,18 @@ const reconnect = async () => {
             break;
         }
     }
+    console.log('\nReconnected!')
 }
 
 export const ConnectToDB = async (): Promise<boolean> => {
     try{
         connectToDB()
+        console.log('\nConnected')
     } catch (_) {}
     if (!await isConnectedToDB()) {
         await reconnect();
         return true;
     }
-    console.log('\n\nReconnected!');
     return true;
 }
 
@@ -219,7 +220,7 @@ const _RemoveProduct = (product_id: number, attempts: number) =>
         .then(success)
         .catch(new_err => handler(new_err, _RemoveProduct, product_id, attempts))
 
-export const AppointManager = (target_email: string, appointer_email: string, shop_id: number, permissions: Permission[]) =>
+export const AppointManager = (target_email: string, appointer_email: string, shop_id: number, permissions: Permission[]) => //TODO add to all offer
     _AppointManager([target_email, appointer_email, shop_id, permissions], 3)
 
 const _AppointManager = ([target_email, appointer_email, shop_id, permissions]: [string, string, number, Permission[]], attempts: number) =>
@@ -235,7 +236,7 @@ const _AppointManager = ([target_email, appointer_email, shop_id, permissions]: 
         .then(success)
         .catch(new_err => handler(new_err, _AppointManager, [target_email, appointer_email, shop_id, permissions], attempts))
 
-export const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) =>
+export const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) => //TODO add to all offer
     _AppointOwner([target_email, appointer_email, shop_id], 3)
 
 const _AppointOwner = ([target_email, appointer_email, shop_id]: [string, string, number], attempts: number) =>
@@ -249,7 +250,7 @@ const _AppointOwner = ([target_email, appointer_email, shop_id]: [string, string
         .then(success)
         .catch(new_err => handler(new_err, _AppointOwner, [target_email, appointer_email, shop_id], attempts))
 
-export const RemoveManager = (target_email: string, shop_id: number) =>
+export const RemoveManager = (target_email: string, shop_id: number) => //TODO remove from all offers
     _RemoveManager([target_email, shop_id], 3)
 
 const _RemoveManager = ([target_email, shop_id]: [string, number], attempts: number) =>
@@ -264,7 +265,7 @@ const _RemoveManager = ([target_email, shop_id]: [string, number], attempts: num
         .then(success)
         .catch(new_err => handler(new_err, _RemoveManager, [target_email, shop_id], attempts))
 
-export const RemainingManagement = (management_emails: string[], shop_id: number) =>
+export const RemainingManagement = (management_emails: string[], shop_id: number) => //TODO remove from all offers the ones who do not appear here
     _RemainingManagement([management_emails, shop_id], 3)
 
 const _RemainingManagement = ([management_emails, shop_id]: [string[], number], attempts: number) =>
@@ -662,3 +663,17 @@ export const ClearDB = async (): Promise<void> => {
     const dropRequests = config.reduceRight((acc, table) => acc.concat([builder.dropTableIfExists(table.name)]), []);
     await dropRequests[0]
 };
+
+export const AddPurchaseTypeToShop = (shop_id: number, purchase_type: number): Promise<boolean> => Promise.resolve(true)
+
+export const RemovePurchaseTypeFromShop = (shop_id: number, purchase_type: number): Promise<boolean> => Promise.resolve(true)
+
+export const AddOffer = (user_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number): Promise<boolean> => Promise.resolve(true)
+
+export const OfferAcceptedByManagement = (user_id: number, offer_id: number): Promise<boolean> => Promise.resolve(true)
+
+export const RemoveOffer = (offer_id: number): Promise<boolean> => Promise.resolve(true)
+
+export const CounterOffer = (offer_id: number, user_id: number, new_price_per_unit: number): Promise<boolean> => Promise.resolve(true)
+
+export const RemoveNotificationsByPrefix = (prefix: string): Promise<void> => Promise.resolve()

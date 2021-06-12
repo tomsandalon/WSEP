@@ -5,12 +5,14 @@ import {User} from "../Users/User";
 export let offer_id_counter: number = 0
 
 export class Offer {
-    shop: ShopInventory
     id: number
+    shop: ShopInventory
+    user: User
     product: Product
     amount: number
     price_per_unit: number
-    user: User
+
+    //is_counter_offer: boolean
 
     constructor(shop: ShopInventory, id: number, product: Product, amount: number, price_per_unit: number, user: User) {
         this.shop = shop;

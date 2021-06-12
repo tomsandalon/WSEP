@@ -11,7 +11,7 @@ describe("test payment handler system ", () => {
         expect(result).lessThanOrEqual(100000)
     })
     it('pay function', async () => {
-        const result = await PaymentAndSupplyAdapter.getInstance().pay("4580", "08", "2018", "Ronen", "984", "314089651")
+        const result = await PaymentAndSupplyAdapter.getInstance().pay("4580", "08", "2018", "Ronen", "986", "314089651")
         expect(result).to.be.eq(-1)
     })
 })

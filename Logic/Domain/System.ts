@@ -20,22 +20,27 @@ import {
     addDiscountConditionType,
     addDiscountOperator,
     AddItemToBasket,
+    AddOffer,
     addPermissions,
     AddProduct,
     addPurchaseConditionOperator,
     addPurchaseConditionType,
     AddPurchasePolicy,
     addPurchaseTypes,
+    AddPurchaseTypeToShop,
     AddShop,
     AppointManager,
     AppointOwner,
     ConnectToDB,
+    CounterOffer,
     DeleteItemInBasket,
+    OfferAcceptedByManagement,
     RateProduct,
     RegisterUser,
     RemainingManagement,
     removeDiscount,
     RemoveManager,
+    RemoveOffer,
     RemoveProduct,
     removePurchasePolicy,
     UpdateItemInBasket,
@@ -418,6 +423,7 @@ export class SystemImpl implements System {
         await addDiscountOperator(range(10));
         await addDiscountConditionType(range(10));
         await this.login.createAdmin();
+        await SystemImpl.rollback()
         return;
     }
 
@@ -639,6 +645,7 @@ export class SystemImpl implements System {
             location: location,
             active: true,
             name: name,
+            purchase_type: [Purchase_Type.Immediate]
         }).then(r => {
             if (!r) {
                 panicLogger.Error(`Failed to add new shop by ${user_id}. Performing a rollback`)
@@ -1182,11 +1189,16 @@ export class SystemImpl implements System {
         if (typeof user == "string")
             return user
         const ret = shop.addPurchaseType(user_email, purchase_type)
-        if (typeof ret == "string") {
-            //TODO change in DB
+        if (typeof ret != "string") {
+            AddPurchaseTypeToShop(shop_id, purchase_type)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
         }
         return ret
     }
+
+    //TODO remove purchase type of shop
 
     makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number) {
         const result = this.getShopAndUser(user_id, shop_id)
@@ -1196,8 +1208,11 @@ export class SystemImpl implements System {
         if (typeof user == "string")
             return user
         const ret: string | boolean = user.makeOffer(shop.inventory, product_id, amount, price_per_unit)
-        if (typeof ret == "string") {
-            //TODO insert to db
+        if (typeof ret != "string") {
+            AddOffer(user_id, shop_id, product_id, amount, price_per_unit)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
         }
         return ret
     }
@@ -1221,7 +1236,12 @@ export class SystemImpl implements System {
         if (typeof result == "string") return result
         const {shop, user_email} = result
         const ret = shop.acceptOfferAsManagement(user_email, offer_id)
-        //todo add to db
+        if (typeof ret != "string") {
+            OfferAcceptedByManagement(user_id, offer_id)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
         return ret
     }
 
@@ -1230,7 +1250,12 @@ export class SystemImpl implements System {
         if (typeof result == "string") return result
         const {shop, user_email} = result
         const ret = shop.denyOfferAsManagement(user_email, offer_id)
-        //todo add to db
+        if (typeof ret != "string") {
+            RemoveOffer(offer_id)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
         return ret
     }
 
@@ -1239,7 +1264,12 @@ export class SystemImpl implements System {
         if (typeof result == "string") return result
         const {shop, user_email} = result
         const ret = shop.counterOfferAsManagement(user_email, offer_id, new_price_per_unit)
-        //todo add to db
+        if (typeof ret != "string") {
+            CounterOffer(offer_id, user_id, new_price_per_unit)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
         return ret
     }
 
@@ -1248,7 +1278,12 @@ export class SystemImpl implements System {
         if (typeof user == "string")
             return user
         const ret = user.denyCounterOfferAsUser(offer_id)
-        //todo add to db
+        if (typeof ret != "string") {
+            RemoveOffer(offer_id)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
         return ret
     }
 
@@ -1262,8 +1297,6 @@ export class SystemImpl implements System {
     async purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") return user
-        const ret = user.purchaseOffer(offer_id, payment_info)
-        //todo db
-        return ret
+        return user.purchaseOffer(offer_id, payment_info)
     }
 }

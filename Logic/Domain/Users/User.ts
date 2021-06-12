@@ -356,7 +356,6 @@ export class UserImpl implements User {
                 offer.product.price = old_price
                 return result
             })
-        //TODO add to db
     }
 
     purchaseOffer(offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
