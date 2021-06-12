@@ -266,6 +266,7 @@ export class SystemImpl implements System {
             return;
         }
         this.isInRollbackProcess = true;
+        await this.terminateAllConnections();
         await ConnectToDB();
         await initTables();
         const users: User[] = await GetUsers()
@@ -276,12 +277,12 @@ export class SystemImpl implements System {
         await this.reloadPurchases();
         this.reloadUsers(users);
         await this.reloadNotifications();
-        await this.terminateAllConnections();
+        await this.reconnectAllConnections();
         this.isInRollbackProcess = false;
     }
 
     private static deleteData() {
-        PublisherImpl.getInstance(true)
+        PublisherImpl.getInstance().removeAllNotifications()
         SystemImpl.getInstance(true)
     }
 
@@ -342,7 +343,7 @@ export class SystemImpl implements System {
     }
 
     private static terminateAllConnections() {
-        //TODO with mark
+        PublisherImpl.getInstance().disconnectAllUsers()
     }
 
     adminDisplayShopHistory(admin_id: number, shop_id: number): string | string[] {
@@ -1093,5 +1094,9 @@ export class SystemImpl implements System {
             active: entry.active,
         }
         this.shops.push(ShopImpl.createFromDB(newEntry))
+    }
+
+    private static async reconnectAllConnections() {
+        PublisherImpl.getInstance().reconnectAllUsers()
     }
 }
