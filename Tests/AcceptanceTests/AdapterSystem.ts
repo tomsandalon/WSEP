@@ -280,4 +280,8 @@ export class AdapterSystem implements System {
     removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
         return this.system.removePurchaseType(user_id, shop_id, purchase_type)
     }
+
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        return this.system.counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
+    }
 }

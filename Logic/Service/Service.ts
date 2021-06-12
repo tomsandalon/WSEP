@@ -87,6 +87,7 @@ export class Service {
     removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
         return SystemImpl.getInstance().removePurchasePolicy(user_id, shop_id, policy_id)
     }
+
     addItemToBasket(user_id: number, product_id: number, shop_id: number, amount: number): string | void {
         return SystemImpl.getInstance().addItemToBasket(user_id, product_id, shop_id, amount);
     }
@@ -265,9 +266,10 @@ export class Service {
         return SystemImpl.getInstance().removeDiscount(user_id, shop_id, id)
     }
 
-    getAllShops(user_id: number): string | string[]{
+    getAllShops(user_id: number): string | string[] {
         return SystemImpl.getInstance().getAllShops(user_id)
     }
+
     isAdmin(user_id: number): boolean {
         return (SystemImpl.getInstance().isAdmin(user_id) as boolean);
     }
@@ -363,5 +365,9 @@ export class Service {
 
     addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
         return SystemImpl.getInstance().addPurchaseType(user_id, shop_id, purchase_type)
+    }
+
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        return SystemImpl.getInstance().counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
     }
 }

@@ -267,6 +267,16 @@ export interface System {
      */
     purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
 
+    /**
+     * counteroffer an offer as user
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @param new_price_per_unit
+     * @return true iff countered the offer successfully. error as a string otherwise
+     */
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean
+
     init(): Promise<void>
 }
 
@@ -1316,5 +1326,16 @@ export class SystemImpl implements System {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") return user
         return user.purchaseOffer(offer_id, payment_info)
+    }
+
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        let offers_info = this.getActiveOffersAsUser(user_id)
+        if (typeof offers_info == "string") return offers_info
+        let offers_info_as_obj = offers_info.map(s => JSON.parse(s))
+        let offer = offers_info_as_obj.find(o => o.offer_id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} not found`
+        let ret = this.denyCounterOfferAsUser(user_id, offer_id)
+        if (typeof ret == "string") return ret
+        return this.makeOffer(user_id, shop_id, offer.product_id, offer.amount, new_price_per_unit)
     }
 }
