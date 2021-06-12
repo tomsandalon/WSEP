@@ -631,6 +631,7 @@ export class ShopInventoryImpl implements ShopInventory {
         offer.managers_not_accepted.map(m => m.user_email).concat(offer.owners_not_accepted.map(o => o.user_email))
             .forEach(email => NotificationAdapter.getInstance().notify(email, `Offer request id ${offer_id}: new offer to accept from ${user_email}`))
         offer.offer.price_per_unit = new_price_per_unit
+        offer.offer.assignAsCounterOffer()
         NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
         return true
     }
