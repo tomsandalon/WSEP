@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-exports.server_host = 'localhost'
-exports.server_port = 8000
-exports.externalServices = "https://cs-bgu-wsep.herokuapp.com/"
-exports.client = 'mysql'
-exports.connection =  {
-    host: '127.0.0.1',
-    database: 'wsep',
-    user:     'lior',
-    password: '123456',
-    charset: 'utf8'
-}
-=======
 const fs = require('fs');
 const path = require('path');
 
@@ -44,43 +31,43 @@ const loadConfig = () => {
     }
 }
 
-exports.getServerHost = () => {
+module.exports.getServerHost = () => {
     if (!isLoaded) {
         loadConfig()
     }
     return server_host;
 }
-exports.getServerPort = () => {
+module.exports.getServerPort = () => {
     if (!isLoaded) {
         loadConfig()
     }
     return server_port;
 }
-exports.getExternalServices = () => {
+module.exports.getExternalServices = () => {
     if (!isLoaded) {
         loadConfig()
     }
     return externalServices;
 }
-exports.getDB_Client = () => {
+module.exports.getDB_Client = () => {
     if (!isLoaded) {
         loadConfig()
     }
     return db_client;
 }
-exports.getDB_Connection = () => {
+module.exports.getDB_Connection = () => {
     if (!isLoaded) {
         loadConfig()
     }
     return db_connection;
 }
-exports.configFileName = configFileName;
+module.exports.configFileName = configFileName;
 
-exports.loadConfig = () => loadConfig();
+module.exports.loadConfig = () => loadConfig();
 
-exports.isLoaded = () => isLoaded;
-exports.isValid = () => isValid;
-exports.clearCache = () => {
+module.exports.isLoaded = () => isLoaded;
+module.exports.isValid = () => isValid;
+module.exports.clearCache = () => {
     isLoaded = false
     isValid = false;
     printCache = false;
@@ -105,4 +92,3 @@ exports.clearCache = () => {
   }
 }
  */
->>>>>>> caab0bb2498dbf31cc23c298b2bba74e4ba16a3c

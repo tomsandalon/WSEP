@@ -6,7 +6,7 @@ class Error503 extends Component {
             <React.Fragment>
                  <img src={Reactlogo} id="icon" alt="User Icon" />
                 
-                <h1>The service you requests is not available at this time.</h1>
+                <h1>The service you requested is not available at this time, please try again later.</h1>
     
             </React.Fragment>
     
