@@ -1,49 +1,56 @@
-import { useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import postFetch from "../postFetch.js";
+import { useHistory } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
-import putFetch from "../putFetch.js";
 import { Alert } from "reactstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-const EditProduct = () => {
-  const { storeID, storeName, productID } = useParams();
-  const [isPending, setIsPending] = useState(false);
+const ComposeDiscount = (props) => {
+  const [operation, setOperation] = useState();
+  const [id1, setid1] = useState();
+  const [id2, setid2] = useState();
   const [error, setError] = useState("");
+  const [errorColor, setErrorColor] = useState("success");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-  const [action, setAction] = useState();
-  const [parameter, setParameter] = useState();
-  const [errorColor, setErrorColor] = useState("success");
+  const storeID = props.storeID;
+  const storeName = props.storeName;
+  const logic = props.logic;
 
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  const actionOptions = [
-    { label: "Add Amount", value: 0 },
-    { label: "Change Name", value: 1 },
-    { label: "Add Category", value: 2 },
-    { label: "RemoveCategory", value: 3 },
-    { label: "Change Price", value: 4 },
-    { label: "Change Description", value: 5 },
-  ];
+  const conditionOptions = logic
+    ? [
+        { label: "XOR", value: 0 },
+        { label: "And", value: 1 },
+        { label: "Or", value: 2 },
+      ]
+    : [
+        { label: "Max", value: 0 },
+        { label: "Add", value: 1 },
+      ];
   const submit = (e) => {
     e.preventDefault();
-    const args = {
-      shop_id: storeID,
-      product_id: productID,
-      value: parameter,
-      action: action.value,
-    };
-    console.log(args);
-    putFetch("/user/shop/product", args, thenFunc);
+    postFetch(
+      "/user/shop/discount",
+      {
+        request: logic ? 4 : 3,
+        shop_id: storeID,
+        discount_id_one: id1,
+        discount_id_two: id2,
+        operation: operation.value,
+      },
+      thenFunc
+    );
   };
   const success = async () => {
     setErrorColor("success");
-    setError("Product Edited successfully");
+    setError("Discounts composed successfully");
     setVisible(true);
     await sleep(2000);
-    history.push(`/managersStore/${storeID}/${storeName}`);
+    window.location.reload();
   };
   const failure401 = (err_message) => {
     setErrorColor("warning");
@@ -56,14 +63,28 @@ const EditProduct = () => {
   const onDismiss = () => setVisible(false);
   return (
     <div className="add-manager">
-      <p>Edit Product</p>
+      <p>Compose discounts {logic ? "logically" : "numerically"}</p>
       <div className="d-flex mb-2 justify-content-between"></div>
       <form onSubmit={submit}>
+        <label>id1: </label>
+        <input
+          type="text"
+          required
+          value={id1}
+          onChange={(e) => setid1(e.target.value)}
+        />
+        <label>id2: </label>
+        <input
+          type="text"
+          required
+          value={id2}
+          onChange={(e) => setid2(e.target.value)}
+        />
         <label>operator: </label>
         <Select
           components={makeAnimated()}
-          onChange={setAction}
-          options={actionOptions}
+          onChange={setOperation}
+          options={conditionOptions}
           className="mb-3"
           placeHolder="Select Operator"
           noOptionsMessage={() => "No more conditions available"}
@@ -72,17 +93,10 @@ const EditProduct = () => {
           autoFocus
           isSearchable
         />
-        <label>Value: </label>
-        <input
-          type="text"
-          required
-          value={parameter}
-          onChange={(e) => setParameter(e.target.value)}
-        />
         <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
           {error}
         </Alert>
-        {<input type="submit" value="Edit Product" />}
+        {<input type="submit" value="Compose" />}
       </form>
       {/* <Button
           onClick={() => submit()}
@@ -94,5 +108,4 @@ const EditProduct = () => {
     </div>
   );
 };
-
-export default EditProduct;
+export default ComposeDiscount;

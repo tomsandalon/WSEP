@@ -4,6 +4,8 @@ const serverResponse = async (response, success, failure401) => {
       success();
       break;
     case 400:
+    case 401:
+    case 503:
       const err_message = await response.text();
       failure401(err_message);
       break;

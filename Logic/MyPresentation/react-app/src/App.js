@@ -25,8 +25,11 @@ import EditProduct from "./pages/Edit_Product";
 import EditPermissionsPre from "./pages/EditPermissionsPre";
 import Notifications from "./components/Notifications/Notifications";
 import Unatho from "./components/Unatho";
+import AddPolicy from "./pages/Add_Policy";
+import AddCondition from "./pages/Add_Condition";
 import SocketIO from 'socket.io-client';
 import Error503 from './components/Error503';
+
 
 function App() {
   const [counter,setCounter] = useState(0);
@@ -59,8 +62,10 @@ function App() {
           <Route path="/addstore"><AddStore/></Route>
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
           <Route path="/addproduct/:storeID/:storeName"><AddProduct /></Route>
+          <Route path="/addpolicy/:storeID/:storeName"><AddPolicy /></Route>
+          <Route path="/addcondition/:storeID/:storeName/:discountid"><AddCondition /></Route>
           <Route path="/adddiscount/:storeID/:storeName"><AddDiscount /></Route>
-          <Route path="/editproduct/:storeID/:storeName"><EditProduct /></Route>
+          <Route path="/editproduct/:storeID/:storeName/:productID"><EditProduct /></Route>
           <Route path="/editpermissionspre/:storeID/:storeName/:managerID"><EditPermissionsPre /></Route>
         </Switch>
       </div>

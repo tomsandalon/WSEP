@@ -35,7 +35,7 @@ const AddManager = () => {
     e.preventDefault();
     const newManager = { shop_id: storeID, email: newManagerEmail };
     setIsPending(true);
-    console.log(newManager);
+
     postFetch(
       ownerPage
         ? "/user/shop/ownership/assign/owner"
