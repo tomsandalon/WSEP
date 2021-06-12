@@ -29,7 +29,7 @@ import AddPolicy from "./pages/Add_Policy";
 import AddCondition from "./pages/Add_Condition";
 import SocketIO from 'socket.io-client';
 import Error503 from './components/Error503';
-
+import UserOffers from './components/Notifications/UserOffers';
 
 function App() {
   const [counter,setCounter] = useState(0);
