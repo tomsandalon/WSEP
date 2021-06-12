@@ -1,17 +1,18 @@
 import ItemsBlock from "../components/ItemsBlock";
 import ManagersBlock from "../components/ManagersBlock";
 import OwnersBlock from "../components/OwnersBlock";
-import {Link, useHistory, useParams} from "react-router-dom";
+import { Link, useParams, useHistory } from "react-router-dom";
 import useFetch from "../useFetch";
-import {React} from "react";
+import { React } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Divider } from "@material-ui/core";
 import DiscountsBlock from "../components/DiscountsBlock";
 import PurchasePoliciesBlock from "../components/PurchasePoliciesBlock";
 import ComposePolicy from "../components/Compose_Purchase_Policy";
 import ComposeDiscount from "../components/ComposeDiscount";
 
 const ManagersStore = () => {
-  const {storeID, name} = useParams();
+  const { storeID, name } = useParams();
   const history = useHistory();
   const {
     data: storeItems,
@@ -130,10 +131,10 @@ const ManagersStore = () => {
           {itemsError && <div> {itemsError}</div>}
           {itemsIsPending && <div>Loading...</div>}
           <ItemsBlock
-              id={storeID}
-              storeItems={storeItems}
-              storeID={storeID}
-              storeName={name}
+            id={storeID}
+            storeItems={storeItems}
+            storeID={storeID}
+            storeName={name}
           ></ItemsBlock>
         </div>
         <hr></hr>
@@ -145,24 +146,24 @@ const ManagersStore = () => {
             </button>
           </Link>
           {discounts && (
-              <DiscountsBlock
-                  storeName={name}
-                  storeID={storeID}
-                  error={discountsError}
-                  isPending={discountsIsPending}
-                  discounts={discounts}
-              />
+            <DiscountsBlock
+              storeName={name}
+              storeID={storeID}
+              error={discountsError}
+              isPending={discountsIsPending}
+              discounts={discounts}
+            />
           )}
           <div className="row">
             <ComposeDiscount
-                storeID={storeID}
-                storeName={name}
-                logic={true}
+              storeID={storeID}
+              storeName={name}
+              logic={true}
             ></ComposeDiscount>
             <ComposeDiscount
-                storeID={storeID}
-                storeName={name}
-                logic={false}
+              storeID={storeID}
+              storeName={name}
+              logic={false}
             ></ComposeDiscount>
           </div>
           <hr></hr>
@@ -173,12 +174,12 @@ const ManagersStore = () => {
             </button>
           </Link>
           {purchasePolicies && (
-              <PurchasePoliciesBlock
-                  storeID={storeID}
-                  error={policiesError}
-                  isPending={policiesIsPending}
-                  policies={purchasePolicies}
-              />
+            <PurchasePoliciesBlock
+              storeID={storeID}
+              error={policiesError}
+              isPending={policiesIsPending}
+              policies={purchasePolicies}
+            />
           )}
           <ComposePolicy storeID={storeID} storeName={name}></ComposePolicy>
         </div>

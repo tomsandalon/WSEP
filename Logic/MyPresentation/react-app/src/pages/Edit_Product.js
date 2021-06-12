@@ -1,13 +1,13 @@
-import {useState} from "react";
-import {useHistory, useParams} from "react-router-dom";
+import { useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
 import putFetch from "../putFetch.js";
-import {Alert} from "reactstrap";
+import { Alert } from "reactstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
 const EditProduct = () => {
-  const {storeID, storeName, productID} = useParams();
+  const { storeID, storeName, productID } = useParams();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
@@ -19,14 +19,13 @@ const EditProduct = () => {
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-
   const actionOptions = [
-    {label: "Add Amount", value: 0},
-    {label: "Change Name", value: 1},
-    {label: "Add Category", value: 2},
-    {label: "RemoveCategory", value: 3},
-    {label: "Change Price", value: 4},
-    {label: "Change Description", value: 5},
+    { label: "Add Amount", value: 0 },
+    { label: "Change Name", value: 1 },
+    { label: "Add Category", value: 2 },
+    { label: "RemoveCategory", value: 3 },
+    { label: "Change Price", value: 4 },
+    { label: "Change Description", value: 5 },
   ];
   const submit = (e) => {
     e.preventDefault();
@@ -56,43 +55,43 @@ const EditProduct = () => {
   };
   const onDismiss = () => setVisible(false);
   return (
-      <div className="add-manager">
-        <p>Edit Product</p>
-        <div className="d-flex mb-2 justify-content-between"></div>
-        <form onSubmit={submit}>
-          <label>operator: </label>
-          <Select
-              components={makeAnimated()}
-              onChange={setAction}
-              options={actionOptions}
-              className="mb-3"
-              placeHolder="Select Operator"
-              noOptionsMessage={() => "No more conditions available"}
-              defaultValue={[]}
-              isMulti={false}
-              autoFocus
-              isSearchable
-          />
-          <label>Value: </label>
-          <input
-              type="text"
-              required
-              value={parameter}
-              onChange={(e) => setParameter(e.target.value)}
-          />
-          <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
-            {error}
-          </Alert>
-          {<input type="submit" value="Edit Product"/>}
-        </form>
-        {/* <Button
+    <div className="add-manager">
+      <p>Edit Product</p>
+      <div className="d-flex mb-2 justify-content-between"></div>
+      <form onSubmit={submit}>
+        <label>operator: </label>
+        <Select
+          components={makeAnimated()}
+          onChange={setAction}
+          options={actionOptions}
+          className="mb-3"
+          placeHolder="Select Operator"
+          noOptionsMessage={() => "No more conditions available"}
+          defaultValue={[]}
+          isMulti={false}
+          autoFocus
+          isSearchable
+        />
+        <label>Value: </label>
+        <input
+          type="text"
+          required
+          value={parameter}
+          onChange={(e) => setParameter(e.target.value)}
+        />
+        <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
+          {error}
+        </Alert>
+        {<input type="submit" value="Edit Product" />}
+      </form>
+      {/* <Button
           onClick={() => submit()}
           className="mt-auto font-weight-bold"
           block
         >
           Add Policy
         </Button> */}
-      </div>
+    </div>
   );
 };
 

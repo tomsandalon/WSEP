@@ -1,9 +1,14 @@
-import React, {useEffect, useState} from "react";
+import React, {useState,useEffect} from "react";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Navigation from "./components/Navbar/Navigation";
 import ShopItems from "./components/ShopItems";
-import {BrowserRouter as Router, Redirect, Route, Switch,} from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 import ManagerHome from "./pages/ManagerHome";
 import ShoppingCart from "./components/ShoppingCart";
 import "./App.css";
@@ -27,7 +32,7 @@ import Error503 from './components/Error503';
 
 
 function App() {
-  const [counter, setCounter] = useState(0);
+  const [counter,setCounter] = useState(0);
   const cookie = document.cookie;
   const port = 8000;
   const localhost = 'https://localhost:' + port;
@@ -39,29 +44,29 @@ function App() {
   return (
     <Router>
       <div className="app">
-        <Navigation socket={socket}/>
+        <Navigation socket={socket} />
         <Switch>
-          <Route exact path="/"><Redirect to="/home"/></Route>
-          <Route path="/home" render={() => <ShopItems/>}/>
+          <Route exact path="/"><Redirect to="/home" /></Route>
+          <Route path="/home" render={() => <ShopItems />} />
           <Route path="/error"><Error503 socket={socket}/></Route>
           <ProtectedRoute path="/notifications"><Notifications socket={socket}/></ProtectedRoute>
-          <ProtectedRoute path="/roles" component={RoleSelection}/>
-          <ProtectedRoute path="/user-history" component={UserHistory}/>
-          <Route path="/my-cart" component={ShoppingCart}/>
-          <Route path="/login" render={() => <Login socket={socket}/>}/>
-          <Route path="/managerHome" component={ManagerHome}/>
-          <Route path="/register" component={Register}/>
-          <ProtectedRoute role={"admin"} path="/admin-menu" component={AdminMenu}/>
+          <ProtectedRoute path="/roles" component={RoleSelection} />
+          <ProtectedRoute path="/user-history" component={UserHistory} />
+          <Route path="/my-cart" component={ShoppingCart} />
+          <Route path="/login" render={() => <Login socket={socket}/>} />
+          <Route path="/managerHome" component={ManagerHome} />
+          <Route path="/register" component={Register} />
+          <ProtectedRoute role={"admin"} path="/admin-menu" component={AdminMenu} />
           <Route path="/unauthorized" component={Unatho}/>
           <Route path="/addmanager/:storeID/:managerOwner/:storeName"><AddManager/></Route>
           <Route path="/addstore"><AddStore/></Route>
           <Route path="/managersStore/:storeID/:name"><ManagersStore/></Route>
-          <Route path="/addproduct/:storeID/:storeName"><AddProduct/></Route>
-          <Route path="/addpolicy/:storeID/:storeName"><AddPolicy/></Route>
-          <Route path="/addcondition/:storeID/:storeName/:discountid"><AddCondition/></Route>
-          <Route path="/adddiscount/:storeID/:storeName"><AddDiscount/></Route>
-          <Route path="/editproduct/:storeID/:storeName/:productID"><EditProduct/></Route>
-          <Route path="/editpermissionspre/:storeID/:storeName/:managerID"><EditPermissionsPre/></Route>
+          <Route path="/addproduct/:storeID/:storeName"><AddProduct /></Route>
+          <Route path="/addpolicy/:storeID/:storeName"><AddPolicy /></Route>
+          <Route path="/addcondition/:storeID/:storeName/:discountid"><AddCondition /></Route>
+          <Route path="/adddiscount/:storeID/:storeName"><AddDiscount /></Route>
+          <Route path="/editproduct/:storeID/:storeName/:productID"><EditProduct /></Route>
+          <Route path="/editpermissionspre/:storeID/:storeName/:managerID"><EditPermissionsPre /></Route>
         </Switch>
       </div>
     </Router>

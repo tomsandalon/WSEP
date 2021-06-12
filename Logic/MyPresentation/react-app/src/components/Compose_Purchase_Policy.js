@@ -18,7 +18,6 @@ const ComposePolicy = (props) => {
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-
   const conditionOptions = [
     {label: "And", value: 0},
     {label: "Or", value: 1},

@@ -18,7 +18,6 @@ const AddCondition = (props) => {
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-
   const numToCondition = {
     0: "Category",
     1: "Product name",

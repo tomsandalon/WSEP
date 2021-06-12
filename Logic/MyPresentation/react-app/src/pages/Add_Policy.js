@@ -1,11 +1,11 @@
-import React, {useState} from "react";
-import {Card} from "react-bootstrap";
+import React, { useState } from "react";
+import { Card, Button } from "react-bootstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import postFetch from "../postFetch.js";
-import {useHistory, useParams} from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
-import {Alert} from "reactstrap";
+import { Alert } from "reactstrap";
 
 const Action = {
   NotCategory: "Not in category",
@@ -36,11 +36,11 @@ const conditionOptions = [
     label: "Not in category",
     value: 0,
   },
-  {label: "Before Time", value: 1},
-  {label: "After Time", value: 2},
-  {label: "Amount Lower Than", value: 3},
-  {label: "Amount Greater Than", value: 4},
-  {label: "Age Is Under", value: 5},
+  { label: "Before Time", value: 1 },
+  { label: "After Time", value: 2 },
+  { label: "Amount Lower Than", value: 3 },
+  { label: "Amount Greater Than", value: 4 },
+  { label: "Age Is Under", value: 5 },
 ];
 
 const AddPolicy = (props) => {
@@ -50,21 +50,20 @@ const AddPolicy = (props) => {
   const [errorColor, setErrorColor] = useState("success");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-  const {storeID, storeName} = useParams();
+  const { storeID, storeName } = useParams();
 
   var defaultCondition = [];
 
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-
   const submit = (e) => {
     console.log(condition);
     e.preventDefault();
     postFetch(
-        "/user/shop/policy",
-        {shop_id: storeID, condition: condition.value, value: value},
-        thenFunc
+      "/user/shop/policy",
+      { shop_id: storeID, condition: condition.value, value: value },
+      thenFunc
     );
   };
   const success = async () => {
@@ -84,48 +83,48 @@ const AddPolicy = (props) => {
   };
   const onDismiss = () => setVisible(false);
   return (
-      <Card className="add-manager">
-        <Card.Body className="d-flex flex-column">
-          <div className="d-flex mb-2 justify-content-between">
-            <Card.Title className="mb-0 font-weight-bold">Add Policy</Card.Title>
-          </div>
-          <Card.Text className="text-secondary">
-            Add a new Purchase Policy
-          </Card.Text>
-          <Select
-              components={makeAnimated()}
-              onChange={setCondition}
-              options={conditionOptions}
-              className="mb-3"
-              placeHolder="Select Condition"
-              noOptionsMessage={() => "No more conditions available"}
-              defaultValue={defaultCondition}
-              isMulti={false}
-              autoFocus
-              isSearchable
+    <Card className="add-manager">
+      <Card.Body className="d-flex flex-column">
+        <div className="d-flex mb-2 justify-content-between">
+          <Card.Title className="mb-0 font-weight-bold">Add Policy</Card.Title>
+        </div>
+        <Card.Text className="text-secondary">
+          Add a new Purchase Policy
+        </Card.Text>
+        <Select
+          components={makeAnimated()}
+          onChange={setCondition}
+          options={conditionOptions}
+          className="mb-3"
+          placeHolder="Select Condition"
+          noOptionsMessage={() => "No more conditions available"}
+          defaultValue={defaultCondition}
+          isMulti={false}
+          autoFocus
+          isSearchable
+        />
+        <form onSubmit={submit}>
+          <label>value: </label>
+          <input
+            type="text"
+            required
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
           />
-          <form onSubmit={submit}>
-            <label>value: </label>
-            <input
-                type="text"
-                required
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-            />
-            {<input type="submit" value="Add Policy"/>}
-          </form>
-          <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
-            {error}
-          </Alert>
-          {/* <Button
+          {<input type="submit" value="Add Policy" />}
+        </form>
+        <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
+          {error}
+        </Alert>
+        {/* <Button
           onClick={() => submit()}
           className="mt-auto font-weight-bold"
           block
         >
           Add Policy
         </Button> */}
-        </Card.Body>
-      </Card>
+      </Card.Body>
+    </Card>
   );
 };
 export default AddPolicy;

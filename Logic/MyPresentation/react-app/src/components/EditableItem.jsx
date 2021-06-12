@@ -1,10 +1,11 @@
-import React, {useState} from "react";
+import React from "react";
 import Image from "./images/shirt.jpg";
 import "./Product.css";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import deleteFetch from "../deleteFetch";
+import { useState } from "react";
 import serverResponse from "../components/ServerResponse.js";
-import {Alert} from "reactstrap";
+import { Alert } from "reactstrap";
 
 const EditableItem = (props) => {
   const name = props.name;
@@ -36,36 +37,36 @@ const EditableItem = (props) => {
   };
 
   const removeProduct = () => {
-    const args = {shop_id: storeID, product_id: id};
+    const args = { shop_id: storeID, product_id: id };
     deleteFetch("/user/shop/product", args, thenFunc);
   };
   return (
-      <div className="col-md-3">
-        <figure className="itemside mb-4">
-          <div className="right-aside">
-            <img src={Image} alt="E" className="img-sm"/>
-          </div>
-          <figcaption className="info align-self-center">
-            <h4 className="center">{name}</h4>
-            <h4>{"Amount: " + amount}</h4>
-            <h4>{"Price: " + price}</h4>
-            <Link to={`/editproduct/${storeID}/${storeName}/${id}`}>
-              <button className="btn btn-outline-primary btn-sm">
-                Edit Item <i className="fa fa-edit"></i>
-              </button>
-            </Link>
-            <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => removeProduct({id})}
-            >
-              Delete Item <i className="fa fa-trash"></i>
+    <div className="col-md-3">
+      <figure className="itemside mb-4">
+        <div className="right-aside">
+          <img src={Image} alt="E" className="img-sm" />
+        </div>
+        <figcaption className="info align-self-center">
+          <h4 className="center">{name}</h4>
+          <h4>{"Amount: " + amount}</h4>
+          <h4>{"Price: " + price}</h4>
+          <Link to={`/editproduct/${storeID}/${storeName}/${id}`}>
+            <button className="btn btn-outline-primary btn-sm">
+              Edit Item <i className="fa fa-edit"></i>
             </button>
-            <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
-              {error}
-            </Alert>
-          </figcaption>
-        </figure>
-      </div>
+          </Link>
+          <button
+            className="btn btn-outline-primary btn-sm"
+            onClick={() => removeProduct({ id })}
+          >
+            Delete Item <i className="fa fa-trash"></i>
+          </button>
+          <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
+            {error}
+          </Alert>
+        </figcaption>
+      </figure>
+    </div>
   );
 };
 export default EditableItem;

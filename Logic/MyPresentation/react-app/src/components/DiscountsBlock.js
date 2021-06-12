@@ -1,3 +1,4 @@
+import { Divider } from "@material-ui/core";
 import React from "react";
 import Discount from "./Discount";
 
@@ -18,20 +19,20 @@ const DiscountsBlock = (props) => {
           {discounts &&
             discounts.map((discount) => {
               return (
-                  <Discount
-                      storeName={storeName}
-                      key={discount.id}
-                      condition={discount.condition}
-                      parameter={discount.condition_param}
-                      itemID={
-                        discount.discount ? discount.discount.id : discount.id
-                      }
-                      value={
-                        discount.discount ? discount.discount.value : discount.value
-                      }
-                      id={discount.id}
-                      storeID={storeID}
-                  />
+                <Discount
+                  storeName={storeName}
+                  key={discount.id}
+                  condition={discount.condition}
+                  parameter={discount.condition_param}
+                  itemID={
+                    discount.discount ? discount.discount.id : discount.id
+                  }
+                  value={
+                    discount.discount ? discount.discount.value : discount.value
+                  }
+                  id={discount.id}
+                  storeID={storeID}
+                />
               );
             })}
         </div>
