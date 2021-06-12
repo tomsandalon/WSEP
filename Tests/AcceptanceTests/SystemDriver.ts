@@ -1,12 +1,12 @@
-import {System} from "./System";
 import {ProxySystem} from "./ProxySystem";
 import {AdapterSystem} from "./AdapterSystem";
-import {SystemImpl} from "../../Logic/Domain/System";
+import {System, SystemImpl} from "../../Logic/Domain/System";
 
 export class SystemDriver{
-    public static getSystem(reset? : boolean): System{
-        const adapter: AdapterSystem | undefined = new AdapterSystem(SystemImpl.getInstance(reset));
-        // const adapter: AdapterSystem | undefined = undefined;
-        return new ProxySystem(adapter);
+    public static async getSystem(reset?: boolean): Promise<System> {
+        const adapter: AdapterSystem = new AdapterSystem(SystemImpl.getInstance(reset));
+        const result = new ProxySystem(adapter);
+        if (reset) await result.init()
+        return result
     }
 }

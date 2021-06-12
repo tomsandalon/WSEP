@@ -1,4 +1,13 @@
-import {BadRequest, OK, ServerNotFound, service, Session, sid, Unauthorized} from "../../Config/Config";
+import {
+    BadRequest,
+    OK,
+    ServerNotFound,
+    service,
+    ServiceUnavailable,
+    Session,
+    sid,
+    Unauthorized
+} from "../../Config/Config";
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -9,6 +18,11 @@ router.get('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.displayStaffInfo(user_id, request.query.shop_id);
@@ -31,6 +45,11 @@ router.post('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.addItemToBasket(user_id, request.body.product_id, request.body.shop_id, request.body.amount);

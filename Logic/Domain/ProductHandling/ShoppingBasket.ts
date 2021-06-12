@@ -1,6 +1,5 @@
 import {Product} from "./Product";
 import {ProductPurchase, ProductPurchaseImpl} from "./ProductPurchase";
-import {Shop} from "../Shop/Shop";
 import {ShopInventory} from "../Shop/ShopInventory";
 import {
     AmountNonPositiveValue,
@@ -11,11 +10,11 @@ import {
 } from "./ErrorMessages";
 import {Purchase, PurchaseImpl} from "./Purchase";
 import {User} from "../Users/User";
-import {NotificationAdapter} from "../Notifications/NotificationAdapter";
+import {Purchase_Info} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
-type Entry = {product: Product, amount: number, price_after_discount: number}
-export type ShoppingEntry = {productId: number, amount: number}
-export type MinimalUserData = {userId: number, underaged: boolean}
+type Entry = { product: Product, amount: number, price_after_discount: number }
+export type ShoppingEntry = { productId: number, amount: number }
+export type MinimalUserData = { userId: number, underaged: boolean }
 
 export interface ShoppingBasket {
     basket_id: number
@@ -34,6 +33,7 @@ export interface ShoppingBasket {
      * @return ErrorOfShop iff product is not found in the shop
      */
     addToBasket(product_id: number, amount: number): boolean | string
+
     /**
      * @Requirement 2.7
      * @param product_id
@@ -43,6 +43,7 @@ export interface ShoppingBasket {
      * @return AmountNonPositiveValue iff amount <= 0
      */
     editBasketItem(product_id: number, new_amount: number): boolean | string
+
     /**
      * @Requirement 2.7
      * @param product_id
@@ -55,84 +56,101 @@ export interface ShoppingBasket {
      * @Requirement 2.9
      * @param payment_info
      * @param coupons
-     * @return Error if payment method didnt succeed OR
-     *               if delivery TODO
+     * @return Error
      * @return Purchase representing items and amount specified in basket
      */
-    purchase(payment_info: string, coupons: any  []): string | Purchase
-    toString():string[]
-    isEmpty():boolean
+    purchase(payment_info: string | Purchase_Info, coupons: any  []): Promise<string | Purchase>
+
+    toString(): string[]
+
+    isEmpty(): boolean
 }
 
-export class ShoppingBasketImpl implements ShoppingBasket{
+export class ShoppingBasketImpl implements ShoppingBasket {
     private static _basket_id_specifier: number = 0;
+
+    private constructor(basket_id: number, shop: ShopInventory, products: Entry[], user_data: MinimalUserData) {
+        this._basket_id = basket_id;
+        this._products = products;
+        this._shop = shop;
+        this._user_data = user_data
+    }
+
     private _basket_id: number;
-    private _products:  Entry[];
+
+    get basket_id() {
+        return this._basket_id
+    }
+
+    private _products: Entry[];
+
+    get products() {
+        return this._products
+    }
+
     private _user_data: MinimalUserData;
-
-
-    private _shop: ShopInventory;
 
     get user_data(): MinimalUserData {
         return this._user_data;
     }
 
-    private constructor(basket_id: number, shop: ShopInventory, product: Entry, user_data: MinimalUserData) {
-        this._basket_id = basket_id;
-        this._products = [product];
-        this._shop = shop;
-        this._user_data = user_data
-    }
+    private _shop: ShopInventory;
 
-    public static create(shop: ShopInventory, product: ShoppingEntry, user: User): ShoppingBasket | string{
-        const fetched_product = shop.getItem(product.productId);
-        if (typeof fetched_product === "string"){
-            return fetched_product
-        }
-        const user_data = {userId: user.user_id, underaged: user.underaged}
-        const final_product = {product: fetched_product, amount: product.amount,
-            price_after_discount: shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], product.amount, shop) as ProductPurchase], user_data)};
-        const id = this._basket_id_specifier++;
-        return new ShoppingBasketImpl(id, shop, final_product, user_data)
-    }
-
-    get products(){
-        return this._products
-    }
-
-    get basket_id(){
-        return this._basket_id
-    }
-
-    get shop(){
+    get shop() {
         return this._shop
     }
 
+    public static createFromDB(shop: ShopInventory, product: Entry[], user_data: MinimalUserData) {
+        return new ShoppingBasketImpl(ShoppingBasketImpl._basket_id_specifier++, shop, product, user_data)
+    }
+
+    public static create(shop: ShopInventory, product: ShoppingEntry, user: User): ShoppingBasket | string {
+        const fetched_product = shop.getItem(product.productId);
+        if (typeof fetched_product === "string") {
+            return fetched_product
+        }
+        const user_data = {userId: user.user_id, underaged: user.underaged}
+        const final_product = {
+            product: fetched_product, amount: product.amount,
+            price_after_discount: shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], product.amount, shop) as ProductPurchase], user_data)
+        };
+        const id = this._basket_id_specifier++;
+        return new ShoppingBasketImpl(id, shop, [final_product], user_data)
+    }
+
+    static basketsAreEqual(c1: ShoppingBasket, c2: ShoppingBasket) {
+        return JSON.stringify(c1.user_data) == JSON.stringify(c2.user_data) &&
+            c1.products.every(p1 => c2.products.some(p2 =>
+                p1.amount == p2.amount &&
+                p1.price_after_discount == p2.price_after_discount &&
+                JSON.stringify(p1.product) == JSON.stringify(p2.product)
+            ))
+    }
+
     public addToBasket(product_id: number, amount: number): boolean | string {
-        if(amount <= 0){
+        if (amount <= 0) {
             return AmountNonPositiveValue
-        } else if (this._products.reduce((acc: boolean, product: Entry) => acc || (product_id == product.product.product_id), false)){
+        } else if (this._products.reduce((acc: boolean, product: Entry) => acc || (product_id == product.product.product_id), false)) {
             return ProductExistsInBasket
         }
         const fetched_product = this._shop.getItem(product_id);
-        if (typeof fetched_product === "string"){
+        if (typeof fetched_product === "string") {
             return fetched_product
         }
         if (fetched_product.amount < amount) return StockLessThanBasket
-        const product = {product: fetched_product, amount: amount,
-            price_after_discount: this.shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], amount, this.shop) as ProductPurchase], this.user_data)};
+        const product = {
+            product: fetched_product, amount: amount,
+            price_after_discount: this.shop.calculatePrice([ProductPurchaseImpl.create(fetched_product, [], amount, this.shop) as ProductPurchase], this.user_data)
+        };
         this._products.push(product);
         return true
     }
 
     public editBasketItem(product_id: number, new_amount: number): boolean | string {
-        if (new_amount < 0) {
-            return AmountNonPositiveValue
-        } else if (new_amount == 0){
-            return this.removeItem(product_id)
-        }
-        for (let product of this._products){
-            if(product_id == product.product.product_id){
+        if (new_amount < 0) return AmountNonPositiveValue
+        if (new_amount == 0) return this.removeItem(product_id)
+        for (let product of this._products) {
+            if (product_id == product.product.product_id) {
                 product.amount = new_amount;
                 return true
             }
@@ -145,13 +163,13 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         console.log(`remove ${product_id}`)
         console.log(this.products);
         this._products = this._products.filter((entry) => entry.product.product_id != product_id)
-        if (this._products.length == before){
+        if (this._products.length == before) {
             return ProductNotFound
         }
         return true
     }
 
-    toString(): string[]{
+    toString(): string[] {
         return [JSON.stringify({
             basket_id: this.basket_id,
             shop: {
@@ -164,17 +182,23 @@ export class ShoppingBasketImpl implements ShoppingBasket{
         })]
         // this._products.map(entry => `PID: ${entry.product.product_id}     Product Name: ${entry.product.name}      Description: ${entry.product.description}        Amount: ${entry.amount}`)
     }
-    isEmpty():boolean {
+
+    isEmpty(): boolean {
         return this._products.length == 0
     }
-    purchase(payment_info: string, coupons: any[]): string | Purchase {
-        const order = PurchaseImpl.create(new Date(), this,[], this.shop, this._user_data);
-        if(typeof order == "string")
+
+    async purchase(payment_info: string | Purchase_Info, coupons: any[]): Promise<string | Purchase> {
+        const order = PurchaseImpl.create(new Date(), this, [], this.shop, this._user_data);
+        if (typeof order == "string")
             return order
-        const order_purchase = order.purchase_self(payment_info);
-        if(typeof order_purchase == "string")
-            return order_purchase
-        this.shop.notifyOwners(order)
-        return order
+        // const order_purchase = order.purchase_self(payment_info);
+        return order.purchase_self(payment_info)
+            .then(order_purchase => {
+                if (typeof order_purchase == "string")
+                    return order_purchase
+                this.shop.notifyOwners(order)
+                return order
+            })
+
     }
 }

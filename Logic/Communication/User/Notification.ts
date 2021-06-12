@@ -4,7 +4,7 @@ import {
     get_acknowledge_for_notifications,
     get_notifications,
     hello,
-    send_notifications
+    send_notifications, Service_available, Service_unavailable
 } from "../WSEvents";
 
 export const configWebSocket = (io: any) =>
@@ -17,7 +17,8 @@ export const configWebSocket = (io: any) =>
                 if (service.isLoggedIn(user_id) && Session.publisher.hasNotifications(user_id)) {
                     socket.emit(acknowledge_for_notifications, Session.publisher.getAmountOfNotifications(user_id))
                 }
-            } else {
+             }
+            else {
                 socket.close()
             }
         })
@@ -48,6 +49,24 @@ export const notify = (user_id: number, amount: number) => {
         if (entry != null && entry.socket != null && entry.user_id == user_id) {
             entry.socket.emit(acknowledge_for_notifications, amount)
             return;
+        }
+    }
+}
+
+export const disconnectAllUsers = () => {
+    for (let sid in Session.sessions) {
+        const entry = Session.sessions[sid]
+        if (entry != null && entry.socket != null) {
+            entry.socket.emit(Service_unavailable, true)
+        }
+    }
+}
+
+export const reconnectAllUsers = () => {
+    for (let sid in Session.sessions) {
+        const entry = Session.sessions[sid]
+        if (entry != null && entry.socket != null) {
+            entry.socket.emit(Service_available, true)
         }
     }
 }

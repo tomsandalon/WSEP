@@ -1,10 +1,10 @@
 import {Service} from "../../Service/Service";
 import {Publisher} from "../../Service/Publisher";
-
+import { getServerHost, getServerPort } from "../../Config";
 const path = require('path')
 const fs = require('fs')
-export const host = 'localhost'
-export const port = 8000
+export const host = getServerHost()
+export const port = getServerPort();
 export const config_path = "./Logic/Communication/Config/";
 export const key_file = "server_key.pem";
 export const cert_file = "server_cert.pem";
@@ -31,7 +31,7 @@ export const BadRequest = 400;
 export const Unauthorized = 401;
 export const ServerNotFound = 404;
 export const OK = 200;
-
+export const ServiceUnavailable = 503;
 export const details = '/details'
 export const rate = '/rate'
 export const categories = '/categories'

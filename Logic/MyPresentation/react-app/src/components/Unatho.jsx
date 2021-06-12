@@ -19,9 +19,9 @@ class Unatho extends Component {
             </div>
             <div className="message">
             <h3>403 - You Shall Not Pass</h3>
-            <h4>Uh oh, Gandalf is blocking the way!<br/>Maybe you have a typo in the url? Or you meant to go to a different location? Like...Hobbiton?</h4>
+            <h4>Uh-oh, Gandalf is blocking the way!<br/>Maybe you have a typo in the URL? Or you meant to go to a different location? Like...Hobbiton?</h4>
             <h3>
-                <a className="nav-links cartButton2 btn-primary btn-sm" href="/home">
+                <a className="nav-links cartButton10 btn-primary btn-sm" href="/home">
                             Go Home
                 </a>
             </h3>
