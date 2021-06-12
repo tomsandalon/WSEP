@@ -14,18 +14,15 @@ import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCo
 import {ProductImpl} from "../../Logic/Domain/ProductHandling/Product";
 import {PublisherImpl} from "../../Logic/Domain/Notifications/PublisherImpl";
 
-before(async () => {
-    try {
-        await SystemDriver.getSystem(true)
-    }
-    catch (_) {}
-})
+let system
 /**
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.ic1nksmh7kgv
  */
 describe('Guest:2.1: Enter - enter to the system as a guest', () => {
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+    })
     it('Happy', async () => {
-        const system: System = await SystemDriver.getSystem(true);
         system.openSession();
     });
 });
@@ -34,8 +31,10 @@ describe('Guest:2.1: Enter - enter to the system as a guest', () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.ecerbatgpwk4
  */
 describe('Guest:2.2: Exit - exit', () => {
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+    })
     it('Happy', async () => {
-        const system: System = await SystemDriver.getSystem(true);
         let user_id = system.openSession();
         system.closeSession(user_id);
     });
@@ -45,7 +44,9 @@ describe('Guest:2.2: Exit - exit', () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.s0883svk6c2h
  */
 describe('Guest:2.3: Registration - Add a new user to the system', async () => {
-    const system: System = await SystemDriver.getSystem(true);
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+    })
     it('Happy', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         expect(reg).to.be.true;
@@ -64,7 +65,9 @@ describe('Guest:2.3: Registration - Add a new user to the system', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.mrtynned3j8i
  */
 describe('Guest:2.4: Login - User success to login', async () => {
-    const system: System = await SystemDriver.getSystem(true);
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+    })
     it('Happy', () => {
         let reg = system.performRegister("Test@test.com", "TESTER");
         expect(reg).to.be.true;
@@ -85,14 +88,16 @@ describe('Guest:2.4: Login - User success to login', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.vdd0vxovfnxx
  */
 describe('Guest:2.5: Information - get info about shop and its products', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    // expect(system.getShopInfo(0)).to.be.eq("Shop 0 doesn't exist")
-    let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
-    // expect(system.getShopInfo(0).length == 1).to.be.true
-    // expect(system.getShopInfo(0)[0].includes("TestShop")).to.be.true
-    system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        // expect(system.getShopInfo(0)).to.be.eq("Shop 0 doesn't exist")
+        let shopID = system.addShop(originOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        // expect(system.getShopInfo(0).length == 1).to.be.true
+        // expect(system.getShopInfo(0)[0].includes("TestShop")).to.be.true
+        system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+    })
 
     it('Happy', () => {
         expect(system.getShopInfo(0)[0].includes("TV")).to.be.true
@@ -111,17 +116,18 @@ describe('Guest:2.5: Information - get info about shop and its products', async 
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.k2u60ptuonkv
  */
 describe('Guest:2.6: Search - search an item by detail and get all the shops that sells it', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID1 = system.addShop(originOwner as number, "TestShop 1", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    let shopID2 = system.addShop(originOwner as number, "TestShop 2", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    let shopID3 = system.addShop(originOwner as number, "TestShop 3", "shop for Tests", "Beer Sheva", "En li kesef") as number
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        let originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        let shopID1 = system.addShop(originOwner as number, "TestShop 1", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        let shopID2 = system.addShop(originOwner as number, "TestShop 2", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        let shopID3 = system.addShop(originOwner as number, "TestShop 3", "shop for Tests", "Beer Sheva", "En li kesef") as number
 
-    system.addProduct(originOwner, shopID1, "TV1", "Best desc", 1110, ["not monitors"], 111)
-    system.addProduct(originOwner, shopID2, "TV2", "Best desc", 2202, ["monitors"], 222)
-    system.addProduct(originOwner, shopID3, "TV3", "Best desc", 3303, ["monitors"], 333)
-
+        system.addProduct(originOwner, shopID1, "TV1", "Best desc", 1110, ["not monitors"], 111)
+        system.addProduct(originOwner, shopID2, "TV2", "Best desc", 2202, ["monitors"], 222)
+        system.addProduct(originOwner, shopID3, "TV3", "Best desc", 3303, ["monitors"], 333)
+    })
     // expect(system.searchItemFromShops(SearchTypes.name, "TV1").length == 1 &&
     //     system.searchItemFromShops(SearchTypes.name, "TV1")[0].includes("TV1")).to.be.true
     // expect(system.searchItemFromShops(SearchTypes.category, "monitors").length == 2 &&
@@ -148,13 +154,16 @@ describe('Guest:2.6: Search - search an item by detail and get all the shops tha
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.at2ykxq839q3
  */
 describe('Guest:2.7: Basket - add a product to the basket', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
-    system.performRegister("newUser@test.com", "TESTER");
-    let user = system.performLogin("newUser@test.com", "TESTER") as number
+    let originOwner, shopID, user;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+        system.performRegister("newUser@test.com", "TESTER");
+        user = system.performLogin("newUser@test.com", "TESTER") as number
+    })
 
     it('Happy', () => {
         let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
@@ -174,14 +183,17 @@ describe('Guest:2.7: Basket - add a product to the basket', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.v4lzagr37e31
  */
 describe('Guest:2.8: Information - get info and edit the shopping basket', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    system.addProduct(originOwner, shopID, "TV", "Best desc", 10000, ["monitors"], 1000)
-    system.performRegister("newUser@test.com", "TESTER");
-    let user = system.performLogin("newUser@test.com", "TESTER") as number
-    let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+    let originOwner, shopID, user, add_to_basket;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID, "TV", "Best desc", 10000, ["monitors"], 1000)
+        system.performRegister("newUser@test.com", "TESTER");
+        user = system.performLogin("newUser@test.com", "TESTER") as number
+        add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+    })
     // expect(typeof add_to_basket == "string").to.be.false
 
     it('Happy', () => {
@@ -203,11 +215,7 @@ describe('Guest:2.8: Information - get info and edit the shopping basket', async
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.42ad4kghyt0k
  */
 describe('Guest:2.9.1: Purchase - buy a specific basket', () => {
-    let system
-    let originOwner
-    let shopID
-    let user
-    let add_to_basket
+    let system, originOwner, shopID, user, add_to_basket;
     before(async () => {
         system = await SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
@@ -372,16 +380,19 @@ describe('Guest:2.9.6: Lottery - credit card charged, product added to purchase 
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.f44dar7n7g1d
  */
 describe('Guest:2.9.7: Discount - price changed by discount policy', async () => {
-    const system: System = await SystemDriver.getSystem(true);
+    let userID, badUI, shopID;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        system.performRegister("Test1@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        badUI = system.performLogin("Test1@test.com", "TESTER") as number
 
-    system.performRegister("Test@test.com", "TESTER");
-    system.performRegister("Test1@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let badUI = system.performLogin("Test1@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
 
-    let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(userID, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
 
-    system.addProduct(userID, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+    })
 
     it('Happy', () => {
         system.addDiscount(userID, shopID, 0.5)
@@ -427,9 +438,12 @@ describe('Registered:3.1: Logout - user success to logout', () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.i5sb3n24ktz2
  */
 describe('Registered:3.2: Open shop - add a new shop to the system, add the user as original owner', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    let reg = system.performRegister("Test@test.com", "TESTER");
-    let user = system.performLogin("Test@test.com", "TESTER");
+    let reg, user;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        reg = system.performRegister("Test@test.com", "TESTER");
+        user = system.performLogin("Test@test.com", "TESTER");
+    })
 
     it('Happy', () => {
         let shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef");
@@ -451,16 +465,19 @@ describe('Registered:3.2: Open shop - add a new shop to the system, add the user
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.ae947ro82n2j
  */
 describe('Registered:3.7: Information - get the purchase history', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
-    system.performRegister("newUser@test.com", "TESTER");
-    let user = system.performLogin("newUser@test.com", "TESTER") as number
-    system.addItemToBasket(user, 0, shopID, 500)
-    let result = system.userOrderHistory(user) as string[]
-    // expect(result[0]).to.be.eq("Empty order history") // TODO : is it count as sad test?
+    let originOwner, shopID, user, result;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+        system.performRegister("newUser@test.com", "TESTER");
+        user = system.performLogin("newUser@test.com", "TESTER") as number
+        system.addItemToBasket(user, 0, shopID, 500)
+        result = system.userOrderHistory(user) as string[]
+        // expect(result[0]).to.be.eq("Empty order history") // TODO : is it count as sad test?
+    })
 
     it('Happy', () => {
         system.purchaseShoppingBasket(user, shopID, "hello")
@@ -482,11 +499,14 @@ describe('Registered:3.7: Information - get the purchase history', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.cvl6sukqtukq
  */
 describe('Owner:4.1.1: Product - add a new product to the shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    let reg = system.performRegister("Test@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    let items = system.getItemsFromShop(shopID) as string[]
+    let reg, userID, shopID, items;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        reg = system.performRegister("Test@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        items = system.getItemsFromShop(shopID) as string[]
+    })
     // expect(items.some(p=>p.includes("TV"))).to.be.false
 
     it('Happy', () => {
@@ -510,11 +530,14 @@ describe('Owner:4.1.1: Product - add a new product to the shop', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.qbpk2vkeb2fw
  */
 describe('Owner:4.1.2: Product - remove a product from the shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    let reg = system.performRegister("Test@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    let res = system.addProduct(userID, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+    let reg, userID, shopID, res;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        reg = system.performRegister("Test@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        res = system.addProduct(userID, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+    })
 
     // let items = system.getItemsFromShop(shopID) as string[]
     // expect(items.some(p=>p.includes("TV"))).to.be.true
@@ -533,14 +556,15 @@ describe('Owner:4.1.2: Product - remove a product from the shop', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.pjhgqs8jkxha
  */
 describe('Owner:4.2.1: Purchase policy - add a new purchase policy to the shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-
-    system.performRegister("Test@test.com", "TESTER");
-    system.performRegister("Test1@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let badUI = system.performLogin("Test1@test.com", "TESTER") as number
-
-    let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+    let userID, badUI, shopID;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        system.performRegister("Test1@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        badUI = system.performLogin("Test1@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+    })
 
     it('Happy', () => {
         system.addPurchasePolicy(userID, shopID, ConditionType.NotCategory, "GTX")
@@ -563,14 +587,15 @@ describe('Owner:4.2.1: Purchase policy - add a new purchase policy to the shop',
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.t7p40iokqml
  */
 describe('Owner:4.2.2: Discount policy - add a new discount policy to the shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-
-    system.performRegister("Test@test.com", "TESTER");
-    system.performRegister("Test1@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let badUI = system.performLogin("Test1@test.com", "TESTER") as number
-
-    let shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+    let userID, badUI, shopID;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        system.performRegister("Test1@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        badUI = system.performLogin("Test1@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+    })
 
     it('Happy', () => {
         system.addDiscount(userID, shopID, 0.5)
@@ -638,11 +663,14 @@ describe('Owner:4.2.4: Discount type - add a new discount type to the shop', () 
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.lo3otnn7xt7k
  */
 describe('Owner:4.3: Appoint - appoint a new owner to the shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    //Original owner
-    let reg = system.performRegister("Test@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+    let reg, userID, shopID;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        //Original owner
+        reg = system.performRegister("Test@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+    })
 
     it('Happy', () => {
         //create new employee and appoint him as an owner
@@ -672,11 +700,14 @@ describe('Owner:4.3: Appoint - appoint a new owner to the shop', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.4fpux52hueow
  */
 describe('Owner:4.5: Appoint - appoint a new manager to the shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    //Original owner
-    let reg = system.performRegister("Test@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+    let reg, userID, shopID;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        //Original owner
+        reg = system.performRegister("Test@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+    })
 
     it('Happy', () => {
         //create new employee
@@ -706,10 +737,13 @@ describe('Owner:4.5: Appoint - appoint a new manager to the shop', async () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.2wragr7iuuf5
  */
 describe('Owner:4.6: Manager permissions - modify a manager permission', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originalOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(originalOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+    let originalOwner, shopID;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        originalOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originalOwner as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+    })
 
     it('Happy', () => {
         //create new employee
@@ -742,14 +776,16 @@ describe('Owner:4.6: Manager permissions - modify a manager permission', async (
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.euh2924jrgbs
  */
 describe('Owner:4.7: Manager - remove a manager from the shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    PublisherImpl.getInstance(true)
-
-    //Original owner
-    let reg = system.performRegister("Test@test.com", "TESTER");
-    let userID = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
-    //WHY DAFUQ DOES IT RUN PURCHASE
+    let reg, userID, shopID;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        PublisherImpl.getInstance(true)
+        //Original owner
+        reg = system.performRegister("Test@test.com", "TESTER");
+        userID = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        //WHY DAFUQ DOES IT RUN PURCHASE
+    })
     it('Happy', () => {
         //create new employee
         let newEmp = system.performRegister("OvedMetzuyan1@post.co.il", "123")
@@ -807,18 +843,21 @@ describe('Owner:4.11: Purchase History - gets a shop purchase history', () => {
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.tqiiku4j47bq
  */
 describe('Admin:6.4.1: Information - gets a purchase history of a given user', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
-    system.performRegister("newUser@test.com", "TESTER");
-    let user = system.performLogin("newUser@test.com", "TESTER") as number
-    let add_to_basket = system.addItemToBasket(user, ProductImpl._product_id_specifier - 1, shopID, 500)
-    // expect(typeof add_to_basket == "string").to.be.false
-    let purchase = system.purchaseShoppingBasket(user, shopID, "hello")
-    // expect(typeof purchase == "boolean").to.be.true
-    let admin = system.performLogin("admin@gmail.com", "admin") as number
+    let originOwner, shopID, user, add_to_basket, purchase, admin;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+        system.performRegister("newUser@test.com", "TESTER");
+        user = system.performLogin("newUser@test.com", "TESTER") as number
+        add_to_basket = system.addItemToBasket(user, ProductImpl._product_id_specifier - 1, shopID, 500)
+        // expect(typeof add_to_basket == "string").to.be.false
+        purchase = system.purchaseShoppingBasket(user, shopID, "hello")
+        // expect(typeof purchase == "boolean").to.be.true
+        admin = system.performLogin("admin@gmail.com", "admin") as number
+    })
 
     it('Happy', () => {
         let result = system.adminDisplayUserHistory(admin, user)
@@ -838,114 +877,122 @@ describe('Admin:6.4.1: Information - gets a purchase history of a given user', a
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.abnn9wn6l8rl
  */
 describe('Admin:6.4.2: Information - gets a purchase history of a given shop', async () => {
-    const system: System = await SystemDriver.getSystem(true);
-    system.performRegister("Test@test.com", "TESTER");
-    let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-    let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-    system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
-    system.performRegister("newUser@test.com", "TESTER");
-    let user = system.performLogin("newUser@test.com", "TESTER") as number
-    let add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
-    expect(typeof add_to_basket == "string").to.be.false
-    system.purchaseShoppingBasket(user, shopID, "hello")
-        .then(purchase => {
-            expect(typeof purchase == "boolean").to.be.true
-            let admin = system.performLogin("admin@gmail.com", "admin") as number
-            it('Happy', () => {
-                let result = system.adminDisplayShopHistory(admin, shopID) as string[]
-                expect(result.length).to.be.eq(1)
-            });
-            it('Sad: get a purchase history from non-existing shop', () => {
-                let sad_result = system.adminDisplayShopHistory(admin, 150)
-                expect(typeof sad_result == "string").to.be.true
-            });
-            it('Bad: get a purchase history with non-admin user', () => {
-                let bad_result = system.adminDisplayShopHistory(12, shopID)
-                expect(typeof bad_result == "string").to.be.true
-            });
-        })
+    let originOwner, shopID, user, purchase, add_to_basket, admin;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+        system.performRegister("newUser@test.com", "TESTER");
+        user = system.performLogin("newUser@test.com", "TESTER") as number
+        add_to_basket = system.addItemToBasket(user, 0, shopID, 500)
+        expect(typeof add_to_basket == "string").to.be.false
+        purchase =await system.purchaseShoppingBasket(user, shopID, "hello")
+        expect(typeof purchase == "boolean").to.be.true
+        admin = system.performLogin("admin@gmail.com", "admin") as number
+    })
+    it('Happy', () => {
+        let result = system.adminDisplayShopHistory(admin, shopID) as string[]
+        expect(result.length).to.be.eq(1)
+    });
+    it('Sad: get a purchase history from non-existing shop', () => {
+        let sad_result = system.adminDisplayShopHistory(admin, 150)
+        expect(typeof sad_result == "string").to.be.true
+    });
+    it('Bad: get a purchase history with non-admin user', () => {
+        let bad_result = system.adminDisplayShopHistory(12, shopID)
+        expect(typeof bad_result == "string").to.be.true
+    });
 });
 
-// describe('Services:Payment Handler', () => {
-//     const system: System = await SystemDriver.getSystem(true);
-//     system.performRegister("Test@test.com", "TESTER");
-//     let user = system.performLogin("Test@test.com", "TESTER") as number
-//     let shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
-//     system.addProduct(user, shopID,"TV", "Best desc", 1000, ["monitors"],1000)
-//     let add_to_basket = system.addItemToBasket(user, 0, shopID, 200)
-//     expect(typeof add_to_basket == "string").to.be.false
-//
-//     it('Happy', async () => {
-//         //TODO milestone 2
-//         await system.purchaseShoppingBasket(user, shopID, "MOCK was charged successfully")
-//             .then(purchase => expect(purchase).to.be.true)
-//     });
-//     it('Sad: user dont have enough money', () => {
-//         system.addItemToBasket(user, 0, shopID, 200)
-//         let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK FAIL not enough money")
-//         expect(purchase).to.be.false
-//         let notIncluded = system.shopOrderHistory(user,shopID)
-//         expect(notIncluded.includes('TV')).to.be.false;
-//     });
-//     it('Bad: service crash', () => {
-//         let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK CRASH server is down")
-//         expect(typeof purchase == 'string').to.be.true;
-//     });
-// });
-//
-// describe('Services:Spell Checker', () => {
-//     const system: System = await SystemDriver.getSystem(true);
-//
-//     it('Happy', () => {
-//         //TODO milestone 2
-//         let res = system.spellCheck('FAIEL');
-//         if (typeof res !== 'string')
-//             expect(res[0]).eq('FAIL')
-//         else
-//             assert.fail();
-//     });
-//     it('Sad: input include a word not in english', () => {
-//         let res = system.spellCheck('FAEEEL');
-//         if (typeof res !== 'string')
-//             expect(res[0]).eq('404')
-//         else
-//             assert.fail();
-//     });
-//     it('Bad: service crash', () => {
-//         let res = system.spellCheck('CRASH')
-//         expect(typeof res == 'string').to.be.true
-//     });
-// });
-//
-// describe('Services: delivery', () => {
-//     const system: System = await SystemDriver.getSystem(true);
-//
-//     it('Happy', () => {
-//         let delivery = system.deliverItem(0,50, 0, "Beer Sheva Arlozorov 54",true);
-//         expect(delivery).to.be.true;
-//     });
-//
-//     it('Sad: negative amount', () => {
-//         let delivery = system.deliverItem(0,-50, 0, "Beer Sheva Arlozorov 26",true);
-//         expect(delivery).to.be.false;
-//     });
-//
-//     system.performRegister("Test@test.com", "TESTER");
-//     let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-//     let shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-//     system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
-//     system.performRegister("newUser@test.com", "TESTER");
-//     let user = system.performLogin("newUser@test.com", "TESTER") as number
-//     system.addItemToBasket(user, 0, shopID, 500)
-//
-//     it('Sad: purchase failed product not delivered.', () => {
-//         let transaction = system.purchaseShoppingBasket(-150, 152, "MOCK");
-//         let delivery = system.deliverItem( 0,50, 0, "Beer Sheva Arlozorov 54", transaction);
-//         expect(delivery).to.be.false;
-//     });
-//
-//     it('Bad: injection', () => {
-//         let delivery = system.deliverItem(0,50, 0, "Drop table",true);
-//         expect(delivery).to.be.false;
-//     });
-// });
+describe('Services:Payment Handler', () => {
+    let user, shopID, add_to_basket;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        user = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(user as number, "TestShop", "shop for tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(user, shopID,"TV", "Best desc", 1000, ["monitors"],1000)
+        add_to_basket = system.addItemToBasket(user, 0, shopID, 200)
+        expect(typeof add_to_basket == "string").to.be.false
+    })
+
+    it('Happy', async () => {
+        //TODO milestone 2
+        await system.purchaseShoppingBasket(user, shopID, "MOCK was charged successfully")
+            .then(purchase => expect(purchase).to.be.true)
+    });
+    it('Sad: user dont have enough money', () => {
+        system.addItemToBasket(user, 0, shopID, 200)
+        let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK FAIL not enough money")
+        expect(purchase).to.be.false
+        let notIncluded = system.shopOrderHistory(user,shopID)
+        expect(notIncluded.includes('TV')).to.be.false;
+    });
+    it('Bad: service crash', () => {
+        let purchase = system.purchaseShoppingBasket(user, shopID, "MOCK CRASH server is down")
+        expect(typeof purchase == 'string').to.be.true;
+    });
+});
+
+describe('Services:Spell Checker', () => {
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+    })
+
+    it('Happy', () => {
+        //TODO milestone 2
+        let res = system.spellCheck('FAIEL');
+        if (typeof res !== 'string')
+            expect(res[0]).eq('FAIL')
+        else
+            assert.fail();
+    });
+    it('Sad: input include a word not in english', () => {
+        let res = system.spellCheck('FAEEEL');
+        if (typeof res !== 'string')
+            expect(res[0]).eq('404')
+        else
+            assert.fail();
+    });
+    it('Bad: service crash', () => {
+        let res = system.spellCheck('CRASH')
+        expect(typeof res == 'string').to.be.true
+    });
+});
+
+describe('Services: delivery', () => {
+    let originOwner, shopID, user;
+    before(async () => {
+        system = await SystemDriver.getSystem(true)
+        system.performRegister("Test@test.com", "TESTER");
+        originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        system.performRegister("newUser@test.com", "TESTER");
+        user = system.performLogin("newUser@test.com", "TESTER") as number
+        system.addItemToBasket(user, 0, shopID, 500)
+    })
+
+    it('Happy', () => {
+        let delivery = system.deliverItem(0,50, 0, "Beer Sheva Arlozorov 54",true);
+        expect(delivery).to.be.true;
+    });
+
+    it('Sad: negative amount', () => {
+        let delivery = system.deliverItem(0,-50, 0, "Beer Sheva Arlozorov 26",true);
+        expect(delivery).to.be.false;
+    });
+
+    it('Sad: purchase failed product not delivered.', () => {
+        let transaction = system.purchaseShoppingBasket(-150, 152, "MOCK");
+        let delivery = system.deliverItem( 0,50, 0, "Beer Sheva Arlozorov 54", transaction);
+        expect(delivery).to.be.false;
+    });
+
+    it('Bad: injection', () => {
+        let delivery = system.deliverItem(0,50, 0, "Drop table",true);
+        expect(delivery).to.be.false;
+    });
+});

@@ -23,8 +23,12 @@ export class ProxySystem implements System{
         if(this.system == undefined){
             return Promise.resolve(undefined);
         }
-        // @ts-ignore
-        return ConnectToDB().then(_ => ClearDB().then(() => this.system.init()))
+        return ConnectToDB()
+            .then(_ => ClearDB()
+                .then(() =>
+                    (this.system as System).init()
+                )
+            )
     }
 
     isAdmin(user_id: number): string | boolean {
