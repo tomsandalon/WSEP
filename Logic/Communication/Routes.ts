@@ -1,11 +1,11 @@
 import {
     assign_manager,
     assign_owner,
-    categories, details, isAdmin, isLoggedIn, isManager, isOwner,
+    categories, details, isAdmin, isLoggedIn, isManager, isOwner, offer,
     permissions,
     purchase_cart,
-    rate,
-    shop_purchase_history
+    rate, shop_offer,
+    shop_purchase_history, user_offer
 } from "./Config/Config";
 
 export const route_notifications = "/"
@@ -234,3 +234,67 @@ export const route_shop_purchase_history = route_shop + shop_purchase_history
  * @return 200 -> OK
  */
 export const route_shop_manage_product_rating = route_shop_manage_product + rate;
+
+/**
+ * @method GET
+ * @function offerIsPurchasable
+ * @params user_id
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> text
+ *
+ * @method POST
+ * @function purchaseOffer
+ * @params user_id, offer_id, payment_info
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> OK
+ */
+export const route_offer = offer;
+
+/**
+ * @method GET
+ * @function getActiveOffersAsUser
+ * @params user_id
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> JSON
+ *
+ * @method POST
+ * @function makeOffer
+ * @params user_id, shop_id, product_id, amount, price_per_unit
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> OK
+ *
+ * @method PUT
+ * @function denyCounterOfferAsUser
+ * @params user_id, offer_id
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> OK
+ */
+export const route_offer_user = offer + user_offer;
+
+/**
+ * @method GET
+ * @function getActiveOfferForShop
+ * @params user_id
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> JSON
+ *
+ * @method POST
+ * @location body
+ ** If action = 'Accept' => acceptOfferAsManagement => params user_id, shop_id, offer_id
+ ** If action = 'Deny' => denyOfferAsManagement => params user_id, shop_id, offer_id
+ ** If action = 'Counter' => counterOfferAsManager => params shop_id, offer_id, new_price_per_unit
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> OK
+ */
+export const route_offer_shop = offer + shop_offer;
+
