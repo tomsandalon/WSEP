@@ -1,22 +1,17 @@
 import {connectToDB} from './DB.config';
 import {
     AddDiscount, addDiscountConditionType,
-    AddDiscountConditionType, addDiscountOperator,
-    AddDiscountOperator,
+    addDiscountOperator,
     AddItemToBasket,
-    AddPermission,
     addPermissions,
     AddProduct,
     addPurchaseConditionOperator,
-    AddPurchaseConditionOperator,
     addPurchaseConditionType,
-    AddPurchaseConditionType,
     AddPurchasePolicy,
-    AddPurchaseType,
     addPurchaseTypes,
     AddShop,
     AppointManager,
-    AppointOwner,
+    AppointOwner, CreateAdminIfNotExist,
     PurchaseBasket,
     RateProduct,
     RegisterUser,
@@ -105,18 +100,16 @@ export const initData = () =>
         .then((_: any) =>
             RegisterUser(five_user))
         .then((_: any) =>
-            AddPurchaseType(first_purchase_type))
+            addPurchaseTypes([1,2,3,4]))
         .then((_: any) =>
-            AddPurchaseConditionType(first_purchase_condition_type))
+            addPurchaseConditionType([1,2,3,4]))
         .then((_: any) =>
-            AddPurchaseConditionOperator(first_purchase_condition_operator))
+            addPurchaseConditionOperator([1,2,3,4]))
         .then((_: any) =>
-            AddDiscountConditionType(first_discount_condition_type))
+            addDiscountConditionType([1,2,4]))
         .then((_: any) =>
-            AddDiscountOperator(first_discount_operator))
-        .then((_: any) => AddPermission(first_perm))
-        .then((_: any) => AddPermission(second_perm))
-        .then((_: any) => AddPermission(third_perm))
+            addDiscountOperator([1,2,3]))
+        .then((_: any) => addPermissions([1,2,3]))
         .then((_: any) =>
             AddShop(first_shop))
         .then((_: any) => AddProduct(first_product))
@@ -222,15 +215,18 @@ export const initData = () =>
 // AddProduct(first_product)
 //         .then((result: any) => console.log(`Finish ${result}`))
 connectToDB();
-PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, new Date(), [{
-            product_id: first_product.product_id,
-            amount: 20,
-            actual_price: 14,
-            name: first_product.name,
-            base_price: first_product.base_price,
-            description: first_product.description,
-            categories: first_product.categories,
-        }
-    ]).then((result: any) => console.log(`Finish ${result}`))
+// PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, new Date(), [{
+//             product_id: first_product.product_id,
+//             amount: 20,
+//             actual_price: 14,
+//             name: first_product.name,
+//             base_price: first_product.base_price,
+//             description: first_product.description,
+//             categories: first_product.categories,
+//         }
+//     ]).then((result: any) => console.log(`Finish ${result}`))C
+CreateAdminIfNotExist(120, 'MyMail', '1234', 5)
+.then((result: any) => console.log(`Finish ${result}`))
+
 
 // initData().then((result: any) => console.log(`Finish ${result}`))

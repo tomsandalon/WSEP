@@ -117,10 +117,23 @@ export const ConnectToDB = async (): Promise<boolean> => {
     return true;
 }
 
-export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => {
-    return new Promise<void>(() => {
+export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => _CreateAdminIfNotExist([user_id, user_email, hashed_pass, age], 3)
+
+const _CreateAdminIfNotExist = ([user_id, user_email, hashed_pass, age]: [number, string, string, number], attempts: number): Promise<void> =>
+    getDB().transaction(async (trx: any) =>{
+        const result = await trx.select().from(user.name).where({user_id: user_id})
+        if (result.length == 0){
+            await trx.insert({
+                user_id: user_id,
+                email: user_email,
+                password: hashed_pass,
+                age: age,
+                admin: 1,
+            }).into(user.name)
+        }
     })
-}
+        .then(success)
+        .catch(new_err => handler(new_err, _CreateAdminIfNotExist, [user_id, user_email, hashed_pass, age], attempts))
 
 export const AddShop = (data: Shop) => _AddShop(data, 3)
 
