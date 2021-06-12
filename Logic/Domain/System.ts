@@ -278,6 +278,7 @@ export class SystemImpl implements System {
         this.reloadUsers(users);
         await this.reloadNotifications();
         await this.reconnectAllConnections();
+        console.log('\nSystem was rolled back!');
         this.isInRollbackProcess = false;
     }
 
