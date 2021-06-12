@@ -389,7 +389,6 @@ const groupByProduct = (products: any[]): {shop_id: number, product: ProductData
     return output;
 }
 
-//TODO test add product, update product and get shops inventory
 export const GetShopsInventory = (): Promise<ShopRich[]> =>
     getDB().transaction(async (trx: any): Promise<ShopRich[]> => {
         const purchase_types = await trx.select().from(available.name);

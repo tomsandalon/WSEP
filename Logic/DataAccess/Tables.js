@@ -78,16 +78,28 @@ const purchase_type = {
 exports.purchase_type = purchase_type;
 const offer = {
     name: 'offer',
+    pk: 'offer_id',
     build: (builder) => builder.createTable(offer.name, (table) => {
         table.integer(user.pk).references(user.pk).inTable(user.name).unsigned();
         table.integer(product.pk).references(product.pk).inTable(product.name).unsigned();
         table.integer(shop.pk).references(shop.pk).inTable(shop.name).unsigned();
+        table.integer(offer.pk).unsigned().primary();
+        table.integer('isCounterOffer').unsigned().notNullable();
         table.integer('amount').unsigned().notNullable();
         table.float('price_per_unit').unsigned().notNullable();
-        table.primary([user.pk, shop.pk, product.pk]);
     })
 };
 exports.offer = offer;
+const offer_not_accepted_by = {
+    name: 'offer_not_accepted_by',
+    build: (builder) => builder.createTable(offer_not_accepted_by.name, (table) => {
+        table.integer(user.pk).unsigned().references(user.pk).inTable(user.name);
+        table.integer(offer.pk).references(offer.pk).inTable(offer.name).unsigned().onDelete('CASCADE');
+        table.primary([user.pk, offer.pk]);
+    })
+};
+
+exports.offer_not_accepted_by = offer_not_accepted_by;
 const notification = {
     name: 'notification',
     build: (builder) => builder.createTable(notification.name, (table) => {

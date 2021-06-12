@@ -26,6 +26,7 @@ const {
     purchase,
     basket,
     offer,
+    offer_not_accepted_by,
     rates,
     available,
     owns,
@@ -140,9 +141,23 @@ const _CreateAdminIfNotExist = ([user_id, user_email, hashed_pass, age]: [number
 export const AddShop = (data: Shop) => _AddShop(data, 3)
 
 const _AddShop = (data: Shop, attempts: number) =>
-    getDB().transaction((trx: any) =>
-        trx.insert(data).into(shop.name)
-    )
+    getDB().transaction(async (trx: any) => {
+        await trx.insert({
+            shop_id: data.shop_id,
+            user_id: data.user_id,
+            name: data.name,
+            description: data.description,
+            location: data.location,
+            bank_info: data.bank_info,
+            active: data.active,
+        }).into(shop.name)
+        await trx(available.name).insert(data.purchase_type.map(p_type => {
+            return {
+                shop_id: data.shop_id,
+                purchase_type_id: p_type
+            }
+        }))
+    })
         .then(success)
         .catch(new_err => handler(new_err, _AddShop, data, attempts))
 
@@ -664,16 +679,65 @@ export const ClearDB = async (): Promise<void> => {
     await dropRequests[0]
 };
 
-export const AddPurchaseTypeToShop = (shop_id: number, purchase_type: number): Promise<boolean> => Promise.resolve(true)
+export const AddPurchaseTypeToShop = (shop_id: number, purchase_type: number): Promise<boolean> =>
+    getDB().transaction((trx: any) =>
+        trx(available.name).insert({shop_id: shop_id, purchase_type_id: purchase_type})
+    )
 
-export const RemovePurchaseTypeFromShop = (shop_id: number, purchase_type: number): Promise<boolean> => Promise.resolve(true)
+export const RemovePurchaseTypeFromShop = (shop_id: number, purchase_type: number): Promise<boolean> =>
+    getDB().transaction((trx: any) =>
+        trx(available.name).where({shop_id: shop_id, purchase_type_id: purchase_type}).del()
+    )
 
-export const AddOffer = (user_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number): Promise<boolean> => Promise.resolve(true)
+export const AddOffer = (user_id: number, shop_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number) =>
+    getDB().transaction(async (trx: any) => {
+        await trx(offer.name).insert({
+            user_id: user_id,
+            product_id: product_id,
+            shop_id: shop_id,
+            offer_id: offer_id,
+            isCounterOffer: 0, // false
+            amount: amount,
+            price_per_unit: price_per_unit,
+        })
+        const entries_to_add = await trx
+            .select(
+                trx.raw(`${offer_id} as offer_id`),
+                user.pk).
+            from({
+                A:trx.select(user.pk).from(manages.name).where({shop_id: shop_id}).union(trx.select(user.pk).from(owns.name).where({shop_id: shop_id}))
+            })
+        await trx(offer_not_accepted_by.name).insert(entries_to_add.map(e => ({offer_id: e.offer_id, user_id: e.user_id})))
+    })
 
-export const OfferAcceptedByManagement = (user_id: number, offer_id: number): Promise<boolean> => Promise.resolve(true)
+export const OfferAcceptedByManagement = (user_id: number, offer_id: number): Promise<boolean> =>
+    getDB().transaction((trx: any) =>
+        trx(offer_not_accepted_by.name).where({user_id: user_id, offer_id: offer_id}).del()
+    )
 
-export const RemoveOffer = (offer_id: number): Promise<boolean> => Promise.resolve(true)
+export const RemoveOffer = (offer_id: number): Promise<boolean> =>
+    getDB().transaction((trx: any) =>
+        trx(offer.name).where({offer_id: offer_id}).del()
+    )
 
-export const CounterOffer = (offer_id: number, user_id: number, new_price_per_unit: number): Promise<boolean> => Promise.resolve(true)
+export const CounterOffer = (offer_id: number, user_id: number, new_price_per_unit: number): Promise<boolean> =>
+    getDB().transaction(async (trx: any) => {
+        const shop_id = (await trx.select(shop.pk).from(offer.name).where({offer_id: offer_id}))[0].shop_id;
+        const all_management = (await trx
+            .select(
+                trx.raw(`${offer_id} as offer_id`),
+                user.pk).
+            from({
+                A:trx.select(user.pk).from(manages.name).where({shop_id: shop_id}).union(trx.select(user.pk).from(owns.name).where({shop_id: shop_id}))
+            }))
+            .filter(m => m.user_id != user_id)
+            .map(m => ({user_id: m.user_id, offer_id: m.offer_id}))
+        await trx(offer_not_accepted_by.name).where({offer_id: offer_id}).del()
+        await trx(offer_not_accepted_by.name).insert(all_management)
+        await trx(offer.name).where({offer_id: offer_id}).update({isCounterOffer: 1,  price_per_unit: new_price_per_unit})
+    })
 
-export const RemoveNotificationsByPrefix = (prefix: string): Promise<void> => Promise.resolve()
+export const RemoveNotificationsByPrefix = (prefix: string): Promise<void> =>
+    getDB().transaction((trx: any) =>
+        trx(notification.name).where(trx.raw(`notification like '${prefix}%'`)).del()
+    )

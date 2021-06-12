@@ -16,3 +16,7 @@ const initTables = async () => {
 };
 exports.initTables = initTables;
 
+connectToDB()
+initTables().then(_ => {
+    console.log('Finished')
+})
