@@ -1,47 +1,57 @@
-import {useState} from "react";
+import React, {useState} from "react";
+import postFetch from "../postFetch.js";
 import {useHistory, useParams} from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
-import putFetch from "../putFetch.js";
 import {Alert} from "reactstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-const EditProduct = () => {
-  const {storeID, storeName, productID} = useParams();
-  const [isPending, setIsPending] = useState(false);
+const AddCondition = (props) => {
+  const [condition, setCondition] = useState();
+  const [parameter, setParameter] = useState();
   const [error, setError] = useState("");
+  const [errorColor, setErrorColor] = useState("success");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-  const [action, setAction] = useState();
-  const [parameter, setParameter] = useState();
-  const [errorColor, setErrorColor] = useState("success");
+  const {storeID, storeName, discountid} = useParams();
 
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  const actionOptions = [
-    {label: "Add Amount", value: 0},
-    {label: "Change Name", value: 1},
-    {label: "Add Category", value: 2},
-    {label: "RemoveCategory", value: 3},
-    {label: "Change Price", value: 4},
-    {label: "Change Description", value: 5},
+  const numToCondition = {
+    0: "Category",
+    1: "Product name",
+    2: "Amount",
+    3: "Shop",
+  };
+  const consditionToNum = {
+    Category: 0,
+    "Product name": 1,
+    Amount: 2,
+    Shop: 3,
+  };
+  const conditionOptions = [
+    {label: "Category", value: 0},
+    {label: "Product name", value: 1},
+    {label: "Amount", value: 2},
+    {label: "Shop", value: 3},
   ];
   const submit = (e) => {
     e.preventDefault();
-    const args = {
+    const params = {
+      request: 2,
       shop_id: storeID,
-      product_id: productID,
-      value: parameter,
-      action: action.value,
+      condition_param: parameter,
+      condition: condition.value,
+      id: discountid,
     };
-    console.log(args);
-    putFetch("/user/shop/product", args, thenFunc);
+    console.log(params);
+    postFetch("/user/shop/discount", params, thenFunc);
   };
   const success = async () => {
     setErrorColor("success");
-    setError("Product Edited successfully");
+    setError("Condition added successfully");
     setVisible(true);
     await sleep(2000);
     history.push(`/managersStore/${storeID}/${storeName}`);
@@ -57,14 +67,14 @@ const EditProduct = () => {
   const onDismiss = () => setVisible(false);
   return (
       <div className="add-manager">
-        <p>Edit Product</p>
+        <p>Add condition to discount</p>
         <div className="d-flex mb-2 justify-content-between"></div>
         <form onSubmit={submit}>
-          <label>operator: </label>
+          <label>condition: </label>
           <Select
               components={makeAnimated()}
-              onChange={setAction}
-              options={actionOptions}
+              onChange={setCondition}
+              options={conditionOptions}
               className="mb-3"
               placeHolder="Select Operator"
               noOptionsMessage={() => "No more conditions available"}
@@ -73,17 +83,18 @@ const EditProduct = () => {
               autoFocus
               isSearchable
           />
-          <label>Value: </label>
+          <label>parameter: </label>
           <input
               type="text"
               required
               value={parameter}
               onChange={(e) => setParameter(e.target.value)}
           />
+
           <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
             {error}
           </Alert>
-          {<input type="submit" value="Edit Product"/>}
+          {<input type="submit" value="Add Condition"/>}
         </form>
         {/* <Button
           onClick={() => submit()}
@@ -95,5 +106,4 @@ const EditProduct = () => {
       </div>
   );
 };
-
-export default EditProduct;
+export default AddCondition;

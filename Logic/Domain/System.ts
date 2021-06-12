@@ -61,6 +61,7 @@ import {
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
 import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+import {offer_id_counter} from "./ProductHandling/Offer";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -1237,7 +1238,7 @@ export class SystemImpl implements System {
             return user
         const ret: string | boolean = user.makeOffer(shop.inventory, product_id, amount, price_per_unit)
         if (typeof ret != "string") {
-            AddOffer(user_id, shop_id, product_id, amount, price_per_unit)
+            AddOffer(user_id, shop_id, offer_id_counter - 1, product_id, amount, price_per_unit)
                 .then(r => {
                     if (!r) SystemImpl.rollback()
                 })

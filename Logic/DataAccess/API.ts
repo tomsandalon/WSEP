@@ -668,7 +668,7 @@ export const AddPurchaseTypeToShop = (shop_id: number, purchase_type: number): P
 
 export const RemovePurchaseTypeFromShop = (shop_id: number, purchase_type: number): Promise<boolean> => Promise.resolve(true)
 
-export const AddOffer = (user_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number): Promise<boolean> => Promise.resolve(true)
+export const AddOffer = (user_id: number, shop_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number): Promise<boolean> => Promise.resolve(true)
 
 export const OfferAcceptedByManagement = (user_id: number, offer_id: number): Promise<boolean> => Promise.resolve(true)
 

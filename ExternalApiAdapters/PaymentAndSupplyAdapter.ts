@@ -1,5 +1,6 @@
 const unirest = require('unirest');
 import {getExternalServices} from '../Logic/Config';
+
 const URL = getExternalServices();
 const POST = 'POST'
 
@@ -62,7 +63,6 @@ export class PaymentAndSupplyAdapter {
                 .end(function (response) {
                     if (response.error) return false
                     const ret = Number(response.raw_body);
-                    console.log(ret)
                     return resolve(isNaN(ret) ? -1 : ret)
                 })
         )
@@ -77,7 +77,6 @@ export class PaymentAndSupplyAdapter {
                 .end(function (response) {
                     if (response.error) return false
                     const ret = Number(response.raw_body);
-                    console.log(ret)
                     return resolve(isNaN(ret) ? -1 : ret)
                 })
         )
@@ -96,7 +95,6 @@ export class PaymentAndSupplyAdapter {
                 .end(function (response) {
                     if (response.error) return false
                     const ret = Number(response.raw_body);
-                    console.log(ret)
                     return resolve(isNaN(ret) ? -1 : ret)
                 })
         )
@@ -111,16 +109,8 @@ export class PaymentAndSupplyAdapter {
                 .end(function (response) {
                     if (response.error) return false
                     const ret = Number(response.raw_body);
-                    console.log(ret)
                     return resolve(isNaN(ret) ? -1 : ret)
                 })
         )
-    }
-
-    getResult = function (res) {
-        if (res.error) return -1;
-        const ret = Number(res.raw_body);
-        console.log(ret)
-        return isNaN(ret) ? -1 : ret
     }
 }

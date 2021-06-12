@@ -27,6 +27,11 @@ export class NotificationAdapter {
         } else logger.Error(`Failed to send message ${notification} to ${user_email}`)
     }
 
+    notifyForUserId(user_id: number, notification: string): void {
+        const new_notification = new Notification(notification)
+        PublisherImpl.getInstance().notify(user_id, new_notification)
+    }
+
     removeOfferNotificationsOfOffer(offer_id: number) {
         return PublisherImpl.getInstance().removeNotificationsOfOffer(offer_id)
     }

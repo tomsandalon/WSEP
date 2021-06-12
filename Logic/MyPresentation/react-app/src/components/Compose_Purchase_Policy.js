@@ -1,50 +1,45 @@
-import {useState} from "react";
-import {useHistory, useParams} from "react-router-dom";
-import serverResponse from "../components/ServerResponse.js";
+import React, {useState} from "react";
 import putFetch from "../putFetch.js";
+import serverResponse from "../components/ServerResponse.js";
 import {Alert} from "reactstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-const EditProduct = () => {
-  const {storeID, storeName, productID} = useParams();
-  const [isPending, setIsPending] = useState(false);
+const ComposePolicy = (props) => {
+  const [operator, setOperator] = useState();
+  const [id1, setid1] = useState();
+  const [id2, setid2] = useState();
   const [error, setError] = useState("");
-  const [visible, setVisible] = useState(false);
-  const history = useHistory();
-  const [action, setAction] = useState();
-  const [parameter, setParameter] = useState();
   const [errorColor, setErrorColor] = useState("success");
+  const [visible, setVisible] = useState(false);
+  const storeID = props.storeID;
+
 
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  const actionOptions = [
-    {label: "Add Amount", value: 0},
-    {label: "Change Name", value: 1},
-    {label: "Add Category", value: 2},
-    {label: "RemoveCategory", value: 3},
-    {label: "Change Price", value: 4},
-    {label: "Change Description", value: 5},
+  const conditionOptions = [
+    {label: "And", value: 0},
+    {label: "Or", value: 1},
   ];
   const submit = (e) => {
     e.preventDefault();
     const args = {
       shop_id: storeID,
-      product_id: productID,
-      value: parameter,
-      action: action.value,
+      policy_id_first: id1,
+      policy_id_second: id2,
+      operator: operator.value,
     };
     console.log(args);
-    putFetch("/user/shop/product", args, thenFunc);
+    putFetch("/user/shop/policy", args, thenFunc);
   };
   const success = async () => {
     setErrorColor("success");
-    setError("Product Edited successfully");
+    setError("Policies composed successfully");
     setVisible(true);
     await sleep(2000);
-    history.push(`/managersStore/${storeID}/${storeName}`);
+    window.location.reload();
   };
   const failure401 = (err_message) => {
     setErrorColor("warning");
@@ -57,14 +52,28 @@ const EditProduct = () => {
   const onDismiss = () => setVisible(false);
   return (
       <div className="add-manager">
-        <p>Edit Product</p>
+        <p>Compose purchase policy</p>
         <div className="d-flex mb-2 justify-content-between"></div>
         <form onSubmit={submit}>
+          <label>id1: </label>
+          <input
+              type="text"
+              required
+              value={id1}
+              onChange={(e) => setid1(e.target.value)}
+          />
+          <label>id2: </label>
+          <input
+              type="text"
+              required
+              value={id2}
+              onChange={(e) => setid2(e.target.value)}
+          />
           <label>operator: </label>
           <Select
               components={makeAnimated()}
-              onChange={setAction}
-              options={actionOptions}
+              onChange={setOperator}
+              options={conditionOptions}
               className="mb-3"
               placeHolder="Select Operator"
               noOptionsMessage={() => "No more conditions available"}
@@ -73,17 +82,10 @@ const EditProduct = () => {
               autoFocus
               isSearchable
           />
-          <label>Value: </label>
-          <input
-              type="text"
-              required
-              value={parameter}
-              onChange={(e) => setParameter(e.target.value)}
-          />
           <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
             {error}
           </Alert>
-          {<input type="submit" value="Edit Product"/>}
+          {<input type="submit" value="Compose"/>}
         </form>
         {/* <Button
           onClick={() => submit()}
@@ -95,5 +97,4 @@ const EditProduct = () => {
       </div>
   );
 };
-
-export default EditProduct;
+export default ComposePolicy;

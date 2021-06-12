@@ -523,11 +523,13 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     notifyOwners(order: Purchase): void {
-        this._shop_management.notifyOwners(`New successful order:\n` +
+        const message = `New successful order:\n` +
             `Order number: ${order.order_id}\n` +
             `Items: ${order.products.reduce(
                 (acc, cur) => acc + "\n" + cur.name, ""
-            )}`)
+            )}`
+        this._shop_management.notifyOwners(message)
+        NotificationAdapter.getInstance().notifyForUserId(order.minimal_user_data.userId, message)
     }
 
     rateProduct(product_id: number, rating: number, rater: string): void {

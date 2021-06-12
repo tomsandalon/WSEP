@@ -1,15 +1,17 @@
 import ItemsBlock from "../components/ItemsBlock";
 import ManagersBlock from "../components/ManagersBlock";
 import OwnersBlock from "../components/OwnersBlock";
-import { Link, useParams, useHistory } from "react-router-dom";
+import {Link, useHistory, useParams} from "react-router-dom";
 import useFetch from "../useFetch";
-import { React } from "react";
+import {React} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Divider } from "@material-ui/core";
 import DiscountsBlock from "../components/DiscountsBlock";
+import PurchasePoliciesBlock from "../components/PurchasePoliciesBlock";
+import ComposePolicy from "../components/Compose_Purchase_Policy";
+import ComposeDiscount from "../components/ComposeDiscount";
 
 const ManagersStore = () => {
-  const { storeID, name } = useParams();
+  const {storeID, name} = useParams();
   const history = useHistory();
   const {
     data: storeItems,
@@ -29,6 +31,13 @@ const ManagersStore = () => {
     detailsIsPending,
     detailsError,
   } = useFetch(`/user/details`);
+
+  const {
+    data: unparsed_purchasePolicies,
+    policiesIsPending,
+    policiesError,
+  } = useFetch(`/user/shop/policy?shop_id=${storeID}`);
+  const purchasePolicies = JSON.parse(unparsed_purchasePolicies);
 
   const {
     data: unparsed_discounts,
@@ -120,7 +129,12 @@ const ManagersStore = () => {
           </Link>
           {itemsError && <div> {itemsError}</div>}
           {itemsIsPending && <div>Loading...</div>}
-          <ItemsBlock id={storeID} storeItems={storeItems}></ItemsBlock>
+          <ItemsBlock
+              id={storeID}
+              storeItems={storeItems}
+              storeID={storeID}
+              storeName={name}
+          ></ItemsBlock>
         </div>
         <hr></hr>
         <div classname="store-view">
@@ -131,13 +145,42 @@ const ManagersStore = () => {
             </button>
           </Link>
           {discounts && (
-            <DiscountsBlock
-              storeID={storeID}
-              error={discountsError}
-              isPending={discountsIsPending}
-              discounts={discounts}
-            />
+              <DiscountsBlock
+                  storeName={name}
+                  storeID={storeID}
+                  error={discountsError}
+                  isPending={discountsIsPending}
+                  discounts={discounts}
+              />
           )}
+          <div className="row">
+            <ComposeDiscount
+                storeID={storeID}
+                storeName={name}
+                logic={true}
+            ></ComposeDiscount>
+            <ComposeDiscount
+                storeID={storeID}
+                storeName={name}
+                logic={false}
+            ></ComposeDiscount>
+          </div>
+          <hr></hr>
+          <h3>Purchase Policies:</h3>
+          <Link to={`/addpolicy/${storeID}/${name}`}>
+            <button className="btn btn-outline-primary btn-sm ">
+              Add Purchase Policy <i className="fa fa-plus"></i>
+            </button>
+          </Link>
+          {purchasePolicies && (
+              <PurchasePoliciesBlock
+                  storeID={storeID}
+                  error={policiesError}
+                  isPending={policiesIsPending}
+                  policies={purchasePolicies}
+              />
+          )}
+          <ComposePolicy storeID={storeID} storeName={name}></ComposePolicy>
         </div>
         {/* </div> */}
       </div>
