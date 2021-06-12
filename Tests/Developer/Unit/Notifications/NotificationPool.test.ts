@@ -60,7 +60,7 @@ describe('Domain notifications tests', () => {
     // SystemImpl.getInstance(true)
     it('Purchase', () => {
         const pool: PublisherImpl = PublisherImpl.getInstance(true);
-        pool.removeAllNotificationsForTests()
+        pool.removeAllNotifications()
         const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
         const user: User = UserImpl.create();
         shop.addItem("Tom@gmail.com", "GTX", "GPU", 1000, ["GPU", "HW"], 1000);
