@@ -569,78 +569,90 @@ const _PurchaseBasket = ([user_id, shop_id, purchase_id, date,  items]: [number,
 export const addPurchaseTypes = (types: number[]) => _addPurchaseTypes(types, 3)
 
 const _addPurchaseTypes = (types: number[], attempts: number) =>
-    getDB().transaction((trx: any) =>
-        trx(purchase_type.name).insert(types.map(t => {
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(purchase_type.name)).map(r => r.purchase_type_id)
+        const types_to_add = types.filter(t => !(result.includes(t)));
+        await trx(purchase_type.name).insert(types_to_add.map(t => {
             return {
                 purchase_type_id: t
             }
         }))
-    )
+    })
         .then(success)
         .catch(new_err => handler(new_err, _addPurchaseTypes, types, attempts))
 
 export const addPermissions = (permissions: number[]) => _addPermissions(permissions, 3)
 
 const _addPermissions = (permissions: number[], attempts: number) =>
-    getDB().transaction((trx: any) =>
-        trx(permission.name).insert(permissions.map(p => {
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(permission.name)).map(r => r.permission_id)
+        const permissions_to_add = permissions.filter(p => !(result.includes(p)));
+        await trx(permission.name).insert(permissions_to_add.map(p => {
             return {
                 permission_id: p
             }
         }))
-    )
+    })
         .then(success)
         .catch(new_err => handler(new_err, _addPermissions, permissions, attempts))
 
 export const addPurchaseConditionType = (types: number[]) => _addPurchaseConditionType(types, 3)
 
 const _addPurchaseConditionType = (types: number[], attempts: number) =>
-    getDB().transaction((trx: any) =>
-        trx(purchase_condition_type.name).insert(types.map(t => {
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(purchase_condition_type.name)).map(r => r.type_id)
+        const types_to_add = types.filter(t => !(result.includes(t)));
+        await trx(purchase_condition_type.name).insert(types_to_add.map(t => {
             return {
                 type_id: t
             }
         }))
-    )
+    })
         .then(success)
         .catch(new_err => handler(new_err, _addPurchaseConditionType, types, attempts))
 
 export const addPurchaseConditionOperator = (operators: number[]) => _addPurchaseConditionOperator(operators, 3)
 
 const _addPurchaseConditionOperator = (operators: number[], attempts: number) =>
-    getDB().transaction((trx: any) =>
-        trx(purchase_condition_operator.name).insert(operators.map(o => {
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(purchase_condition_operator.name)).map(r => r.operator_id)
+        const operators_to_add = operators.filter(o => !(result.includes(o)));
+        await trx(purchase_condition_operator.name).insert(operators_to_add.map(o => {
             return {
                 operator_id: o
             }
         }))
-    )
+    })
         .then(success)
         .catch(new_err => handler(new_err, _addPurchaseConditionOperator, operators, attempts))
 
 export const addDiscountOperator = (operators: number[]) => _addDiscountOperator(operators, 3)
 
 const _addDiscountOperator = (operators: number[], attempts: number) =>
-    getDB().transaction((trx: any) =>
-        trx(discount_operator.name).insert(operators.map(o => {
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(discount_operator.name)).map(r => r.discount_operator_id)
+        const operators_to_add = operators.filter(o => !(result.includes(o)));
+        await trx(discount_operator.name).insert(operators_to_add.map(o => {
             return {
                 discount_operator_id: o
             }
         }))
-    )
+    })
         .then(success)
         .catch(new_err => handler(new_err, _addDiscountOperator, operators, attempts))
 
 export const addDiscountConditionType = (types: number[]) => _addDiscountConditionType(types, 3)
 
 const _addDiscountConditionType = (types: number[], attempts: number) =>
-    getDB().transaction((trx: any) =>
-        trx(discount_condition_type.name).insert(types.map(t => {
+    getDB().transaction(async (trx: any) => {
+        const result = (await trx.select().from(discount_condition_type.name)).map(r => r.discount_condition_type_id)
+        const types_to_add = types.filter(t => !(result.includes(t)));
+        await trx(discount_condition_type.name).insert(types_to_add.map(t => {
             return {
                 discount_condition_type_id: t
             }
         }))
-    )
+    })
         .then(success)
         .catch(new_err => handler(new_err, _addDiscountConditionType, types, attempts))
 
