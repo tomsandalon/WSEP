@@ -57,6 +57,8 @@ export class Service {
         this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, dummy)
         this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, dummy)
         this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, dummy)
+
+        this.addPurchasePolicy(tom_id,nvidia_id,ConditionType.GreaterAmount,"4")
         this.logout(tom_id);
     }
 
