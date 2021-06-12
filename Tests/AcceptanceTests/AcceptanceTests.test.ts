@@ -3,7 +3,7 @@ import {SystemDriver} from "./SystemDriver";
 // import {System} from "./System";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {SearchTypes, System} from "../../Logic/Domain/System";
-import {Filter_Type, id_counter} from "../../Logic/Domain/Shop/ShopInventory";
+import {Filter_Type, id_counter, ShopInventory} from "../../Logic/Domain/Shop/ShopInventory";
 import {BasketDoesntExists} from "../../Logic/Domain/ProductHandling/ErrorMessages";
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
@@ -13,6 +13,7 @@ import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicComp
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ProductImpl} from "../../Logic/Domain/ProductHandling/Product";
 import {PublisherImpl} from "../../Logic/Domain/Notifications/PublisherImpl";
+import {offer_id_counter} from "../../Logic/Domain/ProductHandling/Offer";
 
 let system
 /**
@@ -271,21 +272,46 @@ describe('Guest:2.9.1: Purchase - buy a specific basket', () => {
     });
 });
 
+const getNewItem = (shop: ShopInventory): number => shop.products.reduce((acc, product) => Math.max(product.product_id, acc), -1);
+
+
 /**
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.fmvdxw7c1e2c
  */
 describe('Guest:2.9.2: Auction - add a bid to an auction', () => {
-    it('Happy', () => {
-        //TODO Milestone 2
-
-        // expect(shop.addBid(productID, amount, paymentInfo)).to.be.true;
-        // expect(shop.addBid(productID, lowerAmount, paymentInfo)).to.be.false;
+    let system: System, originOwner: number, shopID: number, user: number
+    beforeEach(async () => {
+        system = await SystemDriver.getSystem(true);
+        system.performRegister("Test@test.com", "TESTER");
+        originOwner = system.performLogin("Test@test.com", "TESTER") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
+        system.performRegister("newUser@test.com", "TESTER");
+        user = system.performLogin("newUser@test.com", "TESTER") as number
+    })
+    it('Happy', async () => {
+        let ret = system.makeOffer(user, shopID, ProductImpl._product_id_specifier - 1, 1, 999)
+        expect(typeof ret != "string").to.b.true
+        ret = system.acceptOfferAsManagement(originOwner, shopID, offer_id_counter - 1)
+        expect(typeof ret != "string").to.be.true
+        ret = await system.purchaseOffer(user, offer_id_counter - 1, "ApplePay")
+        expect((system.userOrderHistory(user) as string[]).length == 1).to.be.true
     });
-    it('Sad', () => {
-        //TODO
+    it('Sad', async () => {
+        let ret = system.makeOffer(user, shopID, ProductImpl._product_id_specifier - 1, 1, 999)
+        expect(typeof ret != "string").to.be.true
+        ret = system.denyOfferAsManagement(originOwner, shopID, offer_id_counter - 1)
+        expect(typeof ret != "string").to.be.true
+        ret = await system.purchaseOffer(user, offer_id_counter - 1, "ApplePay")
+        expect((system.userOrderHistory(user) as string[]).length == 0).to.be.true
     });
     it('Bad', () => {
-        //TODO
+        let ret = system.makeOffer(user, shopID, ProductImpl._product_id_specifier - 1, 1, 999)
+        expect(typeof ret != "string").to.be.true
+        ret = system.removeProduct(originOwner, shopID, ProductImpl._product_id_specifier - 1)
+        expect(typeof ret != "string").to.be.true
+        ret = await system.purchaseOffer(user, offer_id_counter - 1, "ApplePay")
+        expect(typeof ret == "string").to.be.true
     });
 });
 
@@ -316,9 +342,8 @@ describe('Guest:2.9.3: Auction - credit card charged, product added to purchase 
 /**
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.gm1b34nj0qnb
  */
-describe('Guest:2.9.4: Offer -  credit card charged, product added to purchase history', () => {
+describe('Guest:2.9.4: Offer -  credit card charged, product added to purchase history', async () => {
     it('Happy', () => {
-        //TODO Milestone 2
 
         //let balance = service.paymentService.getBalance();
         //shop.sendOffer(productID, amount, offer, paymentInfo); //manager accepts
