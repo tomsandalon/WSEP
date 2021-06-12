@@ -333,7 +333,7 @@ export class SystemImpl implements System {
         await addPurchaseConditionOperator(range(10));
         await addDiscountOperator(range(10));
         await addDiscountConditionType(range(10));
-        // await this.login.createAdmin();
+        await this.login.createAdmin();
         return;
     }
 
