@@ -21,7 +21,8 @@ export class Service {
     }
 
     public initData() {
-        const dummy: Purchase_Type = Purchase_Type.Immediate
+        const immediate: Purchase_Type = Purchase_Type.Immediate
+        const offer: Purchase_Type = Purchase_Type.Offer
         this.system.performRegister("Liorpev@gmail.com", "123456")
         this.system.performRegister("Mark@gmail.com", "123456")
         this.system.performRegister("TomAndSons@gmail.com", "123456") // Owner
@@ -36,20 +37,21 @@ export class Service {
         const zara_id = this.addShop(tom_id, "ZARA", "Best style in UK", 'China', "Budaa 4 ever")
         if (typeof nvidia_id === "string" || typeof zara_id === "string")
             return
-        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, dummy)
-        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 1, ["GPU"], 2000, dummy)
-        this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, dummy)
-        this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, dummy)
-        this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, dummy)
+        this.addPurchaseType(tom_id, nvidia_id, Purchase_Type.Offer)
+        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, immediate)
+        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 1, ["GPU"], 2000, offer)
+        this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, offer)
+        this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, immediate)
+        this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, immediate)
         this.addDiscount(tom_id, nvidia_id, 0.5)
         this.addConditionToDiscount(tom_id, nvidia_id, 0, Condition.Amount, "3")
         this.addDiscount(tom_id, nvidia_id, 0.2)
 
-        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, dummy)
-        this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, dummy)
-        this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, dummy)
-        this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, dummy)
-        this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, dummy)
+        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, immediate)
+        this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, immediate)
+        this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, immediate)
+        this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, immediate)
+        this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, immediate)
 
         this.addPurchasePolicy(tom_id, nvidia_id, ConditionType.GreaterAmount, "4")
         this.logout(tom_id);
