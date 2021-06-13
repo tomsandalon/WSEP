@@ -53,11 +53,12 @@ export class Service {
         this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, immediate)
         this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, immediate)
 
-        const someone = this.system.performLogin("a@gmail.com", "123456")
+        const someone = this.system.performLogin("a@gmail.com", "123456") as number
         this.makeOffer(someone, nvidia_id, 1, 2, 3)
 
         this.addPurchasePolicy(tom_id, nvidia_id, ConditionType.GreaterAmount, "4")
         this.logout(tom_id);
+        this.logout(someone)
     }
 
     addConditionToDiscount(user_id: number, shop_id: number, id: number, condition: Condition, condition_param: string): string | boolean {
