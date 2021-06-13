@@ -191,18 +191,24 @@ export class ProductImpl implements Product {
         return ProductImpl.createSupporter(base_price, description, name, id, purchase_type);
     }
 
-    static productsAreEqual(p1: Product[], p2: Product[]) {
-        return p1.length == p2.length && p1.every(p1 => p2.some(p2 =>
-            p1.product_id == p2.product_id &&
-            p1.amount == p2.amount &&
-            p1.name == p2.name &&
-            p1.base_price == p2.base_price &&
-            p1.purchase_type == p2.purchase_type &&
-            p1.category.length == p2.category.length &&
-            p1.category.every(c1 => p2.category.some(c2 => c1.name == c2.name)) &&
-            p1.description == p2.description &&
-            Rating.ratingsAreEqual(p1.rating, p2.rating)
+    static productsAreEqual(p1_before: Product[], p2_before: Product[]) {
+        const no_zeroes = (p: Product) => p.amount != 0
+        const p1 = p1_before.filter(no_zeroes)
+        const p2 = p2_before.filter(no_zeroes)
+        const res = p1.length == p2.length && p1.every(p1 => p2.some(p2 => {
+                const id = p1.product_id == p2.product_id
+                const amount = p1.amount == p2.amount
+                const name = p1.name == p2.name
+                const base_price = p1.base_price == p2.base_price
+                const purchase_type = p1.purchase_type == p2.purchase_type
+                const categories = p1.category.length == p2.category.length &&
+                    p1.category.every(c1 => p2.category.some(c2 => c1.name == c2.name))
+                const description = p1.description == p2.description
+                const ratings = Rating.ratingsAreEqual(p1.rating, p2.rating)
+                return id && amount && name && base_price && purchase_type && categories && categories && description && ratings
+            }
         ))
+        return res
     }
 
     private static createSupporter(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {

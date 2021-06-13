@@ -796,4 +796,8 @@ export class ShopImpl implements Shop {
     async addOffersToShopFromDB(offers: OfferDTO[], users: UserImpl[], products: Product[]): Promise<void> {
         return this.inventory.addOffersToShopFromDB(offers, users, products)
     }
+
+    static same_offers(shops1: Shop, shops2: Shop) {
+        return ShopInventoryImpl.same_offers(shops1.inventory, shops2.inventory)
+    }
 }

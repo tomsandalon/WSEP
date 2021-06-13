@@ -71,11 +71,11 @@ export const addPermissions = (permissions: number[]) => blockDB ? Promise.resol
 
 export const addPurchaseConditionType = (types: number[]) => blockDB ? Promise.resolve(true) : API.addPurchaseConditionType(types)
 
-export const addPurchaseConditionOperator = (operators: number[]) => blockDB ? Promise.resolve(true) : API.addPurchaseConditionType(operators)
+export const addPurchaseConditionOperator = (operators: number[]) => blockDB ? Promise.resolve(true) : API.addPurchaseConditionOperator(operators)
 
 export const addDiscountOperator = (operators: number[]) => blockDB ? Promise.resolve(true) : API.addDiscountOperator(operators)
 
-export const addDiscountConditionType = (types: number[]) => blockDB ? Promise.resolve(true) : API.addPurchaseConditionType(types)
+export const addDiscountConditionType = (types: number[]) => blockDB ? Promise.resolve(true) : API.addDiscountConditionType(types)
 
 export const ClearDB = async (): Promise<void> => blockDB ? Promise.resolve() : API.ClearDB()
 

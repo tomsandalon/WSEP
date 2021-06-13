@@ -10,7 +10,6 @@ import {User as UserFromDB} from "../../DataAccess/Getters"
 import {SystemImpl} from "../System";
 import {Purchase_Info} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 import {Offer} from "../ProductHandling/Offer";
-import {Product} from "../ProductHandling/Product";
 
 const LEGAL_DRINKING_AGE = 18
 export let id_counter: number = 0;
@@ -165,33 +164,8 @@ export class UserImpl implements User {
         return;
     }
 
-    /**
-     * Requirement number 2.7
-     * Add an item to a shopping basket which is connected to a specific store.
-     * @param shop
-     * @param product_id
-     * @param amount
-     * @param override_immediate
-     * @return string if an error occurred or void otherwise.
-     */
-    addToBasket(shop: ShopInventory, product_id: number, amount: number, override_immediate?: boolean): string | void {
-        let shopping_basket = this._cart.filter(element => element.shop.shop_id == shop.shop_id) //basket for provided shop_id exists
-        if (!override_immediate && (shop.products.find(p => product_id == p.product_id) as Product).purchase_type != Purchase_Type.Immediate) return `Purchase type of product ${product_id} is not Immediate`
-        if (shopping_basket.length == 0) { //new shopping basket
-            const item: ShoppingEntry = {productId: product_id, amount: amount};
-            let new_basket = ShoppingBasketImpl.create(shop, item, this);
-            if (typeof new_basket === "string") {
-                return new_basket;
-            }
-            this._cart.push(new_basket);
-        } else {//add to existing
-            const add = shopping_basket[0].addToBasket(product_id, amount)
-            if (typeof add == "boolean") {
-                logger.Info(`Product id ${product_id} was added successfully to the basket of shop_id ${shop.shop_id}`)
-                return
-            }
-            return add;
-        }
+    static same_offers(u1: UserImpl, u2: UserImpl) {
+        return u1.active_offers.length == u2.active_offers.length && u1.active_offers.every(o1 => u2.active_offers.some(o2 => Offer.equals(o1, o2)))
     }
 
     /**
@@ -362,6 +336,37 @@ export class UserImpl implements User {
         if (offer == undefined) return Promise.resolve(`Offer ${offer_id} doesn't exist`)
         if (!offer.isPurchasable()) return Promise.resolve(`Offer ${offer_id} is not accepted by all shop management`)
         return this.purchaseRealOffer(offer, payment_info)
+    }
+
+    /**
+     * Requirement number 2.7
+     * Add an item to a shopping basket which is connected to a specific store.
+     * @param shop
+     * @param product_id
+     * @param amount
+     * @param override_immediate
+     * @return string if an error occurred or void otherwise.
+     */
+    addToBasket(shop: ShopInventory, product_id: number, amount: number, override_immediate?: boolean): string | void {
+        let shopping_basket = this._cart.filter(element => element.shop.shop_id == shop.shop_id) //basket for provided shop_id exists
+        const product = shop.products.find(p => product_id == p.product_id)
+        if (product == undefined) return `Product ${product_id} not found`
+        if (!override_immediate && product.purchase_type != Purchase_Type.Immediate) return `Purchase type of product ${product_id} is not Immediate`
+        if (shopping_basket.length == 0) { //new shopping basket
+            const item: ShoppingEntry = {productId: product_id, amount: amount};
+            let new_basket = ShoppingBasketImpl.create(shop, item, this);
+            if (typeof new_basket === "string") {
+                return new_basket;
+            }
+            this._cart.push(new_basket);
+        } else {//add to existing
+            const add = shopping_basket[0].addToBasket(product_id, amount)
+            if (typeof add == "boolean") {
+                logger.Info(`Product id ${product_id} was added successfully to the basket of shop_id ${shop.shop_id}`)
+                return
+            }
+            return add;
+        }
     }
 }
 
