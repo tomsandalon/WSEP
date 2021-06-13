@@ -39,7 +39,7 @@ export class Service {
             return
         this.addPurchaseType(tom_id, nvidia_id, Purchase_Type.Offer)
         this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, immediate)
-        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 1, ["GPU"], 2000, offer)
+        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 10, ["GPU"], 2000, offer)
         this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, offer)
         this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, immediate)
         this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, immediate)
@@ -52,6 +52,9 @@ export class Service {
         this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, immediate)
         this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, immediate)
         this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, immediate)
+
+        const someone = this.system.performLogin("a@gmail.com", "123456")
+        this.makeOffer(someone, nvidia_id, 1, 2, 3)
 
         this.addPurchasePolicy(tom_id, nvidia_id, ConditionType.GreaterAmount, "4")
         this.logout(tom_id);
