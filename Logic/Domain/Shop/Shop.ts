@@ -424,6 +424,10 @@ export class ShopImpl implements Shop {
             return "Insufficient permissions";
         }
         const ret = this._inventory.removeItem(product_id);
+        if (typeof ret == "string") {
+            logger.Error(ret)
+            return ret
+        }
         if (!ret) {
             const error = `${failure_message}. Item doesn't exist.`
             logger.Error(error);
@@ -779,7 +783,7 @@ export class ShopImpl implements Shop {
             logger.Error(error);
             return error
         }
-        const ret = this.inventory.removePurchasePolicy(purchase_type)
+        const ret = this.inventory.removePurchaseType(purchase_type)
         if (typeof ret == "string") {
             logger.Error(`${user_email} failed to remove purchase type as ${ret}`)
             return ret
