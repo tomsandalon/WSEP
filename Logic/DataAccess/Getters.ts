@@ -7,6 +7,7 @@ const {
     purchase,
     basket,
     offer,
+    offer_not_accepted_by,
     rates,
     available,
     owns,
@@ -46,6 +47,7 @@ export type User = {
     age: number,
     admin: boolean,
     purchases_ids: number[],
+    offers: number[],
     cart: {
         shop_id: number,
         product_id: number,
@@ -58,23 +60,25 @@ export const GetUsers = (): Promise<User[]> =>
             .then((users: any[]) =>
                 Promise.all(
                     users.map(async (u: any): Promise<User> => {
-                    const purchases = await trx.select().from(purchase.name).where(user.pk, u.user_id)
-                    const baskets = await trx.select().from(basket.name).where(user.pk, u.user_id)
-                    return {
-                        user_id: u.user_id,
-                        email: u.email,
-                        password: u.password,
-                        age: u.age,
-                        admin: u.admin == 1,
-                        purchases_ids: purchases.map((p: any) => p.purchase_id),
-                        cart: baskets.map((b: any) => {
-                            return {
-                                shop_id: b.shop_id,
-                                product_id: b.product_id,
-                                amount: b.amount
+                        const purchases = await trx.select().from(purchase.name).where(user.pk, u.user_id)
+                        const baskets = await trx.select().from(basket.name).where(user.pk, u.user_id)
+                        const offers = await trx.select(offer.pk).from(offer.name).where(user.pk, u.user_id)
+                        return {
+                            user_id: u.user_id,
+                            email: u.email,
+                            password: u.password,
+                            age: u.age,
+                            admin: u.admin == 1,
+                            purchases_ids: purchases.map((p: any) => p.purchase_id),
+                            offers: offers.map((off: any) => off.offer_id),
+                            cart: baskets.map((b: any) => {
+                                return {
+                                    shop_id: b.shop_id,
+                                    product_id: b.product_id,
+                                    amount: b.amount
+                                }
+                            })
                             }
-                        })
-                        }
                     })
                 )
             )
@@ -296,7 +300,8 @@ export type ShopRich = {
     products: ProductData[],
     purchase_conditions: number[],
     discounts: number[],
-    purchase_types: number[]
+    purchase_types: number[],
+    offers: OfferDTO[]
 };
 
 export const groupByShops = (shops: any[]): ShopRich[]  =>{
@@ -313,6 +318,8 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
                 output[output.length - 1].discounts.push(shops[i].discount_id)
             } else if(shops[i].purchase_type_id != undefined) {
                 output[output.length - 1].purchase_types.push(shops[i].purchase_type_id)
+            } else if (shops[i].offer_id != undefined) {
+                output[output.length - 1].offers.push(shops[i])
             } else {
                 output[output.length - 1].products.push(shops[i].product)
             }
@@ -325,6 +332,7 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
                     purchase_conditions: [shops[i].p_condition_id],
                     discounts: [],
                     purchase_types: [],
+                    offers: []
                 })
             } else if(shops[i].discount_id != undefined){
                 output.push({
@@ -333,6 +341,7 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
                     purchase_conditions: [],
                     discounts: [shops[i].discount_id],
                     purchase_types: [],
+                    offers: []
                 })
             } else if(shops[i].purchase_type_id != undefined){
                 output.push({
@@ -341,6 +350,16 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
                     purchase_conditions: [],
                     discounts: [],
                     purchase_types: [shops[i].purchase_type_id],
+                    offers: []
+                })
+            } else if(shops[i].offer_id != undefined) {
+                output.push({
+                    shop_id: shops[i].shop_id,
+                    products: [],
+                    purchase_conditions: [],
+                    discounts: [],
+                    purchase_types: [],
+                    offers: [shops[i]]
                 })
             } else {
                 output.push({
@@ -349,6 +368,7 @@ export const groupByShops = (shops: any[]): ShopRich[]  =>{
                     purchase_conditions: [],
                     discounts: [],
                     purchase_types: [],
+                    offers: []
                 })
             }
         }
@@ -390,7 +410,7 @@ const groupByProduct = (products: any[]): {shop_id: number, product: ProductData
 }
 
 export const GetShopsInventory = (): Promise<ShopRich[]> =>
-    getDB().transaction(async (trx: any): Promise<ShopRich[]> => {
+    getDB().transaction(async (trx: any)=> {//: Promise<ShopRich[]> => {
         const purchase_types = await trx.select().from(available.name);
         const products = await
             trx.select().from({
@@ -401,8 +421,50 @@ export const GetShopsInventory = (): Promise<ShopRich[]> =>
         const sortedProducts = groupByProduct(products);
         const purchaseConditions = await trx.select().from(purchase_condition_allowed_in.name);
         const discounts = await trx.select().from(discount_allowed_in.name);
-        return groupByShops(purchaseConditions.concat(discounts).concat(sortedProducts).concat(purchase_types))
+        const offers_data = await trx.select().from(offer.name);
+        const offers_not_accepted_by = await trx.select().from(offer_not_accepted_by.name);
+        const offers = groupByOffer(offers_data, offers_not_accepted_by);
+        return groupByShops(purchaseConditions.concat(discounts).concat(sortedProducts).concat(purchase_types).concat(offers))
     })
+
+type OfferDTO = {
+    offer_id: number,
+    shop_id: number,
+    product_id: number,
+    user_id: number,
+    amount: number,
+    price_per_unit: number,
+    isCounterOffer: boolean,
+    not_accepted_by: number[]
+}
+
+export const groupByOffer = (offer_data, offer_not_accepted_by): OfferDTO[] => {
+    const data = offer_data.concat(offer_not_accepted_by)
+    data.sort((first: any, second: any) => first.offer_id - second.offer_id)
+    let flag = -1;
+    let output: OfferDTO[] = []
+    for (let i = 0; i < data.length; i++) {
+        if (flag != data[i].offer_id) {
+            flag = data[i].offer_id;
+            if(data[i].isCounterOffer != undefined) {
+                output.push({
+                    amount: data[i].amount,
+                    isCounterOffer: data[i].isCounterOffer == 1,
+                    offer_id: data[i].offer_id,
+                    price_per_unit: data[i].price_per_unit,
+                    product_id: data[i].product_id,
+                    shop_id: data[i].shop_id,
+                    user_id: data[i].user_id,
+                    not_accepted_by: []
+                })
+            }
+        }
+        if (data[i].isCounterOffer == undefined){
+            output[output.length - 1].not_accepted_by.push(data[i].user_id)
+        }
+    }
+    return output;
+}
 
 export const GetNotifications = () =>
     getDB().transaction(async (trx: any) =>
