@@ -113,7 +113,7 @@ export interface ShopInventory {
      * @param item_id product id of the item
      * @return true iff the removal was successful
      */
-    removeItem(item_id: number): boolean
+    removeItem(item_id: number): boolean | string
 
     /**
      * @Requirement 4.11
@@ -198,6 +198,8 @@ export interface ShopInventory {
     addManagementToExistingOffers(appointee_email: string): void;
 
     addOffersToShopFromDB(offers: OfferDTO[], users: User[], products: Product[]): Promise<void>;
+
+    removePurchaseType(purchase_type: Purchase_Type): boolean | string;
 }
 
 export let id_counter: number = 0;
@@ -388,8 +390,11 @@ export class ShopInventoryImpl implements ShopInventory {
         return result
     }
 
-    removeItem(item_id: number): boolean {
-        if (!this._products.some(p => p.product_id == item_id)) return false;
+    removeItem(item_id: number): boolean | string {
+        const p = this.products.find(p => p.product_id == item_id)
+        if (p == undefined) return false;
+        if (p.purchase_type == Purchase_Type.Offer && this.active_offers.some(o => o.offer.product.product_id == item_id))
+            return `${p.name} has an active offer and cannot be deleted`
         this._products = this._products.filter(p => p.product_id != item_id);
         return true;
     }
@@ -692,5 +697,19 @@ export class ShopInventoryImpl implements ShopInventory {
             return res
         })
         return Promise.resolve()
+    }
+
+    removePurchaseType(purchase_type: Purchase_Type): boolean | string {
+        if (!this.purchase_types.includes(purchase_type)) {
+            return `This purchase type doesn't exist in the shop`
+        }
+        if (purchase_type == Purchase_Type.Immediate) {
+            return `Cannot remove purchase type 'Immediate'`
+        }
+        if (purchase_type == Purchase_Type.Offer && this.active_offers.length > 0) {
+            return `Cannot remove purchase type 'Offer' because there are active offers`
+        }
+        this._purchase_types = this.purchase_types.filter(p => p != purchase_type)
+        return true
     }
 }
