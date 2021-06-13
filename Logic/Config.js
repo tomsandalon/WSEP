@@ -5,7 +5,7 @@ exports.connection =  {
     host: '127.0.0.1',
     database: 'wsep',
     user:     'Mark',
-    password: '123456',
+    password: 'fuckuni2021',
     charset: 'utf8'
 }
 exports.paymentAndDeliveryServices = 'https://cs-bgu-wsep.herokuapp.com/'

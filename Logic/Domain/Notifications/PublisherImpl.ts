@@ -2,8 +2,8 @@ import { Notification } from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
 
-// let P: any
-import * as P from "../../Service/Publisher"
+ let P: any
+//import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
 
 export class PublisherImpl implements Publisher{
@@ -27,12 +27,12 @@ export class PublisherImpl implements Publisher{
     }
 
     notifyFlush(user_id: number): void {
-        if (P != undefined) { //TODO remove prints
-            if (LoginImpl.getInstance().isLoggedIn(user_id)) {
-                P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
-            }
-        }
-        else logger.Error(`Failed to send notifications to ${user_id} as the publisher is not defined`)
+        // if (P != undefined) { //TODO remove prints
+        //     if (LoginImpl.getInstance().isLoggedIn(user_id)) {
+        //         P.Publisher.getInstance().notify(user_id, this.notificationQueue[user_id].length)
+        //     }
+        // }
+        // else logger.Error(`Failed to send notifications to ${user_id} as the publisher is not defined`)
     }
 
     getAmountOfNotifications(user_id: number): number {
