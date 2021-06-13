@@ -11,13 +11,13 @@ import {
     addPurchaseTypes,
     AddShop,
     AppointManager,
-    AppointOwner, CounterOffer, CreateAdminIfNotExist, OfferAcceptedByManagement,
+    AppointOwner, CreateAdminIfNotExist, OfferAcceptedByManagement,
     PurchaseBasket,
     RateProduct,
     RegisterUser,
     RemainingManagement,
     removeDiscount,
-    RemoveManager, RemoveNotificationsByPrefix,
+    RemoveManager,
     removePurchasePolicy,
     UpdatePermissions
 } from "./API";
@@ -227,7 +227,11 @@ connectToDB();
 //         }
 //     ]).then((result: any) => console.log(`Finish ${result}`))C
 // user_id: number, shop_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number
-RemoveNotificationsByPrefix('Offer 1')
-.then((result: any) => console.log(`Finish ${result}`))
+// AppointOwner('mark@gmail.com', 'tom@gmail.com', 1)
+// .then((result: any) => console.log(`Finish ${result}`))
+
+RemainingManagement(['tom@gmail.com'], 1)
+    .then((result: any) => console.log(`Finish ${result}`))
+
 
 // initData().then((result: any) => console.log(`Finish ${result}`))
