@@ -15,12 +15,13 @@ import {CompositeCondition, Operator} from "./PurchasePolicy/CompositeCondition"
 import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
-import {GetPurchaseConditions, ShopRich} from "../../DataAccess/Getters";
+import {GetPurchaseConditions, OfferDTO, ShopRich} from "../../DataAccess/Getters";
 import {SimpleCondition} from "./PurchasePolicy/SimpleCondition";
-import {Offer} from "../ProductHandling/Offer";
-import {Manager} from "../ShopPersonnel/Manager";
-import {Owner} from "../ShopPersonnel/Owner";
+import {inc_offer_id_counter, Offer, set_offer_id_counter} from "../ProductHandling/Offer";
+import {Manager, ManagerImpl} from "../ShopPersonnel/Manager";
+import {Owner, OwnerImpl} from "../ShopPersonnel/Owner";
 import {NotificationAdapter} from "../Notifications/NotificationAdapter";
+import {User, UserImpl} from "../Users/User";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
 
@@ -195,6 +196,8 @@ export interface ShopInventory {
     counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
 
     addManagementToExistingOffers(appointee_email: string): void;
+
+    addOffersToShopFromDB(offers: OfferDTO[], users: User[], products: Product[]): Promise<void>;
 }
 
 export let id_counter: number = 0;
@@ -335,8 +338,8 @@ export class ShopInventoryImpl implements ShopInventory {
     filter(products: Product[], filters: Filter[]): Product[] {
         if (filters.length == 0) return products
         const passed_filter = (f: Filter) => (product: Product) => {
-            return (f.filter_type == Filter_Type.AbovePrice) ? product.price >= Number(f.filter_value) :
-                (f.filter_type == Filter_Type.BelowPrice) ? product.price <= Number(f.filter_value) :
+            return (f.filter_type == Filter_Type.AbovePrice) ? product.base_price >= Number(f.filter_value) :
+                (f.filter_type == Filter_Type.BelowPrice) ? product.base_price <= Number(f.filter_value) :
                     (f.filter_type == Filter_Type.Rating) ? product.rating.get_rating() == Number(f.filter_value) :
                         (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
                             //can add more
@@ -662,5 +665,20 @@ export class ShopInventoryImpl implements ShopInventory {
             return `Purchase policy doesn't allow this purchase`
         }
         return true
+    }
+
+    addOffersToShopFromDB(offers: OfferDTO[], users: User[], products: Product[]): Promise<void> {
+        set_offer_id_counter(offers.reduce((acc, cur) => Math.max(acc, cur.offer_id), -1) + 1)
+        this.active_offers = offers.map(o => {
+            const not_accepted_by_emails = o.not_accepted_by.map(id => (users.find(u => u.user_id == id) as UserImpl).user_email)
+            const res = {
+                offer: new Offer(this, inc_offer_id_counter(), products.find(p => p.product_id == o.product_id) as ProductImpl, o.amount, o.price_per_unit, users.find(u => u.user_id == o.user_id) as UserImpl, o.isCounterOffer),
+                managers_not_accepted: not_accepted_by_emails.filter(email => this.shop_management.isManager(email)).map(m_email => this.shop_management.managers.find(m => m_email == m.user_email) as ManagerImpl),
+                owners_not_accepted: not_accepted_by_emails.filter(email => this.shop_management.isOwner(email)).map(o_email => this.shop_management.owners.concat([this.shop_management.original_owner]).find(o => o_email == o.user_email) as OwnerImpl)
+            }
+            res.offer.user.active_offers = res.offer.user.active_offers.concat([res.offer])
+            return res
+        })
+        return Promise.resolve()
     }
 }

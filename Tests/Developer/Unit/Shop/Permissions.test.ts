@@ -1,7 +1,9 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Action, ManagerPermissions} from "../../../../Logic/Domain/ShopPersonnel/Permissions";
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
 
+DBCommand.turnBlockDBON()
 describe('Permissions test', () => {
     it('Create default permissions', () => {
         const p = new ManagerPermissions()

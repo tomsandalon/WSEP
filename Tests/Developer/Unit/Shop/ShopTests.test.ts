@@ -6,7 +6,9 @@ import {ProductImpl} from "../../../../Logic/Domain/ProductHandling/Product";
 import {Filter_Type, Purchase_Type} from "../../../../Logic/Domain/Shop/ShopInventory";
 import {Action} from "../../../../Logic/Domain/ShopPersonnel/Permissions";
 import {SystemImpl} from "../../../../Logic/Domain/System";
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
 
+DBCommand.turnBlockDBON()
 
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor", Purchase_Type.Immediate);
@@ -95,11 +97,11 @@ describe('Test Shop', () => {
         let products = shop.getAllItems()
         let result = shop.filter(products, [{filter_type: Filter_Type.AbovePrice, filter_value: "999"}])
         expect(result.length).to.be.eq(2)
-        expect(result.some(r => r.price < 999)).to.be.false
+        expect(result.some(r => r.base_price < 999)).to.be.false
         products = shop.getAllItems()
         result = shop.filter(products, [{filter_type: Filter_Type.AbovePrice, filter_value: "999"}, {filter_type: Filter_Type.BelowPrice, filter_value: "1001"}])
         expect(result.length).to.be.eq(1)
-        expect(result.some(r => r.price != 1000)).to.be.false
+        expect(result.some(r => r.base_price != 1000)).to.be.false
     })
 
     it('Test add owner - requirement 4.3', () => {

@@ -19,7 +19,7 @@ export interface Product {
     description: string
     amount: number // >= 0
     category: Category[]
-    price: number // >= 0
+    base_price: number // >= 0
     purchase_type: Purchase_Type
     rating: Rating
 
@@ -123,6 +123,10 @@ export class ProductImpl implements Product {
         return this._amount;
     }
 
+    get base_price() {
+        return this._base_price;
+    }
+
     private _description: string;
 
     get description() {
@@ -151,8 +155,8 @@ export class ProductImpl implements Product {
         return this._rating;
     }
 
-    get price() {
-        return this._base_price;
+    set base_price(value: number) {
+        this._base_price = value;
     }
 
     get product_id() {
@@ -192,7 +196,7 @@ export class ProductImpl implements Product {
             p1.product_id == p2.product_id &&
             p1.amount == p2.amount &&
             p1.name == p2.name &&
-            p1.price == p2.price &&
+            p1.base_price == p2.base_price &&
             p1.purchase_type == p2.purchase_type &&
             p1.category.length == p2.category.length &&
             p1.category.every(c1 => p2.category.some(c2 => c1.name == c2.name)) &&

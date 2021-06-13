@@ -22,6 +22,7 @@ const config = [
     defs.purchase,
     defs.basket,
     defs.offer,
+    defs.offer_not_accepted_by,
     defs.rates,
     defs.available,
     defs.owns,
@@ -46,4 +47,5 @@ const config = [
     defs.discount_condition_type,
     defs.discount_conditional_type_of,
 ];
+exports.offer_not_accepted_by = defs.offer_not_accepted_by;
 exports.config = config;

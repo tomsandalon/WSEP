@@ -4,7 +4,7 @@ import {LoginImpl} from "./Users/Login";
 import {RegisterImpl} from "./Users/Register";
 import {Filter, id_counter, Item_Action, Purchase_Type} from "./Shop/ShopInventory";
 import {Action, ManagerPermissions, permission_to_numbers} from "./ShopPersonnel/Permissions";
-import {ProductImpl} from "./ProductHandling/Product";
+import {Product, ProductImpl} from "./ProductHandling/Product";
 // import {PurchaseType} from "./PurchaseProperties/PurchaseType";
 import {PurchaseImpl} from "./ProductHandling/Purchase";
 import {ConditionType, SimpleCondition} from "./Shop/PurchasePolicy/SimpleCondition";
@@ -46,7 +46,7 @@ import {
     RemovePurchaseTypeFromShop,
     UpdateItemInBasket,
     UpdatePermissions
-} from "../DataAccess/API";
+} from "./DBCommand";
 import {DiscountHandler} from "./Shop/DiscountPolicy/DiscountHandler";
 import {PublisherImpl} from "./Notifications/PublisherImpl";
 import {
@@ -377,6 +377,7 @@ export class SystemImpl implements System {
         await this.reloadItems();
         await this.reloadPurchases();
         this.reloadUsers(users);
+        await this.reloadOffers()
         await this.reloadNotifications();
         await this.reconnectAllConnections();
         console.log('\nSystem was rolled back!');
@@ -420,6 +421,14 @@ export class SystemImpl implements System {
             })))
     }
 
+    private static reloadOffersToShop(users: UserImpl[], products: Product[]): Promise<void[]> {
+        return GetShopsInventory().then(inventory =>
+            Promise.all(inventory.map(async i => {
+                const shop = SystemImpl.getInstance().shops.find(s => s.shop_id == i.shop_id) as ShopImpl;
+                return await shop.addOffersToShopFromDB(i.offers, users, products);
+            })))
+    }
+
     private static reloadNotifications(): Promise<void> {
         return GetNotifications().then(result => {
             PublisherImpl.getInstance().addNotificationsFromDB(result);
@@ -442,7 +451,7 @@ export class SystemImpl implements System {
     }
 
     private static reloadPurchases(): Promise<void> {
-        return GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases));
+        return GetPurchases().then(purchases => UserPurchaseHistoryImpl.getInstance().reloadPurchasesFromDB(purchases, SystemImpl.getInstance().shops));
     }
 
     private static terminateAllConnections() {
@@ -1327,6 +1336,10 @@ export class SystemImpl implements System {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") return user
         return user.purchaseOffer(offer_id, payment_info)
+    }
+
+    private static async reloadOffers() {
+        return await SystemImpl.reloadOffersToShop(LoginImpl.getInstance().existing_users, SystemImpl.getInstance().shops.flatMap(s => s.inventory.products))
     }
 
     counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {

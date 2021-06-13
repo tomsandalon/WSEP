@@ -85,7 +85,7 @@ export class ProductPurchaseImpl implements ProductPurchase {
     }
 
     public static create(product: Product, coupons: any[], amount: number, shop: ShopInventory, actual_price?: number): ProductPurchase | string {
-        const ret = ProductPurchaseImpl.createSupporterFunction(product, product.price, amount, 0)
+        const ret = ProductPurchaseImpl.createSupporterFunction(product, product.base_price, amount, 0)
         if (!actual_price) {
             const final_price = shop.calculatePrice([ret], {userId: -1, underaged: false});
             if (typeof final_price === "string") {

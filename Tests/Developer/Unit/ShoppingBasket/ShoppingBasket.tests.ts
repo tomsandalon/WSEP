@@ -13,10 +13,15 @@ import {NumericOperation} from "../../../../Logic/Domain/Shop/DiscountPolicy/Num
 import {Operator} from "../../../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
 import {offer_id_counter} from "../../../../Logic/Domain/ProductHandling/Offer";
 
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
+import {PaymentAndSupplyAdapter} from "../../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+
+DBCommand.turnBlockDBON()
+PaymentAndSupplyAdapter.TurnOnBlocking()
 
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");
-    if(typeof temp === "string"){
+    if (typeof temp === "string") {
         assert.fail("Failed to created product")
     }
     return temp
@@ -25,7 +30,7 @@ const createProduct = () => {
 const getNewItem = (shop: ShopInventory): number => shop.products.reduce((acc, product) => Math.max(product.product_id, acc), -1);
 
 describe('Buy product by policies', () => {
-    ProductImpl.resetIDs();
+    // ProductImpl.resetIDs();
     it('Buy product by conditional discount policy', async () => {
         const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
         const user: User = UserImpl.create();
@@ -34,7 +39,7 @@ describe('Buy product by policies', () => {
         shop.addConditionToDiscount("Tom@gmail.com", DiscountHandler.discountCounter - 1, Condition.Product_Name, "GTX")
         user.addToBasket(shop.inventory, getNewItem(shop.inventory), 10);
         await user.purchaseBasket(shop.shop_id, "1234-Israel-Israeli")
-        expect(user.getOrderHistory() as string[])[0].to.include(10 * 1000 * 0.5)
+        expect((user.getOrderHistory() as string[])[0]).to.include(10 * 1000 * 0.5)
     });
     it('Buy product by composite discount policy', async () => {
         const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
@@ -89,6 +94,7 @@ describe('Buy product by policies', () => {
         user.makeOffer(shop.inventory, getNewItem(shop.inventory), 1, 1000)
         shop.acceptOfferAsManagement("Tom@gmail.com", offer_id_counter - 1)
         await user.purchaseOffer(offer_id_counter - 1, "Some info")
+        const res = (user.getOrderHistory() as string[])[0]
         expect((user.getOrderHistory() as string[])[0]).to.include(1000)
     })
     it('Try to buy product by basic offer with denial', async () => {
@@ -109,7 +115,7 @@ describe('Buy product by policies', () => {
         user.makeOffer(shop.inventory, getNewItem(shop.inventory), 1, 1000)
         shop.counterOfferAsManagement("Tom@gmail.com", offer_id_counter - 1, 500)
         await user.purchaseOffer(offer_id_counter - 1, "Some info")
-        expect((user.getOrderHistory() as string[])[0]).to.not.include(500)
+        expect((user.getOrderHistory() as string[])[0]).to.include(500)
     })
 })
 describe("Purchase test", () => {

@@ -10,7 +10,9 @@ import {
     ProductNameEmpty
 } from "../../../../Logic/Domain/ProductHandling/ErrorMessages";
 import {CategoryImpl} from "../../../../Logic/Domain/ProductHandling/Category";
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
 
+DBCommand.turnBlockDBON()
 const createProduct = () => {
     const temp = ProductImpl.create(1000, "Best 29 inch Monitor", "LG monitor");
     if(typeof temp === "string"){
