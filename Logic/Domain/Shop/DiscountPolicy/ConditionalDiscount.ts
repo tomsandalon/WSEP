@@ -1,5 +1,3 @@
-import {CompositeDiscount} from "./CompositeDiscount";
-import {Product} from "../../ProductHandling/Product";
 import {Discount} from "./Discount";
 import {ProductPurchase} from "../../ProductHandling/ProductPurchase";
 import {DiscountHandler} from "./DiscountHandler";
@@ -17,11 +15,16 @@ export class ConditionalDiscount implements Discount {
     condition_param: string
     id: number
 
-    constructor(condition: Condition, discount: Discount, condition_param: string) {
-        this.id = DiscountHandler.discountCounter++;
+    constructor(id: number, condition: Condition, discount: Discount, condition_param: string) {
+        this.id = id;
         this.condition = condition;
         this.discount = discount;
         this.condition_param = condition_param;
+    }
+
+    static create(condition: Condition, discount: Discount, condition_param: string) {
+        let id = DiscountHandler.discountCounter++;
+        return new ConditionalDiscount(id, condition, discount, condition_param)
     }
 
     evaluate(product: ProductPurchase, amount: number): number {
@@ -43,6 +46,7 @@ export class ConditionalDiscount implements Discount {
         }
         return shouldApply ? this.discount.evaluate(product, amount) : 0
     }
+
     toString(): string {
         return JSON.stringify(this)
     }

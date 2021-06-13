@@ -1,14 +1,16 @@
-import {Publisher} from "./Publisher";
 import {PublisherImpl} from "./PublisherImpl";
 import {Notification} from "./Notification";
-import {Login, LoginImpl} from "../Users/Login";
-import {pool} from "async-parallel";
+import {LoginImpl} from "../Users/Login";
 import {logger} from "../Logger";
 
 export class NotificationAdapter {
-    notificationPool: Publisher
-    login: Login
+    // notificationPool: Publisher
+    // login: Login
     private static instance: NotificationAdapter
+
+    private constructor(reset?: boolean) {
+        // this.notificationPool = PublisherImpl.getInstance()
+    }
 
     static getInstance(reset?: boolean): NotificationAdapter {
         if (NotificationAdapter.instance == null || reset) {
@@ -17,17 +19,20 @@ export class NotificationAdapter {
         return NotificationAdapter.instance
     }
 
-    private constructor(reset?: boolean) {
-        this.login = LoginImpl.getInstance()
-        this.notificationPool = PublisherImpl.getInstance()
-    }
-
     notify(user_email: string, notification: string): void {
         const new_notification = new Notification(notification)
-        const user_id = this.login.getUserId(user_email);
+        const user_id = LoginImpl.getInstance().getUserId(user_email);
         if (user_id != undefined) {
-            this.notificationPool.notify(user_id, new_notification)
-        }
-        else logger.Error(`Failed to send message ${notification} to ${user_email}`)
+            PublisherImpl.getInstance().notify(user_id, new_notification)
+        } else logger.Error(`Failed to send message ${notification} to ${user_email}`)
+    }
+
+    notifyForUserId(user_id: number, notification: string): void {
+        const new_notification = new Notification(notification)
+        PublisherImpl.getInstance().notify(user_id, new_notification)
+    }
+
+    removeOfferNotificationsOfOffer(offer_id: number) {
+        return PublisherImpl.getInstance().removeNotificationsOfOffer(offer_id)
     }
 }

@@ -1,15 +1,34 @@
-import {System, TestNotAssociatedWithImplementation} from "./System";
+import {TestNotAssociatedWithImplementation} from "./System";
 import {AdapterSystem} from "./AdapterSystem";
 // import {PurchaseType} from "../../Logic/Domain/PurchaseProperties/PurchaseType";
 import {Action} from "../../Logic/Domain/ShopPersonnel/Permissions";
 import {Filter, Item_Action, Purchase_Type} from "../../Logic/Domain/Shop/ShopInventory";
-import {SearchTypes} from "../../Logic/Domain/System";
+import {SearchTypes, System} from "../../Logic/Domain/System";
+import {Condition} from "../../Logic/Domain/Shop/DiscountPolicy/ConditionalDiscount";
+import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicCompositionDiscount";
+import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
+import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
+import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
+import {ClearDB, ConnectToDB} from "../../Logic/Domain/DBCommand";
+import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 export class ProxySystem implements System{
     private readonly system: AdapterSystem | undefined
 
     constructor(system: AdapterSystem | undefined) {
         this.system = system;
+    }
+
+    init(): Promise<void> {
+        if(this.system == undefined){
+            return Promise.resolve(undefined);
+        }
+        return ConnectToDB()
+            .then(_ => ClearDB()
+                .then(() =>
+                    (this.system as System).init()
+                )
+            )
     }
 
     isAdmin(user_id: number): string | boolean {
@@ -186,28 +205,28 @@ export class ProxySystem implements System{
         return this.system.performRegister(user_email, password)
     }
 
-    purchaseCart(user_id: number, payment_info: string): string | boolean {
-        if(this.system == undefined){
+    async purchaseCart(user_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
-        return this.system.purchaseCart(user_id, payment_info)
+        return await this.system.purchaseCart(user_id, payment_info)
     }
 
-    purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string): string | boolean {
-        if(this.system == undefined){
+    async purchaseShoppingBasket(user_id: number, shop_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         //for payment service mock
-        if(payment_info.includes('MOCK')) {
-            if (payment_info.includes('CRASH'))
-                return "Payment service has been crashed";
-            if (payment_info.includes('FAIL'))
-                return false;
-            return true;
-        }
+        // if (payment_info.includes('MOCK')) {
+        //     if (payment_info.includes('CRASH'))
+        //         return "Payment service has been crashed";
+        //     if (payment_info.includes('FAIL'))
+        //         return false;
+        //     return true;
+        // }
         //end mock
 
-        return this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
+        return await this.system.purchaseShoppingBasket(user_id, shop_id, payment_info)
     }
 
     removeProduct(user_id: number, shop_id: number, product_id: number): boolean | string {
@@ -252,17 +271,7 @@ export class ProxySystem implements System{
         return this.system.removeManager(user_id, shop_id, target);
     }
 
-    //mock
-    spellCheck(input : string ): string | string[]{
-        if (input.includes('CRASH'))
-            return "spell checker service has been crashed";
-        else if (input.includes('FAEEEL'))
-            return ['404'];
-        else if (input.includes('FAIEL')){
-            return ['FAIL'];
-        }
-        return 'panic: spell checker';
-    }
+
 
     getAllCategories(user_id: number): string | string[] {
         if(this.system == undefined){
@@ -297,5 +306,214 @@ export class ProxySystem implements System{
             return TestNotAssociatedWithImplementation
         }
         return this.system.isLoggedIn(user_id)
+    }
+
+    addConditionToDiscount(user_id: number, shop_id: number, id: number, condition: Condition, condition_param: string): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addConditionToDiscount(user_id, shop_id, id, condition, condition_param)
+    }
+
+    addDiscount(user_id: number, shop_id: number, value: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addDiscount(user_id, shop_id, value)
+    }
+
+    addLogicComposeDiscount(user_id: number, shop_id: number, operation: LogicComposition, d_id1: number, d_id2: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addLogicComposeDiscount(user_id, shop_id, operation, d_id1, d_id2)
+    }
+
+    addNumericComposeDiscount(user_id: number, shop_id: number, operation: NumericOperation, d_id1: number, d_id2: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addNumericComposeDiscount(user_id, shop_id, operation, d_id1, d_id2)
+    }
+
+    addPurchasePolicy(user_id: number, shop_id: number, condition: ConditionType, value: string): string[] | string {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addPurchasePolicy(user_id, shop_id, condition, value)
+    }
+
+    composePurchasePolicy(user_id: number, shop_id: number, policy_id1: number, policy_id2: number, operator: Operator): boolean | string {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.composePurchasePolicy(user_id, shop_id, policy_id1, policy_id2, operator)
+    }
+
+    getAllDiscounts(user_id: number, shop_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllDiscounts(user_id, shop_id)
+    }
+
+    getAllPurchasePolicies(user_id: number, shop_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllPurchasePolicies(user_id, shop_id)
+    }
+
+    getAllShops(user_id: number): string | string[] {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllShops(user_id)
+    }
+
+    rateProduct(user_id: number, shop_id: number, product_id: number, rating: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.rateProduct(user_id, shop_id, product_id, rating)
+    }
+
+    removeDiscount(user_id: number, shop_id: number, id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removeDiscount(user_id, shop_id, id)
+    }
+
+    removeOwner(user_id: number, shop_id: number, target: string): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removeOwner(user_id, shop_id, target)
+    }
+
+    removePermission(user_id: number, shop_id: number, target_email: string, action: Action): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removePermission(user_id, shop_id, target_email, action)
+    }
+
+    removePurchasePolicy(user_id: number, shop_id: number, policy_id: number): string | boolean {
+        if(this.system == undefined){
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removePurchasePolicy(user_id, shop_id, policy_id)
+    }
+
+    getUserEmailFromUserId(user_id: number): string | string[] {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getUserEmailFromUserId(user_id)
+    }
+
+    //mock
+    spellCheck(input : string ): string | string[]{
+        if (input.includes('CRASH'))
+            return "spell checker service has been crashed";
+        else if (input.includes('FAEEEL'))
+            return ['404'];
+        else if (input.includes('FAIEL')){
+            return ['FAIL'];
+        }
+        return 'panic: spell checker';
+    }
+
+    //mock
+    deliverItem(product_id: number, amount: number, shop_id: number, to: string, transaction_id: boolean | string): boolean {
+        if (product_id < 0 || amount < 0 || shop_id < 0 || to.includes("Drop table") || (typeof transaction_id == 'string'))
+            return false;
+        else
+            return true;
+    }
+
+    acceptOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.acceptOfferAsManagement(user_id, shop_id, offer_id)
+    }
+
+    addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.addPurchaseType(user_id, shop_id, purchase_type)
+    }
+
+    counterOfferAsManager(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.counterOfferAsManager(user_id, shop_id, offer_id, new_price_per_unit)
+    }
+
+    denyCounterOfferAsUser(user_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.denyCounterOfferAsUser(user_id, offer_id)
+    }
+
+    denyOfferAsManagement(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.denyOfferAsManagement(user_id, shop_id, offer_id)
+    }
+
+    getActiveOfferForShop(user_id: number, shop_id: number): string | string[] {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getActiveOfferForShop(user_id, shop_id)
+    }
+
+    getActiveOffersAsUser(user_id: number): string | string[] {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getActiveOffersAsUser(user_id)
+    }
+
+    makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.makeOffer(user_id, shop_id, product_id, amount, price_per_unit)
+    }
+
+    offerIsPurchasable(user_id: number, shop_id: number, offer_id: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.offerIsPurchasable(user_id, shop_id, offer_id)
+    }
+
+    purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        if (this.system == undefined) {
+            return Promise.resolve(TestNotAssociatedWithImplementation)
+        }
+        return this.system.purchaseOffer(user_id, offer_id, payment_info)
+    }
+
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type) {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.removePurchaseType(user_id, shop_id, purchase_type)
+    }
+
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
     }
 }

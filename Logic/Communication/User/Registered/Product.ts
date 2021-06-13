@@ -5,7 +5,7 @@ import {
     OK,
     rate,
     ServerNotFound,
-    service,
+    service, ServiceUnavailable,
     Session,
     sid
 } from "../../Config/Config";
@@ -21,6 +21,11 @@ router.delete('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.removeProduct(user_id, request.body.shop_id, request.body.product_id);
@@ -41,6 +46,11 @@ router.put('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.editProduct(
@@ -68,6 +78,11 @@ router.put(rate, (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.rateProduct(
         user_id,
@@ -92,6 +107,11 @@ router.post('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.addProduct(

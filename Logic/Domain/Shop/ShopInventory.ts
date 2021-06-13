@@ -15,8 +15,22 @@ import {CompositeCondition, Operator} from "./PurchasePolicy/CompositeCondition"
 import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
+import {GetPurchaseConditions, OfferDTO, ShopRich} from "../../DataAccess/Getters";
+import {SimpleCondition} from "./PurchasePolicy/SimpleCondition";
+import {Offer, set_offer_id_counter} from "../ProductHandling/Offer";
+import {Manager, ManagerImpl} from "../ShopPersonnel/Manager";
+import {Owner, OwnerImpl} from "../ShopPersonnel/Owner";
+import {NotificationAdapter} from "../Notifications/NotificationAdapter";
+import {User, UserImpl} from "../Users/User";
 
 export type Filter = { filter_type: Filter_Type; filter_value: string }
+
+export type OfferAcceptance = {
+    offer: Offer,
+    managers_not_accepted: Manager[],
+    owners_not_accepted: Owner[]
+}
+
 export enum Filter_Type {
     BelowPrice,
     AbovePrice,
@@ -36,6 +50,7 @@ export enum Item_Action {
 
 export enum Purchase_Type {
     Immediate,
+    Offer,
 }
 
 export interface ShopInventory {
@@ -51,6 +66,7 @@ export interface ShopInventory {
     purchase_types: Purchase_Type[]
     purchase_history: UserPurchaseHistory
     bank_info: string
+    active_offers: OfferAcceptance[]
 
     /**
      * @Requirement 2.5
@@ -97,7 +113,7 @@ export interface ShopInventory {
      * @param item_id product id of the item
      * @return true iff the removal was successful
      */
-    removeItem(item_id: number): boolean
+    removeItem(item_id: number): boolean | string
 
     /**
      * @Requirement 4.11
@@ -130,11 +146,7 @@ export interface ShopInventory {
     editItem(product_id: number, action: Item_Action, value: string): string | boolean;
 
     /**
-     * @param order the order to log in the shop order history
-     */
-    logOrder(order: Purchase): void
-
-    /**
+     *
      * @param discount the discount to add
      */
     addDiscount(discount: Discount): void
@@ -168,41 +180,71 @@ export interface ShopInventory {
     alreadyRated(product_id: number, user_email: string): Boolean;
 
     hasPurchased(user_id: number, product_id: number): Boolean;
+
+    addInventoryFromDB(inventory: ShopRich): Promise<void>;
+
+    addPurchaseType(purchase_type: Purchase_Type): string | boolean;
+
+    addOffer(param: Offer): string | boolean;
+
+    getActiveOffers(): string[];
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
+
+    addManagementToExistingOffers(appointee_email: string): void;
+
+    addOffersToShopFromDB(offers: OfferDTO[], users: User[], products: Product[]): Promise<void>;
+
+    removePurchaseType(purchase_type: Purchase_Type): boolean | string;
 }
 
+export let id_counter: number = 0;
+export const generateId = () => id_counter++;
+
 export class ShopInventoryImpl implements ShopInventory {
+    active_offers: OfferAcceptance[]
     private readonly _discount_policies: DiscountHandler;
-    private _purchase_policies: PurchaseCondition[];
-
-    private readonly _purchase_types: Purchase_Type[]
-
-
     private readonly _shop_id: number;
     private readonly _bank_info: string;
-    private _purchase_history: UserPurchaseHistory;
-    get discount_policies(): DiscountHandler {
-        return this._discount_policies;
-    }
-    get purchase_policies(): PurchaseCondition[] {
-        return this._purchase_policies;
-    }
-    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string) {
+    private readonly _shop_name: string;
+
+    constructor(shop_id: number, shop_management: ShopManagement, shop_name: string, bank_info: string, purchase_type: Purchase_Type[], active_offers: OfferAcceptance[]) {
         this._shop_id = shop_id;
         this._shop_management = shop_management;
-        this._purchase_types = [Purchase_Type.Immediate];
+        this._purchase_types = purchase_type ? purchase_type : [Purchase_Type.Immediate];
         this._products = [];
         this._bank_info = bank_info;
         this._shop_name = shop_name;
         this._purchase_history = UserPurchaseHistoryImpl.getInstance();
         this._discount_policies = new DiscountHandler();
         this._purchase_policies = Array<PurchaseCondition>();
+        this.active_offers = active_offers
     }
 
+    private _purchase_policies: PurchaseCondition[];
 
-    private readonly _shop_name: string;
+    get purchase_policies(): PurchaseCondition[] {
+        return this._purchase_policies;
+    }
+
+    private _purchase_types: Purchase_Type[]
+
+    get purchase_types(): Purchase_Type[] {
+        return this._purchase_types;
+    }
+
+    private _purchase_history: UserPurchaseHistory;
 
     get purchase_history(): UserPurchaseHistory {
         return this._purchase_history;
+    }
+
+    get discount_policies(): DiscountHandler {
+        return this._discount_policies;
     }
 
     get shop_name(): string {
@@ -225,10 +267,6 @@ export class ShopInventoryImpl implements ShopInventory {
         this._shop_management = value;
     }
 
-    get purchase_types(): Purchase_Type[] {
-        return this._purchase_types;
-    }
-
     get shop_id(): number {
         return this._shop_id;
     }
@@ -237,7 +275,46 @@ export class ShopInventoryImpl implements ShopInventory {
         return this._bank_info
     }
 
+    static shopsAreEqual(inv1: ShopInventory, inv2: ShopInventory) {
+        return inv1.shop_id == inv2.shop_id &&
+            inv1.shop_name == inv2.shop_name &&
+            inv1.bank_info == inv2.bank_info &&
+            DiscountHandler.discountsAreEqual(inv1.discount_policies, inv2.discount_policies) &&
+            ShopInventoryImpl.purchaseTypesAreEqual(inv1.purchase_types, inv2.purchase_types) &&
+            ShopInventoryImpl.purchasePoliciesAreEqual(inv1.purchase_policies, inv2.purchase_policies) &&
+            ProductImpl.productsAreEqual(inv1.products, inv2.products);
+    }
+
+    private static createPurchasePoliciesFromDB(purchase_condition: number): Promise<PurchaseCondition> {
+        if (id_counter + 1 <= purchase_condition) id_counter = purchase_condition + 1
+        return GetPurchaseConditions(purchase_condition).then(result =>
+            (result.left && result.right) ? this.createPurchasePoliciesFromDB(result.left.id).then(left => this.createPurchasePoliciesFromDB(result.right.id).then(right =>
+                    new CompositeCondition(purchase_condition, [left, right], result.operator as number))) :
+                new SimpleCondition(purchase_condition, result.type as number, result.value))
+    }
+
+    private static purchaseTypesAreEqual(p1: Purchase_Type[], p2: Purchase_Type[]) {
+        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => p1 == p2))
+    }
+
+    private static purchasePoliciesAreEqual(p1: PurchaseCondition[], p2: PurchaseCondition[]) {
+        return p1.length == p2.length && p1.every(p1 => p2.some(p2 => ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1, p2)));
+    }
+
+    private static twoPurchasePoliciesAreEqual(p1: PurchaseCondition, p2: PurchaseCondition): boolean {
+        if (p1.id != p2.id) return false
+        if (p1 instanceof SimpleCondition && p2 instanceof SimpleCondition)
+            return p1.condition == p2.condition && p1.value == p2.value
+        if (p1 instanceof CompositeCondition && p2 instanceof CompositeCondition)
+            return p1.action == p2.action && ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[0], p2.conditions[0]) &&
+                ShopInventoryImpl.twoPurchasePoliciesAreEqual(p1.conditions[1], p2.conditions[1])
+        return false
+    }
+
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
+        if (purchase_type == undefined && !this.purchase_types.includes(Purchase_Type.Immediate) ||
+            purchase_type != undefined && !this.purchase_types.includes(purchase_type))
+            return "Purchase type is not allowed in the shop"
         const item: Product | string = ProductImpl.create(base_price, description, name, purchase_type);
         if (typeof item === "string") {
             return item
@@ -256,7 +333,6 @@ export class ShopInventoryImpl implements ShopInventory {
             logger.Error(result)
             return result
         }
-        // item.addDiscountType(discount_type) //TODO
         this._products = this._products.concat([item]);
         return true;
     }
@@ -264,12 +340,12 @@ export class ShopInventoryImpl implements ShopInventory {
     filter(products: Product[], filters: Filter[]): Product[] {
         if (filters.length == 0) return products
         const passed_filter = (f: Filter) => (product: Product) => {
-            return (f.filter_type == Filter_Type.AbovePrice) ? product.price >= Number(f.filter_value) :
-                (f.filter_type == Filter_Type.BelowPrice) ? product.price <= Number(f.filter_value) :
+            return (f.filter_type == Filter_Type.AbovePrice) ? product.base_price >= Number(f.filter_value) :
+                (f.filter_type == Filter_Type.BelowPrice) ? product.base_price <= Number(f.filter_value) :
                     (f.filter_type == Filter_Type.Rating) ? product.rating.get_rating() == Number(f.filter_value) :
-                    (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
-                        //can add more
-                        false;
+                        (f.filter_type == Filter_Type.Category) ? product.category.some(c => c.name == f.filter_value) :
+                            //can add more
+                            false;
         }
         return (filters.length == 0) ? products :
             this.filter(products.filter(passed_filter(filters[0])), filters.slice(1));
@@ -288,15 +364,6 @@ export class ShopInventoryImpl implements ShopInventory {
         return result.map(p => p.toString());
     }
 
-    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
-        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
-        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
-            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
-            return `Purchase policy doesn't allow this purchase`
-        }
-        return true
-    }
-
     purchaseItems(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
         let result = this.evaluatePurchaseItem(products, minimal_user_data)
         if (typeof result == "string") return result
@@ -305,12 +372,10 @@ export class ShopInventoryImpl implements ShopInventory {
             if (typeof product == "string") {
                 logger.Error(`Failed to purchase as ${p.product_id} was not found`)
                 result = `Product ${p.product_id} was not found`
-            }
-            else if (product.amount < 1) {
+            } else if (product.amount < 1) {
                 logger.Error(`Failed to purchase as ${p.product_id} has an amount lower than 1`)
                 result = `Product ${p.product_id} has an amount lower than 1`
-            }
-            else if (product.amount < p.amount) {
+            } else if (product.amount < p.amount) {
                 logger.Error(`Failed to purchase as ${p.product_id} has ${product.amount} units but requires ${p.amount}`)
                 result = `Product ${p.product_id} doesn't have enough in stock for this purchase`
             }
@@ -325,8 +390,11 @@ export class ShopInventoryImpl implements ShopInventory {
         return result
     }
 
-    removeItem(item_id: number): boolean {
-        if (!this._products.some(p => p.product_id == item_id)) return false;
+    removeItem(item_id: number): boolean | string {
+        const p = this.products.find(p => p.product_id == item_id)
+        if (p == undefined) return false;
+        if (p.purchase_type == Purchase_Type.Offer && this.active_offers.some(o => o.offer.product.product_id == item_id))
+            return `${p.name} has an active offer and cannot be deleted`
         this._products = this._products.filter(p => p.product_id != item_id);
         return true;
     }
@@ -378,7 +446,7 @@ export class ShopInventoryImpl implements ShopInventory {
         })
     }
 
-    displayItems(): string{
+    displayItems(): string {
         return JSON.stringify(
             this.products.filter(p => p.amount > 0).map(p => p.toString()),
         )
@@ -393,28 +461,9 @@ export class ShopInventoryImpl implements ShopInventory {
             shop_name: this.shop_name,
             purchase_history: this._purchase_history.toString(),
             discount_policies: this.discount_policies,
-            purchase_policies: this.purchase_policies
+            purchase_policies: this.purchase_policies,
+            active_offers: this.active_offers
         })
-        // this._shop_id = shop_id;
-        // this._shop_management = shop_management;
-        // this._discount_types = [];
-        // this._purchase_types = [Purchase_Type.Immediate];
-        // this._products = [];
-        // this._bank_info = bank_info;
-        // this._shop_name = shop_name;
-        // this._purchase_history = UserPurchaseHistoryImpl.getInstance();
-        // this._discount_policies = new DiscountHandler();
-        // this._purchase_policies = Array<PurchaseCondition>();
-        //
-        // return JSON.stringify(this.products.filter(p => p.amount > 0).map(p => p.toString()))
-        // return this.products.reduce(function(acc, cur) {
-        //     return acc.concat(cur.amount != 0 ? cur.toString().concat("\n") : "")}, "")
-    }
-
-    logOrder(order: Purchase): void {
-        //still maintained in order to support further logic expansion.
-        //for now, it shall stay unimplemented
-        return
     }
 
     calculatePrice(products: ReadonlyArray<ProductPurchase>, user_data: MinimalUserData): number {
@@ -454,53 +503,6 @@ export class ShopInventoryImpl implements ShopInventory {
         return length != this._purchase_policies.length
     }
 
-    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
-        if (this._purchase_policies.every(p => p.id != id1) ||
-            this._purchase_policies.every(p => p.id != id2)) {
-            logger.Error(`Policies not found`)
-            return "Policies not found"
-        }
-        const new_policy = new CompositeCondition([
-            this._purchase_policies.find(p => p.id == id1) as PurchaseCondition,
-            this._purchase_policies.find(p => p.id == id2) as PurchaseCondition
-        ], operator)
-        this._purchase_policies = this._purchase_policies.filter(p => p.id == id1 || p.id == id2)
-        this._purchase_policies = this._purchase_policies.concat([new_policy])
-        return true
-    }
-
-    //temp
-
-    // public addDiscountType(discountType: DiscountType): string | boolean{
-    //     if (this._discount_types.indexOf(discountType) < 0) {
-    //         return DiscountExists
-    //     }
-    //     this._discount_types.push(discountType);
-    //     return true;
-    // }
-    // public removeDiscountType(discountType: DiscountType): string | boolean{
-    //     if (this._discount_types.indexOf(discountType) < 0){
-    //         return DiscountNotExists
-    //     }
-    //     this._discount_types.splice(this._discount_types.indexOf(discountType), 1);
-    //     return true;
-    // }
-    //
-    // /**
-    //  * @Requirement - 4.1 and Quality assurance No. 5b
-    //  * @param discountType
-    //  * @return true iff this.discount_types.contains(discountType)
-    //  * @return DiscountNotExists otherwise
-    //  */
-    // removeDiscountType(discountType: DiscountType): string | boolean
-    //
-    //
-    // /**
-    //  * @Requirement - Quality assurance No. 5b
-    //  * @param discountType
-    //  */
-    // addDiscountType(discountType: DiscountType): string | boolean
-
     addConditionToDiscount(discount_id: number, condition: Condition, condition_param: string) {
         const result = this.discount_policies.addConditionToDiscount(discount_id, condition, condition_param)
         if (!result) {
@@ -529,11 +531,13 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     notifyOwners(order: Purchase): void {
-        this._shop_management.notifyOwners(`New successful order:\n` +
-        `Order number: ${order.order_id}\n` +
-        `Items: ${order.products.reduce(
-            (acc, cur) => acc + "\n" + cur.name, ""
-        )}`)
+        const message = `New successful order:\n` +
+            `Order number: ${order.order_id}\n` +
+            `Items: ${order.products.reduce(
+                (acc, cur) => acc + "\n" + cur.name, ""
+            )}`
+        this._shop_management.notifyOwners(message)
+        NotificationAdapter.getInstance().notifyForUserId(order.minimal_user_data.userId, message)
     }
 
     rateProduct(product_id: number, rating: number, rater: string): void {
@@ -551,5 +555,161 @@ export class ShopInventoryImpl implements ShopInventory {
     hasPurchased(user_id: number, product_id: number): Boolean {
         return (this.purchase_history.getShopPurchases(this.shop_id) as Purchase[]).some(
             purchase => purchase.products.some(product => product.product_id == product_id) && purchase.minimal_user_data.userId == user_id)
+    }
+
+    //export type ShopRich = {shop_id: number, products: any[], purchase_conditions: any[], discounts: any[], purchase_types: any[]};
+    async addInventoryFromDB(inventory: ShopRich): Promise<void> {
+        this._products = inventory.products.map(p => ProductImpl.createFromDB(p))
+        this._purchase_types = inventory.purchase_types && inventory.purchase_types.length > 0 ? inventory.purchase_types : [Purchase_Type.Immediate]
+        await this.discount_policies.addDiscountsFromDB(inventory.discounts)
+        this._purchase_policies = await Promise.all(
+            inventory.purchase_conditions.map(condition => ShopInventoryImpl.createPurchasePoliciesFromDB(condition))
+        )
+    }
+
+    composePurchasePolicies(id1: number, id2: number, operator: Operator): boolean | string {
+        if (this._purchase_policies.every(p => p.id != id1) ||
+            this._purchase_policies.every(p => p.id != id2)) {
+            logger.Error(`Policies not found`)
+            return "Policies not found"
+        }
+        const new_policy = CompositeCondition.create([
+            this._purchase_policies.find(p => p.id == id1) as PurchaseCondition,
+            this._purchase_policies.find(p => p.id == id2) as PurchaseCondition
+        ], operator)
+        this._purchase_policies = this._purchase_policies.filter(p => p.id != id1 && p.id != id2)
+        this._purchase_policies = this._purchase_policies.concat([new_policy])
+        return true
+    }
+
+    addPurchaseType(purchase_type: Purchase_Type) {
+        if (this._purchase_types.includes(purchase_type)) return "Purchase type already exists"
+        this._purchase_types = this.purchase_types.concat(purchase_type)
+        return true
+    }
+
+    addOffer(offer: Offer): string | boolean {
+        this.active_offers = this.active_offers.concat([{
+            offer: offer,
+            managers_not_accepted: this.shop_management.managers,
+            owners_not_accepted: this.shop_management.owners.concat([this.shop_management.original_owner]),
+        }])
+        return this.shop_management.notifyForOffer(`Offer request id ${offer.id}: a new offer for product ${offer.product.name}`)
+    }
+
+    getActiveOffers(): string[] {
+        return this.active_offers.map(offer => {
+            return JSON.stringify({
+                offer: JSON.parse(offer.offer.toString()),
+                managers_not_responded: offer.managers_not_accepted,
+                owners_not_responded: offer.owners_not_accepted
+            })
+        });
+    }
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        const offer = this.active_offers.find(offer => offer.offer.id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        if (!offer.managers_not_accepted.map(m => m.user_email)
+            .concat(offer.owners_not_accepted.map(o => o.user_email))
+            .includes(user_email)) return `${user_email} already accepted this offer`
+        offer.owners_not_accepted = offer.owners_not_accepted.filter(o => o.user_email != user_email)
+        offer.managers_not_accepted = offer.managers_not_accepted.filter(m => m.user_email != user_email)
+        if (offer.managers_not_accepted.length + offer.owners_not_accepted.length == 0)
+            NotificationAdapter.getInstance().notify(offer.offer.user.user_email, `Offer ${offer_id} is accepted, you can now purchase the item`)
+        return true
+    }
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        const offer = this.active_offers.find(offer => offer.offer.id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        offer.offer.denied()
+        NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
+        NotificationAdapter.getInstance().notify(offer.offer.user.user_email, `${user_email} denied your offer id ${offer_id}`)
+        return true
+    }
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean {
+        const offer = this.active_offers.find(offer => offer.offer.id == offer_id)
+        if (new_price_per_unit < 0) return "Cannot offer a negative price"
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        if (!offer.managers_not_accepted.map(m => m.user_email)
+            .concat(offer.owners_not_accepted.map(o => o.user_email))
+            .includes(user_email)) return `${user_email} already accepted this offer`
+        offer.managers_not_accepted = this.shop_management.managers.filter(m => m.user_email != user_email)
+        offer.owners_not_accepted = this.shop_management.owners.concat([this.shop_management.original_owner]).filter(o => o.user_email != user_email)
+        offer.managers_not_accepted.map(m => m.user_email).concat(offer.owners_not_accepted.map(o => o.user_email))
+            .forEach(email => NotificationAdapter.getInstance().notify(email, `Offer request id ${offer_id}: new offer to accept from ${user_email}`))
+        offer.offer.price_per_unit = new_price_per_unit
+        offer.offer.assignAsCounterOffer()
+        NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
+        return true
+    }
+
+    addManagementToExistingOffers(appointee_email: string): void {
+        const isOwner = this.shop_management.isOwner(appointee_email)
+        const isManager = !isOwner
+        this.active_offers = this.active_offers.map(o => {
+            return {
+                offer: o.offer,
+                managers_not_accepted: isManager ?
+                    o.managers_not_accepted.concat([this.shop_management.managers.find(m => m.user_email == appointee_email) as Manager]) :
+                    o.managers_not_accepted.filter(m => m.user_email != appointee_email),
+                owners_not_accepted: isOwner ?
+                    o.owners_not_accepted :
+                    o.owners_not_accepted.concat([this.shop_management.owners.concat([this.shop_management.original_owner]).find(o => o.user_email == appointee_email) as Owner])
+            }
+        })
+
+    }
+
+    private evaluatePurchaseItem(products: ReadonlyArray<ProductPurchase>, minimal_user_data: MinimalUserData): string | boolean {
+        const purchase_data: PurchaseEvalData = {basket: products, underaged: minimal_user_data.underaged}
+        if (!this._purchase_policies.every(policy => policy.evaluate(purchase_data))) {
+            logger.Error(`Failed to purchase as the purchase policy doesn't permit it`)
+            return `Purchase policy doesn't allow this purchase`
+        }
+        return true
+    }
+
+    static same_offers(inventory1: ShopInventory, inventory2: ShopInventory) {
+        const amount = inventory1.active_offers.length == inventory2.active_offers.length
+        const offers = inventory1.active_offers.every(o1 => inventory2.active_offers.some(o2 => Offer.equals(o1.offer, o2.offer)))
+        const managers = inventory1.active_offers.every(o1 => inventory2.active_offers.some(o2 => Offer.equals(o1.offer, o2.offer) &&
+            o1.managers_not_accepted.every(m1 => o2.managers_not_accepted.some(m2 => m1.user_email == m2.user_email))
+        ))
+        const owners = inventory1.active_offers.every(o1 => inventory2.active_offers.some(o2 => Offer.equals(o1.offer, o2.offer) &&
+            o1.owners_not_accepted.every(m1 => o2.owners_not_accepted.some(m2 => m1.user_email == m2.user_email))
+        ))
+        return amount && offers && managers && owners
+    }
+
+    addOffersToShopFromDB(offers: OfferDTO[], users: User[], products: Product[]): Promise<void> {
+        set_offer_id_counter(offers.reduce((acc, cur) => Math.max(acc, cur.offer_id), -1) + 1)
+        this.active_offers = offers.map(o => {
+            const not_accepted_by_emails = o.not_accepted_by.map(id => (users.find(u => u.user_id == id) as UserImpl).user_email)
+            const res = {
+                offer: new Offer(this, o.offer_id, products.find(p => p.product_id == o.product_id) as ProductImpl, o.amount, o.price_per_unit, users.find(u => u.user_id == o.user_id) as UserImpl, o.isCounterOffer),
+                managers_not_accepted: not_accepted_by_emails.filter(email => this.shop_management.isManager(email)).map(m_email => this.shop_management.managers.find(m => m_email == m.user_email) as ManagerImpl),
+                owners_not_accepted: not_accepted_by_emails.filter(email => this.shop_management.isOwner(email)).map(o_email => this.shop_management.owners.concat([this.shop_management.original_owner]).find(o => o_email == o.user_email) as OwnerImpl)
+            }
+            res.offer.user.active_offers = res.offer.user.active_offers.concat([res.offer])
+            return res
+        })
+        return Promise.resolve()
+    }
+
+    removePurchaseType(purchase_type: Purchase_Type): boolean | string {
+        if (!this.purchase_types.includes(purchase_type)) {
+            return `This purchase type doesn't exist in the shop`
+        }
+        if (purchase_type == Purchase_Type.Immediate) {
+            return `Cannot remove purchase type 'Immediate'`
+        }
+        if (purchase_type == Purchase_Type.Offer && this.active_offers.length > 0) {
+            return `Cannot remove purchase type 'Offer' because there are active offers`
+        }
+        this._purchase_types = this.purchase_types.filter(p => p != purchase_type)
+        return true
     }
 }

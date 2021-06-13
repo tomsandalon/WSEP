@@ -1,4 +1,4 @@
-import {BadRequest, hour, OK, ServerNotFound, service, Session, sid} from "../../Config/Config";
+import {BadRequest, hour, OK, ServerNotFound, service, ServiceUnavailable, Session, sid} from "../../Config/Config";
 
 const express = require('express');
 const router = express.Router();
@@ -10,6 +10,11 @@ router.post('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.logout(user_id);

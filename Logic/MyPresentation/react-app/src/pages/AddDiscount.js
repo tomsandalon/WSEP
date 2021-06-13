@@ -1,98 +1,79 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { Card, Button } from "react-bootstrap";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
+import postFetch from "../postFetch.js";
 import { useHistory, useParams } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
-import postFetch from "../postFetch.js";
 import { Alert } from "reactstrap";
 
-const AddDiscount = () => {
-  const { storeID, storeName } = useParams();
-  const [name, setName] = useState();
-  const [amount, setAmount] = useState();
-  const [description, setDescription] = useState();
-  const [categories, setCategories] = useState();
-  const [price, setPrice] = useState();
-  const [isPending, setIsPending] = useState(false);
+const AddDiscount = (props) => {
+  const [condition, setCondition] = useState();
+  const [value, setValue] = useState();
   const [error, setError] = useState("");
+  const [errorColor, setErrorColor] = useState("success");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
+  const { storeID, storeName } = useParams();
 
-  const onDismiss = () => setVisible(false);
-  const success = () => {
-    setError("Product Added Successfully");
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  const submit = (e) => {
+    e.preventDefault();
+    postFetch(
+      "/user/shop/discount",
+      { shop_id: storeID, value: value, request: 1 },
+      thenFunc
+    );
+  };
+  const success = async () => {
+    setErrorColor("success");
+    setError("Discount added successfully");
     setVisible(true);
-    setIsPending(false);
+    await sleep(2000);
     history.push(`/managersStore/${storeID}/${storeName}`);
   };
   const failure401 = (err_message) => {
+    setErrorColor("warning");
     setError(err_message);
     setVisible(true);
-    setIsPending(false);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newProduct = {
-      shop_id: storeID,
-      name: name,
-      description: description,
-      amount: amount,
-      categories: categories.split(" "),
-      base_price: price,
-    };
-    setIsPending(true);
-    postFetch("/user/shop/product", newProduct, thenFunc);
   };
   const thenFunc = async (response) => {
-    setIsPending(false);
     serverResponse(response, success, failure401);
   };
+  const onDismiss = () => setVisible(false);
   return (
-    <div className="add-manager">
-      {<h2> Add Product to {storeName}</h2>}
-      <form onSubmit={handleSubmit}>
-        <label>Product name: </label>
-        <input
-          type="text"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <label>Amount: </label>
-        <input
-          type="text"
-          required
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <label>Description: </label>
-        <input
-          type="text"
-          required
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <label>Categories: </label>
-        <input
-          type="text"
-          required
-          value={categories}
-          onChange={(e) => setCategories(e.target.value)}
-        />
-        <label>Price: </label>
-        <input
-          type="text"
-          required
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-        {!isPending && <input type="submit" value="Add Product" />}
-        {isPending && <button diabled>Adding product...</button>}
-      </form>
-      <Alert color="danger" isOpen={visible} toggle={onDismiss}>
-        {error}
-      </Alert>
-    </div>
+    <Card className="add-manager">
+      <Card.Body className="d-flex flex-column">
+        <div className="d-flex mb-2 justify-content-between">
+          <Card.Title className="mb-0 font-weight-bold">Add Discount</Card.Title>
+        </div>
+        <Card.Text className="text-secondary">
+          Add a new discount
+        </Card.Text>
+        <form onSubmit={submit}>
+          <label>value: </label>
+          <input
+            type="text"
+            required
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+          {<input type="submit" value="Add Discount" />}
+        </form>
+        <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
+          {error}
+        </Alert>
+        {/* <Button
+          onClick={() => submit()}
+          className="mt-auto font-weight-bold"
+          block
+        >
+          Add Policy
+        </Button> */}
+      </Card.Body>
+    </Card>
   );
 };
-
 export default AddDiscount;

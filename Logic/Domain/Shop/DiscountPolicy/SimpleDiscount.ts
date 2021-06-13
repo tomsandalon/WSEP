@@ -5,17 +5,20 @@ import {DiscountHandler} from "./DiscountHandler";
 
 export class SimpleDiscount implements Discount {
     value: number
+    id: number;
 
-    constructor(value: number) {
-        this.id = DiscountHandler.discountCounter++;
+    constructor(id: number, value: number) {
+        this.id = id;
         this.value = value;
+    }
+
+    static create(value: number) {
+        return new SimpleDiscount(DiscountHandler.discountCounter++, value)
     }
 
     evaluate(product: Product | ProductPurchase, amount: number): number {
         return this.value;
     }
-
-    id: number;
 
     toString(): string {
         return JSON.stringify(this)

@@ -3,7 +3,7 @@ import {ShopManagement, ShopManagementImpl} from "./ShopManagement";
 import {Product} from "../ProductHandling/Product";
 // import {PurchaseType} from "../PurchaseProperties/PurchaseType";
 import {logger} from "../Logger";
-import {Action} from "../ShopPersonnel/Permissions";
+import {Action, Permissions} from "../ShopPersonnel/Permissions";
 import {DiscountHandler} from "./DiscountPolicy/DiscountHandler";
 import {Discount} from "./DiscountPolicy/Discount";
 import {PurchaseCondition} from "./PurchasePolicy/PurchaseCondition";
@@ -12,6 +12,8 @@ import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 // import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
+import {OfferDTO, ShopRich} from "../../DataAccess/Getters"
+import {UserImpl} from "../Users/User";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
@@ -202,54 +204,57 @@ export interface Shop {
     removePermission(user_email: string, target_email: string, action: Action): string | boolean;
 
     rateProduct(user_email: string, user_id: number, product_id: number, rating: number): string | boolean;
+
+    getAllManagementEmail(): string[];
+
+    getRealPermissions(user_email: string): Permissions;
+
+    addPurchaseType(user_email: string, purchase_type: Purchase_Type): string | boolean;
+
+    getActiveOffers(user_email: string): string | string[];
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean;
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
+
+    removePurchaseType(user_email: string, purchase_type: Purchase_Type): string | boolean;
 }
 
 export class ShopImpl implements Shop {
     private readonly _inventory: ShopInventory;
     private readonly _shop_id: number;
     private readonly _management: ShopManagement;
-
     private readonly _is_active: boolean;
-    static resetIDs = () => {
-        id_counter = 0
-        DiscountHandler.discountCounter = 0
-    }
 
-    static create(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
-        if (bank_info.length == 0) return "Bank info can't be empty"
-        if (location.length == 0) return "Location can't be empty"
-        if (name.length == 0) return "Name can't be empty"
-        return new ShopImpl(user_email, bank_info, description, location, name)
-    }
     /**
      * @Requirement 3.2
-     * @param user_email
+     * @param shop_id
      * @param bank_info
      * @param description
      * @param location
      * @param name
-     * @param purchasePolicy
-     * @param discountPolicy
+     * @param management
+     * @param inventory
+     * @param is_active
      */
-    constructor(user_email: string, bank_info: string, description: string, location: string, name: string) {
-        this._shop_id = generateId();
+    constructor(shop_id: number, bank_info: string, description: string, location: string, name: string, management: ShopManagement, inventory: ShopInventory, is_active: boolean) {
+        this._shop_id = shop_id
         this._bank_info = bank_info;
         this._description = description;
         this._location = location;
         this._name = name;
-        this._management = new ShopManagementImpl(this.shop_id, user_email)
-        this._inventory = new ShopInventoryImpl(this.shop_id, this._management, name, bank_info)
-        this._management.shop_inventory = this._inventory;
-        this._is_active = true;
+        this._management = management
+        this._inventory = inventory
+        this._is_active = is_active;
     }
-
-    displayItems(): string {
-        return JSON.stringify({
-            shopID: this.shop_id,
-            name: this.name,
-            products: this.inventory.displayItems(),
-        })
-    }
+    // static check(user_email: string, bank_info: string, description: string, location: string, name: string): string | ShopImpl {
+    //     if (bank_info.length == 0) return "Bank info can't be empty"
+    //     if (location.length == 0) return "Location can't be empty"
+    //     if (name.length == 0) return "Name can't be empty"
+    //     return ShopImpl.create(user_email, bank_info, description, location, name)
+    // }
 
     private _bank_info: string;
 
@@ -305,6 +310,51 @@ export class ShopImpl implements Shop {
 
     get is_active(): boolean {
         return this._is_active;
+    }
+
+    static resetIDs = () => {
+        id_counter = 0
+        DiscountHandler.discountCounter = 0
+    }
+
+    static create(user_email: string, bank_info: string, description: string, location: string, name: string) {
+        // const result = this.check(user_email, bank_info, description, location, name)
+        // if (typeof  result == "string") return result
+        let _shop_id = generateId();
+        let _bank_info = bank_info;
+        let _description = description;
+        let _location = location;
+        let _name = name;
+        let _management = new ShopManagementImpl(_shop_id, user_email)
+        let _inventory = new ShopInventoryImpl(_shop_id, _management, name, bank_info, [Purchase_Type.Immediate], [])
+        _management.shop_inventory = _inventory;
+        let _is_active = true;
+        return new ShopImpl(_shop_id, _bank_info, _description, _location, _name, _management, _inventory, _is_active)
+    }
+
+    static createFromDB(entry: { shop_id: any; bank_info: string; name: string; description: string; active: any; location: string; original_owner: string }) {
+        id_counter = Math.max(id_counter, entry.shop_id + 1)
+        let _management = new ShopManagementImpl(entry.shop_id, entry.original_owner)
+        let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info, [Purchase_Type.Immediate], [])
+        return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active);
+    }
+
+    static shopsAreEquals(s1: Shop, s2: Shop) {
+        return s1.shop_id == s2.shop_id &&
+            s1.name == s2.name &&
+            s1.location == s2.location &&
+            s1.bank_info == s2.bank_info &&
+            s1.description == s2.description &&
+            ShopInventoryImpl.shopsAreEqual(s1.inventory, s2.inventory) &&
+            ShopManagementImpl.shopsAreEqual(s1.management, s2.management)
+    }
+
+    displayItems(): string {
+        return JSON.stringify({
+            shopID: this.shop_id,
+            name: this.name,
+            products: this.inventory.displayItems(),
+        })
     }
 
     addItem(user_email: string, name: string, description: string, amount: number, categories: string[], base_price: number,
@@ -374,6 +424,10 @@ export class ShopImpl implements Shop {
             return "Insufficient permissions";
         }
         const ret = this._inventory.removeItem(product_id);
+        if (typeof ret == "string") {
+            logger.Error(ret)
+            return ret
+        }
         if (!ret) {
             const error = `${failure_message}. Item doesn't exist.`
             logger.Error(error);
@@ -417,8 +471,10 @@ export class ShopImpl implements Shop {
 
     appointNewManager(appointer_email: string, appointee_email: string): boolean | string {
         const ret = this._management.appointNewManager(appointer_email, appointee_email);
-        if (typeof ret == "boolean") logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
-        else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
+        if (typeof ret == "boolean") {
+            logger.Info(`${appointee_email} was made manager by ${appointer_email}`)
+            this.inventory.addManagementToExistingOffers(appointee_email)
+        } else logger.Error(`Failed to make ${appointee_email} a manager by ${appointer_email}`)
         return ret;
     }
 
@@ -529,6 +585,21 @@ export class ShopImpl implements Shop {
         }
         logger.Info(success_message);
         return ret;
+    }
+
+    addPurchaseType(user_email: string, purchase_type: Purchase_Type) {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            const error = `${user_email} tried to add purchase type but doesn't have permissions to do so`
+            logger.Error(error);
+            return error
+        }
+        const ret = this.inventory.addPurchaseType(purchase_type)
+        if (typeof ret == "string") {
+            logger.Error(`${user_email} failed to add purchase type as ${ret}`)
+            return ret
+        }
+        logger.Info(`${user_email} added purchase type successfully`)
+        return true
     }
 
     removeOwner(user_email: string, target: string): string | boolean {
@@ -661,5 +732,76 @@ export class ShopImpl implements Shop {
         }
         this.inventory.rateProduct(product_id, rating, user_email)
         return true;
+    }
+
+    getAllManagementEmail(): string[] {
+        return this.management.getAllManagementEmails();
+    }
+
+    getRealPermissions(user_email: string): Permissions {
+        return this.management.getRealPermissions(user_email);
+    }
+
+    addManagement(owners: {
+        owner_email: string,
+        appointer_email: string
+    }[], managers: {
+        manager_email: string,
+        appointer_email: string,
+        permissions: number[]
+    }[]) {
+        this.management.addManagement(owners, managers)
+    }
+
+    async addInventoryFromDB(inventory: ShopRich): Promise<void> {
+        await this.inventory.addInventoryFromDB(inventory)
+    }
+
+    getActiveOffers(user_email: string): string | string[] {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot get active offers`
+        return this.inventory.getActiveOffers()
+    }
+
+    acceptOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot accept active offers`
+        return this.inventory.acceptOfferAsManagement(user_email, offer_id)
+    }
+
+    denyOfferAsManagement(user_email: string, offer_id: number): string | boolean {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot decline active offers`
+        return this.inventory.denyOfferAsManagement(user_email, offer_id)
+    }
+
+    counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean {
+        if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot make counter offers`
+        return this.inventory.counterOfferAsManagement(user_email, offer_id, new_price_per_unit)
+    }
+
+    removePurchaseType(user_email: string, purchase_type: Purchase_Type): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            const error = `${user_email} tried to remove purchase type but doesn't have permissions to do so`
+            logger.Error(error);
+            return error
+        }
+        const ret = this.inventory.removePurchaseType(purchase_type)
+        if (typeof ret == "string") {
+            logger.Error(`${user_email} failed to remove purchase type as ${ret}`)
+            return ret
+        }
+        if (!ret) {
+            logger.Error(`${user_email} failed to remove purchase type as it doesn't exist in the shop`)
+        } else {
+            logger.Info(`${user_email} removed purchase type successfully`)
+        }
+        return true
+    }
+
+
+    async addOffersToShopFromDB(offers: OfferDTO[], users: UserImpl[], products: Product[]): Promise<void> {
+        return this.inventory.addOffersToShopFromDB(offers, users, products)
+    }
+
+    static same_offers(shops1: Shop, shops2: Shop) {
+        return ShopInventoryImpl.same_offers(shops1.inventory, shops2.inventory)
     }
 }

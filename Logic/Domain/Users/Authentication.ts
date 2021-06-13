@@ -13,8 +13,7 @@ export class Authentication {
      * Singelton design pattern
      */
     public static getInstance(): Authentication {
-        if(!Authentication.instance)
-        {
+        if (!Authentication.instance) {
             Authentication.instance = new Authentication();
         }
         return Authentication.instance;
@@ -34,8 +33,7 @@ export class Authentication {
      * @param password as a string
      * @return if a password was hashed using the hashing function
      */
-    public isHashed(password: string): boolean
-    {
+    public isHashed(password: string): boolean {
         return password_hash.isHashed(password);
     }
 
@@ -45,8 +43,7 @@ export class Authentication {
      * @param hashed_password
      * @return true if the the hashed_password is the password's hashed value.
      */
-    public verify(password:string, hashed_password:string):boolean
-    {
+    public verify(password: string, hashed_password: string): boolean {
         return password_hash.verify(password, hashed_password);
     }
 }

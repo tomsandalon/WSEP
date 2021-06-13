@@ -4,6 +4,8 @@ import EditableItem from "./EditableItem";
 
 const EditableItems = (props) => {
   const items = props.items;
+  const storeID = props.storeID;
+  const storeName = props.storeName;
   return (
     <div className="container">
       <div className="jr-card">
@@ -13,13 +15,14 @@ const EditableItems = (props) => {
             const parsedItem = JSON.parse(item);
             return (
               <EditableItem
-              key= {parsedItem._product_id}
-              id= {parsedItem._product_id}
+                key={parsedItem._product_id}
+                id={parsedItem._product_id}
                 name={parsedItem._name}
                 available={parsedItem._available}
                 amount={parsedItem._amount}
                 price={parsedItem._base_price}
-                
+                storeID={storeID}
+                storeName={storeName}
               />
             );
           })}

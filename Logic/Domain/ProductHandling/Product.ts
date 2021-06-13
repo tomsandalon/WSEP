@@ -1,4 +1,4 @@
-import {Category} from "./Category";
+import {Category, CategoryImpl} from "./Category";
 // import {Purchase_Type} from "../PurchaseProperties/Purchase_Type";
 import {
     AmountIsLargerThanStock,
@@ -6,12 +6,11 @@ import {
     BasePriceNonPositiveValue,
     CategoryNotFound,
     DescriptionEmpty,
-    DiscountNotExists,
     ProductNameEmpty
 } from "./ErrorMessages";
 import {Purchase_Type} from "../Shop/ShopInventory";
 import {Rating} from "./Rating";
-
+import {ProductData} from "../../DataAccess/Getters";
 
 
 export interface Product {
@@ -20,7 +19,7 @@ export interface Product {
     description: string
     amount: number // >= 0
     category: Category[]
-    price: number // >= 0
+    base_price: number // >= 0
     purchase_type: Purchase_Type
     rating: Rating
 
@@ -88,15 +87,6 @@ export interface Product {
     addSupplies(amount: number): string | boolean
 
     /**
-     *
-     * @param coupons
-     * @return actual_price considering all discounts applied on this product and coupons that the customer applied
-     * @return DiscountNotExists iff the customer entered a coupon that can't be applied on this product
-     */
-    calculatePrice(coupons: any[]): number | string
-
-
-    /**
      * @Requirement 2.7
      * @functionality increase amount of supplies of this product account of what the user returned
      * @param amount
@@ -110,171 +100,217 @@ export interface Product {
     alreadyRated(user_email: string): Boolean;
 }
 
-export class ProductImpl implements Product{
+export class ProductImpl implements Product {
+    static _product_id_specifier: number = 0;
+    private readonly _product_id: number;
+    private _base_price: number;
+    private readonly _category: Category[];
+
+    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type: Purchase_Type, category: Category[], amount: number, rating: Rating) {
+        this._product_id = product_id
+        this._base_price = base_price
+        this._name = name
+        this._description = description
+        this._purchase_type = purchase_type
+        this._category = category
+        this._amount = amount
+        this._rating = rating
+    }
+
+    private _amount: number;
+
+    get amount() {
+        return this._amount;
+    }
+
+    get base_price() {
+        return this._base_price;
+    }
+
+    private _description: string;
+
+    get description() {
+        return this._description;
+    }
+
+    private _name: string;
+
+    get name() {
+        return this._name;
+    }
+
+    private _purchase_type: Purchase_Type;
+
+    get purchase_type() {
+        return this._purchase_type;
+    }
+
     set purchase_type(value: Purchase_Type) {
         this._purchase_type = value;
     }
-    static _product_id_specifier: number = 0;
-    private readonly _product_id: number;
-    private _amount: number;
-    private _base_price: number;
-    private readonly _category: Category[];
-    private _description: string;
-    private _name: string;
-    private _purchase_type: Purchase_Type;
-    private _rating = new Rating();
 
-    private constructor(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
-        this._base_price = base_price;
-        this._description = description;
-        this._name = name;
-        this._product_id = product_id;
-        this._purchase_type = purchase_type ? purchase_type : Purchase_Type.Immediate;
-        this._category = [];
-        this._amount = 0;
+    private _rating = Rating.create();
+
+    get rating(): Rating {
+        return this._rating;
+    }
+
+    set base_price(value: number) {
+        this._base_price = value;
+    }
+
+    get product_id() {
+        return this._product_id;
+    }
+
+    get category() {
+        return this._category;
     }
 
     static resetIDs = () => ProductImpl._product_id_specifier = 0
 
+    static createFromDB(product: ProductData) {
+        return new ProductImpl(
+            product.data.base_price,
+            product.data.description,
+            product.data.name,
+            product.data.product_id,
+            product.data.purchase_type,
+            product.data.categories.split(",").map(category => CategoryImpl.create(category) as CategoryImpl),
+            product.data.amount,
+            Rating.createFromDB(product.rates)
+        )
+    }
 
     public static create(base_price: number, description: string, name: string, purchase_type?: Purchase_Type): Product | string {
         const result = ProductImpl.isValid(base_price, description, name);
-        if(typeof result === "string"){
+        if (typeof result === "string") {
             return result;
         }
         const id: number = this._product_id_specifier++;
-        return new ProductImpl(base_price, description, name, id, purchase_type);
+        return ProductImpl.createSupporter(base_price, description, name, id, purchase_type);
     }
 
-    private static isValid(base_price: number, description: string, name: string): string | boolean{
-        if (base_price <= 0){
+    static productsAreEqual(p1_before: Product[], p2_before: Product[]) {
+        const no_zeroes = (p: Product) => p.amount != 0
+        const p1 = p1_before.filter(no_zeroes)
+        const p2 = p2_before.filter(no_zeroes)
+        const res = p1.length == p2.length && p1.every(p1 => p2.some(p2 => {
+                const id = p1.product_id == p2.product_id
+                const amount = p1.amount == p2.amount
+                const name = p1.name == p2.name
+                const base_price = p1.base_price == p2.base_price
+                const purchase_type = p1.purchase_type == p2.purchase_type
+                const categories = p1.category.length == p2.category.length &&
+                    p1.category.every(c1 => p2.category.some(c2 => c1.name == c2.name))
+                const description = p1.description == p2.description
+                const ratings = Rating.ratingsAreEqual(p1.rating, p2.rating)
+                return id && amount && name && base_price && purchase_type && categories && categories && description && ratings
+            }
+        ))
+        return res
+    }
+
+    private static createSupporter(base_price: number, description: string, name: string, product_id: number, purchase_type?: Purchase_Type) {
+        let _base_price = base_price;
+        let _description = description;
+        let _name = name;
+        let _product_id = product_id;
+        let _purchase_type = purchase_type ? purchase_type : Purchase_Type.Immediate;
+        let _category = [];
+        let _amount = 0;
+        return new ProductImpl(_base_price, _description, _name, _product_id, _purchase_type, _category, _amount, Rating.create())
+    }
+
+    private static isValid(base_price: number, description: string, name: string): string | boolean {
+        if (base_price <= 0) {
             return BasePriceNonPositiveValue;
-        } else if (description.length == 0){
+        } else if (description.length == 0) {
             return DescriptionEmpty;
         } else if (name.length == 0) {
             return ProductNameEmpty;
         } else return true;
     }
 
-    get amount(){
-        return this._amount;
-    }
-    public addSupplies(amount: number): string | boolean{
-        if(amount <= 0) {
+    public addSupplies(amount: number): string | boolean {
+        if (amount <= 0) {
             return AmountNonPositiveValue;
         }
         this._amount += amount;
         return true;
     }
-    public makePurchase(amount: number): string | boolean{
-        if(amount <= 0){
+
+    public makePurchase(amount: number): string | boolean {
+        if (amount <= 0) {
             return AmountNonPositiveValue;
         }
-        if(amount > this._amount){
+        if (amount > this._amount) {
             return AmountIsLargerThanStock
         }
         this._amount -= amount;
         return true;
     }
-    get price(){
-        return this._base_price;
-    }
-    public changePrice(base_price: number): string | boolean{
-        if(base_price <= 0){
+
+    public changePrice(base_price: number): string | boolean {
+        if (base_price <= 0) {
             return BasePriceNonPositiveValue
         }
         this._base_price = base_price;
         return true;
     }
-    get product_id(){
-        return this._product_id;
-    }
-    get category(){
-        return this._category;
-    }
-    public addCategory(category: Category): string | boolean{
+
+    public addCategory(category: Category): string | boolean {
         this._category.push(category);
         return true;
     }
-    public removeCategory(toRemove: Category): string | boolean{
+
+    public removeCategory(toRemove: Category): string | boolean {
         let position = -1;
-        this._category.forEach((category: Category, index: number) =>{
-            if(category.equals(toRemove))
+        this._category.forEach((category: Category, index: number) => {
+            if (category.equals(toRemove))
                 position = index
         });
-        if (position < 0){
+        if (position < 0) {
             return CategoryNotFound
         }
-        this._category.splice(position,1);
+        this._category.splice(position, 1);
         return true;
     }
-    get description(){
-        return this._description;
-    }
-    public changeDescription(description: string): string | boolean{
-        if (description.length == 0){
+
+    public changeDescription(description: string): string | boolean {
+        if (description.length == 0) {
             return DescriptionEmpty
         }
         this._description = description;
         return true;
     }
-    get name(){
-        return this._name;
-    }
-    public changeName(name: string): string | boolean{
-        if(name.length == 0){
+
+    public changeName(name: string): string | boolean {
+        if (name.length == 0) {
             return ProductNameEmpty
         }
         this._name = name;
         return true;
     }
-    get purchase_type(){
-        return this._purchase_type;
-    }
-    public changePurchaseType(purchaseType: Purchase_Type): string | boolean{
-        //TODO purchasetype.change
+
+    public changePurchaseType(purchaseType: Purchase_Type): string | boolean {
         this._purchase_type = purchaseType;
         return true;
     }
 
-    //TODO move function to inventory
-    public calculatePrice(coupons: any[]): number | string{
-        let price = this._base_price;
-        let privateDiscounts: number[] = [];
-        for (let coupon of coupons){
-            // const position = this._discount_types.indexOf(coupon);
-            // if( position < 0){
-            //     return DiscountNotExists
-            // }
-            // privateDiscounts.push(position);
-            // price = coupon.applyDiscount(price);
-        }
-        // this._discount_types.forEach((discount: DiscountType, index: number) => {
-        //         if(privateDiscounts.indexOf(index) < 0){
-        //             price = discount.applyDiscount(price)
-        //         }
-        // });
-        return price
-    }
-
     public returnAmount(amount: number): string | boolean {
-        if (amount <= 0){
+        if (amount <= 0) {
             return AmountNonPositiveValue
         }
         this._amount += amount;
         return true;
     }
 
-
-    get rating(): Rating {
-        return this._rating;
-    }
-
     rate(rating: number, rater: string): void {
         if (0 <= rating && rating <= 5) this.rating.add_rating(rating, rater)
     }
 
-    public toString(){
+    public toString() {
         return JSON.stringify(this)
 
     }

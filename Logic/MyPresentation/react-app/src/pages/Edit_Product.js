@@ -1,97 +1,96 @@
 import { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
-import postFetch from "../postFetch.js";
+import putFetch from "../putFetch.js";
 import { Alert } from "reactstrap";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 
 const EditProduct = () => {
-  const { storeID, storeName } = useParams();
-  //TODO: this code is copied from add product. Change as u need
-  const [name, setName] = useState();
-  const [amount, setAmount] = useState();
-  const [description, setDescription] = useState();
-  const [categories, setCategories] = useState();
-  const [price, setPrice] = useState();
+  const { storeID, storeName, productID } = useParams();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
+  const [action, setAction] = useState();
+  const [parameter, setParameter] = useState();
+  const [errorColor, setErrorColor] = useState("success");
 
-  const onDismiss = () => setVisible(false);
-  const success = () => {
-    setError("Product Added Successfully");
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  const actionOptions = [
+    { label: "Add Amount", value: 0 },
+    { label: "Change Name", value: 1 },
+    { label: "Add Category", value: 2 },
+    { label: "RemoveCategory", value: 3 },
+    { label: "Change Price", value: 4 },
+    { label: "Change Description", value: 5 },
+  ];
+  const submit = (e) => {
+    e.preventDefault();
+    const args = {
+      shop_id: storeID,
+      product_id: productID,
+      value: parameter,
+      action: action.value,
+    };
+    console.log(args);
+    putFetch("/user/shop/product", args, thenFunc);
+  };
+  const success = async () => {
+    setErrorColor("success");
+    setError("Product Edited successfully");
     setVisible(true);
-    setIsPending(false);
+    await sleep(2000);
     history.push(`/managersStore/${storeID}/${storeName}`);
   };
   const failure401 = (err_message) => {
+    setErrorColor("warning");
     setError(err_message);
     setVisible(true);
-    setIsPending(false);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newProduct = {
-      shop_id: storeID,
-      name: name,
-      description: description,
-      amount: amount,
-      categories: categories.split(" "),
-      base_price: price,
-    };
-    setIsPending(true);
-    postFetch("/user/shop/product", newProduct, thenFunc);
   };
   const thenFunc = async (response) => {
-    setIsPending(false);
     serverResponse(response, success, failure401);
   };
+  const onDismiss = () => setVisible(false);
   return (
     <div className="add-manager">
-      {<h2> Add Product to {storeName}</h2>}
-      <form onSubmit={handleSubmit}>
-        <label>Product name: </label>
+      <p>Edit Product</p>
+      <div className="d-flex mb-2 justify-content-between"></div>
+      <form onSubmit={submit}>
+        <label>operator: </label>
+        <Select
+          components={makeAnimated()}
+          onChange={setAction}
+          options={actionOptions}
+          className="mb-3"
+          placeHolder="Select Operator"
+          noOptionsMessage={() => "No more conditions available"}
+          defaultValue={[]}
+          isMulti={false}
+          autoFocus
+          isSearchable
+        />
+        <label>Value: </label>
         <input
           type="text"
           required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={parameter}
+          onChange={(e) => setParameter(e.target.value)}
         />
-        <label>Amount: </label>
-        <input
-          type="text"
-          required
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <label>Description: </label>
-        <input
-          type="text"
-          required
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <label>Categories: </label>
-        <input
-          type="text"
-          required
-          value={categories}
-          onChange={(e) => setCategories(e.target.value)}
-        />
-        <label>Price: </label>
-        <input
-          type="text"
-          required
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-        {!isPending && <input type="submit" value="Add Product" />}
-        {isPending && <button diabled>Adding product...</button>}
+        <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
+          {error}
+        </Alert>
+        {<input type="submit" value="Edit Product" />}
       </form>
-      <Alert color="danger" isOpen={visible} toggle={onDismiss}>
-        {error}
-      </Alert>
+      {/* <Button
+          onClick={() => submit()}
+          className="mt-auto font-weight-bold"
+          block
+        >
+          Add Policy
+        </Button> */}
     </div>
   );
 };

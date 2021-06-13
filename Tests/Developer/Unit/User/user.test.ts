@@ -1,13 +1,16 @@
 import 'mocha';
 import {assert, expect} from 'chai';
-import {Authentication} from "../../../Logic/Domain/Users/Authentication";
-import {RegisterImpl} from "../../../Logic/Domain/Users/Register";
-import {LoginImpl} from "../../../Logic/Domain/Users/Login";
-import {ShopInventoryImpl} from "../../../Logic/Domain/Shop/ShopInventory";
-import {ShopManagementImpl} from "../../../Logic/Domain/Shop/ShopManagement";
-import {ProductImpl} from "../../../Logic/Domain/ProductHandling/Product";
-import {SystemImpl} from "../../../Logic/Domain/System";
-import {id_counter} from "../../../Logic/Domain/Users/User";
+import {Authentication} from "../../../../Logic/Domain/Users/Authentication";
+import {RegisterImpl} from "../../../../Logic/Domain/Users/Register";
+import {LoginImpl} from "../../../../Logic/Domain/Users/Login";
+import {ShopInventoryImpl} from "../../../../Logic/Domain/Shop/ShopInventory";
+import {ShopManagementImpl} from "../../../../Logic/Domain/Shop/ShopManagement";
+import {ProductImpl} from "../../../../Logic/Domain/ProductHandling/Product";
+import {SystemImpl} from "../../../../Logic/Domain/System";
+import {id_counter} from "../../../../Logic/Domain/Users/User";
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
+
+DBCommand.turnBlockDBON()
 
 describe('Authentication Tests', () => {
     it('should return a hashed password ', () => {
@@ -136,7 +139,7 @@ describe('Guest testing', () => {
         if(typeof user ==  "string")
             assert.fail()
         expect(user.user_email == "" && user.password == "").eq(true)
-        let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","nye");
+        let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "nye", [], []);
         //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
         // @ts-ignore
         shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -157,7 +160,7 @@ describe('User Tests', () => {
             assert.fail()
         else
         {
-            let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+            let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "ney", [], []);
             //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
             // @ts-ignore
             shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -179,7 +182,7 @@ describe('User Tests', () => {
             assert.fail()
         else
         {
-            let shop = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"),"hey","nye");
+            let shop = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"), "hey", "nye", [], []);
             //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
             // @ts-ignore
             shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -210,7 +213,7 @@ describe('User Tests', () => {
                 assert.fail()
             else
             {
-                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "ney", [], []);
                 //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
                 // @ts-ignore
                 shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -218,15 +221,17 @@ describe('User Tests', () => {
                 if(typeof logged_user == "string")
                     assert.fail()
                 expect(typeof (logged_user.addToBasket(shop, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
-                const purchase =logged_user.purchaseBasket(1, "paying");
-                if(typeof purchase == "string"){
-                    assert.fail()
-                }
-                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
-                const history = logged_user.getOrderHistory();
-                if(typeof history == "string")
-                    assert.fail()
-                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+                logged_user.purchaseBasket(1, "paying")
+                    .then(purchase => {
+                        if(typeof purchase == "string"){
+                            assert.fail()
+                        }
+                        expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
+                        const history = logged_user.getOrderHistory();
+                        if(typeof history == "string")
+                            assert.fail()
+                        expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+                    })
             }
         });
     });
@@ -242,11 +247,11 @@ describe('User Tests', () => {
                 assert.fail()
             else
             {
-                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "ney", [], []);
                 //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
                 // @ts-ignore
                 shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
-                let shop2 = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"),"hey","ney");
+                let shop2 = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"), "hey", "ney", [], []);
                 //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
                 // @ts-ignore
                 shop2.addItem("banana","banana", 100,["food"],15,null,null)
@@ -255,17 +260,21 @@ describe('User Tests', () => {
                     assert.fail()
                 expect(typeof (logged_user.addToBasket(shop, ProductImpl._product_id_specifier - 2,15)) !== "string").eq(true);
                 expect(typeof (logged_user.addToBasket(shop2, ProductImpl._product_id_specifier - 1,15)) !== "string").eq(true);
-                const purchase =logged_user.purchaseBasket(1, "paying");
-                const purchase2 =logged_user.purchaseBasket(2, "paying");
-                if(typeof purchase == "string" || typeof  purchase2 == "string"){
-                    assert.fail()
-                }
-                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
-                const history = logged_user.getOrderHistory();
-                if(typeof history == "string")
-                    assert.fail()
-                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
-                expect(history[1].includes("banana")).is.eq(true); // cart purchase
+                logged_user.purchaseBasket(1, "paying")
+                    .then(purchase => {
+                        logged_user.purchaseBasket(2, "paying")
+                            .then(purchase2 => {
+                                if(typeof purchase == "string" || typeof  purchase2 == "string"){
+                                    assert.fail()
+                                }
+                                expect(logged_user.cart.length == 0).is.eq(true); //no baskets after purchase
+                                const history = logged_user.getOrderHistory();
+                                if(typeof history == "string")
+                                    assert.fail()
+                                expect(history[0].includes("vodka")).is.eq(true); // order history exists.
+                                expect(history[1].includes("banana")).is.eq(true); // cart purchase
+                            })
+                    })
             }
         });
     });

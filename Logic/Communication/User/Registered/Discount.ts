@@ -1,12 +1,14 @@
 import {
-    assign_manager,
-    assign_owner, BadRequest, OK,
+    BadRequest,
+    OK,
     ServerNotFound,
     service,
+    ServiceUnavailable,
     Session,
-    sid, Unauthorized
+    sid,
+    Unauthorized
 } from "../../Config/Config";
-import {route_shop_manage_product} from "../../Routes";
+
 const express = require('express');
 const router = express.Router();
 module.exports = router;
@@ -17,6 +19,11 @@ router.get('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.getAllDiscounts(user_id, request.query.shop_id)
@@ -39,6 +46,11 @@ router.delete('/', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.removeDiscount(user_id, request.body.shop_id, request.body.id);
     response.setHeader("Content-Type", "text/html");
@@ -59,6 +71,11 @@ router.post('/', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     let result;
     switch (request.body.request){
@@ -66,13 +83,13 @@ router.post('/', (request: any, response: any) => {
             result = service.addDiscount(user_id,  request.body.shop_id, request.body.value);
             break;
         case 2:
-            result = service.addConditionToDiscount(user_id, request.body.shop_id, request.body.id, request.body.condition, request.condition_param);
+            result = service.addConditionToDiscount(user_id, request.body.shop_id, request.body.id, request.body.condition, request.body.condition_param);
             break;
         case 3:
-            result = service.addNumericComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.discount_id_two);
+            result = service.addNumericComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.body.discount_id_two);
             break;
         case 4:
-            result = service.addLogicComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.discount_id_two);
+            result = service.addLogicComposeDiscount(user_id, request.body.shop_id, request.body.operation, request.body.discount_id_one, request.body.discount_id_two);
             break;
         default:
             result = 'bad request'

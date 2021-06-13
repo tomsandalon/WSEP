@@ -1,7 +1,7 @@
 import {
     BadRequest, categories, OK,
     ServerNotFound,
-    service,
+    service, ServiceUnavailable,
     Session,
     shop_purchase_history,
     sid
@@ -17,6 +17,11 @@ router.get('/', (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const result = service.getItemsFromShop(request.query.shop_id);
     if(typeof result == "string") {
@@ -43,6 +48,11 @@ router.post('/', (request: any, response: any) => {
         response.end()
         return
     }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
     const user_id = session_data.user_id;
     const result = service.addShop(user_id, request.body.name, request.body.description, request.body.location, request.body.bank_info);
     response.setHeader("Content-Type", "text/html");
@@ -62,6 +72,11 @@ router.get(categories, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.getAllCategories(user_id);
@@ -84,6 +99,11 @@ router.get(shop_purchase_history, (request: any, response: any) => {
         response.send('Bad session id')
         response.end()
         return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
     }
     const user_id = session_data.user_id;
     const result = service.shopOrderHistory(user_id, request.query.shop_id);
