@@ -217,6 +217,8 @@ export interface Shop {
     denyOfferAsManagement(user_email: string, offer_id: number): string | boolean;
 
     counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
+
+    removePurchaseType(user_email: string, purchase_type: Purchase_Type): string | boolean;
 }
 
 export class ShopImpl implements Shop {
@@ -769,4 +771,25 @@ export class ShopImpl implements Shop {
         if (!this.management.isManager(user_email) && !this.management.isOwner(user_email)) return `${user_email} is not in management and cannot make counter offers`
         return this.inventory.counterOfferAsManagement(user_email, offer_id, new_price_per_unit)
     }
+
+    removePurchaseType(user_email: string, purchase_type: Purchase_Type): string | boolean {
+        if (!this.management.allowedEditPolicy(user_email)) {
+            const error = `${user_email} tried to remove purchase type but doesn't have permissions to do so`
+            logger.Error(error);
+            return error
+        }
+        const ret = this.inventory.removePurchasePolicy(purchase_type)
+        if (typeof ret == "string") {
+            logger.Error(`${user_email} failed to remove purchase type as ${ret}`)
+            return ret
+        }
+        if (!ret) {
+            logger.Error(`${user_email} failed to remove purchase type as it doesn't exist in the shop`)
+        } else {
+            logger.Info(`${user_email} removed purchase type successfully`)
+        }
+        return true
+    }
+
+
 }

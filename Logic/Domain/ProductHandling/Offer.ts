@@ -11,16 +11,16 @@ export class Offer {
     product: Product
     amount: number
     price_per_unit: number
+    is_counter_offer: boolean
 
-    //is_counter_offer: boolean
-
-    constructor(shop: ShopInventory, id: number, product: Product, amount: number, price_per_unit: number, user: User) {
+    constructor(shop: ShopInventory, id: number, product: Product, amount: number, price_per_unit: number, user: User, is_counter_offer: boolean) {
         this.shop = shop;
         this.id = id;
         this.product = product;
         this.amount = amount;
         this.price_per_unit = price_per_unit;
         this.user = user
+        this.is_counter_offer = is_counter_offer
     }
 
     static create(shop: ShopInventory, product_id: number, amount: number, price_per_unit: number, user: User): Offer | string {
@@ -28,7 +28,7 @@ export class Offer {
         if (product == undefined) return "Product doesn't exist"
         if (product.purchase_type != Purchase_Type.Offer) return "Purchase type doesn't match"
         if (amount <= 0 || price_per_unit < 0) return "Can't offer negative numbers"
-        return new Offer(shop, offer_id_counter++, product, amount, price_per_unit, user)
+        return new Offer(shop, offer_id_counter++, product, amount, price_per_unit, user, false)
     }
 
     addToShop(): string | boolean {
@@ -46,7 +46,8 @@ export class Offer {
             product_name: this.product.name,
             amount: this.amount,
             price_per_unit: this.price_per_unit,
-            is_purchasable: this.isPurchasable()
+            is_purchasable: this.isPurchasable(),
+            is_counter_offer: this.is_counter_offer
         })
     }
 
@@ -69,5 +70,9 @@ export class Offer {
         const offer_and_management = this.shop.active_offers.find(o => o.offer.id == this.id)
         if (offer_and_management == undefined) return
         offer_and_management.offer.shop.shop_management.notifyForOffer(`User ${this.user.user_email} denied the counteroffer`)
+    }
+
+    assignAsCounterOffer() {
+        this.is_counter_offer = true
     }
 }

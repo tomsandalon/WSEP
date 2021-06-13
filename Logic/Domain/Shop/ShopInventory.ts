@@ -523,11 +523,13 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     notifyOwners(order: Purchase): void {
-        this._shop_management.notifyOwners(`New successful order:\n` +
+        const message = `New successful order:\n` +
             `Order number: ${order.order_id}\n` +
             `Items: ${order.products.reduce(
                 (acc, cur) => acc + "\n" + cur.name, ""
-            )}`)
+            )}`
+        this._shop_management.notifyOwners(message)
+        NotificationAdapter.getInstance().notifyForUserId(order.minimal_user_data.userId, message)
     }
 
     rateProduct(product_id: number, rating: number, rater: string): void {
@@ -631,6 +633,7 @@ export class ShopInventoryImpl implements ShopInventory {
         offer.managers_not_accepted.map(m => m.user_email).concat(offer.owners_not_accepted.map(o => o.user_email))
             .forEach(email => NotificationAdapter.getInstance().notify(email, `Offer request id ${offer_id}: new offer to accept from ${user_email}`))
         offer.offer.price_per_unit = new_price_per_unit
+        offer.offer.assignAsCounterOffer()
         NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
         return true
     }

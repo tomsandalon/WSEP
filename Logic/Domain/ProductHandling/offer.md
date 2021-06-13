@@ -2,7 +2,7 @@ The flow of offers
 =============
 Offers are as follows:
 
-1. A user creates an offer for an item which is marked as purchasable by offer. These items have<code>purchase_type:
+1. A user creates an offer for an item which is marked as purchasable by offer. These items have**<code>purchase_type:
    Purchase_Type.Offer</code>, which is also <code>purchase_type: 1</code>
    The function to call is <code>makeOffer</code>
 

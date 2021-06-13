@@ -18,10 +18,10 @@ export class PublisherImpl implements Publisher {
     }
 
     disconnectAllUsers() {
-        P.Publisher.getInstance().disconnectAllUsers()
+        if (P != undefined) P.Publisher.getInstance().disconnectAllUsers()
     }
     reconnectAllUsers() {
-        P.Publisher.getInstance().reconnectAllUsers()
+        if (P != undefined) P.Publisher.getInstance().reconnectAllUsers()
     }
 
     public static getInstance(reset?: boolean): PublisherImpl {

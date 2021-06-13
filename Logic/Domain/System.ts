@@ -43,6 +43,7 @@ import {
     RemoveOffer,
     RemoveProduct,
     removePurchasePolicy,
+    RemovePurchaseTypeFromShop,
     UpdateItemInBasket,
     UpdatePermissions
 } from "../DataAccess/API";
@@ -60,6 +61,7 @@ import {
 } from "../DataAccess/Getters";
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
 import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+import {offer_id_counter} from "./ProductHandling/Offer";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -179,6 +181,8 @@ export interface System {
 
     addPurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
 
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type)
+
     //string is bad, string[] is good and the answer is at [0]
     getUserEmailFromUserId(user_id: number): string | string[]
 
@@ -263,6 +267,16 @@ export interface System {
      * @return Promise containing true if the purchase was successful, string representing an error otherwise
      */
     purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean>
+
+    /**
+     * counteroffer an offer as user
+     * @param user_id
+     * @param shop_id
+     * @param offer_id
+     * @param new_price_per_unit
+     * @return true iff countered the offer successfully. error as a string otherwise
+     */
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean
 
     init(): Promise<void>
 }
@@ -1198,7 +1212,22 @@ export class SystemImpl implements System {
         return ret
     }
 
-    //TODO remove purchase type of shop
+    removePurchaseType(user_id: number, shop_id: number, purchase_type: Purchase_Type): string | boolean {
+        const result = this.getShopAndUser(user_id, shop_id)
+        if (typeof result == "string") return result
+        const {shop, user_email} = result
+        const user = this._login.retrieveUser(user_id);
+        if (typeof user == "string")
+            return user
+        const ret = shop.removePurchaseType(user_email, purchase_type)
+        if (typeof ret != "string") {
+            RemovePurchaseTypeFromShop(shop_id, purchase_type)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
+    }
 
     makeOffer(user_id: number, shop_id: number, product_id: number, amount: number, price_per_unit: number) {
         const result = this.getShopAndUser(user_id, shop_id)
@@ -1209,7 +1238,7 @@ export class SystemImpl implements System {
             return user
         const ret: string | boolean = user.makeOffer(shop.inventory, product_id, amount, price_per_unit)
         if (typeof ret != "string") {
-            AddOffer(user_id, shop_id, product_id, amount, price_per_unit)
+            AddOffer(user_id, shop_id, offer_id_counter - 1, product_id, amount, price_per_unit)
                 .then(r => {
                     if (!r) SystemImpl.rollback()
                 })
@@ -1298,5 +1327,16 @@ export class SystemImpl implements System {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") return user
         return user.purchaseOffer(offer_id, payment_info)
+    }
+
+    counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
+        let offers_info = this.getActiveOffersAsUser(user_id)
+        if (typeof offers_info == "string") return offers_info
+        let offers_info_as_obj = offers_info.map(s => JSON.parse(s))
+        let offer = offers_info_as_obj.find(o => o.offer_id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} not found`
+        let ret = this.denyCounterOfferAsUser(user_id, offer_id)
+        if (typeof ret == "string") return ret
+        return this.makeOffer(user_id, shop_id, offer.product_id, offer.amount, new_price_per_unit)
     }
 }
