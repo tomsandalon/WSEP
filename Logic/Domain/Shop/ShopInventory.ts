@@ -17,7 +17,7 @@ import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 import {GetPurchaseConditions, OfferDTO, ShopRich} from "../../DataAccess/Getters";
 import {SimpleCondition} from "./PurchasePolicy/SimpleCondition";
-import {inc_offer_id_counter, Offer, set_offer_id_counter} from "../ProductHandling/Offer";
+import {Offer, set_offer_id_counter} from "../ProductHandling/Offer";
 import {Manager, ManagerImpl} from "../ShopPersonnel/Manager";
 import {Owner, OwnerImpl} from "../ShopPersonnel/Owner";
 import {NotificationAdapter} from "../Notifications/NotificationAdapter";
@@ -667,12 +667,24 @@ export class ShopInventoryImpl implements ShopInventory {
         return true
     }
 
+    static same_offers(inventory1: ShopInventory, inventory2: ShopInventory) {
+        const amount = inventory1.active_offers.length == inventory2.active_offers.length
+        const offers = inventory1.active_offers.every(o1 => inventory2.active_offers.some(o2 => Offer.equals(o1.offer, o2.offer)))
+        const managers = inventory1.active_offers.every(o1 => inventory2.active_offers.some(o2 => Offer.equals(o1.offer, o2.offer) &&
+            o1.managers_not_accepted.every(m1 => o2.managers_not_accepted.some(m2 => m1.user_email == m2.user_email))
+        ))
+        const owners = inventory1.active_offers.every(o1 => inventory2.active_offers.some(o2 => Offer.equals(o1.offer, o2.offer) &&
+            o1.owners_not_accepted.every(m1 => o2.owners_not_accepted.some(m2 => m1.user_email == m2.user_email))
+        ))
+        return amount && offers && managers && owners
+    }
+
     addOffersToShopFromDB(offers: OfferDTO[], users: User[], products: Product[]): Promise<void> {
         set_offer_id_counter(offers.reduce((acc, cur) => Math.max(acc, cur.offer_id), -1) + 1)
         this.active_offers = offers.map(o => {
             const not_accepted_by_emails = o.not_accepted_by.map(id => (users.find(u => u.user_id == id) as UserImpl).user_email)
             const res = {
-                offer: new Offer(this, inc_offer_id_counter(), products.find(p => p.product_id == o.product_id) as ProductImpl, o.amount, o.price_per_unit, users.find(u => u.user_id == o.user_id) as UserImpl, o.isCounterOffer),
+                offer: new Offer(this, o.offer_id, products.find(p => p.product_id == o.product_id) as ProductImpl, o.amount, o.price_per_unit, users.find(u => u.user_id == o.user_id) as UserImpl, o.isCounterOffer),
                 managers_not_accepted: not_accepted_by_emails.filter(email => this.shop_management.isManager(email)).map(m_email => this.shop_management.managers.find(m => m_email == m.user_email) as ManagerImpl),
                 owners_not_accepted: not_accepted_by_emails.filter(email => this.shop_management.isOwner(email)).map(o_email => this.shop_management.owners.concat([this.shop_management.original_owner]).find(o => o_email == o.user_email) as OwnerImpl)
             }

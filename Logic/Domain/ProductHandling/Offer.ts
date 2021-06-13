@@ -78,4 +78,15 @@ export class Offer {
     assignAsCounterOffer() {
         this.is_counter_offer = true
     }
+
+    static equals(offer1: Offer, offer2: Offer): boolean {
+        const id = offer1.id == offer2.id
+        const shop = offer1.shop.shop_id == offer2.shop.shop_id
+        const user = offer1.user.user_id == offer2.user.user_id
+        const product = offer1.product.product_id == offer2.product.product_id
+        const amount = offer1.amount == offer2.amount
+        const price_per_unit = offer1.price_per_unit == offer2.price_per_unit
+        const is_counter_offer = offer1.is_counter_offer == offer2.is_counter_offer
+        return id && shop && user && product && amount && price_per_unit && is_counter_offer
+    }
 }
