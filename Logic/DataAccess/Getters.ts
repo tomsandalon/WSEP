@@ -427,7 +427,7 @@ export const GetShopsInventory = (): Promise<ShopRich[]> =>
         return groupByShops(purchaseConditions.concat(discounts).concat(sortedProducts).concat(purchase_types).concat(offers))
     })
 
-type OfferDTO = {
+export type OfferDTO = {
     offer_id: number,
     shop_id: number,
     product_id: number,

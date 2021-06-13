@@ -3,6 +3,9 @@ import {Product} from "./Product";
 import {User} from "../Users/User";
 
 export let offer_id_counter: number = 0
+export const set_offer_id_counter = (n: number) => offer_id_counter = n
+export const inc_offer_id_counter = () => offer_id_counter++
+
 
 export class Offer {
     id: number

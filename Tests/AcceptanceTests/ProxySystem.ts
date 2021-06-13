@@ -9,7 +9,7 @@ import {LogicComposition} from "../../Logic/Domain/Shop/DiscountPolicy/LogicComp
 import {NumericOperation} from "../../Logic/Domain/Shop/DiscountPolicy/NumericCompositionDiscount";
 import {ConditionType} from "../../Logic/Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../../Logic/Domain/Shop/PurchasePolicy/CompositeCondition";
-import {ClearDB, ConnectToDB} from "../../Logic/DataAccess/API";
+import {ClearDB, ConnectToDB} from "../../Logic/Domain/DBCommand";
 import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 
 export class ProxySystem implements System{

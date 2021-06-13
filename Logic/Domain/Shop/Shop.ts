@@ -12,7 +12,8 @@ import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {NumericOperation} from "./DiscountPolicy/NumericCompositionDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 // import {DiscountPolicyHandler} from "../PurchaseProperties/DiscountPolicyHandler";
-import {ShopRich} from "../../DataAccess/Getters"
+import {OfferDTO, ShopRich} from "../../DataAccess/Getters"
+import {UserImpl} from "../Users/User";
 
 let id_counter: number = 0;
 const generateId = () => id_counter++;
@@ -334,7 +335,7 @@ export class ShopImpl implements Shop {
     static createFromDB(entry: { shop_id: any; bank_info: string; name: string; description: string; active: any; location: string; original_owner: string }) {
         id_counter = Math.max(id_counter, entry.shop_id + 1)
         let _management = new ShopManagementImpl(entry.shop_id, entry.original_owner)
-        let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info, [Purchase_Type.Immediate], []) //TODO replace [] with real offer
+        let _inventory = new ShopInventoryImpl(entry.shop_id, _management, entry.name, entry.bank_info, [Purchase_Type.Immediate], [])
         return new ShopImpl(entry.shop_id, entry.bank_info, entry.description, entry.location, entry.name, _management, _inventory, entry.active);
     }
 
@@ -792,4 +793,7 @@ export class ShopImpl implements Shop {
     }
 
 
+    async addOffersToShopFromDB(offers: OfferDTO[], users: UserImpl[], products: Product[]): Promise<void> {
+        return this.inventory.addOffersToShopFromDB(offers, users, products)
+    }
 }

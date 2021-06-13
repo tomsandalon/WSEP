@@ -11,7 +11,6 @@ import {SystemImpl} from "../System";
 import {Purchase_Info} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 import {Offer} from "../ProductHandling/Offer";
 import {Product} from "../ProductHandling/Product";
-import {product} from "../../Communication/Tests/Notifications/Setup";
 
 const LEGAL_DRINKING_AGE = 18
 export let id_counter: number = 0;
@@ -347,13 +346,13 @@ export class UserImpl implements User {
     purchaseRealOffer(offer: Offer, payment_info: string | Purchase_Info): Promise<string | boolean> {
         const old_cart = this._cart
         this._cart = this._cart.filter(b => b.shop.shop_id != offer.shop.shop_id)
-        const old_price = offer.product.price
-        offer.product.price = offer.price_per_unit
-        this.addToBasket(offer.shop, product.id, offer.amount)
+        const old_price = offer.product.base_price
+        offer.product.base_price = offer.price_per_unit
+        this.addToBasket(offer.shop, offer.product.product_id, offer.amount, true)
         return this.purchaseBasket(offer.shop.shop_id, payment_info)
             .then(result => {
                 this._cart = old_cart
-                offer.product.price = old_price
+                offer.product.base_price = old_price
                 return result
             })
     }

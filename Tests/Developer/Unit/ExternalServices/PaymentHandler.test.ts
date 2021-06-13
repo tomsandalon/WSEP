@@ -1,7 +1,9 @@
 import {expect} from "chai";
 import {PaymentAndSupplyAdapter} from "../../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 import {describe} from "mocha";
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
 
+DBCommand.turnBlockDBON()
 describe("test payment handler system ", () => {
     it('pay function', async () => {
         let result = 0

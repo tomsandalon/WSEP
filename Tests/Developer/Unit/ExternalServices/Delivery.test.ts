@@ -1,8 +1,9 @@
-import {assert, expect} from "chai";
+import {expect} from "chai";
 import {PaymentAndSupplyAdapter} from "../../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 import {describe} from "mocha";
-import {response} from "express";
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
 
+DBCommand.turnBlockDBON()
 //TODO
 
 describe("test delivery system ", () => {

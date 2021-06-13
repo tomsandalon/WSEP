@@ -117,12 +117,12 @@ export const ConnectToDB = async (): Promise<boolean> => {
     return true;
 }
 
-export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<void> => _CreateAdminIfNotExist([user_id, user_email, hashed_pass, age], 3)
+export const CreateAdminIfNotExist = (user_id: number, user_email: string, hashed_pass: string, age: number): Promise<boolean> => _CreateAdminIfNotExist([user_id, user_email, hashed_pass, age], 3)
 
-const _CreateAdminIfNotExist = ([user_id, user_email, hashed_pass, age]: [number, string, string, number], attempts: number): Promise<void> =>
-    getDB().transaction(async (trx: any) =>{
+const _CreateAdminIfNotExist = ([user_id, user_email, hashed_pass, age]: [number, string, string, number], attempts: number): Promise<boolean> =>
+    getDB().transaction(async (trx: any) => {
         const result = await trx.select().from(user.name).where({user_id: user_id})
-        if (result.length == 0){
+        if (result.length == 0) {
             await trx.insert({
                 user_id: user_id,
                 email: user_email,
@@ -780,9 +780,9 @@ const _CounterOffer = ([offer_id, user_id, new_price_per_unit]: [number, number,
         .then(success)
         .catch(new_err => handler(new_err, _CounterOffer, [offer_id, user_id, new_price_per_unit], attempts))
 
-export const RemoveNotificationsByPrefix = (prefix: string): Promise<void> => _RemoveNotificationsByPrefix(prefix, 3)
+export const RemoveNotificationsByPrefix = (prefix: string): Promise<boolean> => _RemoveNotificationsByPrefix(prefix, 3)
 
-const _RemoveNotificationsByPrefix = (prefix: string, attempts: number): Promise<void> =>
+const _RemoveNotificationsByPrefix = (prefix: string, attempts: number): Promise<boolean> =>
     getDB().transaction((trx: any) =>
         trx(notification.name).where(trx.raw(`notification like '${prefix}%'`)).del()
     )

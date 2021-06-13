@@ -1,12 +1,12 @@
 import {Notification} from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
-import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
-import {ClearNotifications, Notify, RemoveNotificationsByPrefix} from "../../DataAccess/API";
+import {ClearNotifications, Notify, RemoveNotificationsByPrefix} from "../DBCommand";
 import {SystemImpl} from "../System";
 
-// let P: any
+// import * as P from "../../Service/Publisher"
+let P: any
 
 export class PublisherImpl implements Publisher {
     private static instance: PublisherImpl;
@@ -125,7 +125,7 @@ export class PublisherImpl implements Publisher {
         const string_to_remove = `Offer request id ${offer_id}:`
         for (let i = 0; i < Infinity; i++) {
             if (this.notificationQueue[i] == undefined) i = Infinity
-            this.notificationQueue[i] = this.notificationQueue[i].filter(n => !n.message.startsWith(string_to_remove))
+            else this.notificationQueue[i] = this.notificationQueue[i].filter(n => !n.message.startsWith(string_to_remove))
         }
         RemoveNotificationsByPrefix(string_to_remove).then(_ => _)
     }
