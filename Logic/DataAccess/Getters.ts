@@ -304,7 +304,7 @@ export type ShopRich = {
     offers: OfferDTO[]
 };
 
-export const groupByShops = (shops: any[]): ShopRich[]  =>{
+const groupByShops = (shops: any[]): ShopRich[]  =>{
     shops.sort((first: any, second: any) => first.shop_id - second.shop_id)
     let output: ShopRich[] = [];
     let flag = -1;
@@ -438,7 +438,7 @@ type OfferDTO = {
     not_accepted_by: number[]
 }
 
-export const groupByOffer = (offer_data, offer_not_accepted_by): OfferDTO[] => {
+const groupByOffer = (offer_data, offer_not_accepted_by): OfferDTO[] => {
     const data = offer_data.concat(offer_not_accepted_by)
     data.sort((first: any, second: any) => first.offer_id - second.offer_id)
     let flag = -1;

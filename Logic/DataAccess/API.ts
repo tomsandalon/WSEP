@@ -69,10 +69,7 @@ const handler = (err, f, data, attempts) =>
     failure(err, f, data, attempts)
         .then(x => x).catch(new_err => handler(new_err, f, data, attempts))
 
-const returnFalse = (err: any) => {
-    console.log(err)
-    return false;
-}
+
 type TryAgain = (_: any, attemps: number) => any
 
 export const RegisterUser = (data: User) => _RegisterUser(data, 3)
@@ -699,17 +696,29 @@ export const ClearDB = async (): Promise<void> => {
     await dropRequests[0]
 };
 
-export const AddPurchaseTypeToShop = (shop_id: number, purchase_type: number): Promise<boolean> =>
+export const AddPurchaseTypeToShop = (shop_id: number, purchase_type: number): Promise<boolean> => _AddPurchaseTypeToShop([shop_id, purchase_type], 3)
+
+const _AddPurchaseTypeToShop = ([shop_id, purchase_type]: [number, number], attempts: number): Promise<boolean> =>
     getDB().transaction((trx: any) =>
         trx(available.name).insert({shop_id: shop_id, purchase_type_id: purchase_type})
     )
+        .then(success)
+        .catch(new_err => handler(new_err, _AddPurchaseTypeToShop, [shop_id, purchase_type], attempts))
 
 export const RemovePurchaseTypeFromShop = (shop_id: number, purchase_type: number): Promise<boolean> =>
+    _RemovePurchaseTypeFromShop([shop_id, purchase_type], 3)
+
+const _RemovePurchaseTypeFromShop = ([shop_id, purchase_type]: [number, number], attempts: number): Promise<boolean> =>
     getDB().transaction((trx: any) =>
         trx(available.name).where({shop_id: shop_id, purchase_type_id: purchase_type}).del()
     )
+        .then(success)
+        .catch(new_err => handler(new_err, _RemovePurchaseTypeFromShop, [shop_id, purchase_type], attempts))
 
 export const AddOffer = (user_id: number, shop_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number) =>
+    _AddOffer([user_id, shop_id, offer_id, product_id, amount, price_per_unit], 3)
+
+const _AddOffer = ([user_id, shop_id, offer_id, product_id, amount, price_per_unit]: [number, number, number, number, number, number], attempts: number) =>
     getDB().transaction(async (trx: any) => {
         await trx(offer.name).insert({
             user_id: user_id,
@@ -729,18 +738,30 @@ export const AddOffer = (user_id: number, shop_id: number, offer_id: number, pro
             })
         await trx(offer_not_accepted_by.name).insert(entries_to_add.map(e => ({offer_id: e.offer_id, user_id: e.user_id})))
     })
+        .then(success)
+        .catch(new_err => handler(new_err, _AddOffer, [user_id, shop_id, offer_id, product_id, amount, price_per_unit], attempts))
 
-export const OfferAcceptedByManagement = (user_id: number, offer_id: number): Promise<boolean> =>
+export const OfferAcceptedByManagement = (user_id: number, offer_id: number): Promise<boolean> => _OfferAcceptedByManagement([user_id, offer_id], 3)
+
+const _OfferAcceptedByManagement = ([user_id, offer_id]: [number, number], attempts: number): Promise<boolean> =>
     getDB().transaction((trx: any) =>
         trx(offer_not_accepted_by.name).where({user_id: user_id, offer_id: offer_id}).del()
     )
+        .then(success)
+        .catch(new_err => handler(new_err, _OfferAcceptedByManagement, [user_id, offer_id], attempts))
 
-export const RemoveOffer = (offer_id: number): Promise<boolean> =>
+export const RemoveOffer = (offer_id: number): Promise<boolean> => _RemoveOffer(offer_id, 3)
+
+const _RemoveOffer = (offer_id: number, attempts: number): Promise<boolean> =>
     getDB().transaction((trx: any) =>
         trx(offer.name).where({offer_id: offer_id}).del()
     )
+        .then(success)
+        .catch(new_err => handler(new_err, _RemoveOffer, offer_id, attempts))
 
-export const CounterOffer = (offer_id: number, user_id: number, new_price_per_unit: number): Promise<boolean> =>
+export const CounterOffer = (offer_id: number, user_id: number, new_price_per_unit: number): Promise<boolean> => _CounterOffer([offer_id, user_id, new_price_per_unit], 3)
+
+const _CounterOffer = ([offer_id, user_id, new_price_per_unit]: [number, number, number], attempts: number): Promise<boolean> =>
     getDB().transaction(async (trx: any) => {
         const shop_id = (await trx.select(shop.pk).from(offer.name).where({offer_id: offer_id}))[0].shop_id;
         const all_management = (await trx
@@ -756,8 +777,14 @@ export const CounterOffer = (offer_id: number, user_id: number, new_price_per_un
         await trx(offer_not_accepted_by.name).insert(all_management)
         await trx(offer.name).where({offer_id: offer_id}).update({isCounterOffer: 1,  price_per_unit: new_price_per_unit})
     })
+        .then(success)
+        .catch(new_err => handler(new_err, _CounterOffer, [offer_id, user_id, new_price_per_unit], attempts))
 
-export const RemoveNotificationsByPrefix = (prefix: string): Promise<void> =>
+export const RemoveNotificationsByPrefix = (prefix: string): Promise<void> => _RemoveNotificationsByPrefix(prefix, 3)
+
+const _RemoveNotificationsByPrefix = (prefix: string, attempts: number): Promise<void> =>
     getDB().transaction((trx: any) =>
         trx(notification.name).where(trx.raw(`notification like '${prefix}%'`)).del()
     )
+        .then(success)
+        .catch(new_err => handler(new_err, _RemoveNotificationsByPrefix, prefix, attempts))

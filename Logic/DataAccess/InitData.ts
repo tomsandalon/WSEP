@@ -8,17 +8,17 @@ import {
     addPurchaseConditionOperator,
     addPurchaseConditionType,
     AddPurchasePolicy,
-    addPurchaseTypes,
+    addPurchaseTypes, AddPurchaseTypeToShop,
     AddShop,
     AppointManager,
-    AppointOwner, CreateAdminIfNotExist, OfferAcceptedByManagement,
+    AppointOwner, CounterOffer, CreateAdminIfNotExist, OfferAcceptedByManagement,
     PurchaseBasket,
     RateProduct,
     RegisterUser,
     RemainingManagement,
     removeDiscount,
-    RemoveManager,
-    removePurchasePolicy,
+    RemoveManager, RemoveNotificationsByPrefix, RemoveOffer,
+    removePurchasePolicy, RemovePurchaseTypeFromShop,
     UpdatePermissions
 } from "./API";
 import {
@@ -216,22 +216,27 @@ export const initData = () =>
 // AddProduct(first_product)
 //         .then((result: any) => console.log(`Finish ${result}`))
 connectToDB();
-// PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, new Date(), [{
-//             product_id: first_product.product_id,
-//             amount: 20,
-//             actual_price: 14,
-//             name: first_product.name,
-//             base_price: first_product.base_price,
-//             description: first_product.description,
-//             categories: first_product.categories,
-//         }
-//     ]).then((result: any) => console.log(`Finish ${result}`))C
-// user_id: number, shop_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number
-// AppointOwner('mark@gmail.com', 'tom@gmail.com', 1)
-// .then((result: any) => console.log(`Finish ${result}`))
-//
-GetUsers()
-    .then((result: any) => console.log(`Finish ${JSON.stringify(result, null, 2)}`))
+
+AddPurchaseTypeToShop(1, 22)
+    .then((result: any) => console.log(`Finish ${result}`))
+
+// RemovePurchaseTypeFromShop(1, 1)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// OfferAcceptedByManagement(4, 88)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// AddOffer(1, 1, 120, 1, 120, 55)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// RemoveOffer(99)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// CounterOffer(88, 3, 120)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// RemoveNotificationsByPrefix('Off 1')
+//     .then((result: any) => console.log(`Finish ${result}`))
 
 
 // initData().then((result: any) => console.log(`Finish ${result}`))
