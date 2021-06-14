@@ -111,6 +111,7 @@ toggle(){
                             Notifications ({this.state.notifications})<i className="icon3 far fa-bell"></i>
                             </a>
                         </li>}
+                    {this.state.loggedUser && <li key={150}><a className="nav-links cartButton btn-primary btn-sm" href="/my-offers">My Offers</a></li>}
                     {!this.state.loggedUser && MenuItems.map((item,index) => {
                         return(
                         <li key={index}><a className={item.cName} href={item.url}>

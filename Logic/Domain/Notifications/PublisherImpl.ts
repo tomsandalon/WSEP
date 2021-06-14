@@ -1,11 +1,11 @@
 import {Notification} from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
+import * as P from "../../Service/Publisher"
 import {LoginImpl} from "../Users/Login";
 import {ClearNotifications, Notify, RemoveNotificationsByPrefix} from "../DBCommand";
 import {SystemImpl} from "../System";
 
-import * as P from "../../Service/Publisher"
 // let P: any
 
 export class PublisherImpl implements Publisher {

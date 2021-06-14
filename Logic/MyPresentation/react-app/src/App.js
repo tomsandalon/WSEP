@@ -29,7 +29,7 @@ import AddPolicy from "./pages/Add_Policy";
 import AddCondition from "./pages/Add_Condition";
 import SocketIO from 'socket.io-client';
 import Error503 from './components/Error503';
-
+import UserOffers from './components/Notifications/UserOffers';
 
 function App() {
   const [counter,setCounter] = useState(0);
@@ -41,6 +41,9 @@ function App() {
     console.log("Hello react",counter);
     setCounter(counter + 1);
   },[]);
+  socket.on("Unavailable",(message) =>{
+    window.location.assign("/error")
+  })
   return (
     <Router>
       <div className="app">
@@ -48,7 +51,8 @@ function App() {
         <Switch>
           <Route exact path="/"><Redirect to="/home" /></Route>
           <Route path="/home" render={() => <ShopItems />} />
-          <Route path="/error"><Error503 socket={socket}/></Route>
+          <Route path="/error"><Error503/></Route>
+          <ProtectedRoute path="/my-offers"><UserOffers/></ProtectedRoute>
           <ProtectedRoute path="/notifications"><Notifications socket={socket}/></ProtectedRoute>
           <ProtectedRoute path="/roles" component={RoleSelection} />
           <ProtectedRoute path="/user-history" component={UserHistory} />

@@ -438,6 +438,7 @@ export class SystemImpl implements System {
     async init(): Promise<void> {
         await ConnectToDB();
         await initTables();
+        // LoginImpl.getInstance().createAdmin();
         let range = SystemImpl.range;
         await addPurchaseTypes(range(10));
         await addPermissions(range(10));

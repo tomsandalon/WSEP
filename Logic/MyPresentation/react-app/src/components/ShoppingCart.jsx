@@ -70,6 +70,7 @@ class ShoppingCart extends Component {
 			  .then(async response => {
 				switch(response.status){
 					case 200: //welcome
+					console.log("success refresh")
 					response.json().then(
 						baskets => {
 							let cart =[]

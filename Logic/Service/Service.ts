@@ -47,7 +47,8 @@ export class Service {
         this.addConditionToDiscount(tom_id, nvidia_id, 0, Condition.Amount, "3")
         this.addDiscount(tom_id, nvidia_id, 0.2)
 
-        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, immediate)
+        this.addPurchaseType(tom_id, zara_id, Purchase_Type.Offer)
+        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, offer)
         this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, immediate)
         this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, immediate)
         this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, immediate)
