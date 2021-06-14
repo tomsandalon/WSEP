@@ -96,13 +96,13 @@ class Offer extends Component{
             <React.Fragment>
                 <div class="rowalert alert alert-primary" role="alert">
                             {this.state.offer.is_counter_offer ? <h1>Counter offer:</h1> :
-                            this.state.offer.is_purchaseable ?
+                            this.state.offer.is_purchasable ?
                             <h1>Offer:</h1>
                              :
                              <h1>Pending Offer:</h1>}
 
                             <h3>Shop: {this.state.offer.shop_name} Product: {this.state.offer.product_name}({this.state.offer.product_id}) Total: {this.state.offer.amount*this.state.offer.price_per_unit}(Amount:{this.state.offer.amount} Price:{this.state.offer.price_per_unit})</h3>
-                            {this.state.offer.is_purchaseable && this.state.offer.is_counter_offer ?
+                            {this.state.offer.is_purchasable && this.state.offer.is_counter_offer ?
                             <div className="offer">
                             <input type="number" className="amount form-control" placeholder={"Offer price"}  onChange={this.handleOfferPrice}/>
                             <button className="offer2 btn btn-primary btn-block" onClick={this.handleCounterOffer}> Counter Offer </button>   
@@ -114,7 +114,7 @@ class Offer extends Component{
 					        </div>
 				            }
                             </div>
-                            :this.state.offer.is_purchaseable ?
+                            :this.state.offer.is_purchasable ?
                             <div>
                             {this.state.payment  && 
                                 <div>

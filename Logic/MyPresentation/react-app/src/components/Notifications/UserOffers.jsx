@@ -26,6 +26,7 @@ class UserOffers extends Component {
 					case 200: //welcome
 					response.json().then(
 						offers => {
+                            // console.log(offers);
 							let user_offers =[]
 							// console.log("myoffers" ,offers)
 							user_offers = offers.map(offer => {
@@ -38,11 +39,12 @@ class UserOffers extends Component {
                                     product_name:JSON.parse(offer).product_name,
                                     price_per_unit:JSON.parse(offer).price_per_unit,
                                     amount:JSON.parse(offer).amount,
-                                    is_purchaseable:JSON.parse(offer).is_purchaseable,
+                                    //is_purchasable
+                                    is_purchasable:JSON.parse(offer).is_purchasable,
                                     is_counter_offer:JSON.parse(offer).is_counter_offer,
                                     offer_id:JSON.parse(offer).offer_id,
 								}
-                                // console.log("temp",temp)
+                                console.log("temp",temp)
 								return temp;
 							})
 							this.setState({user_offers})
