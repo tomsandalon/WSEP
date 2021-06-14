@@ -765,17 +765,21 @@ export const CounterOffer = (offer_id: number, user_id: number, new_price_per_un
 const _CounterOffer = ([offer_id, user_id, new_price_per_unit]: [number, number, number], attempts: number): Promise<boolean> =>
     getDB().transaction(async (trx: any) => {
         const shop_id = (await trx.select(shop.pk).from(offer.name).where({offer_id: offer_id}))[0].shop_id;
-        const all_management = (await trx
+        let all_management = (await trx
             .select(
                 trx.raw(`${offer_id} as offer_id`),
                 user.pk).
             from({
-                A:trx.select(user.pk).from(manages.name).where({shop_id: shop_id}).union(trx.select(user.pk).from(owns.name).where({shop_id: shop_id}))
+                A: trx.select(user.pk).from(manages.name).where({shop_id: shop_id})
+                    .union(trx.select(user.pk).from(owns.name).where({shop_id: shop_id}))
+                    .union(trx.select(user.pk).from(shop.name).where({shop_id: shop_id}))
             }))
             .filter(m => m.user_id != user_id)
             .map(m => ({user_id: m.user_id, offer_id: m.offer_id}))
         await trx(offer_not_accepted_by.name).where({offer_id: offer_id}).del()
-        await trx(offer_not_accepted_by.name).insert(all_management)
+        if(all_management.length > 0){
+            await trx(offer_not_accepted_by.name).insert(all_management)
+        }
         await trx(offer.name).where({offer_id: offer_id}).update({isCounterOffer: 1,  price_per_unit: new_price_per_unit})
     })
         .then(success)

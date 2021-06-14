@@ -405,7 +405,9 @@ export class SystemImpl implements System {
     private static reloadUsers(users: User[]) {
         users.forEach(entry => {
             LoginImpl.getInstance().reloadUser(entry)
+            RegisterImpl.getInstance().reloadUser(entry)
         })
+
     }
 
     private static reloadShop(users: User[]): Promise<void> {

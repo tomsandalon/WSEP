@@ -17,7 +17,7 @@ import {Condition} from "./DiscountPolicy/ConditionalDiscount";
 import {LogicComposition} from "./DiscountPolicy/LogicCompositionDiscount";
 import {GetPurchaseConditions, OfferDTO, ShopRich} from "../../DataAccess/Getters";
 import {SimpleCondition} from "./PurchasePolicy/SimpleCondition";
-import {Offer, set_offer_id_counter} from "../ProductHandling/Offer";
+import {Offer, offer_id_counter, set_offer_id_counter} from "../ProductHandling/Offer";
 import {Manager, ManagerImpl} from "../ShopPersonnel/Manager";
 import {Owner, OwnerImpl} from "../ShopPersonnel/Owner";
 import {NotificationAdapter} from "../Notifications/NotificationAdapter";
@@ -691,7 +691,7 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     addOffersToShopFromDB(offers: OfferDTO[], users: User[], products: Product[]): Promise<void> {
-        set_offer_id_counter(offers.reduce((acc, cur) => Math.max(acc, cur.offer_id), -1) + 1)
+        set_offer_id_counter(Math.max((offers.reduce((acc, cur) => Math.max(acc, cur.offer_id), -1) + 1), offer_id_counter))
         this.active_offers = offers.map(o => {
             const not_accepted_by_emails = o.not_accepted_by.map(id => (users.find(u => u.user_id == id) as UserImpl).user_email)
             const res = {
