@@ -1,6 +1,7 @@
 import {Authentication} from "./Authentication";
 import {UserInfoTrio} from "./UserInfoTrio";
 import {logger} from "../Logger";
+import {User} from "../../DataAccess/Getters";
 
 export interface Register {
     registered_users: UserInfoTrio[]
@@ -13,7 +14,7 @@ export interface Register {
 export class RegisterImpl implements Register {
     private static instance: RegisterImpl;
     private _password_handler: Authentication
-    private readonly _registered_users: UserInfoTrio[]
+    private _registered_users: UserInfoTrio[]
 
     private constructor() {
         this._password_handler = Authentication.getInstance();
@@ -101,6 +102,12 @@ export class RegisterImpl implements Register {
             return false;
         }
         return this.alreadyExists(user_email);
+    }
+
+    reloadUser(entry: User) {
+        this._registered_users = this.registered_users.concat([
+            new UserInfoTrio(entry.email, entry.password, entry.age)
+        ])
     }
 }
 
