@@ -122,7 +122,7 @@ router.get('/', (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    const result = service.offerIsPurchasable(user_id, request.body.shop_id, request.body.offer_id);
+    const result = service.offerIsPurchasable(user_id, request.query.shop_id, request.query.offer_id);
     if (typeof result === 'string') {
         response.status(BadRequest);
     } else {
@@ -173,7 +173,7 @@ router.get(shop_offer, (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    const result = service.getActiveOfferForShop(user_id, request.body.shop_id);
+    const result = service.getActiveOfferForShop(user_id, request.query.shop_id);
     if (typeof result === 'string') {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
