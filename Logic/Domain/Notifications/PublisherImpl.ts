@@ -1,20 +1,12 @@
 import {Notification} from "./Notification";
 import {Publisher} from "./Publisher";
 import {logger} from "../Logger";
-<<<<<<< HEAD
 import * as P from "../../Service/Publisher"
-=======
->>>>>>> 2231bdd232e4d5e9de87c795bf17a0b54a57841b
 import {LoginImpl} from "../Users/Login";
 import {ClearNotifications, Notify, RemoveNotificationsByPrefix} from "../DBCommand";
 import {SystemImpl} from "../System";
 
-<<<<<<< HEAD
 // let P: any
-=======
-// import * as P from "../../Service/Publisher"
-let P: any
->>>>>>> 2231bdd232e4d5e9de87c795bf17a0b54a57841b
 
 export class PublisherImpl implements Publisher {
     private static instance: PublisherImpl;

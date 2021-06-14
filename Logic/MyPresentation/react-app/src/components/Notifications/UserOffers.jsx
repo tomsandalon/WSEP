@@ -6,37 +6,7 @@ class UserOffers extends Component {
     {
         super(props);
         this.state = {
-            offers:[
-                {
-                    shop_id:'1',
-                    shop_name:'NVIDIA',
-                    product_name:'gtx',
-                    product_id:'1',
-                    amount:'15',
-                    price_per_unit:'25',
-                    is_purchaseable:true,
-                    is_counter_offer:true,
-                },
-                {
-                    shop_id:'2',
-                    shop_name:'KSP',
-                    product_name:'rtx',
-                    product_id:'2',
-                    amount:'25',
-                    price_per_unit:'25',
-                    is_purchaseable:true,
-                    is_counter_offer:false,
-                },
-                {
-                    shop_id:'3',
-                    shop_name:'IVORY',
-                    product_name:'amd',
-                    product_id:'3',
-                    amount:'25',
-                    price_per_unit:'25',
-                    is_purchaseable:false,
-                    is_counter_offer:false,
-                }
+            user_offers:[
             ],
             payment:false,
             
@@ -50,25 +20,32 @@ class UserOffers extends Component {
 				'Cookie': document.cookie
 			},
 		  };
-		  fetch('/cart',requestOptions)
+		  fetch('/offer/user',requestOptions)
 			  .then(async response => {
 				switch(response.status){
 					case 200: //welcome
 					response.json().then(
 						offers => {
-							let offer =[]
-							console.log(offers)
-							offer = offers.map(offer => {
-								const temp ={
-									// basket_id:JSON.parse(basket).basket_id,
-									// shop_id:JSON.parse(basket).shop.id,
-									// shop_name:JSON.parse(basket).shop.name,
-									// products:JSON.parse(basket).products,
+							let user_offers =[]
+							// console.log("myoffers" ,offers)
+							user_offers = offers.map(offer => {
+                                console.log("offer",JSON.parse(offer))
+								const temp =
+                                {
+									shop_id:JSON.parse(offer).shop_id,
+									shop_name:JSON.parse(offer).shop_name,
+                                    product_id:JSON.parse(offer).product_id,
+                                    product_name:JSON.parse(offer).product_name,
+                                    price_per_unit:JSON.parse(offer).price_per_unit,
+                                    amount:JSON.parse(offer).amount,
+                                    is_purchaseable:JSON.parse(offer).is_purchaseable,
+                                    is_counter_offer:JSON.parse(offer).is_counter_offer,
+                                    offer_id:JSON.parse(offer).offer_id,
 								}
+                                // console.log("temp",temp)
 								return temp;
-								// JSON.parse(basket).products.forEach(product => console.log(product))
 							})
-							this.setState({})
+							this.setState({user_offers})
 						}
 						)
 					break;
@@ -85,7 +62,7 @@ class UserOffers extends Component {
 			})
 	}
     componentDidMount() {
-        // this.displayOffers();
+        this.displayOffers();
     }
     
     render() {
@@ -97,10 +74,10 @@ class UserOffers extends Component {
                 </div>
                 <form>
                     <ul>
-                        { this.state.offers.length === 0 ? <div class="rowalert alert alert-danger" role="alert">
+                        { this.state.user_offers.length === 0 ? <div class="rowalert alert alert-danger" role="alert">
                                                                 <i className="icon3 far fa-bell"><h4>No offers available.</h4></i> 
                                                             </div>
-                        : this.state.offers.map((offer) => 
+                        : this.state.user_offers.map((offer) => 
                         <Offer offer={offer}></Offer>
                         )}
                     </ul>

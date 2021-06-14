@@ -53,7 +53,53 @@ class Payment extends Component {
 	handleName = (event) => {
 		this.setState({name:event.target.value})
 	}
-    
+    handleOffer = (event) => {
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': document.cookie
+            },
+            body: JSON.stringify({
+                offer_id:this.props.offer_id,
+                payment:{
+                    payment_info:{
+						holder_id:this.state.id,
+						holder_name:this.state.name,
+						card_number:this.state.cardNo,
+						month:this.state.month,
+						year:this.state.year,
+						ccv:this.state.ccv
+					},
+					delivery_info:{
+						name:this.state.delivery_name,
+						address:this.state.address,
+						city:this.state.city,
+						country:this.state.country,
+						zip:this.state.zip,
+
+					},
+                }
+            })
+        };
+        fetch('/purchase',requestOptions)
+            .then(async response => {
+                switch (response.status) {
+                    case 200: //welcome
+                        // console.log("sucesss>>>")
+                        this.props.refreshCart();
+                        break;
+                    case 400:
+                        const err_message_fail = await response.text();
+                        this.props.handleFailedPayment(err_message_fail);
+                        break;
+                    case 404: //server not found
+                        break;
+                    default:
+                        break;
+                }
+            });
+    } 
     handleSubmit = (event) => {
         const requestOptions = {
             method: 'POST',
@@ -122,7 +168,11 @@ class Payment extends Component {
 							  <input type="text" className="pay fadeIn second" placeholder="City" onChange={this.handleCity}/>
 							  <input type="text" className="pay fadeIn second" placeholder="Country" onChange={this.handleCountry}/>
 							  <input type="text" className="pay fadeIn second" placeholder="Zip" onChange={this.handleZip}/>
-                    <button type="button" class="pay2 btn btn-primary" onClick={this.handleSubmit}>Pay</button>
+					{this.props.isOffer ?  
+                    <button type="button" class="pay2 btn btn-primary" onClick={this.handleOffer}>Pay</button>
+					:
+					<button type="button" class="pay2 btn btn-primary" onClick={this.handleSubmit}>Pay</button>
+					}
                     <button type="button" class="pay2 btn btn-primary" onClick={() => this.props.cancelPayment()}>Cancel</button>
                   </form>
             </div>

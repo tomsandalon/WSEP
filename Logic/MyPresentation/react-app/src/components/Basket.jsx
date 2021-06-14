@@ -71,7 +71,7 @@ class Basket extends Component {
 			</div> 
 			{this.state.payment  && 
 					<div>
-						<Payment handleFailedPayment={this.handleFailedPayment} refreshCart ={this.props.refreshCart} shop_id={this.props.selected_basket.shop_id} cancelPayment={this.cancelPayment}/>
+						<Payment isOffer={false} handleFailedPayment={this.handleFailedPayment} refreshCart ={this.props.refreshCart} shop_id={this.props.selected_basket.shop_id} cancelPayment={this.cancelPayment}/>
 					</div>
 				}
 		</aside> 

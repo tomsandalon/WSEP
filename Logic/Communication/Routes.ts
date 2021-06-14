@@ -244,7 +244,7 @@ export const route_shop_manage_product_rating = route_shop_manage_product + rate
  * @return 200 -> text
  *
  * @method POST
- * @function purchaseOffer
+ * @function purchaseOffer - DONE
  * @params user_id, offer_id, payment_info
  * @location body
  * @return 404 -> error -> server not found mssg
@@ -254,14 +254,14 @@ export const route_shop_manage_product_rating = route_shop_manage_product + rate
 export const route_offer = offer;
 
 /**
- * @method GET
+ * @method GET - DONE
  * @function getActiveOffersAsUser
  * @params user_id
  * @return 404 -> error -> server not found mssg
  * @return 400 -> error -> text
  * @return 200 -> JSON
  *
- * @method POST
+ * @method POST - DONE
  * @function makeOffer
  * @params user_id, shop_id, product_id, amount, price_per_unit
  * @location body
@@ -269,7 +269,7 @@ export const route_offer = offer;
  * @return 400 -> error -> text
  * @return 200 -> OK
  *
- * @method PUT
+ * @method PUT - DONE
  * @function denyCounterOfferAsUser
  * @params user_id, offer_id
  * @location body

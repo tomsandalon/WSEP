@@ -65,6 +65,7 @@ router.post(user_offer, (request: any, response: any) => {
         response.send(result);
         response.end()
     } else {
+        console.log("Offer accepted");
         response.status(OK);
         response.end();
     }
@@ -86,10 +87,12 @@ router.put(user_offer, (request: any, response: any) => {
     const user_id = session_data.user_id;
     const result = service.denyCounterOfferAsUser(user_id, request.body.offer_id);
     if (typeof result === 'string') {
+        console.log("Deny offer failed");
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
+        console.log("Deny offer success");
         response.status(OK);
         response.end();
     }
@@ -135,10 +138,12 @@ router.post('/', (request: any, response: any) => {
     const user_id = session_data.user_id;
     const result = service.purchaseOffer(user_id, request.body.offer_id, request.body.payment_info);
     if (typeof result === 'string') {
+        console.log("purchase success");
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
+        console.log("purchase failed");
         response.status(OK);
         response.end();
     }

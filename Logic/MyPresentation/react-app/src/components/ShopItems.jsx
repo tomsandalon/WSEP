@@ -47,6 +47,7 @@ class ShopItems extends Component {
         .then((shops) => {
         let shopsInfo = [];
         shops.forEach((shop) => {
+            // console.log("shops",shop);
             const tempShop = JSON.parse(shop);
             const products_string = JSON.parse(tempShop.products);
             const products = products_string.map((product) =>
@@ -59,6 +60,7 @@ class ShopItems extends Component {
             name: tempShop.name,
             products: products,
             };
+            console.log(products);
             shopsInfo.push(shopInfo);
         });
         this.setState({ shopsInfo: shopsInfo });
@@ -101,7 +103,7 @@ componentDidMount(){
                             {((this.state.shopsInfo !== null) && (this.state.shopsInfo.length !== 0)) &&
                             (this.state.shopsInfo.map(shop =>
                                     shop.products.map(item =>
-                                        <ItemOfShop rating={item._rating.real_rating} raters={item._rating.number_of_rating} productID={item._product_id} shopID={shop.id} shopName={shop.name} name={item._name} available="Available" amount={item._amount} price={item._base_price}/>
+                                        <ItemOfShop type={item._purchase_type} rating={item._rating.real_rating} raters={item._rating.number_of_rating} productID={item._product_id} shopID={shop.id} shopName={shop.name} name={item._name} available="Available" amount={item._amount} price={item._base_price}/>
                                     )
                             ))}
                         </div>   

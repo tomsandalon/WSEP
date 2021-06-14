@@ -647,6 +647,10 @@ body h1 {
   border-bottom-right-radius: 20px;
   transform: rotate(8deg);
 }
+.size{
+  width:200px;
+  height:200px;
+}
 .gandalf .head .hair::after {
   top: 13px;
   right: -16px;

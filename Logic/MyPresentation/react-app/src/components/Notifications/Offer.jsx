@@ -1,15 +1,45 @@
 import React,{ Component} from 'react';
-
+import {Alert} from 'reactstrap';
 import Payment from '../Payment';
 class Offer extends Component{
-    constructor(props)
-    {
+    constructor(props){
         super(props);
-        this.state = {offer:props.offer}
+        this.state = {
+            offer:props.offer,
+            visible:false,
+            errorMsg:'',
+        }
     }
-    handleDecline = () =>{
 
-    }
+    handleDecline = () =>{
+		const requestOptions = {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				'Cookie': document.cookie,
+			},
+			body: JSON.stringify({
+                offer_id:this.offer.offer_id
+			})
+		  };
+		  fetch('/offer/user',requestOptions)
+			  .then(async response => {
+				switch(response.status){
+					case 200: //welcome
+					this.props.refreshOffers();
+					break;
+					case 400:
+					const err_message_fail = await response.text();
+					console.log(err_message_fail);
+                    break;
+                	case 404: //server not found
+                    break;
+					default:
+					break;
+				}
+			})
+	}
+    
     handleFailedPayment = (message) =>{
 		console.log(message);
 		this.setState({visible:true,errorMsg:message});
@@ -17,6 +47,9 @@ class Offer extends Component{
     handlePay = (e) =>{
 		this.setState({payment:true});
         e.preventDefault();
+	}
+    toggle(){
+		this.setState({visible:!this.state.visible, errorMsg:''})
 	}
     cancelPayment = () =>{
 		this.setState({payment:false});
@@ -38,7 +71,7 @@ class Offer extends Component{
                             <button className="offer2 btn btn-primary btn-block" onClick={this.handleDecline}> Decline </button>
                             {this.state.payment  && 
 					        <div>
-						        <Payment handleFailedPayment={this.handleFailedPayment} refreshCart ={this.displayOffers} shop_id={1} cancelPayment={this.cancelPayment}/>
+						        <Payment isOffer={true} handleFailedPayment={this.handleFailedPayment} refreshOffers ={this.props.refreshOffers} offer_id ={this.offer.offer_id} cancelPayment={this.cancelPayment}/>
 					        </div>
 				            }
                             </div>
@@ -46,13 +79,14 @@ class Offer extends Component{
                             <div>
                             {this.state.payment  && 
                                 <div>
-                                    <Payment handleFailedPayment={this.handleFailedPayment} refreshCart ={this.displayOffers} shop_id={1} cancelPayment={this.cancelPayment}/>
-                                </div>
+                                   <Payment isOffer={true} handleFailedPayment={this.handleFailedPayment} refreshOffers ={this.props.refreshOffers} offer_id ={this.offer.offer_id}  cancelPayment={this.cancelPayment}/>
+					        </div>
                                 }
                             <button className="offer2 btn btn-primary btn-block" onClick={this.handlePay}> Purchase </button>
                             </div>
                             : <button className="offer2 btn btn-secondary btn-block" onClick={(e) => e.preventDefault()}> Offer pending </button> }
                         </div>
+                        <Alert color="danger" toggle={this.toggle.bind(this)} isOpen={this.state.visible}>{this.state.errorMsg}</Alert>   
                 </React.Fragment>
         )
     }
