@@ -20,7 +20,7 @@ export class ProxySystem implements System{
     }
 
     init(): Promise<void> {
-        if(this.system == undefined){
+        if (this.system == undefined) {
             return Promise.resolve(undefined);
         }
         return ConnectToDB()
@@ -31,15 +31,22 @@ export class ProxySystem implements System{
             )
     }
 
+    getAllShopsInSystem(): string | string[] {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getAllShopsInSystem()
+    }
+
     isAdmin(user_id: number): string | boolean {
-        if(this.system == undefined){
+        if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         return this.system.isAdmin(user_id);
     }
 
     isManager(user_id: number): string | boolean {
-        if(this.system == undefined){
+        if (this.system == undefined) {
             return TestNotAssociatedWithImplementation
         }
         return this.system.isManager(user_id);

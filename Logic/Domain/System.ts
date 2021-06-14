@@ -108,6 +108,8 @@ export interface System {
 
     userOrderHistory(user_id: number): string | string[]
 
+    getAllShopsInSystem(): string | string[]
+
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
                base_price: number, purchase_type?: Purchase_Type): boolean | string
 
@@ -1061,6 +1063,10 @@ export class SystemImpl implements System {
         if (typeof result == "string") return result
         const {shop, user_email} = result
         return shop.getAllPurchasePolicies(user_id)
+    }
+
+    getAllShopsInSystem(): string[] {
+        return this.shops.map(s => s.toString())
     }
 
     getAllShops(user_id: number): string | string[] {

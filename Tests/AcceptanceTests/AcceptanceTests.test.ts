@@ -291,7 +291,7 @@ describe('Guest:2.9.2: Auction - add a bid to an auction', () => {
     })
     it('Happy', async () => {
         let ret = system.makeOffer(user, shopID, ProductImpl._product_id_specifier - 1, 1, 999)
-        expect(typeof ret != "string").to.b.true
+        expect(typeof ret != "string").to.be.true
         ret = system.acceptOfferAsManagement(originOwner, shopID, offer_id_counter - 1)
         expect(typeof ret != "string").to.be.true
         ret = await system.purchaseOffer(user, offer_id_counter - 1, "ApplePay")
@@ -305,7 +305,7 @@ describe('Guest:2.9.2: Auction - add a bid to an auction', () => {
         ret = await system.purchaseOffer(user, offer_id_counter - 1, "ApplePay")
         expect((system.userOrderHistory(user) as string[]).length == 0).to.be.true
     });
-    it('Bad', () => {
+    it('Bad', async () => {
         let ret = system.makeOffer(user, shopID, ProductImpl._product_id_specifier - 1, 1, 999)
         expect(typeof ret != "string").to.be.true
         ret = system.removeProduct(originOwner, shopID, ProductImpl._product_id_specifier - 1)

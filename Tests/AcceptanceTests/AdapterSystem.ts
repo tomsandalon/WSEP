@@ -21,6 +21,10 @@ export class AdapterSystem implements System {
         return this.system.init();
     }
 
+    getAllShopsInSystem(): string | string[] {
+        return this.system.getAllShopsInSystem()
+    }
+
     userOrderHistory(user_id: number): string | string[] {
         return this.system.userOrderHistory(user_id);
     }
