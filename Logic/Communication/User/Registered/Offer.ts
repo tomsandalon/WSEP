@@ -84,7 +84,17 @@ router.put(user_offer, (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    const result = service.denyCounterOfferAsUser(user_id, request.body.offer_id);
+    let result;
+    switch (request.body.action) {
+        case 'Deny':
+            result = service.denyCounterOfferAsUser(user_id, request.body.offer_id);
+            break;
+        case 'Counter':
+            result = service.counterOfferAsUser(user_id, request.body.shop_id, request.body.offer_id, request.body.new_price_per_unit);
+            break;
+        default:
+            result = 'Bad action on offer as user';
+    }
     if (typeof result === 'string') {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");

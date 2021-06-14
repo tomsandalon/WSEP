@@ -47,6 +47,7 @@ export const isOwner = '/is/owner'
 export const isLoggedIn = '/is/loggedin'
 
 export const shop_purchase_history = '/purchase_history'
+export const purchase_type = '/purchase_type'
 export const purchase_cart = "/all"
 export const second = 1000;
 export const minute = 60 * second;

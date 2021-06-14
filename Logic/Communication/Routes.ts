@@ -3,7 +3,7 @@ import {
     assign_owner,
     categories, details, isAdmin, isLoggedIn, isManager, isOwner, offer,
     permissions,
-    purchase_cart,
+    purchase_cart, purchase_type,
     rate, shop_offer,
     shop_purchase_history, user_offer
 } from "./Config/Config";
@@ -225,6 +225,27 @@ export const route_shop_ownership_assign_owner = route_shop_ownership + assign_o
 export const route_shop_purchase_history = route_shop + shop_purchase_history
 
 /**
+ * @method POST
+ * @function addPurchaseType
+ * @params user_id, shop_id, purchase_type
+ ** Purchase_type is 0 or 1 if not you get bad request code
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> OK
+ *
+ * @method DELETE
+ * @function removePurchaseType
+ * @params user_id, shop_id, purchase_type
+ ** Purchase_type is 0 or 1 if not you get bad request code
+ * @location body
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> OK
+ */
+export const route_shop_purchase_type = route_shop + purchase_type
+
+/**
  * @method PUT
  * @function rateProduct
  * @params user_id, shop_id, product_id, rating
@@ -270,9 +291,9 @@ export const route_offer = offer;
  * @return 200 -> OK
  *
  * @method PUT
- * @function denyCounterOfferAsUser
- * @params user_id, offer_id
  * @location body
+ ** If action = 'Deny' => denyCounterOfferAsUser => params user_id, offer_id
+ ** If action = 'Counter' => counterOfferAsUser => params user_id, shop_id, offer_id, new_price_per_unit
  * @return 404 -> error -> server not found mssg
  * @return 400 -> error -> text
  * @return 200 -> OK

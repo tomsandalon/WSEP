@@ -1,5 +1,5 @@
 import {
-    BadRequest, categories, OK,
+    BadRequest, categories, OK, purchase_type,
     ServerNotFound,
     service, ServiceUnavailable,
     Session,
@@ -116,6 +116,68 @@ router.get(shop_purchase_history, (request: any, response: any) => {
         response.setHeader("Content-Type", "application/json");
         response.status(OK);
         response.json(result)
+    }
+    response.end();
+})
+
+router.post(purchase_type, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
+    const user_id = session_data.user_id;
+    let result;
+    if(request.body.purchase_type == 0 || request.body.purchase_type == 1){
+        result = service.addPurchaseType(user_id, request.body.shop_id, request.body.purchase_type);
+    } else {
+        result = 'bad purchase_type'
+    }
+    response.setHeader("Content-Type", "text/html");
+    if(typeof result == "string") {
+        response.status(BadRequest);
+        response.send(result);
+    }
+    else{
+        response.status(OK);
+    }
+    response.end();
+})
+
+router.delete(purchase_type, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
+    const user_id = session_data.user_id;
+    let result;
+    if(request.body.purchase_type == 0 || request.body.purchase_type == 1){
+        result = service.removePurchaseType(user_id, request.body.shop_id, request.body.purchase_type);
+    } else {
+        result = 'bad purchase_type'
+    }
+    response.setHeader("Content-Type", "text/html");
+    if(typeof result == "string") {
+        response.status(BadRequest);
+        response.send(result);
+    }
+    else{
+        response.status(OK);
     }
     response.end();
 })
