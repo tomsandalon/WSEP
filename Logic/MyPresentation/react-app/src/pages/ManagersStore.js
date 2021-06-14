@@ -8,12 +8,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Divider } from "@material-ui/core";
 import DiscountsBlock from "../components/DiscountsBlock";
 import PurchasePoliciesBlock from "../components/PurchasePoliciesBlock";
+import OffersBlock from "../components/Offers_Block";
 import ComposePolicy from "../components/Compose_Purchase_Policy";
 import ComposeDiscount from "../components/ComposeDiscount";
+import Switch from "react-switch";
+import { useState } from "react";
 
 const ManagersStore = () => {
   const { storeID, name } = useParams();
   const history = useHistory();
+  const [acceptOffers, setAcceptOffers] = useState(false);
   const {
     data: storeItems,
     itemsIsPending,
@@ -39,6 +43,14 @@ const ManagersStore = () => {
     policiesError,
   } = useFetch(`/user/shop/policy?shop_id=${storeID}`);
   const purchasePolicies = JSON.parse(unparsed_purchasePolicies);
+  const {
+    data: unparsedPendingOffers,
+    offersIsPending,
+    offersError,
+  } = useFetch(`/offer/shop?shop_id=${storeID}`);
+  const pendingOffers = unparsedPendingOffers;
+  // const pendingOffers = JSON.parse(unparsedPendingOffers);
+  console.log(pendingOffers);
 
   const {
     data: unparsed_discounts,
@@ -68,12 +80,32 @@ const ManagersStore = () => {
   };
 
   isUser();
+  const {
+    data: shouldAcceptOffers,
+    acceptOffersIsPending,
+    acceptOffersError,
+  } = useFetch(`route`);
+  // console.log(shouldAcceptOffers);
+  //TODO acceptOffers = shouldAcceptOffers[1] == true
+  const toggleDoesAcceptOffers = () => {};
 
   return (
     <div className="row">
       <div className="col-3">
         <output>
           <div className="card">
+            <div className="row">
+              <div className="col-5">
+                <p>Store accepts offers: </p>
+              </div>
+              <div className="col-7">
+                <Switch
+                  checked={acceptOffers}
+                  onChange={toggleDoesAcceptOffers}
+                />
+              </div>
+            </div>
+            <hr></hr>
             {parsedStaff && (
               <article className="management">
                 <div className="card-body">
@@ -182,6 +214,18 @@ const ManagersStore = () => {
             />
           )}
           <ComposePolicy storeID={storeID} storeName={name}></ComposePolicy>
+          <hr></hr>
+          <h3>Offers:</h3>
+          {pendingOffers && (
+            <OffersBlock
+              storeName={name}
+              storeID={storeID}
+              error={discountsError}
+              isPending={discountsIsPending}
+              offers={pendingOffers}
+            />
+          )}
+          <hr></hr>
         </div>
         {/* </div> */}
       </div>

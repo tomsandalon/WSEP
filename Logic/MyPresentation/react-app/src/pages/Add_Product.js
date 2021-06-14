@@ -15,6 +15,27 @@ const AddProduct = () => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
+  const isUser = () => {
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json", Cookie: document.cookie },
+    };
+    fetch("/user/is/loggedin", requestOptions).then(async (response) => {
+      switch (response.status) {
+        case 200:
+          let value = await response.text();
+          value = value === "true" ? true : false;
+          if (!value) history.push("/home");
+          // return value;
+          break;
+        default:
+          history.push("/home");
+          break;
+      }
+    });
+  };
+
+  isUser();
 
   const onDismiss = () => setVisible(false);
   const success = () => {
