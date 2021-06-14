@@ -225,6 +225,17 @@ export const route_shop_ownership_assign_owner = route_shop_ownership + assign_o
 export const route_shop_purchase_history = route_shop + shop_purchase_history
 
 /**
+ * @method GET
+ * @function getPurchaseTypes
+ * @params user_id, shop_id
+ ** Purchase_type are:
+ ** 0 = IMMEDIATE
+ ** 1 = OFFER
+ * @location query
+ * @return 404 -> error -> server not found mssg
+ * @return 400 -> error -> text
+ * @return 200 -> json
+ *
  * @method POST
  * @function addPurchaseType
  * @params user_id, shop_id, purchase_type
