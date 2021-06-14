@@ -132,7 +132,7 @@ router.get('/', (request: any, response: any) => {
     response.send(result);
 })
 
-router.post('/', (request: any, response: any) => {
+router.post('/', async (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -140,13 +140,13 @@ router.post('/', (request: any, response: any) => {
         response.end()
         return
     }
-    if (!service.isAvailable()){
+    if (!service.isAvailable()) {
         response.status(ServiceUnavailable);
         response.end();
         return;
     }
     const user_id = session_data.user_id;
-    const result = service.purchaseOffer(user_id, request.body.offer_id, request.body.payment_info);
+    const result = await service.purchaseOffer(user_id, request.body.offer_id, request.body.payment_info);
     if (typeof result === 'string') {
         console.log("purchase success");
         response.status(BadRequest);
