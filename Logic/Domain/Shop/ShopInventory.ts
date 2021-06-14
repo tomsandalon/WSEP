@@ -462,7 +462,13 @@ export class ShopInventoryImpl implements ShopInventory {
             purchase_history: this._purchase_history.toString(),
             discount_policies: this.discount_policies,
             purchase_policies: this.purchase_policies,
-            active_offers: this.active_offers
+            active_offers: this.active_offers.map(o => {
+                return {
+                offer: JSON.parse(o.offer.toString()),
+                managers_not_accepted: o.managers_not_accepted,
+                owners_not_accepted: o.owners_not_accepted
+                }
+            })
         })
     }
 

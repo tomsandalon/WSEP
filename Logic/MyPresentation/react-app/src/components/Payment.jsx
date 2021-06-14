@@ -82,12 +82,12 @@ class Payment extends Component {
                 }
             })
         };
-        fetch('/purchase',requestOptions)
+        fetch('/offer',requestOptions)
             .then(async response => {
                 switch (response.status) {
                     case 200: //welcome
                         // console.log("sucesss>>>")
-                        this.props.refreshCart();
+                        this.props.refreshOffers();
                         break;
                     case 400:
                         const err_message_fail = await response.text();
@@ -133,7 +133,7 @@ class Payment extends Component {
             .then(async response => {
                 switch (response.status) {
                     case 200: //welcome
-                        // console.log("sucesss>>>")
+                        console.log("sucesss>>>")
                         this.props.refreshCart();
                         break;
                     case 400:

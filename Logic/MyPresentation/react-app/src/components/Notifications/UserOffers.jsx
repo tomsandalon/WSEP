@@ -78,7 +78,7 @@ class UserOffers extends Component {
                                                                 <i className="icon3 far fa-bell"><h4>No offers available.</h4></i> 
                                                             </div>
                         : this.state.user_offers.map((offer) => 
-                        <Offer offer={offer}></Offer>
+                        <Offer refreshOffers={this.displayOffers} offer={offer}></Offer>
                         )}
                     </ul>
                 </form>

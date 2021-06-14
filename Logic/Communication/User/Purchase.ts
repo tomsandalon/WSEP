@@ -59,12 +59,15 @@ router.post('/', (request: any, response: any) => {
     }
     const user_id = session_data.user_id;
     const result = service.purchaseShoppingBasket(user_id, request.body.shop_id, request.body.payment);
+    
     if (typeof result === 'string') {
+        console.log("purchase error",result);
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
         response.end()
     } else {
+        console.log("purchase ok",result);
         response.status(OK);
         response.end();
     }
