@@ -8,6 +8,9 @@ import {ShopManagementImpl} from "../../../../Logic/Domain/Shop/ShopManagement";
 import {ProductImpl} from "../../../../Logic/Domain/ProductHandling/Product";
 import {SystemImpl} from "../../../../Logic/Domain/System";
 import {id_counter} from "../../../../Logic/Domain/Users/User";
+import * as DBCommand from "../../../../Logic/Domain/DBCommand"
+
+DBCommand.turnBlockDBON()
 
 describe('Authentication Tests', () => {
     it('should return a hashed password ', () => {
@@ -136,7 +139,7 @@ describe('Guest testing', () => {
         if(typeof user ==  "string")
             assert.fail()
         expect(user.user_email == "" && user.password == "").eq(true)
-        let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","nye");
+        let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "nye", [], []);
         //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
         // @ts-ignore
         shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -157,7 +160,7 @@ describe('User Tests', () => {
             assert.fail()
         else
         {
-            let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+            let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "ney", [], []);
             //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
             // @ts-ignore
             shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -179,7 +182,7 @@ describe('User Tests', () => {
             assert.fail()
         else
         {
-            let shop = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"),"hey","nye");
+            let shop = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"), "hey", "nye", [], []);
             //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
             // @ts-ignore
             shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -210,7 +213,7 @@ describe('User Tests', () => {
                 assert.fail()
             else
             {
-                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "ney", [], []);
                 //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
                 // @ts-ignore
                 shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
@@ -244,11 +247,11 @@ describe('User Tests', () => {
                 assert.fail()
             else
             {
-                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"),"hey","ney");
+                let shop = new ShopInventoryImpl(1, new ShopManagementImpl(1, "mark"), "hey", "ney", [], []);
                 //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
                 // @ts-ignore
                 shop.addItem("vodka","vodka", 100,["drinks"],15,null,null)
-                let shop2 = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"),"hey","ney");
+                let shop2 = new ShopInventoryImpl(2, new ShopManagementImpl(2, "mark"), "hey", "ney", [], []);
                 //(name: string, description: string, amount: number, categories: string[], base_price: number, discount_type: DiscountType, purchase_type: PurchaseType):
                 // @ts-ignore
                 shop2.addItem("banana","banana", 100,["food"],15,null,null)

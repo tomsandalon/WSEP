@@ -2,23 +2,23 @@ import {connectToDB} from './DB.config';
 import {
     AddDiscount, addDiscountConditionType,
     addDiscountOperator,
-    AddItemToBasket,
+    AddItemToBasket, AddOffer,
     addPermissions,
     AddProduct,
     addPurchaseConditionOperator,
     addPurchaseConditionType,
     AddPurchasePolicy,
-    addPurchaseTypes,
+    addPurchaseTypes, AddPurchaseTypeToShop,
     AddShop,
     AppointManager,
-    AppointOwner, CreateAdminIfNotExist,
+    AppointOwner, CounterOffer, CreateAdminIfNotExist, OfferAcceptedByManagement,
     PurchaseBasket,
     RateProduct,
     RegisterUser,
     RemainingManagement,
     removeDiscount,
-    RemoveManager,
-    removePurchasePolicy,
+    RemoveManager, RemoveNotificationsByPrefix, RemoveOffer,
+    removePurchasePolicy, RemovePurchaseTypeFromShop,
     UpdatePermissions
 } from "./API";
 import {
@@ -78,6 +78,7 @@ const first_shop = {
     location: "USA",
     bank_info: "USA 4 ever",
     active: true,
+    purchase_type: [1]
 };
 const first_product = {
     product_id: 1,
@@ -110,84 +111,84 @@ export const initData = () =>
         .then((_: any) =>
             addDiscountOperator([1,2,3]))
         .then((_: any) => addPermissions([1,2,3]))
-        // .then((_: any) =>
-        //     AddShop(first_shop))
-        // .then((_: any) => AddProduct(first_product))
-        // .then((_: any) => AddItemToBasket({
-        //     user_id: third_user.user_id,
-        //     shop_id: first_shop.shop_id,
-        //     product_id: first_product.product_id,
-        //     amount: 20
-        // }))
-        // .then((_: any) => AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm]))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 1, {
-        //     value: "VVV",
-        //     purchase_condition: first_purchase_condition_type
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 2, {
-        //     value: "abb",
-        //     purchase_condition: first_purchase_condition_type
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 3, {
-        //     value: "ccc",
-        //     purchase_condition: first_purchase_condition_type
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 4, {
-        //     value: "444",
-        //     purchase_condition: first_purchase_condition_type
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 5, {
-        //     value: "555",
-        //     purchase_condition: first_purchase_condition_type
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 6, {
-        //     first_policy: 1,
-        //     second_policy: 2,
-        //     operator: first_purchase_condition_operator,
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 7, {
-        //     first_policy: 3,
-        //     second_policy: 6,
-        //     operator: first_purchase_condition_operator,
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 8, {
-        //     first_policy: 4,
-        //     second_policy: 5,
-        //     operator: first_purchase_condition_operator,
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 9, {
-        //     first_policy: 8,
-        //     second_policy: 7,
-        //     operator: first_purchase_condition_operator,
-        // }))
-        // .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 10, {
-        //     value: "1010",
-        //     purchase_condition: first_purchase_condition_type
-        // }))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 1, 111))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 2, 222))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 3, 333))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 4, 444))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 5, 555))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 6, 666))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 7, {
-        //             first_policy: 1,
-        //             second_policy: 2,
-        //             operator: first_discount_operator
-        //         }))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 8, {
-        //         discount_param: "banana",
-        //         discount_condition: first_discount_condition_type,
-        //         operand_discount: 3,
-        //     }))
-        // .then((_: any) => AddDiscount(first_shop.shop_id, 9, {
-        //     first_policy: 8,
-        //     second_policy: 7,
-        //     operator: first_discount_operator
-        // }))
-        // .then((_: any) => AppointOwner(third_user.email, first_user.email, first_shop.shop_id,))
-        // .then((_: any) => AppointOwner(four_user.email, first_user.email, first_shop.shop_id,))
-        // .then((_: any) => AppointOwner(five_user.email, first_user.email, first_shop.shop_id,))
+        .then((_: any) =>
+            AddShop(first_shop))
+        .then((_: any) => AddProduct(first_product))
+        .then((_: any) => AddItemToBasket({
+            user_id: third_user.user_id,
+            shop_id: first_shop.shop_id,
+            product_id: first_product.product_id,
+            amount: 20
+        }))
+        .then((_: any) => AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm]))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 1, {
+            value: "VVV",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 2, {
+            value: "abb",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 3, {
+            value: "ccc",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 4, {
+            value: "444",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 5, {
+            value: "555",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 6, {
+            first_policy: 1,
+            second_policy: 2,
+            operator: first_purchase_condition_operator,
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 7, {
+            first_policy: 3,
+            second_policy: 6,
+            operator: first_purchase_condition_operator,
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 8, {
+            first_policy: 4,
+            second_policy: 5,
+            operator: first_purchase_condition_operator,
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 9, {
+            first_policy: 8,
+            second_policy: 7,
+            operator: first_purchase_condition_operator,
+        }))
+        .then((_: any) => AddPurchasePolicy(first_shop.shop_id, 10, {
+            value: "1010",
+            purchase_condition: first_purchase_condition_type
+        }))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 1, 111))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 2, 222))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 3, 333))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 4, 444))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 5, 555))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 6, 666))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 7, {
+                    first_policy: 1,
+                    second_policy: 2,
+                    operator: first_discount_operator
+                }))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 8, {
+                discount_param: "banana",
+                discount_condition: first_discount_condition_type,
+                operand_discount: 3,
+            }))
+        .then((_: any) => AddDiscount(first_shop.shop_id, 9, {
+            first_policy: 8,
+            second_policy: 7,
+            operator: first_discount_operator
+        }))
+        .then((_: any) => AppointOwner(third_user.email, first_user.email, first_shop.shop_id,))
+        .then((_: any) => AppointOwner(four_user.email, first_user.email, first_shop.shop_id,))
+        .then((_: any) => AppointOwner(five_user.email, first_user.email, first_shop.shop_id,))
 
 // RemoveManager(second_user.email, first_shop.shop_id)
 // AppointManager(second_user.email, first_user.email, first_shop.shop_id, [first_perm, second_perm])
@@ -215,18 +216,27 @@ export const initData = () =>
 // AddProduct(first_product)
 //         .then((result: any) => console.log(`Finish ${result}`))
 connectToDB();
-// PurchaseBasket(third_user.user_id, first_shop.shop_id, 1, new Date(), [{
-//             product_id: first_product.product_id,
-//             amount: 20,
-//             actual_price: 14,
-//             name: first_product.name,
-//             base_price: first_product.base_price,
-//             description: first_product.description,
-//             categories: first_product.categories,
-//         }
-//     ]).then((result: any) => console.log(`Finish ${result}`))C
-addDiscountConditionType([1,4,8])
-.then((result: any) => console.log(`Finish ${result}`))
 
-//
+AddPurchaseTypeToShop(1, 22)
+    .then((result: any) => console.log(`Finish ${result}`))
+
+// RemovePurchaseTypeFromShop(1, 1)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// OfferAcceptedByManagement(4, 88)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// AddOffer(1, 1, 120, 1, 120, 55)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// RemoveOffer(99)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// CounterOffer(88, 3, 120)
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+// RemoveNotificationsByPrefix('Off 1')
+//     .then((result: any) => console.log(`Finish ${result}`))
+
+
 // initData().then((result: any) => console.log(`Finish ${result}`))

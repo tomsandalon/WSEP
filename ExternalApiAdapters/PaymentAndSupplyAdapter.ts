@@ -1,7 +1,8 @@
+import {PaymentAndSupplySystem} from "./PaymentAndSupplySystem";
+
 const unirest = require('unirest');
-import {getExternalServices} from '../Logic/Config';
-const URL = getExternalServices();
-const POST = 'POST'
+
+let blockExternalServices: boolean = false
 
 export type Purchase_Info = {
     payment_info: {
@@ -21,13 +22,25 @@ export type Purchase_Info = {
     }
 }
 
+const HIGH = 100000
+const LOW = 10000
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
 
 export class PaymentAndSupplyAdapter {
+
+    private external_system: PaymentAndSupplySystem
+
 
     private static instance: PaymentAndSupplyAdapter | undefined
 
     private constructor() {
+        this.external_system = PaymentAndSupplySystem.getInstance()
     }
+
+    static TurnOnBlocking = () => blockExternalServices = true
 
     static getInstance(): PaymentAndSupplyAdapter {
         if (!this.instance) this.instance = new PaymentAndSupplyAdapter()
@@ -35,56 +48,22 @@ export class PaymentAndSupplyAdapter {
     }
 
     async handshake(): Promise<boolean> {
-        return unirest(POST, URL)
-            .field('action_type', 'handshake')
-            .end((res: { error: string | undefined; raw_body: any; }) => {
-                if (res.error) return false;
-                return res.raw_body == "OK"
-            });
+        return blockExternalServices ? Promise.resolve(true) : this.external_system.handshake()
     }
 
     async pay(card_number: string, month: string, year: string, holder: string, ccv: string, id: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'pay')
-            .field('card_number', card_number)
-            .field('month', month)
-            .field('year', year)
-            .field('holder', holder)
-            .field('ccv', ccv)
-            .field('id', id)
-            .end(this.getResult());
+        return blockExternalServices ? Promise.resolve(getRandomInt(HIGH - LOW) + LOW) : this.external_system.pay(card_number, month, year, holder, ccv, id)
     }
 
     async cancel_pay(transaction_id: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'cancel_pay')
-            .field('transaction_id', transaction_id)
-            .end(this.getResult());
+        return blockExternalServices ? Promise.resolve(1) : this.external_system.cancel_pay(transaction_id)
     }
 
     async supply(name: string, address: string, city: string, country: string, zip: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'supply')
-            .field('name', name)
-            .field('address', address)
-            .field('city', city)
-            .field('country', country)
-            .field('zip', zip)
-            .end(this.getResult());
+        return blockExternalServices ? Promise.resolve(getRandomInt(HIGH - LOW) + LOW) : this.external_system.supply(name, address, city, country, zip)
     }
 
     async cancel_supply(transaction_id: string): Promise<number> {
-        return unirest(POST, URL)
-            .field('action_type', 'cancel_supply')
-            .field('transaction_id', transaction_id)
-            .end(this.getResult());
-    }
-
-    private getResult() {
-        return (res: { error: string | undefined; raw_body: any; }) => {
-            if (res.error) return -1;
-            const ret = Number(res.raw_body);
-            return isNaN(ret) ? -1 : ret
-        };
+        return blockExternalServices ? Promise.resolve(1) : this.cancel_supply(transaction_id)
     }
 }

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import postFetch from "../postFetch.js";
-import { useHistory, useParams } from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
-import { Alert } from "reactstrap";
+import {Alert} from "reactstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
@@ -13,7 +13,7 @@ const AddCondition = (props) => {
   const [errorColor, setErrorColor] = useState("success");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-  const { storeID, storeName, discountid } = useParams();
+  const {storeID, storeName, discountid} = useParams();
 
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -31,10 +31,10 @@ const AddCondition = (props) => {
     Shop: 3,
   };
   const conditionOptions = [
-    { label: "Category", value: 0 },
-    { label: "Product name", value: 1 },
-    { label: "Amount", value: 2 },
-    { label: "Shop", value: 3 },
+    {label: "Category", value: 0},
+    {label: "Product name", value: 1},
+    {label: "Amount", value: 2},
+    {label: "Shop", value: 3},
   ];
   const submit = (e) => {
     e.preventDefault();
@@ -65,44 +65,44 @@ const AddCondition = (props) => {
   };
   const onDismiss = () => setVisible(false);
   return (
-    <div className="add-manager">
-      <p>Add condition to discount</p>
-      <div className="d-flex mb-2 justify-content-between"></div>
-      <form onSubmit={submit}>
-        <label>condition: </label>
-        <Select
-          components={makeAnimated()}
-          onChange={setCondition}
-          options={conditionOptions}
-          className="mb-3"
-          placeHolder="Select Operator"
-          noOptionsMessage={() => "No more conditions available"}
-          defaultValue={[]}
-          isMulti={false}
-          autoFocus
-          isSearchable
-        />
-        <label>parameter: </label>
-        <input
-          type="text"
-          required
-          value={parameter}
-          onChange={(e) => setParameter(e.target.value)}
-        />
+      <div className="add-manager">
+        <p>Add condition to discount</p>
+        <div className="d-flex mb-2 justify-content-between"></div>
+        <form onSubmit={submit}>
+          <label>condition: </label>
+          <Select
+              components={makeAnimated()}
+              onChange={setCondition}
+              options={conditionOptions}
+              className="mb-3"
+              placeHolder="Select Operator"
+              noOptionsMessage={() => "No more conditions available"}
+              defaultValue={[]}
+              isMulti={false}
+              autoFocus
+              isSearchable
+          />
+          <label>parameter: </label>
+          <input
+              type="text"
+              required
+              value={parameter}
+              onChange={(e) => setParameter(e.target.value)}
+          />
 
-        <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
-          {error}
-        </Alert>
-        {<input type="submit" value="Add Condition" />}
-      </form>
-      {/* <Button
+          <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
+            {error}
+          </Alert>
+          {<input type="submit" value="Add Condition"/>}
+        </form>
+        {/* <Button
           onClick={() => submit()}
           className="mt-auto font-weight-bold"
           block
         >
           Add Policy
         </Button> */}
-    </div>
+      </div>
   );
 };
 export default AddCondition;

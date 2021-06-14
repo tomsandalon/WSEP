@@ -13,7 +13,7 @@ import {
     route_filter, route_guest,
     route_home,
     route_login,
-    route_logout,
+    route_logout, route_offer,
     route_purchase,
     route_register,
     route_shop,
@@ -68,6 +68,7 @@ const initServer = () => {
     app.use(route_user_management, require('./User/Registered/User'));
     app.use(route_shop_policy, require('./User/Registered/Policy'));
     app.use(route_shop_discount, require('./User/Registered/Discount'));
+    app.use(route_offer, require('./User/Registered/Offer'));
 }
 
 if(isLoaded() || loadConfig()){

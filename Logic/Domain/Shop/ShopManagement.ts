@@ -105,6 +105,8 @@ export interface ShopManagement {
     getRealPermissions(user_email: string): Permissions;
 
     addManagement(owners: { owner_email: string; appointer_email: string }[], managers: { manager_email: string; appointer_email: string; permissions: number[] }[]): void;
+
+    notifyForOffer(offer_message: string): string | boolean;
 }
 
 
@@ -114,7 +116,7 @@ export class ShopManagementImpl implements ShopManagement {
     constructor(shop_id: number, original_owner: string, shop_inventory?: ShopInventory) {
         this._shop_id = shop_id;
         //placing a temporary value which is immediately replaced
-        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "");
+        this._shop_inventory = shop_inventory ? shop_inventory : new ShopInventoryImpl(-1, this, "", "", [], []);
         this._original_owner = OwnerImpl.create(original_owner);
         this._managers = [];
         this._owners = [];
@@ -153,11 +155,10 @@ export class ShopManagementImpl implements ShopManagement {
     }
 
     static shopsAreEqual(m1: ShopManagement, m2: ShopManagement) {
-        const result = m1.shop_id == m2.shop_id &&
+        return m1.shop_id == m2.shop_id &&
             JSON.stringify(m1.original_owner) == JSON.stringify(m2.original_owner) &&
             m1.managers.length == m2.managers.length && m1.managers.every(m1 => m2.managers.some(m2 => JSON.stringify(m1) == JSON.stringify(m2))) &&
             m1.owners.length == m2.owners.length && m1.owners.every(m1 => m2.owners.some(m2 => OwnerImpl.ownersAreEqual(m1, m2)))
-        return result
     }
 
     allowedEditPolicy(user_email: string): boolean {
@@ -282,7 +283,7 @@ export class ShopManagementImpl implements ShopManagement {
         return true;
     }
 
-    removeOwner(user_email: string, target: string): boolean {
+    removeOwner(user_email: string, target: string): boolean { //TODO remove from offers
         if (!this.isOwner(user_email) || !this.isOwner(target)) return false;
         const ownerToRemove = this.getOwnerByEmail(target);
         if (!ownerToRemove) return false;
@@ -396,5 +397,13 @@ export class ShopManagementImpl implements ShopManagement {
     private updateOriginalOwner(owners, managers) {
         this._original_owner.appointed_owners = owners.filter(o => o.appointer_email == this._original_owner.user_email).map(o => o.owner_email)
         this._original_owner.appointed_managers = managers.filter(m => m.appointer_email == this._original_owner.user_email).map(m => m.manager_email)
+    }
+
+    notifyForOffer(offer_message: string): string | boolean {
+        this.owners.concat([this.original_owner]).map(o => o.user_email).concat(this.managers.map(m => m.user_email))
+            .forEach(user_email => {
+                NotificationAdapter.getInstance().notify(user_email, offer_message)
+            })
+        return true
     }
 }

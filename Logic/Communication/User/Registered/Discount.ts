@@ -1,12 +1,14 @@
 import {
-    assign_manager,
-    assign_owner, BadRequest, OK,
+    BadRequest,
+    OK,
     ServerNotFound,
-    service, ServiceUnavailable,
+    service,
+    ServiceUnavailable,
     Session,
-    sid, Unauthorized
+    sid,
+    Unauthorized
 } from "../../Config/Config";
-import {route_shop_manage_product} from "../../Routes";
+
 const express = require('express');
 const router = express.Router();
 module.exports = router;

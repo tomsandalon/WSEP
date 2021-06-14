@@ -1,9 +1,10 @@
 import {Purchase, PurchaseImpl} from "../ProductHandling/Purchase";
-import {PurchaseBasket} from "../../DataAccess/API";
-import {SystemImpl} from "../System";
+import {PurchaseBasket} from "../DBCommand";
 import {Purchase as PurchaseRestore} from "../../DataAccess/Getters"
 import {ProductPurchaseImpl} from "../ProductHandling/ProductPurchase";
 import {CategoryImpl} from "../ProductHandling/Category";
+import {ShopInventory} from "../Shop/ShopInventory";
+import {Shop, ShopImpl} from "../Shop/Shop";
 
 
 type history_key = { user_id: number, shop_id: number, purchase_id: number };
@@ -69,10 +70,12 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory {
         })
     }
 
-    reloadPurchasesFromDB(purchases: PurchaseRestore[]) {
+    reloadPurchasesFromDB(purchases: PurchaseRestore[], shops: Shop[]) {
         purchases.forEach(purchase => {
-            this.reloadPurchaseFromDB(purchase)
-        })
+                const shop = (shops.find(s => s.shop_id == purchase.shop_id) as ShopImpl).inventory
+                return this.reloadPurchaseFromDB(purchase, shop)
+            }
+        )
     }
 
     private addPurchaseToHistory(user_id: number, purchase: Purchase) {
@@ -86,7 +89,7 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory {
         })
     }
 
-    private reloadPurchaseFromDB(purchase: PurchaseRestore) {
+    private reloadPurchaseFromDB(purchase: PurchaseRestore, shop: ShopInventory) {
         this._history = this._history.concat([
             {
                 key: {
@@ -106,7 +109,7 @@ export class UserPurchaseHistoryImpl implements UserPurchaseHistory {
                         p.base_price,
                         p.actual_price
                     )),
-                    SystemImpl.getInstance().getShopInventoryFromID(purchase.shop_id),
+                    shop,
                     purchase.purchase_id
                 )
             }

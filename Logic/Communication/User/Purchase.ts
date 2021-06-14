@@ -62,7 +62,6 @@ router.post('/', (request: any, response: any) => {
     if (typeof result === 'string') {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
-        console.log("payment failed basket",result);
         response.send(result);
         response.end()
     } else {

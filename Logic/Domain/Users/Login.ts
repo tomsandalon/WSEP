@@ -4,7 +4,7 @@ import {Authentication} from "./Authentication";
 import {logger} from "../Logger";
 import {UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {User as UserFromDB} from "../../DataAccess/Getters";
-import {CreateAdminIfNotExist} from "../../DataAccess/API";
+import {CreateAdminIfNotExist} from "../DBCommand";
 
 export interface Login {
     login(user_email: string, password: string): number | string
@@ -176,6 +176,6 @@ export class LoginImpl implements Login {
     }
 
     createAdmin(): Promise<void> {
-        return CreateAdminIfNotExist(0, "admin@gmail.com", this._password_handler.hash("admin"), 999);
+        return CreateAdminIfNotExist(0, "admin@gmail.com", this._password_handler.hash("admin"), 999).then();
     }
 }

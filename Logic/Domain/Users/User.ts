@@ -2,13 +2,14 @@ import {ShoppingBasket, ShoppingBasketImpl, ShoppingEntry} from "../ProductHandl
 import {Purchase} from "../ProductHandling/Purchase";
 import {ProductPurchase} from "../ProductHandling/ProductPurchase";
 import {logger} from "../Logger";
-import {ShopInventory} from "../Shop/ShopInventory";
+import {Purchase_Type, ShopInventory} from "../Shop/ShopInventory";
 import {PaymentHandler, PaymentHandlerImpl} from "../../Service/Adapters/PaymentHandler";
 import {UserPurchaseHistoryImpl} from "./UserPurchaseHistory";
 import {BasketDoesntExists} from "../ProductHandling/ErrorMessages";
 import {User as UserFromDB} from "../../DataAccess/Getters"
 import {SystemImpl} from "../System";
 import {Purchase_Info} from "../../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+import {Offer} from "../ProductHandling/Offer";
 
 const LEGAL_DRINKING_AGE = 18
 export let id_counter: number = 0;
@@ -22,8 +23,10 @@ export interface User {
     user_id: number
     is_guest: boolean
     underaged: boolean
+    active_offers: Offer[]
 
-    addToBasket(shop: ShopInventory, product_id: number, amount: number): void | string
+
+    addToBasket(shop: ShopInventory, product_id: number, amount: number, override_immediate?: boolean): void | string
 
     editBasketItem(shop: ShopInventory, product_id: number, new_amount: number): void | string
 
@@ -48,8 +51,9 @@ export class UserImpl implements User {
     private readonly _user_id: number
     private readonly _is_guest: boolean
     private readonly _payment_handler: PaymentHandler
+    active_offers: Offer[]
 
-    private constructor(user_email: string, password: string, is_admin: boolean, user_id: number, is_guest: boolean, underaged: boolean, cart: ShoppingBasket[]) {
+    private constructor(user_email: string, password: string, is_admin: boolean, user_id: number, is_guest: boolean, underaged: boolean, cart: ShoppingBasket[], active_offers: Offer[]) {
         this._user_email = user_email
         this._password = password
         this._is_admin = is_admin
@@ -59,6 +63,7 @@ export class UserImpl implements User {
         this._underaged = underaged
         this._payment_handler = PaymentHandlerImpl.getInstance()
         this._cart = cart
+        this.active_offers = active_offers
     }
 
     private _cart: ShoppingBasket[]
@@ -113,15 +118,14 @@ export class UserImpl implements User {
         let _user_id = generateId();
         let _payment_handler = PaymentHandlerImpl.getInstance();
         let _underaged = (age) ? age < LEGAL_DRINKING_AGE : false;
-
-        return new UserImpl(_user_email, _password, _is_admin, _user_id, _is_guest, _is_admin, [])
+        return new UserImpl(_user_email, _password, _is_admin, _user_id, _is_guest, _is_admin, [], [])
     }
 
     static resetIDs = () => id_counter = 0
 
     static createFromEntry(entry: UserFromDB) {
         if (entry.user_id >= id_counter) id_counter = entry.user_id + 1
-        const ret = new UserImpl(entry.email, entry.password, entry.admin, entry.user_id, false, entry.age < 18, [])
+        const ret = new UserImpl(entry.email, entry.password, entry.admin, entry.user_id, false, entry.age < 18, [], []) //todo active offers from db
         entry.cart.forEach(cart => {
             ret.addToBasket(SystemImpl.getInstance().getShopInventoryFromID(cart.shop_id), cart.product_id, cart.amount)
         })
@@ -160,31 +164,8 @@ export class UserImpl implements User {
         return;
     }
 
-    /**
-     * Requirement number 2.7
-     * Add an item to a shopping basket which is connected to a specific store.
-     * @param shop
-     * @param product_id
-     * @param amount
-     * @return string if an error occurred or void otherwise.
-     */
-    addToBasket(shop: ShopInventory, product_id: number, amount: number): string | void {
-        let shopping_basket = this._cart.filter(element => element.shop.shop_id == shop.shop_id) //basket for provided shop_id exists
-        if (shopping_basket.length == 0) { //new shopping basket
-            const item: ShoppingEntry = {productId: product_id, amount: amount};
-            let new_basket = ShoppingBasketImpl.create(shop, item, this);
-            if (typeof new_basket === "string") {
-                return new_basket;
-            }
-            this._cart.push(new_basket);
-        } else {//add to existing
-            const add = shopping_basket[0].addToBasket(product_id, amount)
-            if (typeof add == "boolean") {
-                logger.Info(`Product id ${product_id} was added successfully to the basket of shop_id ${shop.shop_id}`)
-                return
-            }
-            return add;
-        }
+    static same_offers(u1: UserImpl, u2: UserImpl) {
+        return u1.active_offers.length == u2.active_offers.length && u1.active_offers.every(o1 => u2.active_offers.some(o2 => Offer.equals(o1, o2)))
     }
 
     /**
@@ -309,6 +290,83 @@ export class UserImpl implements User {
                 product_purchase.rating = rating
             }
         )
+    }
+
+    makeOffer(shop: ShopInventory, product_id: number, amount: number, price_per_unit: number): string | boolean {
+        const offer = Offer.create(shop, product_id, amount, price_per_unit, this)
+        if (typeof offer == "string") return offer
+        this.active_offers = this.active_offers.concat([offer])
+        return offer.addToShop()
+    }
+
+    getActiveOffers(): string | string[] {
+        return this.active_offers.map(offer => offer.toString())
+    }
+
+    denyCounterOfferAsUser(offer_id: number) {
+        const offer = this.active_offers.find(o => o.id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        offer.denied()
+        offer.notifyManagementOfUserDeny()
+        return true
+    }
+
+    offerIsPurchasable(offer_id: number) {
+        const offer = this.active_offers.find(o => o.id == offer_id)
+        if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        return offer.isPurchasable()
+    }
+
+    purchaseRealOffer(offer: Offer, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        const old_cart = this._cart
+        this._cart = this._cart.filter(b => b.shop.shop_id != offer.shop.shop_id)
+        const old_price = offer.product.base_price
+        offer.product.base_price = offer.price_per_unit
+        this.addToBasket(offer.shop, offer.product.product_id, offer.amount, true)
+        return this.purchaseBasket(offer.shop.shop_id, payment_info)
+            .then(result => {
+                this._cart = old_cart
+                offer.product.base_price = old_price
+                return result
+            })
+    }
+
+    purchaseOffer(offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
+        const offer = this.active_offers.find(o => o.id == offer_id)
+        if (offer == undefined) return Promise.resolve(`Offer ${offer_id} doesn't exist`)
+        if (!offer.isPurchasable()) return Promise.resolve(`Offer ${offer_id} is not accepted by all shop management`)
+        return this.purchaseRealOffer(offer, payment_info)
+    }
+
+    /**
+     * Requirement number 2.7
+     * Add an item to a shopping basket which is connected to a specific store.
+     * @param shop
+     * @param product_id
+     * @param amount
+     * @param override_immediate
+     * @return string if an error occurred or void otherwise.
+     */
+    addToBasket(shop: ShopInventory, product_id: number, amount: number, override_immediate?: boolean): string | void {
+        let shopping_basket = this._cart.filter(element => element.shop.shop_id == shop.shop_id) //basket for provided shop_id exists
+        const product = shop.products.find(p => product_id == p.product_id)
+        if (product == undefined) return `Product ${product_id} not found`
+        if (!override_immediate && product.purchase_type != Purchase_Type.Immediate) return `Purchase type of product ${product_id} is not Immediate`
+        if (shopping_basket.length == 0) { //new shopping basket
+            const item: ShoppingEntry = {productId: product_id, amount: amount};
+            let new_basket = ShoppingBasketImpl.create(shop, item, this);
+            if (typeof new_basket === "string") {
+                return new_basket;
+            }
+            this._cart.push(new_basket);
+        } else {//add to existing
+            const add = shopping_basket[0].addToBasket(product_id, amount)
+            if (typeof add == "boolean") {
+                logger.Info(`Product id ${product_id} was added successfully to the basket of shop_id ${shop.shop_id}`)
+                return
+            }
+            return add;
+        }
     }
 }
 
