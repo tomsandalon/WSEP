@@ -1,4 +1,3 @@
-import { Divider } from "@material-ui/core";
 import React from "react";
 import Discount from "./Discount";
 
@@ -8,7 +7,6 @@ const DiscountsBlock = (props) => {
   const isPending = props.isPending;
   const storeID = props.storeID;
   const storeName = props.storeName;
-  console.log(discounts);
 
   return (
     <div className="container">

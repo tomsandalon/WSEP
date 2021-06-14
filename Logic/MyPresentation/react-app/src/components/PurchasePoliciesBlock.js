@@ -7,7 +7,6 @@ const PurchasePoliciesBlock = (props) => {
   const error = props.error;
   const isPending = props.isPending;
   const storeID = props.storeID;
-  console.log(policies);
 
   return (
     <div className="container">
