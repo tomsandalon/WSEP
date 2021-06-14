@@ -1247,6 +1247,7 @@ export class SystemImpl implements System {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string")
             return user
+        if (user.is_guest) return `You have to be a registered user in order to purchase items`
         const ret: string | boolean = user.makeOffer(shop.inventory, product_id, amount, price_per_unit)
         if (typeof ret != "string") {
             AddOffer(user_id, shop_id, offer_id_counter - 1, product_id, amount, price_per_unit)
