@@ -7,6 +7,7 @@ import {NumericOperation} from "../Domain/Shop/DiscountPolicy/NumericComposition
 import {ConditionType} from "../Domain/Shop/PurchasePolicy/SimpleCondition";
 import {Operator} from "../Domain/Shop/PurchasePolicy/CompositeCondition";
 import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
+import * as db from "../Domain/DBCommand";
 
 // import {PurchaseType} from "../Domain/PurchaseProperties/PurchaseType";
 
@@ -21,7 +22,8 @@ export class Service {
     }
 
     public initData(resume?: boolean) {
-        if (resume) return;
+        // if (resume) return;
+        db.turnBlockDBON();
         const immediate: Purchase_Type = Purchase_Type.Immediate
         const offer: Purchase_Type = Purchase_Type.Offer
         SystemImpl.getInstance().performRegister("Liorpev@gmail.com", "123456")

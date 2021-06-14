@@ -14,9 +14,16 @@ const EditableItem = (props) => {
   const id = props.id;
   const storeID = props.storeID;
   const storeName = props.storeName;
+  const purchaseType = props.purchaseType;
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const [errorColor, setErrorColor] = useState("success");
+  console.log(purchaseType);
+  const numToType = (num) => {
+    if (num == 0) return "Immediate";
+    if (num == 1) return "Offer";
+    return "UNDEFINED";
+  };
 
   const onDismiss = () => {
     setVisible(false);
@@ -49,6 +56,7 @@ const EditableItem = (props) => {
         <figcaption className="info align-self-center">
           <h4 className="center">{name}</h4>
           <h4>{"Amount: " + amount}</h4>
+          <h4>{"Purchase Type: " + numToType(purchaseType)}</h4>
           <h4>{"Price: " + price}</h4>
           <Link to={`/editproduct/${storeID}/${storeName}/${id}`}>
             <button className="btn btn-outline-primary btn-sm">

@@ -20,19 +20,26 @@ const Offer = (props) => {
   const [visible, setVisible] = useState(false);
   const [errorColor, setErrorColor] = useState("success");
 
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
   const onDismiss = () => {
     setVisible(false);
     window.location.reload();
   };
-  const acceptSuccess = () => {
+  const acceptSuccess = async() => {
     setErrorColor("success");
     setError("Offer accepted Successfully");
     setVisible(true);
+    await sleep(2000);
+    window.location.reload();
   };
-  const denySuccess = () => {
+  const denySuccess =async () => {
     setErrorColor("success");
     setError("Offer declined Successfully");
     setVisible(true);
+    await sleep(2000);
+    window.location.reload();
   };
   const failure401 = (err_message) => {
     setErrorColor("warning");

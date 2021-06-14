@@ -13,15 +13,26 @@ import ComposePolicy from "../components/Compose_Purchase_Policy";
 import ComposeDiscount from "../components/ComposeDiscount";
 import Switch from "react-switch";
 import { useState } from "react";
+import { Alert } from "reactstrap";
+import serverResponse from "../components/ServerResponse.js";
+import deleteFetch from "../deleteFetch";
+import postFetch from "../postFetch";
 
 const ManagersStore = () => {
   const { storeID, name } = useParams();
   const history = useHistory();
   const [acceptOffers, setAcceptOffers] = useState(false);
+  const [error, setError] = useState("");
+  const [errorColor, setErrorColor] = useState("success");
+  const [visible, setVisible] = useState(false);
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const {
     data: storeItems,
     itemsIsPending,
-    error: itemsError,
+    storeError: itemsError,
   } = useFetch(`/user/shop?shop_id=${storeID}`);
 
   const {
@@ -50,7 +61,7 @@ const ManagersStore = () => {
   } = useFetch(`/offer/shop?shop_id=${storeID}`);
   const pendingOffers = unparsedPendingOffers;
   // const pendingOffers = JSON.parse(unparsedPendingOffers);
-  console.log(pendingOffers);
+  const onDismiss = () => setVisible(false);
 
   const {
     data: unparsed_discounts,
@@ -80,14 +91,56 @@ const ManagersStore = () => {
   };
 
   isUser();
+  const success = async () => {
+    setErrorColor("success");
+    if (acceptOffers) setError("Support for offers removed");
+    else setError("Shop now supports offers");
+    setVisible(true);
+    await sleep(2000);
+    window.location.reload();
+  };
+  const failure401 = (err_message) => {
+    setErrorColor("warning");
+    setError(err_message);
+    setVisible(true);
+  };
+  const thenFunc = async (response) => {
+    serverResponse(response, success, failure401);
+  };
   const {
     data: purchaseTypes,
     acceptOffersIsPending,
     acceptOffersError,
-  } = useFetch(`/user/shop/purchase_type?${storeID}`);
-  console.log(purchaseTypes);
-  //TODO acceptOffers purchasetypes contains 1
-  const toggleDoesAcceptOffers = () => {};
+  } = useFetch(`/user/shop/purchase_type?shop_id=${storeID}`);
+  if (purchaseTypes && purchaseTypes.includes(1) && !acceptOffers) {
+    setAcceptOffers(true);
+  }
+
+  const removeAcceptOffers = () => {
+    deleteFetch(
+      "/user/shop/purchase_type",
+      {
+        shop_id: storeID,
+        purchase_type: 1,
+      },
+      thenFunc
+    );
+  };
+  const addAcceptOffers = () => {
+    postFetch(
+      "/user/shop/purchase_type",
+      {
+        shop_id: storeID,
+        purchase_type: 1,
+      },
+      thenFunc
+    );
+  };
+
+  const toggleDoesAcceptOffers = () => {
+    if (acceptOffers) removeAcceptOffers();
+    else addAcceptOffers();
+  };
 
   return (
     <div className="row">
@@ -105,6 +158,9 @@ const ManagersStore = () => {
                 />
               </div>
             </div>
+            <Alert color={errorColor} isOpen={visible} toggle={onDismiss}>
+              {error}
+            </Alert>
             <hr></hr>
             {parsedStaff && (
               <article className="management">

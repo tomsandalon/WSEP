@@ -3,11 +3,14 @@ import { useHistory, useParams } from "react-router-dom";
 import serverResponse from "../components/ServerResponse.js";
 import postFetch from "../postFetch.js";
 import { Alert } from "reactstrap";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 
 const AddProduct = () => {
   const { storeID, storeName } = useParams();
   const [name, setName] = useState();
   const [amount, setAmount] = useState();
+  const [purchaseType, setPurchaseType] = useState();
   const [description, setDescription] = useState();
   const [categories, setCategories] = useState();
   const [price, setPrice] = useState();
@@ -15,6 +18,10 @@ const AddProduct = () => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
+  const purchaseTypeOptions = [
+    { label: "Immediate Purchase", value: 0 },
+    { label: "Offer", value: 1 },
+  ];
   const isUser = () => {
     const requestOptions = {
       method: "GET",
@@ -59,6 +66,7 @@ const AddProduct = () => {
       amount: amount,
       categories: categories.split(" "),
       base_price: price,
+      purchase_type: purchaseType.value,
     };
     setIsPending(true);
     postFetch("/user/shop/product", newProduct, thenFunc);
@@ -105,6 +113,18 @@ const AddProduct = () => {
           required
           value={price}
           onChange={(e) => setPrice(e.target.value)}
+        />
+        <Select
+          components={makeAnimated()}
+          onChange={setPurchaseType}
+          options={purchaseTypeOptions}
+          className="mb-3"
+          placeHolder="Select Purchase Type"
+          noOptionsMessage={() => "No more types available"}
+          defaultValue={[purchaseTypeOptions[0]]}
+          isMulti={false}
+          autoFocus
+          isSearchable
         />
         {!isPending && <input type="submit" value="Add Product" />}
         {isPending && <button diabled>Adding product...</button>}

@@ -23,6 +23,7 @@ const EditableItems = (props) => {
                 price={parsedItem._base_price}
                 storeID={storeID}
                 storeName={storeName}
+                purchaseType={parsedItem._purchase_type}
               />
             );
           })}
