@@ -381,4 +381,8 @@ export class Service {
     getPurchaseTypes(user_id: number, shop_id: number): string | number[] {
         return [0, 1];
     }
+
+    getAllShopsInSystem(): string[] | string {
+        return SystemImpl.getInstance().getAllShopsInSystem()
+    }
 }
