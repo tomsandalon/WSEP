@@ -16,6 +16,7 @@ import {
     Shop,
     User
 } from "./DTOS";
+import {panicLogger} from "../Domain/Logger";
 
 const {
     purchase_type,
@@ -54,20 +55,18 @@ const {
 const {getDB, connectToDB, isConnectedToDB, getBuilder, config} = require('./DB.config')
 
 const success = (_: any) => true;
-const failure = async (err: any, f: TryAgain, input: any, currAttempt: number) => {
-    // console.log(err)
-    // console.log('Retrying')
+const failure = async (func_name: string, err: any, f: TryAgain, input: any, currAttempt: number) => {
     if(currAttempt > 0){
         await f(input, currAttempt - 1)
     } else {
-        // console.log('Failure')
+        panicLogger.Critical('Error in function ' + func_name + '\nvalues\n' + JSON.stringify(input, null, 2) + 'Err Mssg\n' + err)
     }
     return false;
 }
 
-const handler = (err, f, data, attempts) =>
-    failure(err, f, data, attempts)
-        .then(x => x).catch(new_err => handler(new_err, f, data, attempts))
+const handler = (func_name, err, f, data, attempts) =>
+    failure(func_name, err, f, data, attempts)
+        .then(x => x).catch(new_err => handler(func_name, new_err, f, data, attempts))
 
 
 type TryAgain = (_: any, attemps: number) => any
@@ -85,7 +84,7 @@ const _RegisterUser = (data: User, attempts: number) =>
         }).into(user.name)
     )
         .then(success)
-        .catch(new_err => handler(new_err, _RegisterUser, data, attempts))
+        .catch(new_err => handler("RegisterUser", new_err, _RegisterUser, data, attempts))
 
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -133,7 +132,7 @@ const _CreateAdminIfNotExist = ([user_id, user_email, hashed_pass, age]: [number
         }
     })
         .then(success)
-        .catch(new_err => handler(new_err, _CreateAdminIfNotExist, [user_id, user_email, hashed_pass, age], attempts))
+        .catch(new_err => handler('CreateAdminIfNotExist', new_err, _CreateAdminIfNotExist, [user_id, user_email, hashed_pass, age], attempts))
 
 export const AddShop = (data: Shop) => _AddShop(data, 3)
 
@@ -156,7 +155,7 @@ const _AddShop = (data: Shop, attempts: number) =>
         }))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _AddShop, data, attempts))
+        .catch(new_err => handler('AddShop', new_err, _AddShop, data, attempts))
 
 export const AddItemToBasket = (data: Basket) => _AddItemToBasket(data, 3)
 
@@ -165,7 +164,7 @@ const _AddItemToBasket = (data: Basket, attempts: number) =>
         trx.insert(data).into(basket.name)
     )
         .then(success)
-        .catch(new_err => handler(new_err, _AddItemToBasket, data, attempts))
+        .catch(new_err => handler('AddItemToBasket', new_err, _AddItemToBasket, data, attempts))
 
 export const UpdateItemInBasket = (data: Basket) => _UpdateItemInBasket(data, 3)
 
@@ -180,7 +179,7 @@ const _UpdateItemInBasket = (data: Basket, attempts: number) =>
             amount: data.amount
         })
         .then(success)
-        .catch(new_err => handler(new_err, _UpdateItemInBasket, data, attempts))
+        .catch(new_err => handler('UpdateItemInBasket', new_err, _UpdateItemInBasket, data, attempts))
 
 export const DeleteItemInBasket = (data: Basket) => _DeleteItemInBasket(data, 3)
 const _DeleteItemInBasket = (data: Basket, attempts: number) =>
@@ -192,7 +191,7 @@ const _DeleteItemInBasket = (data: Basket, attempts: number) =>
         })
         .del()
         .then(success)
-        .catch(new_err => handler(new_err, _DeleteItemInBasket, data, attempts))
+        .catch(new_err => handler('DeleteItemInBasket', new_err, _DeleteItemInBasket, data, attempts))
 
 export const AddProduct = (data: Product) => _AddProduct(data, 3)
 
@@ -200,7 +199,7 @@ const _AddProduct: TryAgain = (data: Product, attempts: number) =>{
     return getDB().transaction((trx: any) =>
         trx.insert(data).into(product.name)
             )
-        .then(success).catch(new_err => handler(new_err, _AddProduct, data, attempts))
+        .then(success).catch(new_err => handler('AddProduct', new_err, _AddProduct, data, attempts))
 }
 export const UpdateProduct = (data: Product) => _UpdateProduct(data, 3)
 
@@ -218,7 +217,7 @@ const _UpdateProduct = (data: Product, attempts: number) =>
             categories: data.categories,
         })
         .then(success)
-        .catch(new_err => handler(new_err, _UpdateProduct, data, attempts))
+        .catch(new_err => handler('UpdateProduct', new_err, _UpdateProduct, data, attempts))
 
 
 export const RemoveProduct = (product_id: number) => _RemoveProduct(product_id, 3)
@@ -230,7 +229,7 @@ const _RemoveProduct = (product_id: number, attempts: number) =>
         })
         .del()
         .then(success)
-        .catch(new_err => handler(new_err, _RemoveProduct, product_id, attempts))
+        .catch(new_err => handler('RemoveProduct', new_err, _RemoveProduct, product_id, attempts))
 
 export const AppointManager = (target_email: string, appointer_email: string, shop_id: number, permissions: Permission[]) =>
     _AppointManager([target_email, appointer_email, shop_id, permissions], 3)
@@ -253,7 +252,7 @@ const _AppointManager = ([target_email, appointer_email, shop_id, permissions]: 
         )
     })
         .then(success)
-        .catch(new_err => handler(new_err, _AppointManager, [target_email, appointer_email, shop_id, permissions], attempts))
+        .catch(new_err => handler('AppointManager', new_err, _AppointManager, [target_email, appointer_email, shop_id, permissions], attempts))
 
 export const AppointOwner = (target_email: string, appointer_email: string, shop_id: number) =>
     _AppointOwner([target_email, appointer_email, shop_id], 3)
@@ -274,7 +273,7 @@ const _AppointOwner = ([target_email, appointer_email, shop_id]: [string, string
         )
     })
         .then(success)
-        .catch(new_err => handler(new_err, _AppointOwner, [target_email, appointer_email, shop_id], attempts))
+        .catch(new_err => handler('AppointOwner', new_err, _AppointOwner, [target_email, appointer_email, shop_id], attempts))
 
 export const RemoveManager = (target_email: string, shop_id: number) =>
     _RemoveManager([target_email, shop_id], 3)
@@ -292,7 +291,7 @@ const _RemoveManager = ([target_email, shop_id]: [string, number], attempts: num
                 ).del()
     })
         .then(success)
-        .catch(new_err => handler(new_err, _RemoveManager, [target_email, shop_id], attempts))
+        .catch(new_err => handler('RemoveManager', new_err, _RemoveManager, [target_email, shop_id], attempts))
 
 export const RemainingManagement = (management_emails: string[], shop_id: number) =>
     _RemainingManagement([management_emails, shop_id], 3)
@@ -309,7 +308,7 @@ const _RemainingManagement = ([management_emails, shop_id]: [string[], number], 
         ).del()
     })
         .then(success)
-        .catch(new_err => handler(new_err, _RemainingManagement, [management_emails, shop_id], attempts))
+        .catch(new_err => handler('RemainingManagement', new_err, _RemainingManagement, [management_emails, shop_id], attempts))
 
 export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) =>
     _UpdatePermissions([manager_id, shop_id, new_permissions], 3)
@@ -331,7 +330,7 @@ const _UpdatePermissions = ([manager_id, shop_id, new_permissions]:[number, numb
                         })]), []))))
     )
         .then(success)
-        .catch(new_err => handler(new_err, _UpdatePermissions, [manager_id, shop_id, new_permissions], attempts))
+        .catch(new_err => handler('UpdatePermissions', new_err, _UpdatePermissions, [manager_id, shop_id, new_permissions], attempts))
 
 export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) =>
     _AddPurchasePolicy([shop_id, policy_id, condition], 3)
@@ -357,7 +356,7 @@ const _AddPurchasePolicy = ([shop_id, policy_id, condition]: [number, number, Pu
                     }))
         )
             .then(success)
-            .catch(new_err => handler(new_err, _AddPurchasePolicy, [shop_id, policy_id, condition], attempts))
+            .catch(new_err => handler('AddPurchasePolicy', new_err, _AddPurchasePolicy, [shop_id, policy_id, condition], attempts))
         :
         getDB().transaction((trx: any) =>
             trx.insert({p_condition_id: policy_id}).into(purchase_condition.name)
@@ -380,7 +379,7 @@ const _AddPurchasePolicy = ([shop_id, policy_id, condition]: [number, number, Pu
                         .del())
         )
             .then(success)
-            .catch(new_err => handler(new_err, _AddPurchasePolicy, [shop_id, policy_id, condition], attempts))
+            .catch(new_err => handler('AddPurchasePolicy', new_err, _AddPurchasePolicy, [shop_id, policy_id, condition], attempts))
 
 export const AddDiscount = (shop_id: number, discount_id: number, discount_to_add: DiscountSimpleCondition | DiscountCompositeCondition | DiscountConditionalCondition) =>
     _AddDiscount([shop_id, discount_id, discount_to_add], 3)
@@ -401,7 +400,7 @@ const _AddDiscount = ([shop_id, discount_id, discount_to_add]: [number, number, 
                     }))
         )
             .then(success)
-            .catch(new_err => handler(new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
+            .catch(new_err => handler('AddDiscount', new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
         :
         isDiscountCompositeCondition(discount_to_add)?
             getDB().transaction((trx: any) =>
@@ -425,7 +424,7 @@ const _AddDiscount = ([shop_id, discount_id, discount_to_add]: [number, number, 
                             .del())
             )
                 .then(success)
-                .catch(new_err => handler(new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
+                .catch(new_err => handler('AddDiscount', new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
             :
             getDB().transaction((trx: any) =>
                 trx.insert({discount_id: discount_id}).into(discount.name)
@@ -459,7 +458,7 @@ const _AddDiscount = ([shop_id, discount_id, discount_to_add]: [number, number, 
                             .del())
             )
                 .then(success)
-                .catch(new_err => handler(new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
+                .catch(new_err => handler('AddDiscount', new_err, _AddDiscount, [shop_id, discount_id, discount_to_add], attempts))
 
 export const removeDiscount = (shop_id: number, discount_id: number,) =>
     _removeDiscount([shop_id, discount_id], 3)
@@ -492,7 +491,7 @@ const _removeDiscount = ([shop_id, discount_id]: [number, number], attempts: num
         return trx(discount.name).whereIn(discount.pk, ids).del()
     })
         .then(success)
-        .catch(new_err => handler(new_err, _removeDiscount, [shop_id, discount_id], attempts))
+        .catch(new_err => handler('removeDiscount', new_err, _removeDiscount, [shop_id, discount_id], attempts))
 }
 
 export const removePurchasePolicy = (shop_id: number, policy_id: number) =>
@@ -521,7 +520,7 @@ const _removePurchasePolicy = ([shop_id, policy_id]: [number, number], attempts:
         return trx(purchase_condition.name).whereIn(purchase_condition.pk, ids).del()
     })
         .then(success)
-        .catch(new_err => handler(new_err, _removePurchasePolicy, [shop_id, policy_id], attempts))
+        .catch(new_err => handler('removePurchasePolicy', new_err, _removePurchasePolicy, [shop_id, policy_id], attempts))
 }
 
 export const RateProduct = (rate: Rate) => _RateProduct(rate, 3)
@@ -535,7 +534,7 @@ const _RateProduct = (rate: Rate, attempts: number) =>
         }).into(rates.name)
     )
         .then(success)
-        .catch(new_err => handler(new_err, _RateProduct, rate, attempts))
+        .catch(new_err => handler('RateProduct', new_err, _RateProduct, rate, attempts))
 
 export const Notify = (notifications: Notification[]) => _Notify(notifications, 3)
 
@@ -551,7 +550,7 @@ const _Notify = (notifications: Notification[], attempts: number) =>
                     })))
     )
         .then(success)
-        .catch(new_err => handler(new_err, _Notify, notifications, attempts))
+        .catch(new_err => handler('Notify', new_err, _Notify, notifications, attempts))
 
 
 export const ClearNotifications = (user_id: number) => _ClearNotifications(user_id, 3)
@@ -561,7 +560,7 @@ const _ClearNotifications = (user_id: number, attempts: number) =>
         trx(notification.name).where(user.pk, user_id).del()
     )
         .then(success)
-        .catch(new_err => handler(new_err, _ClearNotifications, user_id, attempts))
+        .catch(new_err => handler('ClearNotifications', new_err, _ClearNotifications, user_id, attempts))
 
 export const PurchaseBasket = (user_id: number, shop_id: number, purchase_id: number, date: Date,  items: Purchase[]) =>
     _PurchaseBasket([user_id, shop_id, purchase_id, date, items], 3)
@@ -598,7 +597,7 @@ const _PurchaseBasket = ([user_id, shop_id, purchase_id, date,  items]: [number,
             )
     )
         .then(success)
-        .catch(new_err => handler(new_err, _PurchaseBasket, [user_id, shop_id, purchase_id, date,  items], attempts))
+        .catch(new_err => handler('PurchaseBasket', new_err, _PurchaseBasket, [user_id, shop_id, purchase_id, date,  items], attempts))
 
 export const addPurchaseTypes = (types: number[]) => _addPurchaseTypes(types, 3)
 
@@ -613,7 +612,7 @@ const _addPurchaseTypes = (types: number[], attempts: number) =>
         }))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _addPurchaseTypes, types, attempts))
+        .catch(new_err => handler('addPurchaseTypes', new_err, _addPurchaseTypes, types, attempts))
 
 export const addPermissions = (permissions: number[]) => _addPermissions(permissions, 3)
 
@@ -628,7 +627,7 @@ const _addPermissions = (permissions: number[], attempts: number) =>
         }))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _addPermissions, permissions, attempts))
+        .catch(new_err => handler('addPermissions', new_err, _addPermissions, permissions, attempts))
 
 export const addPurchaseConditionType = (types: number[]) => _addPurchaseConditionType(types, 3)
 
@@ -643,7 +642,7 @@ const _addPurchaseConditionType = (types: number[], attempts: number) =>
         }))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _addPurchaseConditionType, types, attempts))
+        .catch(new_err => handler('addPurchaseConditionType', new_err, _addPurchaseConditionType, types, attempts))
 
 export const addPurchaseConditionOperator = (operators: number[]) => _addPurchaseConditionOperator(operators, 3)
 
@@ -658,7 +657,7 @@ const _addPurchaseConditionOperator = (operators: number[], attempts: number) =>
         }))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _addPurchaseConditionOperator, operators, attempts))
+        .catch(new_err => handler('addPurchaseConditionOperator', new_err, _addPurchaseConditionOperator, operators, attempts))
 
 export const addDiscountOperator = (operators: number[]) => _addDiscountOperator(operators, 3)
 
@@ -673,7 +672,7 @@ const _addDiscountOperator = (operators: number[], attempts: number) =>
         }))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _addDiscountOperator, operators, attempts))
+        .catch(new_err => handler('addDiscountOperator', new_err, _addDiscountOperator, operators, attempts))
 
 export const addDiscountConditionType = (types: number[]) => _addDiscountConditionType(types, 3)
 
@@ -688,7 +687,7 @@ const _addDiscountConditionType = (types: number[], attempts: number) =>
         }))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _addDiscountConditionType, types, attempts))
+        .catch(new_err => handler('addDiscountConditionType', new_err, _addDiscountConditionType, types, attempts))
 
 export const ClearDB = async (): Promise<void> => {
     let builder = getBuilder();
@@ -703,7 +702,7 @@ const _AddPurchaseTypeToShop = ([shop_id, purchase_type]: [number, number], atte
         trx(available.name).insert({shop_id: shop_id, purchase_type_id: purchase_type})
     )
         .then(success)
-        .catch(new_err => handler(new_err, _AddPurchaseTypeToShop, [shop_id, purchase_type], attempts))
+        .catch(new_err => handler('AddPurchaseTypeToShop', new_err, _AddPurchaseTypeToShop, [shop_id, purchase_type], attempts))
 
 export const RemovePurchaseTypeFromShop = (shop_id: number, purchase_type: number): Promise<boolean> =>
     _RemovePurchaseTypeFromShop([shop_id, purchase_type], 3)
@@ -713,7 +712,7 @@ const _RemovePurchaseTypeFromShop = ([shop_id, purchase_type]: [number, number],
         trx(available.name).where({shop_id: shop_id, purchase_type_id: purchase_type}).del()
     )
         .then(success)
-        .catch(new_err => handler(new_err, _RemovePurchaseTypeFromShop, [shop_id, purchase_type], attempts))
+        .catch(new_err => handler('RemovePurchaseTypeFromShop', new_err, _RemovePurchaseTypeFromShop, [shop_id, purchase_type], attempts))
 
 export const AddOffer = (user_id: number, shop_id: number, offer_id: number, product_id: number, amount: number, price_per_unit: number) =>
     _AddOffer([user_id, shop_id, offer_id, product_id, amount, price_per_unit], 3)
@@ -734,12 +733,14 @@ const _AddOffer = ([user_id, shop_id, offer_id, product_id, amount, price_per_un
                 trx.raw(`${offer_id} as offer_id`),
                 user.pk).
             from({
-                A:trx.select(user.pk).from(manages.name).where({shop_id: shop_id}).union(trx.select(user.pk).from(owns.name).where({shop_id: shop_id}))
+                A:trx.select(user.pk).from(manages.name).where({shop_id: shop_id})
+                    .union(trx.select(user.pk).from(owns.name).where({shop_id: shop_id}))
+                    .union(trx.select(user.pk).from(shop.name).where({shop_id: shop_id}))
             })
         await trx(offer_not_accepted_by.name).insert(entries_to_add.map(e => ({offer_id: e.offer_id, user_id: e.user_id})))
     })
         .then(success)
-        .catch(new_err => handler(new_err, _AddOffer, [user_id, shop_id, offer_id, product_id, amount, price_per_unit], attempts))
+        .catch(new_err => handler('AddOffer', new_err, _AddOffer, [user_id, shop_id, offer_id, product_id, amount, price_per_unit], attempts))
 
 export const OfferAcceptedByManagement = (user_id: number, offer_id: number): Promise<boolean> => _OfferAcceptedByManagement([user_id, offer_id], 3)
 
@@ -748,7 +749,7 @@ const _OfferAcceptedByManagement = ([user_id, offer_id]: [number, number], attem
         trx(offer_not_accepted_by.name).where({user_id: user_id, offer_id: offer_id}).del()
     )
         .then(success)
-        .catch(new_err => handler(new_err, _OfferAcceptedByManagement, [user_id, offer_id], attempts))
+        .catch(new_err => handler('OfferAcceptedByManagement', new_err, _OfferAcceptedByManagement, [user_id, offer_id], attempts))
 
 export const RemoveOffer = (offer_id: number): Promise<boolean> => _RemoveOffer(offer_id, 3)
 
@@ -757,7 +758,7 @@ const _RemoveOffer = (offer_id: number, attempts: number): Promise<boolean> =>
         trx(offer.name).where({offer_id: offer_id}).del()
     )
         .then(success)
-        .catch(new_err => handler(new_err, _RemoveOffer, offer_id, attempts))
+        .catch(new_err => handler('RemoveOffer', new_err, _RemoveOffer, offer_id, attempts))
 
 export const CounterOffer = (offer_id: number, user_id: number, new_price_per_unit: number): Promise<boolean> => _CounterOffer([offer_id, user_id, new_price_per_unit], 3)
 
@@ -778,7 +779,7 @@ const _CounterOffer = ([offer_id, user_id, new_price_per_unit]: [number, number,
         await trx(offer.name).where({offer_id: offer_id}).update({isCounterOffer: 1,  price_per_unit: new_price_per_unit})
     })
         .then(success)
-        .catch(new_err => handler(new_err, _CounterOffer, [offer_id, user_id, new_price_per_unit], attempts))
+        .catch(new_err => handler('CounterOffer', new_err, _CounterOffer, [offer_id, user_id, new_price_per_unit], attempts))
 
 export const RemoveNotificationsByPrefix = (prefix: string): Promise<boolean> => _RemoveNotificationsByPrefix(prefix, 3)
 
@@ -787,4 +788,4 @@ const _RemoveNotificationsByPrefix = (prefix: string, attempts: number): Promise
         trx(notification.name).where(trx.raw(`notification like '${prefix}%'`)).del()
     )
         .then(success)
-        .catch(new_err => handler(new_err, _RemoveNotificationsByPrefix, prefix, attempts))
+        .catch(new_err => handler('RemoveNotificationsByPrefix', new_err, _RemoveNotificationsByPrefix, prefix, attempts))

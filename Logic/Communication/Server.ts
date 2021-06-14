@@ -44,7 +44,7 @@ export const io = socket_io(server,
 configWebSocket(io)
 //start our server
 const initServer = () => {
-    service.init().then(_ => service.initData()).then(_ => console.log('Ready'));
+    service.init().then(_ => service.initData(true)).then(_ => console.log('Ready'));
 
     server.listen(port, () => {
         console.log(`Server is running on port ${port}`);

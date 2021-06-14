@@ -44,7 +44,7 @@ router.get('/', (request: any, response: any) => {
     }
 })
 
-router.post('/', (request: any, response: any) => {
+router.post('/', async (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -52,28 +52,28 @@ router.post('/', (request: any, response: any) => {
         response.end()
         return
     }
-    if (!service.isAvailable()){
+    if (!service.isAvailable()) {
         response.status(ServiceUnavailable);
         response.end();
         return;
     }
     const user_id = session_data.user_id;
-    const result = service.purchaseShoppingBasket(user_id, request.body.shop_id, request.body.payment);
-    
+    const result = await service.purchaseShoppingBasket(user_id, request.body.shop_id, request.body.payment);
+
     if (typeof result === 'string') {
-        console.log("purchase error",result);
+        console.log("purchase error", result);
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
         response.end()
     } else {
-        console.log("purchase ok",result);
+        console.log("purchase ok", result);
         response.status(OK);
         response.end();
     }
 })
 
-router.post(purchase_cart, (request: any, response: any) => {
+router.post(purchase_cart, async (request: any, response: any) => {
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -81,13 +81,13 @@ router.post(purchase_cart, (request: any, response: any) => {
         response.end()
         return
     }
-    if (!service.isAvailable()){
+    if (!service.isAvailable()) {
         response.status(ServiceUnavailable);
         response.end();
         return;
     }
     const user_id = session_data.user_id;
-    const result = service.purchaseCart(user_id, request.body);
+    const result = await service.purchaseCart(user_id, request.body);
     // console.log("payment",request.body);
     if (typeof result === 'string') {
         response.status(BadRequest);

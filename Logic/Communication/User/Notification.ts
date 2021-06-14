@@ -12,6 +12,11 @@ export const configWebSocket = (io: any) =>
         socket.on(hello, (hello_message: any) => {
             if (sid_regex.test(hello_message)) {
                 const sid = parseInt(hello_message.split('=')[1]);
+                if(Session.sessions[sid] == undefined){
+                    console.log('User is unauthorized user is trying to connect\nRejecting...')
+                    socket.disconnect()
+                    return
+                }
                 Session.sessions[sid].socket = socket;
                 const user_id = Session.sessions[sid].user_id;
                 if (service.isLoggedIn(user_id) && Session.publisher.hasNotifications(user_id)) {
@@ -19,7 +24,7 @@ export const configWebSocket = (io: any) =>
                 }
              }
             else {
-                socket.close()
+                socket.disconnect()
             }
         })
         socket.on(send_notifications, (message: any) => {

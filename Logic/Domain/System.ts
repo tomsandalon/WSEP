@@ -383,6 +383,7 @@ export class SystemImpl implements System {
         await this.reloadNotifications();
         await this.reconnectAllConnections();
         console.log('\nSystem was rolled back!');
+        const sys = SystemImpl.getInstance();
         this.isInRollbackProcess = false;
     }
 
