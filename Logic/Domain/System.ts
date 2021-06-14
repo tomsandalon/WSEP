@@ -139,6 +139,8 @@ export interface System {
 
     editProduct(user_id: number, shop_id: number, product_id: number, action: Item_Action, value: string): string | boolean
 
+    getPurchaseTypesOfShop(shop_id: number): Purchase_Type[] | string
+
     getShopInfo(shop_id: number): string | string[]
 
     addPurchasePolicy(user_id: number, shop_id: number, condition: ConditionType, value: string): string[] | string
@@ -1057,6 +1059,12 @@ export class SystemImpl implements System {
         if (typeof result == "string") return result
         const {shop, user_email} = result
         return shop.getAllDiscounts(user_id)
+    }
+
+    getPurchaseTypesOfShop(shop_id: number): Purchase_Type[] | string {
+        const shop = this.shops.find(s => s.shop_id == shop_id)
+        if (shop == undefined) return `Shop ${shop_id} not found`
+        return shop.getPurchaseTypes()
     }
 
     getAllPurchasePolicies(user_id: number, shop_id: number): string | string[] {

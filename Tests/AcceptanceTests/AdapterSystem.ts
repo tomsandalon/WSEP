@@ -288,4 +288,8 @@ export class AdapterSystem implements System {
     counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
         return this.system.counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
     }
+
+    getPurchaseTypesOfShop(shop_id: number): Purchase_Type[] | string {
+        return this.system.getPurchaseTypesOfShop(shop_id)
+    }
 }

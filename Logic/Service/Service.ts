@@ -385,4 +385,8 @@ export class Service {
     getAllShopsInSystem(): string[] | string {
         return SystemImpl.getInstance().getAllShopsInSystem()
     }
+
+    getPurchaseTypesOfShop(shop_id: number): number[] | string {
+        return SystemImpl.getInstance().getPurchaseTypesOfShop(shop_id)
+    }
 }

@@ -220,6 +220,8 @@ export interface Shop {
     counterOfferAsManagement(user_email: string, offer_id: number, new_price_per_unit: number): string | boolean;
 
     removePurchaseType(user_email: string, purchase_type: Purchase_Type): string | boolean;
+
+    getPurchaseTypes(): Purchase_Type[];
 }
 
 export class ShopImpl implements Shop {
@@ -803,5 +805,9 @@ export class ShopImpl implements Shop {
 
     static same_offers(shops1: Shop, shops2: Shop) {
         return ShopInventoryImpl.same_offers(shops1.inventory, shops2.inventory)
+    }
+
+    getPurchaseTypes(): Purchase_Type[] {
+        return this.inventory.purchase_types
     }
 }

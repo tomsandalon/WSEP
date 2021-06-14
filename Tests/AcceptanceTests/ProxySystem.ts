@@ -523,4 +523,11 @@ export class ProxySystem implements System{
         }
         return this.system.counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
     }
+
+    getPurchaseTypesOfShop(shop_id: number): Purchase_Type[] | string {
+        if (this.system == undefined) {
+            return TestNotAssociatedWithImplementation
+        }
+        return this.system.getPurchaseTypesOfShop(shop_id)
+    }
 }
