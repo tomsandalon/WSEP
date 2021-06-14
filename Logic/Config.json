@@ -6,8 +6,8 @@
     "db_connection": {
         "host": "127.0.0.1",
         "database": "wsep",
-        "user":     "lior",
-        "password": "123456",
+        "user":     "Mark",
+        "password": "FuckUniv2021",
         "charset": "utf8"
     }
 }

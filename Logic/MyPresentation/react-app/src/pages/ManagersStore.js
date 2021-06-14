@@ -81,12 +81,12 @@ const ManagersStore = () => {
 
   isUser();
   const {
-    data: shouldAcceptOffers,
+    data: purchaseTypes,
     acceptOffersIsPending,
     acceptOffersError,
-  } = useFetch(`route`);
-  // console.log(shouldAcceptOffers);
-  //TODO acceptOffers = shouldAcceptOffers[1] == true
+  } = useFetch(`/user/shop/purchase_type?${storeID}`);
+  console.log(purchaseTypes);
+  //TODO acceptOffers purchasetypes contains 1
   const toggleDoesAcceptOffers = () => {};
 
   return (
