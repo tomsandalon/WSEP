@@ -129,7 +129,7 @@ export const route_user_management_details = route_user_management + details;
  *
  * @method POST
  * @function addProduct
- * @params user_id, shop_id, name, description, amount, categories, base_price,
+ * @params user_id, shop_id, name, description, amount, categories, base_price, purchase_type (optional)
  * @location body
  * @return 404 -> error -> server not found mssg
  * @return 400 -> error -> text

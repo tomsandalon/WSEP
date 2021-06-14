@@ -122,6 +122,7 @@ router.post('/', (request: any, response: any) => {
         request.body.amount,
         request.body.categories,
         request.body.base_price,
+        request.body.purchase_type,
         );
     if (typeof result === 'string') {
         response.status(BadRequest);
