@@ -378,11 +378,7 @@ export class Service {
         return SystemImpl.getInstance().counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
     }
 
-    getPurchaseTypes(user_id: number, shop_id: number): string | number[] {
-        return [0, 1];
-    }
-
-    getAllShopsInSystem(): string[] | string {
+    getAllShopsInSystem(): string | string[] {
         return SystemImpl.getInstance().getAllShopsInSystem()
     }
 }
