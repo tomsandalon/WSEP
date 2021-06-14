@@ -290,13 +290,7 @@ export const route_offer = offer;
  * @return 400 -> error -> text
  * @return 200 -> OK
  *
-<<<<<<< HEAD
  * @method PUT - DONE
- * @function denyCounterOfferAsUser
- * @params user_id, offer_id
-=======
- * @method PUT
->>>>>>> 88f85a174913952f912bb7d662f2b154c4e03269
  * @location body
  ** If action = 'Deny' => denyCounterOfferAsUser => params user_id, offer_id
  ** If action = 'Counter' => counterOfferAsUser => params user_id, shop_id, offer_id, new_price_per_unit

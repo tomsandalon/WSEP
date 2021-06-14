@@ -8,6 +8,8 @@ class Offer extends Component{
             offer:props.offer,
             visible:false,
             errorMsg:'',
+            payment:false,
+            newOffer:0,
         }
     }
 
@@ -19,6 +21,7 @@ class Offer extends Component{
 				'Cookie': document.cookie,
 			},
 			body: JSON.stringify({
+                action:'Deny',
                 offer_id:this.offer.offer_id
 			})
 		  };
@@ -48,12 +51,46 @@ class Offer extends Component{
 		this.setState({payment:true});
         e.preventDefault();
 	}
+    handleCounterOffer = (e) =>{
+		const requestOptions = {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				'Cookie': document.cookie,
+			},
+			body: JSON.stringify({
+                action:'Counter',
+                shop_id:this.offer.shop_id,
+                offer_id:this.offer.offer_id,
+                new_price_per_unit:this.state.newOffer
+			})
+		  };
+		  fetch('/offer/user',requestOptions)
+			  .then(async response => {
+				switch(response.status){
+					case 200: //welcome
+					this.props.refreshOffers();
+					break;
+					case 400:
+					const err_message_fail = await response.text();
+					console.log(err_message_fail);
+                    break;
+                	case 404: //server not found
+                    break;
+					default:
+					break;
+				}
+			})
+	}
     toggle(){
 		this.setState({visible:!this.state.visible, errorMsg:''})
 	}
     cancelPayment = () =>{
 		this.setState({payment:false});
 	}
+    handleOfferPrice = (event) => {
+        this.setState({newOffer:event.target.value})
+    }
     render() {
         return(
             <React.Fragment>
@@ -67,6 +104,8 @@ class Offer extends Component{
                             <h3>Shop: {this.state.offer.shop_name} Product: {this.state.offer.product_name}({this.state.offer.product_id}) Total: {this.state.offer.amount*this.state.offer.price_per_unit}(Amount:{this.state.offer.amount} Price:{this.state.offer.price_per_unit})</h3>
                             {this.state.offer.is_purchaseable && this.state.offer.is_counter_offer ?
                             <div className="offer">
+                            <input type="number" className="amount form-control" placeholder={"Offer price"}  onChange={this.handleOfferPrice}/>
+                            <button className="offer2 btn btn-primary btn-block" onClick={this.handleCounterOffer}> Counter Offer </button>   
                             <button className="offer2 btn btn-primary btn-block" onClick={this.handlePay}> Purchase </button>
                             <button className="offer2 btn btn-primary btn-block" onClick={this.handleDecline}> Decline </button>
                             {this.state.payment  && 
