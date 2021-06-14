@@ -195,8 +195,8 @@ router.get(purchase_type, (request: any, response: any) => {
         response.end();
         return;
     }
-    const user_id = session_data.user_id;
-    let result = service.getPurchaseTypes(user_id, request.query.shop_id);
+    // const user_id = session_data.user_id;
+    let result = service.getAllShopsInSystem();
     if(typeof result == "string") {
         response.setHeader("Content-Type", "text/html");
         response.status(BadRequest);
