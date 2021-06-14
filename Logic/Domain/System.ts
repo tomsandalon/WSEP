@@ -615,6 +615,7 @@ export class SystemImpl implements System {
         if (typeof user == "string") {
             return user;
         }
+        if (user.is_guest) return `You have to be a registered user in order to purchase items`
         const shop = this.getShopById(shop_id);
         if (typeof shop == "undefined")
             return `Shop id ${shop_id} doesnt exist`
