@@ -270,7 +270,7 @@ export const route_shop_manage_product_rating = route_shop_manage_product + rate
 /**
  * @method GET
  * @function offerIsPurchasable
- * @params user_id
+ * @params user_id, shop_id, offer_id
  * @return 404 -> error -> server not found mssg
  * @return 400 -> error -> text
  * @return 200 -> text
@@ -314,7 +314,7 @@ export const route_offer_user = offer + user_offer;
 /**
  * @method GET
  * @function getActiveOfferForShop
- * @params user_id
+ * @params user_id, shop_id
  * @return 404 -> error -> server not found mssg
  * @return 400 -> error -> text
  * @return 200 -> JSON
