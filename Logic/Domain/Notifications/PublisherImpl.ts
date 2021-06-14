@@ -5,8 +5,8 @@ import {LoginImpl} from "../Users/Login";
 import {ClearNotifications, Notify, RemoveNotificationsByPrefix} from "../DBCommand";
 import {SystemImpl} from "../System";
 
-// import * as P from "../../Service/Publisher"
-let P: any
+import * as P from "../../Service/Publisher"
+// let P: any
 
 export class PublisherImpl implements Publisher {
     private static instance: PublisherImpl;

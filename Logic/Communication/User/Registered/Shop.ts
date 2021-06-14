@@ -181,3 +181,31 @@ router.delete(purchase_type, (request: any, response: any) => {
     }
     response.end();
 })
+
+router.get(purchase_type, (request: any, response: any) => {
+    const session_data = Session.sessions[request.cookies[sid]];
+    if (session_data == undefined) {
+        response.status(ServerNotFound);
+        response.send('Bad session id')
+        response.end()
+        return
+    }
+    if (!service.isAvailable()){
+        response.status(ServiceUnavailable);
+        response.end();
+        return;
+    }
+    const user_id = session_data.user_id;
+    let result = service.getPurchaseTypes(user_id, request.query.shop_id);
+    if(typeof result == "string") {
+        response.setHeader("Content-Type", "text/html");
+        response.status(BadRequest);
+        response.send(result);
+    }
+    else{
+        response.setHeader("Content-Type", "application/json");
+        response.status(OK);
+        response.send(result);
+    }
+    response.end();
+})

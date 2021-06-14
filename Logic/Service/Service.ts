@@ -375,4 +375,8 @@ export class Service {
     counterOfferAsUser(user_id: number, shop_id: number, offer_id: number, new_price_per_unit: number): string | boolean {
         return this.system.counterOfferAsUser(user_id, shop_id, offer_id, new_price_per_unit)
     }
+
+    getPurchaseTypes(user_id: number, shop_id: number): string | number[] {
+        return [0, 1];
+    }
 }
