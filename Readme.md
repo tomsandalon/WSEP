@@ -1,4 +1,4 @@
-# <div style="text-align: center;"> System Initiation </div>
+# System Initiation
 
 ![Our best logo ever](Logo.png)
 
@@ -52,7 +52,7 @@
 
 [CounterOfferAsManager](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L356)
 
-[CounterOfferAsUser](httphttps://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L380)
+[CounterOfferAsUser](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L380)
 
 [DenyCounterOfferAsUser](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L360)
 
