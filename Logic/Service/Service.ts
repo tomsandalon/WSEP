@@ -225,12 +225,17 @@ export class Service {
             info.delivery_info.country != undefined
     }
 
-    private static getPurchaseInfoOrString(payment_info: string): string | Purchase_Info {
+    private static getPurchaseInfoOrString(payment_info): string | Purchase_Info {
         try {
-            const parsed_info: Purchase_Info = JSON.parse(payment_info);
+            let info;
+            if (typeof payment_info == "string") info = payment_info
+            else info = JSON.stringify(info)
+            const parsed_info: Purchase_Info = JSON.parse(info);
+            console.log("parsed info - ", parsed_info);
             if (Service.isValidPurchaseInfo(parsed_info)) return parsed_info
             return payment_info
         } catch (e) {
+            console.log("error", e);
             return payment_info
         }
     }

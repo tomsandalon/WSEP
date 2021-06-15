@@ -146,14 +146,12 @@ router.post('/', async (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    const result = await service.purchaseOffer(user_id, request.body.offer_id, request.body.payment_info);
+    const result = await service.purchaseOffer(user_id, request.body.offer_id, JSON.stringify(request.body.payment));
     if (typeof result === 'string') {
-        console.log("purchase success");
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
-        console.log("purchase failed");
         response.status(OK);
         response.end();
     }
