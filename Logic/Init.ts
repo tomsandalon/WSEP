@@ -6,7 +6,7 @@ import * as DBCommand from "./Domain/DBCommand"
 const fs = require('fs');
 const path = require('path');
 
-const initFileName = 'Actions.json'
+const initFileName = '../Actions.json'
 export const initData = async (service: Service): Promise<boolean> => {
     await DBCommand.ClearDB()
     await service.system.init()
