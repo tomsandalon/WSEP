@@ -58,8 +58,12 @@ router.post('/', async (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    const result = await service.purchaseShoppingBasket(user_id, request.body.shop_id, request.body.payment);
+    console.log("before entering await purchase basket");
 
+    console.log(typeof request.body.shop_id);
+
+    const result = await service.purchaseShoppingBasket(user_id, request.body.shop_id, JSON.stringify(request.body.payment));
+    console.log("purchase basket result - ", result);
     if (typeof result === 'string') {
         console.log("purchase error", result);
         response.status(BadRequest);
@@ -87,8 +91,7 @@ router.post(purchase_cart, async (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    const result = await service.purchaseCart(user_id, request.body);
-    // console.log("payment",request.body);
+    const result = await service.purchaseCart(user_id, JSON.stringify(request.body));
     if (typeof result === 'string') {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
