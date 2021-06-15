@@ -1,6 +1,6 @@
 import React, {useState} from "react";
-import putFetch from "../putFetch.js";
-import serverResponse from "../components/ServerResponse.js";
+import putFetch from "../../putFetch.js";
+import serverResponse from "../ServerResponse.js";
 import {Alert} from "reactstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";

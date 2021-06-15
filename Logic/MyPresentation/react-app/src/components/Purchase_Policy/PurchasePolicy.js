@@ -1,9 +1,9 @@
 import React from "react";
-import deleteFetch from "../deleteFetch";
-import "./Product.css";
+import deleteFetch from "../../deleteFetch";
+import "../Product.css";
 import { Alert } from "reactstrap";
 import { useState } from "react";
-import serverResponse from "../components/ServerResponse.js";
+import serverResponse from "../ServerResponse.js";
 
 const PurchasePolicy = (props) => {
   const storeID = props.storeID;

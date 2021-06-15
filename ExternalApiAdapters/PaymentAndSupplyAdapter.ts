@@ -52,7 +52,7 @@ export class PaymentAndSupplyAdapter {
     }
 
     async pay(card_number: string, month: string, year: string, holder: string, ccv: string, id: string): Promise<number> {
-        return blockExternalServices ? Promise.resolve(getRandomInt(HIGH - LOW) + LOW) : this.external_system.pay(card_number, month, year, holder, ccv, id)
+        return blockExternalServices ? Promise.resolve(ccv == "986" || ccv == "984" ? -1 : getRandomInt(HIGH - LOW) + LOW) : this.external_system.pay(card_number, month, year, holder, ccv, id)
     }
 
     async cancel_pay(transaction_id: string): Promise<number> {

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import deleteFetch from "../deleteFetch";
-import "./Product.css";
-import serverResponse from "../components/ServerResponse.js";
+import deleteFetch from "../../deleteFetch";
+import "../Product.css";
+import serverResponse from "../ServerResponse.js";
 import {Alert} from "reactstrap";
 import {Link} from "react-router-dom";
 
