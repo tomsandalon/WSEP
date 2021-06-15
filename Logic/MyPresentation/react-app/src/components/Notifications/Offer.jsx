@@ -11,6 +11,7 @@ class Offer extends Component{
             payment:false,
             newOffer:0,
         }
+        console.log("props",this.state.offer)
     }
 
     handleDecline = () =>{
@@ -22,7 +23,7 @@ class Offer extends Component{
 			},
 			body: JSON.stringify({
                 action:'Deny',
-                offer_id:this.offer.offer_id
+                offer_id:this.state.offer.offer_id
 			})
 		  };
 		  fetch('/offer/user',requestOptions)
@@ -52,36 +53,37 @@ class Offer extends Component{
         e.preventDefault();
 	}
     handleCounterOffer = (e) =>{
-		const requestOptions = {
-			method: 'PUT',
+        const requestOptions = {
+            method: 'PUT',
 			headers: {
-				'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
 				'Cookie': document.cookie,
 			},
 			body: JSON.stringify({
                 action:'Counter',
-                shop_id:this.offer.shop_id,
-                offer_id:this.offer.offer_id,
+                shop_id:this.state.offer.shop_id,
+                offer_id:this.state.offer.offer_id,
                 new_price_per_unit:this.state.newOffer
 			})
-		  };
-		  fetch('/offer/user',requestOptions)
-			  .then(async response => {
-				switch(response.status){
-					case 200: //welcome
-					this.props.refreshOffers();
-					break;
-					case 400:
-					const err_message_fail = await response.text();
+        };
+        fetch('/offer/user',requestOptions)
+        .then(async response => {
+            switch(response.status){
+                case 200: //welcome
+                this.props.refreshOffers();
+                break;
+                case 400:
+                    const err_message_fail = await response.text();
 					console.log(err_message_fail);
                     break;
                 	case 404: //server not found
                     break;
 					default:
-					break;
-				}
-			})
-	}
+                        break;
+                    }
+                })
+                // e.preventDefault();
+            }
     toggle(){
 		this.setState({visible:!this.state.visible, errorMsg:''})
 	}
@@ -110,7 +112,7 @@ class Offer extends Component{
                             <button className="offer2 btn btn-primary btn-block" onClick={this.handleDecline}> Decline </button>
                             {this.state.payment  && 
 					        <div>
-						        <Payment isOffer={true} handleFailedPayment={this.handleFailedPayment} refreshOffers ={this.props.refreshOffers} offer_id ={this.offer.offer_id} cancelPayment={this.cancelPayment}/>
+						        <Payment isOffer={true} handleFailedPayment={this.handleFailedPayment} refreshOffers ={this.props.refreshOffers} offer_id ={this.state.offer.offer_id} cancelPayment={this.cancelPayment}/>
 					        </div>
 				            }
                             </div>
@@ -118,7 +120,7 @@ class Offer extends Component{
                             <div>
                             {this.state.payment  && 
                                 <div>
-                                   <Payment isOffer={true} handleFailedPayment={this.handleFailedPayment} refreshOffers ={this.props.refreshOffers} offer_id ={this.offer.offer_id}  cancelPayment={this.cancelPayment}/>
+                                   <Payment isOffer={true} handleFailedPayment={this.handleFailedPayment} refreshOffers ={this.props.refreshOffers} offer_id ={this.state.offer.offer_id}  cancelPayment={this.cancelPayment}/>
 					        </div>
                                 }
                             <button className="offer2 btn btn-primary btn-block" onClick={this.handlePay}> Purchase </button>

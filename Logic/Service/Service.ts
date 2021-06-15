@@ -26,7 +26,7 @@ export class Service {
         db.turnBlockDBON();
         const immediate: Purchase_Type = Purchase_Type.Immediate
         const offer: Purchase_Type = Purchase_Type.Offer
-        SystemImpl.getInstance().performRegister("Liorpev@gmail.com", "123456")
+        SystemImpl.getInstance().performRegister("liorpev@gmail.com", "123456")
         SystemImpl.getInstance().performRegister("Mark@gmail.com", "123456")
         SystemImpl.getInstance().performRegister("TomAndSons@gmail.com", "123456") // Owner
         SystemImpl.getInstance().performRegister("Tomer@gmail.com", "123456") // Manager
