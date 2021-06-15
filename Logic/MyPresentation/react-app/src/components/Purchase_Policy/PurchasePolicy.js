@@ -14,15 +14,19 @@ const PurchasePolicy = (props) => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const [errorColor, setErrorColor] = useState("success");
-
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
   const onDismiss = () => {
     setVisible(false);
     window.location.reload();
   };
-  const success = () => {
+  const success = async () => {
     setErrorColor("success");
     setError("Policy Deleted Successfully");
     setVisible(true);
+    await sleep(2000);
+    window.location.reload();
   };
   const failure401 = (err_message) => {
     setErrorColor("warning");

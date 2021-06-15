@@ -250,18 +250,20 @@ const ManagersStore = () => {
               discounts={discounts}
             />
           )}
-          <div className="row">
-            <ComposeDiscount
-              storeID={storeID}
-              storeName={name}
-              logic={true}
-            ></ComposeDiscount>
-            <ComposeDiscount
-              storeID={storeID}
-              storeName={name}
-              logic={false}
-            ></ComposeDiscount>
-          </div>
+          {discounts && Object.keys(discounts._discounts).length > 1 && (
+            <div className="row">
+              <ComposeDiscount
+                storeID={storeID}
+                storeName={name}
+                logic={true}
+              ></ComposeDiscount>
+              <ComposeDiscount
+                storeID={storeID}
+                storeName={name}
+                logic={false}
+              ></ComposeDiscount>
+            </div>
+          )}
           <hr></hr>
           <h3>Purchase Policies:</h3>
           <Link to={`/addpolicy/${storeID}/${name}`}>
@@ -277,7 +279,9 @@ const ManagersStore = () => {
               policies={purchasePolicies}
             />
           )}
-          <ComposePolicy storeID={storeID} storeName={name}></ComposePolicy>
+          {purchasePolicies && purchasePolicies.length > 1 && (
+            <ComposePolicy storeID={storeID} storeName={name}></ComposePolicy>
+          )}
           <hr></hr>
           <h3>Offers:</h3>
           {pendingOffers && (

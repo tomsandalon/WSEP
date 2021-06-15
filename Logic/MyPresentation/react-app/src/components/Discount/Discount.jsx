@@ -17,6 +17,9 @@ const Discount = (props) => {
   const [visible, setVisible] = useState(false);
   const [errorColor, setErrorColor] = useState("success");
 
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
   const numToCondition = {
     0: "Category",
     1: "Product name",
@@ -33,10 +36,12 @@ const Discount = (props) => {
     setVisible(false);
     window.location.reload();
   };
-  const success = () => {
+  const success = async() => {
     setErrorColor("success");
     setError("Discount Deleted Successfully");
     setVisible(true);
+    await sleep(2000);
+    window.location.reload();
   };
   const failure401 = (err_message) => {
     setErrorColor("warning");
