@@ -1,19 +1,15 @@
 import * as https from 'https';
-import {
-    assign_manager,
-    assign_owner,
-    options,
-    permissions,
-    port,
-    service,
-} from "./Config/Config";
+import {options, port, service,} from "./Config/Config";
+import * as dataInit from "../Init"
 import {
     route_admin,
     route_cart,
-    route_filter, route_guest,
+    route_filter,
+    route_guest,
     route_home,
     route_login,
-    route_logout, route_offer,
+    route_logout,
+    route_offer,
     route_purchase,
     route_register,
     route_shop,
@@ -25,6 +21,7 @@ import {
     route_user_management
 } from "./Routes";
 import {configWebSocket} from "./User/Notification";
+
 const socket_io = require('socket.io');
 const fs = require('fs')
 const path = require('path');
@@ -36,16 +33,14 @@ export const app = express();
 export const server = https.createServer(options, app);
 export const io = socket_io(server,
     {
-    cors: {
-        origin: "http://localhost:3000",
-        credentials: true
-    }
-      });
+        cors: {
+            origin: "http://localhost:3000",
+            credentials: true
+        }
+    });
 configWebSocket(io)
-//start our server
-const initServer = () => {
-    service.init().then(_ => service.initData(true)).then(_ => console.log('Ready'));
 
+const server_setup = () => {
     server.listen(port, () => {
         console.log(`Server is running on port ${port}`);
     })
@@ -71,8 +66,25 @@ const initServer = () => {
     app.use(route_offer, require('./User/Registered/Offer'));
 }
 
-if(isLoaded() || loadConfig()){
-    initServer();
+//start our server
+const initServer = (should_read_from_file?: boolean) => {
+    if (should_read_from_file)
+        service.init().then(_ => dataInit.initData(service).then(res => {
+            if (!res) throw Error("Init data not initialized properly")
+        })).then(_ => {
+            console.log('Ready')
+            server_setup()
+        });
+    else
+        service.init().then(_ => service.initData(true)).then(_ => {
+            console.log('Ready')
+            server_setup()
+        });
+
+}
+
+if(isLoaded() || loadConfig()) {
+    initServer(process.argv[Math.max(2, process.argv.length - 1)] != undefined); //check if load flag is on
 } else {
     console.log("Server cannot read config file\nAborting...")
 }
