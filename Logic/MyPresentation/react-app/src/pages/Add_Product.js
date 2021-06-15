@@ -7,10 +7,14 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
 const AddProduct = () => {
+  const purchaseTypeOptions = [
+    { label: "Immediate Purchase", value: 0 },
+    { label: "Offer", value: 1 },
+  ];
   const { storeID, storeName } = useParams();
   const [name, setName] = useState();
   const [amount, setAmount] = useState();
-  const [purchaseType, setPurchaseType] = useState();
+  const [purchaseType, setPurchaseType] = useState(purchaseTypeOptions[0]);
   const [description, setDescription] = useState();
   const [categories, setCategories] = useState();
   const [price, setPrice] = useState();
@@ -18,10 +22,7 @@ const AddProduct = () => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-  const purchaseTypeOptions = [
-    { label: "Immediate Purchase", value: 0 },
-    { label: "Offer", value: 1 },
-  ];
+ 
   const isUser = () => {
     const requestOptions = {
       method: "GET",

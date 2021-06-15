@@ -312,6 +312,7 @@ export class ShopInventoryImpl implements ShopInventory {
     }
 
     addItem(name: string, description: string, amount: number, categories: string[], base_price: number, purchase_type?: Purchase_Type): boolean | string {
+        console.log("idk where i am",this.purchase_types);
         if (purchase_type == undefined && !this.purchase_types.includes(Purchase_Type.Immediate) ||
             purchase_type != undefined && !this.purchase_types.includes(purchase_type))
             return "Purchase type is not allowed in the shop"

@@ -22,7 +22,7 @@ export class Service {
     }
 
     public initData(resume?: boolean) {
-        // if (resume) return;
+        if (resume) return;
         db.turnBlockDBON();
         const immediate: Purchase_Type = Purchase_Type.Immediate
         const offer: Purchase_Type = Purchase_Type.Offer
@@ -41,7 +41,7 @@ export class Service {
         if (typeof nvidia_id === "string" || typeof zara_id === "string")
             return
         this.addPurchaseType(tom_id, nvidia_id, Purchase_Type.Offer)
-        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 50, ["GPU"], 1000, immediate)
+        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 2500, ["GPU"], 1000, immediate)
         this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 10, ["GPU"], 2000, offer)
         this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, offer)
         this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, immediate)
@@ -138,6 +138,7 @@ export class Service {
     }
 
     displayShops(): string | string[] {
+        console.log("displaying shops");
         return SystemImpl.getInstance().displayShops()
     }
 
@@ -195,6 +196,7 @@ export class Service {
     }
 
     openSession(): number {
+        console.log("in open session");
         return SystemImpl.getInstance().openSession()
     }
 

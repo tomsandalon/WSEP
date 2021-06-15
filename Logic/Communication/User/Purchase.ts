@@ -61,8 +61,9 @@ router.post('/', async (request: any, response: any) => {
     console.log("before entering await purchase basket");
 
     console.log(typeof request.body.shop_id);
-
+    console.log("before paying body - ", JSON.stringify(request.body.payment));
     const result = await service.purchaseShoppingBasket(user_id, request.body.shop_id, JSON.stringify(request.body.payment));
+    console.log("after paying body - ", result);
     console.log("purchase basket result - ", result);
     if (typeof result === 'string') {
         console.log("purchase error", result);

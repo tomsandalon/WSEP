@@ -54,7 +54,9 @@ router.post('/', (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
+    console.log("addshop - body", request.body)
     const result = service.addShop(user_id, request.body.name, request.body.description, request.body.location, request.body.bank_info);
+    console.log(" after addshop - resukt", result)
     response.setHeader("Content-Type", "text/html");
     if (typeof result === 'string') {
         response.status(BadRequest);

@@ -62,6 +62,7 @@ import {
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
 import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 import {offer_id_counter} from "./ProductHandling/Offer";
+import { purchase_type } from "../Communication/Config/Config";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -564,6 +565,7 @@ export class SystemImpl implements System {
     addProduct(user_id: number, shop_id: number, name: string, description: string, amount: number, categories: string[],
                base_price: number, purchase_type?: Purchase_Type): boolean | string {
         const shop = this.getShopById(shop_id)
+        console.log("system productadd" ,typeof purchase_type,purchase_type)
         if (!shop) return `Shop ${shop_id} not found`
         const user = this.login.retrieveUser(user_id);
         if (typeof user == "string")

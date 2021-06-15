@@ -48,7 +48,9 @@ router.post('/', (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
+    console.log("before adding to basket");
     const result = service.addItemToBasket(user_id, request.body.product_id, request.body.shop_id, request.body.amount);
+    console.log("after adding to basket result - ", result);
     if (typeof result === 'string') {
         response.status(400);
         response.setHeader("Content-Type", "text/html");
