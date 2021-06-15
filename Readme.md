@@ -1,4 +1,6 @@
-# System Initiation
+# <div style="text-align: center;"> System Initiation </div>
+
+![Our best logo ever](Logo.png)
 
 - If the system is run with an 'initialize' flag in its parameters (last parameter), it will initiate the database
   according to 'Actions.json' file. //TODO add link
