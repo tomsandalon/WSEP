@@ -117,6 +117,16 @@ describe('Buy product by policies', () => {
         await user.purchaseOffer(offer_id_counter - 1, "Some info")
         expect((user.getOrderHistory() as string[])[0]).to.include(500)
     })
+    it('Try to deny accepted counter offer as manager', async () => {
+        const shop: ShopImpl = ShopImpl.create("Tom@gmail.com", "12345-TOM-SAND", "Best local shop in the negev", "Negev", "Tom and sons");
+        const user: UserImpl = UserImpl.create();
+        shop.addPurchaseType("Tom@gmail.com", Purchase_Type.Offer)
+        shop.addItem("Tom@gmail.com", "GTX", "GPU", 999, ["GPU", "HW"], 20000, Purchase_Type.Offer);
+        user.makeOffer(shop.inventory, getNewItem(shop.inventory), 1, 1000)
+        shop.counterOfferAsManagement("Tom@gmail.com", offer_id_counter - 1, 500)
+        const result = shop.denyOfferAsManagement("Tom@gmail.com", offer_id_counter - 1)
+        expect(typeof result == "string").to.be.true
+    })
 })
 describe("Purchase test", () => {
     it('purchase positive amount and more than stock', async () => {

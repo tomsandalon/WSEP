@@ -96,6 +96,10 @@ onShowAlert = ()=>{
         },1000)
     });
 }
+addShop = () =>{
+    window.location.assign("/addstore")
+    // e.preventDefault();
+}
 toggle(){
     this.setState({visible:!this.state.visible, errorMsg:''})
 }
@@ -132,6 +136,8 @@ toggle(){
                         <a className="nav-links cartButton btn-primary btn-sm" href="/roles">
                             Roles</a>
                         </li>}
+                        {this.state.loggedUser && <li key={148}><button className="nav-links cartButton btn-primary btn-sm" onClick={this.addShop}>
+                        Add Shop</button></li>}
                         {this.state.loggedUser && <li key={100}><button className="nav-links cartButton btn-dark btn-sm" onClick={this.handleLogout}>
                         Logout</button>
                         <Alert color="success" isOpen={this.state.successVisible}>{this.state.errorMsg}</Alert>
