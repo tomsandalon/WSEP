@@ -59,50 +59,140 @@ export class Service {
         this.logout(someone)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param id ID of the condition
+     * @param condition String value of the enum {@link Condition}
+     * @param condition_param Value for the condition
+     */
     addConditionToDiscount(user_id: number, shop_id: string, id: string, condition: string, condition_param: string): string | boolean {
         return SystemImpl.getInstance().addConditionToDiscount(user_id, Number(shop_id), Number(id), Number(condition), condition_param);
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param value Value for the discount [0...1]
+     */
     addDiscount(user_id: number, shop_id: string, value: string): string | boolean {
         return SystemImpl.getInstance().addDiscount(user_id, Number(shop_id), Number(value))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param operation String value of enum {@link LogicComposition}
+     * @param d_id1 ID of the first discount
+     * @param d_id2 ID of the second discount
+     */
     addLogicComposeDiscount(user_id: number, shop_id: string, operation: string, d_id1: string, d_id2: string): string | boolean {
         return SystemImpl.getInstance().addLogicComposeDiscount(user_id, Number(shop_id), Number(operation), Number(d_id1), Number(d_id2))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param operation String value of enum {@link NumericOperation}
+     * @param d_id1 ID of the first discount
+     * @param d_id2 ID of the second discount
+     */
     addNumericComposeDiscount(user_id: number, shop_id: string, operation: string, d_id1: string, d_id2: string): string | boolean {
         return SystemImpl.getInstance().addNumericComposeDiscount(user_id, Number(shop_id), Number(operation), Number(d_id1), Number(d_id2));
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param condition String value of enum {@link ConditionType}
+     * @param value Value for the codntion
+     */
     addPurchasePolicy(user_id: number, shop_id: string, condition: string, value: string): string[] | string {
         return SystemImpl.getInstance().addPurchasePolicy(user_id, Number(shop_id), Number(condition), value)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param policy_id1 ID of the first policy
+     * @param policy_id2 ID of the second policy
+     * @param operator String value of enum {@link CompositeCondition.Operator}
+     */
     composePurchasePolicy(user_id: number, shop_id: string, policy_id1: string, policy_id2: string, operator: string): boolean | string {
         return SystemImpl.getInstance().composePurchasePolicy(user_id, Number(shop_id), Number(policy_id1), Number(policy_id2), Number(operator))
     }
 
-    removeOwner(user_id: number, shop_id: string, target: string): string | boolean {
-        return SystemImpl.getInstance().removeOwner(user_id, Number(shop_id), target)
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param target_email Email of the target user
+     */
+    removeOwner(user_id: number, shop_id: string, target_email: string): string | boolean {
+        return SystemImpl.getInstance().removeOwner(user_id, Number(shop_id), target_email)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param policy_id ID of the policy
+     */
     removePurchasePolicy(user_id: number, shop_id: string, policy_id: string): string | boolean {
         return SystemImpl.getInstance().removePurchasePolicy(user_id, Number(shop_id), Number(policy_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param product_id ID of the product
+     * @param shop_id ID of the shop
+     * @param amount The amount to add
+     */
     addItemToBasket(user_id: number, product_id: string, shop_id: string, amount: string): string | void {
         return SystemImpl.getInstance().addItemToBasket(user_id, Number(product_id), Number(shop_id), Number(amount));
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param target_email Email of the target user
+     * @param action String value of enum {@link Action}
+     */
     addPermissions(user_id: number, shop_id: string, target_email: string, action: string): string | boolean {
         return SystemImpl.getInstance().addPermissions(user_id, Number(shop_id), target_email, Number(action))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param name Name of the product
+     * @param description Description of the product
+     * @param amount Initial amount for the product
+     * @param categories A list of categories
+     * @param base_price The base price of the product
+     * @param purchase_type String value of enum {@link Purchase_Type}
+     */
     addProduct(user_id: number, shop_id: string, name: string, description: string, amount: string, categories: string[], base_price: string, purchase_type?: string): boolean | string {
         return SystemImpl.getInstance().addProduct(user_id, Number(shop_id), name, description, Number(amount), categories, Number(base_price), purchase_type != undefined ? Number(purchase_type) : undefined)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param name Name of the shop
+     * @param description Description of the shop
+     * @param location The location of the shop
+     * @param bank_info The bank info of the shop
+     */
     addShop(user_id: number, name: string, description: string, location: string, bank_info: string): number | string {
         return SystemImpl.getInstance().addShop(user_id, name, description, location, bank_info)
     }
@@ -115,10 +205,22 @@ export class Service {
         return SystemImpl.getInstance().adminDisplayUserHistory(admin, Number(target_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param appointee_user_email Email of the appointee
+     */
     appointManager(user_id: number, shop_id: string, appointee_user_email: string): string | boolean {
         return SystemImpl.getInstance().appointManager(user_id, Number(shop_id), appointee_user_email)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param appointee_user_email Email of the appointee
+     */
     appointOwner(user_id: number, shop_id: string, appointee_user_email: string): string | boolean {
         return SystemImpl.getInstance().appointOwner(user_id, Number(shop_id), appointee_user_email)
     }
@@ -139,18 +241,46 @@ export class Service {
         return SystemImpl.getInstance().displayStaffInfo(user_id, Number(shop_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param target_email Email of the target user
+     * @param actions The actions to permit {@link Action}
+     */
     editPermissions(user_id: number, shop_id: string, target_email: string, actions: string[]): string | boolean {
         return SystemImpl.getInstance().editPermissions(user_id, Number(shop_id), target_email, actions.map(a => Number(a)))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param product_id ID of the product
+     * @param action The action to perform on the item {@link Item_Action}
+     * @param value The value of the action to perform
+     */
     editProduct(user_id: number, shop_id: string, product_id: string, action: string, value: string): string | boolean {
         return SystemImpl.getInstance().editProduct(user_id, Number(shop_id), Number(product_id), Number(action), value)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param product_id ID of the product
+     * @param amount The amount to set for the product in the basket
+     */
     editShoppingCart(user_id: number, shop_id: string, product_id: string, amount: string): string | void {
         return SystemImpl.getInstance().editShoppingCart(user_id, Number(shop_id), Number(product_id), Number(amount))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param product_id ID of the product
+     */
     removeItemFromBasket(user_id: number, shop_id: string, product_id: string): string | void {
         return SystemImpl.getInstance().editShoppingCart(user_id, Number(shop_id), Number(product_id), 0)
     }
@@ -186,6 +316,10 @@ export class Service {
         return SystemImpl.getInstance().getShopInfo(Number(shop_id));
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     */
     logout(user_id: number): string | boolean {
         return SystemImpl.getInstance().logout(user_id);
     }
@@ -198,12 +332,23 @@ export class Service {
         return SystemImpl.getInstance().performGuestLogin()
     }
 
+    /**
+     *
+     * @param user_email Email of the user
+     * @param password Password of the user
+     */
     performLogin(user_email: string, password: string): string | number {
         return SystemImpl.getInstance().performLogin(user_email, password)
     }
 
+    /**
+     *
+     * @param user_email Email of the user
+     * @param password Password of the user
+     * @param age Age of the user
+     */
     performRegister(user_email: string, password: string, age: string): boolean {
-        return SystemImpl.getInstance().performRegister(user_email, password,  age == undefined || age.length == 0 || isNaN(Number(age)) ? undefined : Number(age))
+        return SystemImpl.getInstance().performRegister(user_email, password, age == undefined || age.length == 0 || isNaN(Number(age)) ? undefined : Number(age))
     }
 
     private static isValidPurchaseInfo(info: Purchase_Info): boolean {
@@ -236,18 +381,41 @@ export class Service {
         }
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param payment_info Stringified JSON of the payment info of the user {@link Purchase_Info}
+     */
     purchaseCart(user_id: number, payment_info: string): Promise<string | boolean> {
         return SystemImpl.getInstance().purchaseCart(user_id, Service.getPurchaseInfoOrString(payment_info))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param payment_info Stringified JSON of the payment info of the user {@link Purchase_Info}
+     */
     purchaseShoppingBasket(user_id: number, shop_id: string, payment_info: string): Promise<string | boolean> {
         return SystemImpl.getInstance().purchaseShoppingBasket(user_id, Number(shop_id), Service.getPurchaseInfoOrString(payment_info))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param target Email of the target account
+     */
     removeManager(user_id: number, shop_id: string, target: string): string | boolean {
         return SystemImpl.getInstance().removeManager(user_id, Number(shop_id), target)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param product_id ID of the product
+     */
     removeProduct(user_id: number, shop_id: string, product_id: string): boolean | string {
         return SystemImpl.getInstance().removeProduct(user_id, Number(shop_id), Number(product_id))
     }
@@ -272,6 +440,12 @@ export class Service {
         return SystemImpl.getInstance().getAllPurchasePolicies(user_id, Number(shop_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param id ID of the discount to remove
+     */
     removeDiscount(user_id: number, shop_id: string, id: string): string | boolean {
         return SystemImpl.getInstance().removeDiscount(user_id, Number(shop_id), Number(id))
     }
@@ -312,10 +486,24 @@ export class Service {
         return SystemImpl.getInstance().getAllCategories(user_id)
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param product_id ID of the product
+     * @param rating The rating for the product [0..5]
+     */
     rateProduct(user_id: number, shop_id: string, product_id: string, rating: string): string | boolean {
         return SystemImpl.getInstance().rateProduct(user_id, Number(shop_id), Number(product_id), Number(rating))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param target_email Email of the target user
+     * @param action The permission to remove {@link Action}
+     */
     removePermission(user_id: number, shop_id: string, target_email: string, action: string): string | boolean {
         return SystemImpl.getInstance().removePermission(user_id, Number(shop_id), target_email, Number(action))
     }
@@ -333,6 +521,14 @@ export class Service {
 
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param product_id ID of the product
+     * @param amount The amount to purchase
+     * @param price_per_unit The price for each unit
+     */
     makeOffer(user_id: number, shop_id: string, product_id: string, amount: string, price_per_unit: string): string | boolean {
         return SystemImpl.getInstance().makeOffer(user_id, Number(shop_id), Number(product_id), Number(amount), Number(price_per_unit))
     }
@@ -345,18 +541,42 @@ export class Service {
         return SystemImpl.getInstance().getActiveOfferForShop(user_id, Number(shop_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param offer_id The ID of the offer
+     */
     acceptOfferAsManagement(user_id: number, shop_id: string, offer_id: string): string | boolean {
         return SystemImpl.getInstance().acceptOfferAsManagement(user_id, Number(shop_id), Number(offer_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param offer_id The ID of the offer
+     */
     denyOfferAsManagement(user_id: number, shop_id: string, offer_id: string): string | boolean {
         return SystemImpl.getInstance().denyOfferAsManagement(user_id, Number(shop_id), Number(offer_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param offer_id The ID of the offer
+     * @param new_price_per_unit The new price per unit to offer
+     */
     counterOfferAsManager(user_id: number, shop_id: string, offer_id: string, new_price_per_unit: string): string | boolean {
         return SystemImpl.getInstance().counterOfferAsManager(user_id, Number(shop_id), Number(offer_id), Number(new_price_per_unit))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param offer_id The ID of the offer
+     */
     denyCounterOfferAsUser(user_id: number, offer_id: string): string | boolean {
         return SystemImpl.getInstance().denyCounterOfferAsUser(user_id, Number(offer_id))
     }
@@ -365,18 +585,43 @@ export class Service {
         return SystemImpl.getInstance().offerIsPurchasable(user_id, Number(shop_id), Number(offer_id))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param offer_id The ID of the offer
+     * @param payment_info Stringified JSON of the payment info of the user {@link Purchase_Info}
+     */
     purchaseOffer(user_id: number, offer_id: string, payment_info: string): Promise<string | boolean> {
         return SystemImpl.getInstance().purchaseOffer(user_id, Number(offer_id), Service.getPurchaseInfoOrString(payment_info))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param purchase_type The purchase type to remove {@link Purchase_Type}
+     */
     removePurchaseType(user_id: number, shop_id: string, purchase_type: string): string | boolean {
         return SystemImpl.getInstance().removePurchaseType(user_id, Number(shop_id), Number(purchase_type))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param purchase_type The purchase type to add {@link Purchase_Type}
+     */
     addPurchaseType(user_id: number, shop_id: string, purchase_type: string): string | boolean {
         return SystemImpl.getInstance().addPurchaseType(user_id, Number(shop_id), Number(purchase_type))
     }
 
+    /**
+     *
+     * @param user_id ID of the user
+     * @param shop_id ID of the shop
+     * @param offer_id The ID of the offer
+     * @param new_price_per_unit The new price per unit to offer
+     */
     counterOfferAsUser(user_id: number, shop_id: string, offer_id: string, new_price_per_unit: string): string | boolean {
         return SystemImpl.getInstance().counterOfferAsUser(user_id, Number(shop_id), Number(offer_id), Number(new_price_per_unit))
     }
