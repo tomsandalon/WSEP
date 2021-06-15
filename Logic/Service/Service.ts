@@ -203,7 +203,7 @@ export class Service {
     }
 
     performRegister(user_email: string, password: string, age: string): boolean {
-        return SystemImpl.getInstance().performRegister(user_email, password, age.length == 0 || isNaN(Number(age)) ? undefined : Number(age))
+        return SystemImpl.getInstance().performRegister(user_email, password,  age == undefined || age.length == 0 || isNaN(Number(age)) ? undefined : Number(age))
     }
 
     private static isValidPurchaseInfo(info: Purchase_Info): boolean {

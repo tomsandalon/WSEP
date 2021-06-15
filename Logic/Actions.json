@@ -1,0 +1,72 @@
+{
+  "Operations": [
+    [
+      "PerformRegister",
+      "liorpev@gmail.com",
+      "123456"
+    ],
+    [
+      "PerformRegister",
+      "mark@gmail.com",
+      "123456"
+    ],
+    [
+      "PerformLogin",
+      "liorpev@gmail.com",
+      "123456"
+    ],
+    [
+      "PerformLogin",
+      "mark@gmail.com",
+      "123456"
+    ],
+    [
+      "AddShop",
+      0,
+      "s1",
+      "BEST GPU 4 Ever",
+      "Taiwan",
+      "Taiwan 4 ever"
+    ],
+    [
+      "AddProduct",
+      0,
+      0,
+      "Bamba",
+      "Bamba is love, Bamba is life",
+      20,
+      [
+        "Food"
+      ],
+      30
+    ],
+    [
+      "AppointManager",
+      0,
+      0,
+      "mark@gmail.com"
+    ],
+    [
+      "AddPermissions",
+      0,
+      0,
+      "mark@gmail.com",
+      0
+    ],
+    [
+      "AddPermissions",
+      0,
+      0,
+      "mark@gmail.com",
+      2
+    ],
+    [
+      "Logout",
+      0
+    ],
+    [
+      "Logout",
+      1
+    ]
+  ]
+}
