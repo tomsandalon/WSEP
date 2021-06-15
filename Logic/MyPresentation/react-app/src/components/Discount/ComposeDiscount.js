@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import postFetch from "../postFetch.js";
+import postFetch from "../../postFetch";
 import { useHistory } from "react-router-dom";
-import serverResponse from "../components/ServerResponse.js";
+import serverResponse from "../ServerResponse";
 import { Alert } from "reactstrap";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";

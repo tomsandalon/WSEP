@@ -18,7 +18,7 @@ const EditableItem = (props) => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const [errorColor, setErrorColor] = useState("success");
-  console.log(purchaseType);
+  // console.log(purchaseType);
   const numToType = (num) => {
     if (num == 0) return "Immediate";
     if (num == 1) return "Offer";

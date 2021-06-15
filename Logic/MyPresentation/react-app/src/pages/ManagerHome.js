@@ -1,5 +1,5 @@
 import React from "react";
-import ManagerStoresList from "../components/ManagerStoresList";
+import ManagerStoresList from "../components/ManagerOwner/ManagerStoresList";
 import useFetch from "../useFetch";
 import { Link, useHistory } from "react-router-dom";
 

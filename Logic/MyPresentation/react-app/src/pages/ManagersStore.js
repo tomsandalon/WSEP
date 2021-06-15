@@ -1,22 +1,22 @@
-import ItemsBlock from "../components/ItemsBlock";
-import ManagersBlock from "../components/ManagersBlock";
-import OwnersBlock from "../components/OwnersBlock";
+import ItemsBlock from "../components/ManagerOwner/ItemsBlock";
+import ManagersBlock from "../components/ManagerOwner/ManagersBlock";
+import OwnersBlock from "../components/ManagerOwner/OwnersBlock";
 import { Link, useParams, useHistory } from "react-router-dom";
 import useFetch from "../useFetch";
 import { React } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Divider } from "@material-ui/core";
-import DiscountsBlock from "../components/DiscountsBlock";
-import PurchasePoliciesBlock from "../components/PurchasePoliciesBlock";
-import OffersBlock from "../components/Offers_Block";
-import ComposePolicy from "../components/Compose_Purchase_Policy";
-import ComposeDiscount from "../components/ComposeDiscount";
+import DiscountsBlock from "../components/Discount/DiscountsBlock";
+import PurchasePoliciesBlock from "../components/Purchase_Policy/PurchasePoliciesBlock";
+import OffersBlock from "../components/Offer/Offers_Block";
+import ComposePolicy from "../components/Purchase_Policy/Compose_Purchase_Policy";
+import ComposeDiscount from "../components/Discount/ComposeDiscount";
 import Switch from "react-switch";
 import { useState } from "react";
 import { Alert } from "reactstrap";
 import serverResponse from "../components/ServerResponse.js";
 import deleteFetch from "../deleteFetch";
 import postFetch from "../postFetch";
+import StoreOrderHistory from "../components/ManagerOwner/StoreOrderHistory";
 
 const ManagersStore = () => {
   const { storeID, name } = useParams();
@@ -62,6 +62,14 @@ const ManagersStore = () => {
   const pendingOffers = unparsedPendingOffers;
   // const pendingOffers = JSON.parse(unparsedPendingOffers);
   const onDismiss = () => setVisible(false);
+
+  const {
+    data: unparsedPurchaseHistory,
+    purchaseHistoryIsPending,
+    purchaseHistoryError,
+  } = useFetch(`/user/shop/purchase_history?shop_id=${storeID}`);
+  const purchaseHistory = unparsedPurchaseHistory;
+  console.log(purchaseHistory);
 
   const {
     data: unparsed_discounts,
@@ -282,8 +290,11 @@ const ManagersStore = () => {
             />
           )}
           <hr></hr>
+          <h3>Order History:</h3>
+          {purchaseHistory && (
+            <StoreOrderHistory purchaseHistory={purchaseHistory} />
+          )}
         </div>
-        {/* </div> */}
       </div>
     </div>
   );

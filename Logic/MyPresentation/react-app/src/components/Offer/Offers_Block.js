@@ -17,7 +17,7 @@ const OffersBlock = (props) => {
           {offers &&
             offers.map((unparsed_offer) => {
               const offer = JSON.parse(unparsed_offer).offer;
-              console.log(offer);
+              // console.log(offer);
               return (
                 <Offer
                   key={offer.id}

@@ -23,7 +23,7 @@ const useFetch = (url) => {
         return res.json();
       })
       .then((data) => {
-        console.group(data);
+        // console.group(data);
         setData(data);
         setIsPending(false);
         setError(null);

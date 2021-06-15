@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import postFetch from "../postFetch";
-import "./Product.css";
-import serverResponse from "../components/ServerResponse.js";
+import postFetch from "../../postFetch";
+import "../Product.css";
+import serverResponse from "../ServerResponse.js";
 import { Alert } from "reactstrap";
 import { Link } from "react-router-dom";
 import CounterOffer from "./Counter_Offer";

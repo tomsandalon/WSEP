@@ -1,6 +1,5 @@
 import React from "react";
 import ManagerCell from "./ManagerCell";
-import useFetch from "../useFetch";
 
 const ManagersBlock = (props) => {
   const managers = props.managers;

@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import postFetch from "../postFetch.js";
+import postFetch from "../../postFetch";
 import { useHistory } from "react-router-dom";
-import serverResponse from "../components/ServerResponse.js";
+import serverResponse from "../ServerResponse.js";
 import { Alert } from "reactstrap";
-import Select from "react-select";
-import makeAnimated from "react-select/animated";
 
 const CounterOffer = (props) => {
   const [newPrice, setNewPrice] = useState();

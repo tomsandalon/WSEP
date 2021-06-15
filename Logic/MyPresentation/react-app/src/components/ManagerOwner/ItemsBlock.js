@@ -1,7 +1,5 @@
 import React from "react";
-// import { useState, useEffect } from "react";
-// import useFetch from "../useFetch";
-import EditableItems from "./EditableItems";
+import EditableItems from "../EditableItems";
 
 const ItemsBlock = (props) => {
   const storeItems = props.storeItems;
