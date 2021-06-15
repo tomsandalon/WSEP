@@ -22,79 +22,93 @@
 
 <i>
 
-[AcceptOfferAsManagement](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L348)
+[AcceptOfferAsManagement](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L550)
 
-[AddConditionToDiscount](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L62)
+[AddConditionToDiscount](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L62)
 
-[AddDiscount](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L66)
+[AddDiscount](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L74)
 
-[AddItemToBasket](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L94)
+[AddItemToBasket](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L151)
 
-[AddLogicComposeDiscount](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L70)
+[AddLogicComposeDiscount](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L84)
 
-[AddNumericComposeDiscount](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L74)
+[AddNumericComposeDiscount](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L96)
 
-[AddPermissions](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L98)
+[AddPermissions](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L162)
 
-[AddProduct](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L102)
+[AddProduct](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L173)
 
-[AddPurchasePolicy](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L78)
+[AddPurchasePolicy](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L108)
 
-[AddPurchaseType](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L376)
+[AddPurchaseType](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L608)
 
-[AddShop](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L106)
+[AddShop](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L188)
 
-[AppointManager](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L118)
+[AppointManager](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L208)
 
-[AppointOwner](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L122)
+[AppointOwner](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L218)
 
-[ComposePurchasePolicy](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L82)
+[ComposePurchasePolicy](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L119)
 
-[CounterOfferAsManager](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L356)
+[CounterOfferAsManager](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L564)
 
-[CounterOfferAsUser](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L380)
+[CounterOfferAsUser](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L618)
 
-[DenyCounterOfferAsUser](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L360)
+[DenyCounterOfferAsUser](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L575)
 
-[DenyOfferAsManagement](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L352)
+[DenyOfferAsManagement](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L554)
 
-[EditPermissions](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L142)
+[EditPermissions](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L244)
 
-[EditProduct](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L146)
+[EditProduct](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L255)
 
-[EditShoppingCart](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L150)
+[EditShoppingCart](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L267)
 
-[Logout](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L189)
+[Logout](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L319)
 
-[MakeOffer](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L336)
+[MakeOffer](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L524)
 
-[PerformLogin](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L201)
+[PerformLogin](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L335)
 
-[PerformRegister](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L205)
+[PerformRegister](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L344)
 
-[PurchaseCart](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L239)
+[PurchaseCart](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L384)
 
-[PurchaseOffer](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L368)
+[PurchaseOffer](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L588)
 
-[PurchaseShoppingBasket](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L243)
+[PurchaseShoppingBasket](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L393)
 
-[RateProduct](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L315)
+[RateProduct](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L489)
 
-[RemoveDiscount](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L275)
+[RemoveDiscount](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L443)
 
-[RemoveItemFromBasket](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L154)
+[RemoveItemFromBasket](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L278)
 
-[RemoveManager](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L247)
+[RemoveManager](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L403)
 
-[RemoveOwner](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L86)
+[RemoveOwner](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L131)
 
-[RemovePermission](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L319)
+[RemovePermission](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L500)
 
-[RemoveProduct](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L251)
+[RemoveProduct](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L413)
 
-[RemovePurchasePolicy](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L90)
+[RemovePurchasePolicy](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L141)
 
-[RemovePurchaseType](https://github.com/tomsandalon/WSEP/blob/0b74d356737dec9bdf3e98002bac1500269240e7/Logic/Service/Service.ts#L372)
+[RemovePurchaseType](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L598)
 
 </i>
 
+# System configuration
+
+The system configuration is located in 'Logic/Config.json'. This is a JSON file with the following attributes:
+
+    - server_host: Address of the server
+    - server_port: Port of the server
+    - externalServices: Address to the external services
+    - db_client: Type of DB
+    - DB_connection:
+        - host: Address of the DB
+        - database: DB name
+        - user: User to log with
+        - password: Password to use
+        - charset: Charset to use
