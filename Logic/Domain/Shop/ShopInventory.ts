@@ -629,6 +629,9 @@ export class ShopInventoryImpl implements ShopInventory {
     denyOfferAsManagement(user_email: string, offer_id: number): string | boolean {
         const offer = this.active_offers.find(offer => offer.offer.id == offer_id)
         if (offer == undefined) return `Offer ${offer_id} doesn't exist`
+        if (!offer.managers_not_accepted.map(m => m.user_email)
+            .concat(offer.owners_not_accepted.map(o => o.user_email))
+            .includes(user_email)) return `${user_email} already accepted this offer`
         offer.offer.denied()
         NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
         NotificationAdapter.getInstance().notify(offer.offer.user.user_email, `${user_email} denied your offer id ${offer_id}`)
@@ -642,13 +645,17 @@ export class ShopInventoryImpl implements ShopInventory {
         if (!offer.managers_not_accepted.map(m => m.user_email)
             .concat(offer.owners_not_accepted.map(o => o.user_email))
             .includes(user_email)) return `${user_email} already accepted this offer`
+        NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
         offer.managers_not_accepted = this.shop_management.managers.filter(m => m.user_email != user_email)
         offer.owners_not_accepted = this.shop_management.owners.concat([this.shop_management.original_owner]).filter(o => o.user_email != user_email)
         offer.managers_not_accepted.map(m => m.user_email).concat(offer.owners_not_accepted.map(o => o.user_email))
             .forEach(email => NotificationAdapter.getInstance().notify(email, `Offer request id ${offer_id}: new offer to accept from ${user_email}`))
+        if (offer.managers_not_accepted.length + offer.owners_not_accepted.length == 0)
+            NotificationAdapter.getInstance().notify(offer.offer.user.user_email, `${user_email} made a counter offer, and is ready for your response.`)
+        else
+            NotificationAdapter.getInstance().notify(offer.offer.user.user_email, `${user_email} made a counter offer. Waiting for the rest of the management to respond`)
         offer.offer.price_per_unit = new_price_per_unit
         offer.offer.assignAsCounterOffer()
-        NotificationAdapter.getInstance().removeOfferNotificationsOfOffer(offer_id)
         return true
     }
 
