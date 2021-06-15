@@ -9,7 +9,7 @@
     "unit-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Unit/*/*",
     "integ-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Integration/*",
     "config-test": "ts-mocha -p tsconfig.testing.json Tests/ConfigTest/* --timeout 2000",
-    "external-pay-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Unit/ExternalServices/* --timeout 3000",
+    "external-pay-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Unit/ExternalServices/* --timeout 60000",
     "roll-test": "ts-mocha -p tsconfig.testing.json Tests/Developer/Integration/Rollback.ts --timeout 50000",
     "debug-roll-test": "ts-mocha --debug -p tsconfig.testing.json Tests/Developer/Integration/Rollback.ts --timeout 50000",
     "build": "cross-env TS_NODE_PROJECT=\\\"tsconfig.testing.json\\\" mocha -r ts-node/register Tests/*/*/*",
