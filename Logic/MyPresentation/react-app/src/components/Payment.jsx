@@ -131,6 +131,7 @@ class Payment extends Component {
                 }
             })
         };
+        console.log("paying normal");
         fetch('/purchase',requestOptions)
             .then(async response => {
                 switch (response.status) {
@@ -140,6 +141,7 @@ class Payment extends Component {
                         break;
                     case 400:
                         const err_message_fail = await response.text();
+                        console.log("fail")
                         this.props.handleFailedPayment(err_message_fail);
                         break;
                     case 404: //server not found
