@@ -16,4 +16,8 @@ describe("test payment handler system ", () => {
         const result = await PaymentAndSupplyAdapter.getInstance().pay("4580", "08", "2018", "Ronen", "986", "314089651")
         expect(result).to.be.eq(-1)
     })
+    it('pay function', async () => {
+        const result = await PaymentAndSupplyAdapter.getInstance().pay("4580", "08", "2018", "Ronen", "984", "314089651")
+        expect(result).to.be.eq(-1)
+    })
 })
