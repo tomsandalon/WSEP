@@ -18,7 +18,7 @@ export class Service {
     }
 
     public initData(resume?: boolean) {
-        // if (resume) return;
+        if (resume) return;
         db.turnBlockDBON();
         const immediate: Purchase_Type = Purchase_Type.Immediate
         const offer: Purchase_Type = Purchase_Type.Offer
@@ -377,7 +377,7 @@ export class Service {
         return SystemImpl.getInstance().addPurchaseType(user_id, Number(shop_id), Number(purchase_type))
     }
 
-    counterOfferAsUser(user_id: number, shop_id: string, offer_id: string, new_price_per_unit: number): string | boolean {
+    counterOfferAsUser(user_id: number, shop_id: string, offer_id: string, new_price_per_unit: string): string | boolean {
         return SystemImpl.getInstance().counterOfferAsUser(user_id, Number(shop_id), Number(offer_id), Number(new_price_per_unit))
     }
 
