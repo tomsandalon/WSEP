@@ -336,6 +336,10 @@ export class UserImpl implements User {
         if (offer == undefined) return Promise.resolve(`Offer ${offer_id} doesn't exist`)
         if (!offer.isPurchasable()) return Promise.resolve(`Offer ${offer_id} is not accepted by all shop management`)
         return this.purchaseRealOffer(offer, payment_info)
+            .then(result => {
+                if (typeof result != "string" && result) this.active_offers = this.active_offers.filter(o => o.id != offer_id)
+                return result
+            })
     }
 
     /**

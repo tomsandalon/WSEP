@@ -57,7 +57,7 @@ export class PaymentAndSupplySystem {
                 .field('transaction_id', transaction_id)
                 .timeout(TIME_OUT_VALUE)
                 .end(function (response) {
-                    if (response.error) return false
+                    if (response.error) return -1
                     const ret = Number(response.raw_body);
                     return resolve(isNaN(ret) ? -1 : ret)
                 })
@@ -75,7 +75,7 @@ export class PaymentAndSupplySystem {
                 .field('zip', zip)
                 .timeout(TIME_OUT_VALUE)
                 .end(function (response) {
-                    if (response.error) return false
+                    if (response.error) return -1
                     const ret = Number(response.raw_body);
                     return resolve(isNaN(ret) ? -1 : ret)
                 })
@@ -89,7 +89,7 @@ export class PaymentAndSupplySystem {
                 .field('transaction_id', transaction_id)
                 .timeout(TIME_OUT_VALUE)
                 .end(function (response) {
-                    if (response.error) return false
+                    if (response.error) return -1
                     const ret = Number(response.raw_body);
                     return resolve(isNaN(ret) ? -1 : ret)
                 })
