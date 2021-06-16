@@ -22,6 +22,7 @@ export const initData = async (service: Service): Promise<boolean> => {
             }
             let result
             let [action, ...parameters] = operation
+            console.log(`Performing ${action}, has ${data.length - i - 1} actions remaining`)
             switch (action) {
                 case "AddConditionToDiscount":
                     result = service.addConditionToDiscount.apply(this, parameters)

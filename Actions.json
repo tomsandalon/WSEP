@@ -2,27 +2,47 @@
   "Operations": [
     [
       "PerformRegister",
-      "liorpev@gmail.com",
+      "u1@gmail.com",
       "123456"
     ],
     [
       "PerformRegister",
-      "mark@gmail.com",
+      "u2@gmail.com",
+      "123456"
+    ],
+    [
+      "PerformRegister",
+      "u3@gmail.com",
+      "123456"
+    ],
+    [
+      "PerformRegister",
+      "u4@gmail.com",
       "123456"
     ],
     [
       "PerformLogin",
-      "liorpev@gmail.com",
+      "u1@gmail.com",
       "123456"
     ],
     [
       "PerformLogin",
-      "mark@gmail.com",
+      "u2@gmail.com",
+      "123456"
+    ],
+    [
+      "PerformLogin",
+      "u3@gmail.com",
+      "123456"
+    ],
+    [
+      "PerformLogin",
+      "u4@gmail.com",
       "123456"
     ],
     [
       "AddShop",
-      0,
+      1,
       "s1",
       "BEST GPU 4 Ever",
       "Taiwan",
@@ -30,43 +50,37 @@
     ],
     [
       "AddProduct",
+      1,
       0,
-      0,
-      "Bamba",
-      "Bamba is love, Bamba is life",
-      20,
+      "Wine",
+      "Good wine for Mark and da boys",
+      40,
       [
-        "Food"
+        "Snacks"
       ],
-      30
+      35
     ],
     [
-      "AppointManager",
+      "AppointOwner",
+      1,
       0,
-      0,
-      "mark@gmail.com"
-    ],
-    [
-      "AddPermissions",
-      0,
-      0,
-      "mark@gmail.com",
-      0
-    ],
-    [
-      "AddPermissions",
-      0,
-      0,
-      "mark@gmail.com",
-      2
-    ],
-    [
-      "Logout",
-      0
+      "u4@gmail.com"
     ],
     [
       "Logout",
       1
+    ],
+    [
+      "Logout",
+      2
+    ],
+    [
+      "Logout",
+      3
+    ],
+    [
+      "Logout",
+      4
     ]
   ]
 }

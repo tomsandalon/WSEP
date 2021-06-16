@@ -279,6 +279,37 @@ const getNewItem = (shop: ShopInventory): number => shop.products.reduce((acc, p
  * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.fmvdxw7c1e2c
  */
 describe('Guest:2.9.2: Auction - add a bid to an auction', () => {
+    //TODO never
+});
+
+/**
+ * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.xt24dfblxfxf
+ */
+describe('Guest:2.9.3: Auction - credit card charged, product added to purchase history', () => {
+    it('Happy', () => {
+        //TODO Milestone 2
+
+        //let balance = service.paymentService.getBalance();
+        //shop.addBid(productID, amount, paymentInfo);
+        //expect(service.paymentBalance.getBalance()).equal(balance - amount);
+        //expect(user.getPurchaseHistory().contains(productID)).to.be.true;
+        //let balance = service.paymentService.getBalance();
+        //shop.addBid(productID, amount, wrongPaymentInfo);
+        //expect(service.paymentBalance.getBalance()).equal(balance);
+        //expect(user.getPurchaseHistory().contains(productID)).to.be.false;
+    });
+    it('Sad', () => {
+        //TODO
+    });
+    it('Bad', () => {
+        //TODO
+    });
+});
+
+/**
+ * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.gm1b34nj0qnb
+ */
+describe('Guest:2.9.4: Offer -  credit card charged, product added to purchase history', async () => {
     let system: System, originOwner: number, shopID: number, user: number
     beforeEach(async () => {
         system = await SystemDriver.getSystem(true);
@@ -312,53 +343,6 @@ describe('Guest:2.9.2: Auction - add a bid to an auction', () => {
         expect(typeof ret != "string").to.be.true
         ret = await system.purchaseOffer(user, offer_id_counter - 1, "ApplePay")
         expect(typeof ret == "string").to.be.true
-    });
-});
-
-/**
- * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.xt24dfblxfxf
- */
-describe('Guest:2.9.3: Auction - credit card charged, product added to purchase history', () => {
-    it('Happy', () => {
-        //TODO Milestone 2
-
-        //let balance = service.paymentService.getBalance();
-        //shop.addBid(productID, amount, paymentInfo);
-        //expect(service.paymentBalance.getBalance()).equal(balance - amount);
-        //expect(user.getPurchaseHistory().contains(productID)).to.be.true;
-        //let balance = service.paymentService.getBalance();
-        //shop.addBid(productID, amount, wrongPaymentInfo);
-        //expect(service.paymentBalance.getBalance()).equal(balance);
-        //expect(user.getPurchaseHistory().contains(productID)).to.be.false;
-    });
-    it('Sad', () => {
-        //TODO
-    });
-    it('Bad', () => {
-        //TODO
-    });
-});
-
-/**
- * @Requirement https://docs.google.com/document/d/1a606MxIS5A5RrXk6Gnc3JQx27IE6jZSh0swnjZ9u9us/edit#heading=h.gm1b34nj0qnb
- */
-describe('Guest:2.9.4: Offer -  credit card charged, product added to purchase history', async () => {
-    it('Happy', () => {
-
-        //let balance = service.paymentService.getBalance();
-        //shop.sendOffer(productID, amount, offer, paymentInfo); //manager accepts
-        //expect(service.paymentBalance.getBalance()).equal(balance - offer);
-        //expect(user.getPurchaseHistory().contains(productID)).to.be.true;
-        //let balance = service.paymentService.getBalance();
-        //shop.sendOffer(productID, amount, offer, paymentInfo); //manager declines
-        //expect(service.paymentBalance.getBalance()).equal(balance);
-        //expect(user.getPurchaseHistory().contains(productID)).to.be.false;
-    });
-    it('Sad', () => {
-        //TODO
-    });
-    it('Bad', () => {
-        //TODO
     });
 });
 
