@@ -22,7 +22,7 @@
 
 <i>
 
-[AcceptOfferAsManagement](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L550)
+[AcceptOfferAsManagement](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L544)
 
 [AddConditionToDiscount](https://github.com/tomsandalon/WSEP/blob/9e893fd29080d371259a425ed519485a4f2a9119/Logic/Service/Service.ts#L62)
 
