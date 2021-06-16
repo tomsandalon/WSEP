@@ -62,7 +62,6 @@ import {
 import {UserPurchaseHistoryImpl} from "./Users/UserPurchaseHistory";
 import {Purchase_Info} from "../../ExternalApiAdapters/PaymentAndSupplyAdapter";
 import {offer_id_counter} from "./ProductHandling/Offer";
-import { purchase_type } from "../Communication/Config/Config";
 
 const {initTables} = require('../DataAccess/Init');
 
@@ -1357,7 +1356,14 @@ export class SystemImpl implements System {
     async purchaseOffer(user_id: number, offer_id: number, payment_info: string | Purchase_Info): Promise<string | boolean> {
         const user = this._login.retrieveUser(user_id);
         if (typeof user == "string") return user
-        return user.purchaseOffer(offer_id, payment_info)
+        const ret = await user.purchaseOffer(offer_id, payment_info)
+        if (typeof ret != "string") {
+            RemoveOffer(offer_id)
+                .then(r => {
+                    if (!r) SystemImpl.rollback()
+                })
+        }
+        return ret
     }
 
     private static async reloadOffers() {
