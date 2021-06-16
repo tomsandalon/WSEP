@@ -101,7 +101,7 @@ router.put(rate, (request: any, response: any) => {
 })
 
 router.post('/', (request: any, response: any) => {
-    console.log("in add item to shop");
+    // console.log("in add item to shop");
     const session_data = Session.sessions[request.cookies[sid]];
     if (session_data == undefined) {
         response.status(ServerNotFound);
@@ -115,9 +115,9 @@ router.post('/', (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    console.log("before add product body" , request.body);
-    console.log(typeof request.body.purchase_type);
-    console.log(request.body.purchase_type);
+    // console.log("before add product body" , request.body);
+    // console.log(typeof request.body.purchase_type);
+    // console.log(request.body.purchase_type);
     const result = service.addProduct(
         user_id,
         request.body.shop_id,
@@ -128,7 +128,7 @@ router.post('/', (request: any, response: any) => {
         request.body.base_price,
         request.body.purchase_type,
         );
-        console.log("before add product result" ,result);
+        // console.log("before add product result" ,result);
     if (typeof result === 'string') {
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");

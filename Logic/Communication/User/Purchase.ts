@@ -58,21 +58,21 @@ router.post('/', async (request: any, response: any) => {
         return;
     }
     const user_id = session_data.user_id;
-    console.log("before entering await purchase basket");
+    // console.log("before entering await purchase basket");
 
-    console.log(typeof request.body.shop_id);
-    console.log("before paying body - ", JSON.stringify(request.body.payment));
+    // console.log(typeof request.body.shop_id);
+    // console.log("before paying body - ", JSON.stringify(request.body.payment));
     const result = await service.purchaseShoppingBasket(user_id, request.body.shop_id, JSON.stringify(request.body.payment));
-    console.log("after paying body - ", result);
-    console.log("purchase basket result - ", result);
+    // console.log("after paying body - ", result);
+    // console.log("purchase basket result - ", result);
     if (typeof result === 'string') {
-        console.log("purchase error", result);
+        // console.log("purchase error", result);
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
         response.end()
     } else {
-        console.log("purchase ok", result);
+        // console.log("purchase ok", result);
         response.status(OK);
         response.end();
     }

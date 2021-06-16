@@ -15,9 +15,9 @@ router.post('/', (request: any, response: any) => {
         response.end();
         return;
     }
-    console.log("before register sid - :",request.cookies[sid]);
+    // console.log("before register sid - :",request.cookies[sid]);
     const result = service.performRegister(request.body.email, request.body.password, request.body.age);
-    console.log("after register result- ", result)
+    // console.log("after register result- ", result)
     response.setHeader("Content-Type", "text/html");
     if (result) {
         response.status(OK);
