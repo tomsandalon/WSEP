@@ -8,7 +8,7 @@
 - Initiating from a file will cause the DB to reset and only have the values in the initialization file
 
 - How IDs work:
-    - Whenever an ID is required (e.g. AddProduct, etc.), the IDs start counting from 0. For example, creating three
+    - Whenever an ID is required (e.g. AddProduct, etc.), the IDs start counting from 0, except for user-id which starts at 1 (0 is set for system admin). For example, creating three
       users will result in the creation of users with IDs 0, 1, 2, with the first receiving ID 0 and so on.
     - Adding conditions to purchase conditions or discounts, as well as composing two discounts or two purchase
       conditions will result in a new ID of the new discounts or purchas conditions
