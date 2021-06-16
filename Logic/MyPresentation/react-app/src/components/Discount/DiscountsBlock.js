@@ -16,6 +16,7 @@ const DiscountsBlock = (props) => {
         <div className="row">
           {discounts &&
             discounts.map((discount) => {
+              console.log(discount);
               return (
                 <Discount
                   storeName={storeName}
@@ -30,6 +31,18 @@ const DiscountsBlock = (props) => {
                   }
                   id={discount.id}
                   storeID={storeID}
+                  logic={discount.logic_composition}
+                  operation={discount.operation}
+                  firstDiscount={
+                    discount.discounts
+                      ? discount.discounts[0]
+                      : discount.firstDiscount
+                  }
+                  secondDiscount={
+                    discount.discounts
+                      ? discount.discounts[1]
+                      : discount.secondDiscount
+                  }
                 />
               );
             })}
