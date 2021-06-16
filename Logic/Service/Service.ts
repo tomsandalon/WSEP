@@ -32,28 +32,6 @@ export class Service {
         const tom_id = SystemImpl.getInstance().performLogin("TomAndSons@gmail.com", "123456")
         if (typeof tom_id === "string")
             return
-<<<<<<< HEAD
-        const nvidia_id = this.addShop(tom_id, "INVIDIA", "BEST GPU 4 Ever", 'Taiwan', "Taiwan 4 ever")
-        const zara_id = this.addShop(tom_id, "ZARA", "Best style in UK", 'China', "Budaa 4 ever")
-        if (typeof nvidia_id === "string" || typeof zara_id === "string")
-            return
-        this.addPurchaseType(tom_id, nvidia_id, Purchase_Type.Offer)
-        this.addProduct(tom_id, nvidia_id, "GTX 1060", "6GB RAM", 2500, ["GPU"], 1000, immediate)
-        this.addProduct(tom_id, nvidia_id, "RTX 3080", "Best performance", 10, ["GPU"], 2000, offer)
-        this.addProduct(tom_id, nvidia_id, "RTX 2080", "Best power consumption", 0, ["GPU"], 3000, offer)
-        this.addProduct(tom_id, nvidia_id, "GTX 280", "Innovative tech", 30, ["GPU"], 4000, immediate)
-        this.addProduct(tom_id, nvidia_id, "GTX 980", "Economic power device", 10, ["GPU"], 5000, immediate)
-        this.addDiscount(tom_id, nvidia_id, 0.5)
-        this.addConditionToDiscount(tom_id, nvidia_id, 0, Condition.Amount, "3")
-        this.addDiscount(tom_id, nvidia_id, 0.2)
-
-        this.addPurchaseType(tom_id, zara_id, Purchase_Type.Offer)
-        this.addProduct(tom_id, zara_id, "Leather Jacket", "Leather from black mamba", 500, ["Winter", "Men"], 1000, offer)
-        this.addProduct(tom_id, zara_id, "Fur for lady", "From white fox", 400, ["Winter", "Evening"], 1000, immediate)
-        this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", 100, ["Evening", "Men"], 1000, immediate)
-        this.addProduct(tom_id, zara_id, "Boots", "made in USA", 70, ["Shoes"], 1000, immediate)
-        this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", 800, ["Shoes"], 1000, immediate)
-=======
         const nvidia_id = this.addShop(tom_id, "NVIDIA", "BEST GPU 4 Ever", 'Taiwan', "Taiwan 4 ever").toString()
         const zara_id = this.addShop(tom_id, "ZARA", "Best style in UK", 'China', "Budaa 4 ever").toString()
         this.addPurchaseType(tom_id, nvidia_id, Purchase_Type.Offer.toString())
@@ -72,7 +50,6 @@ export class Service {
         this.addProduct(tom_id, zara_id, "Lycra shirt", "made in Japan", "100", ["Evening", "Men"], "1000", immediate.toString())
         this.addProduct(tom_id, zara_id, "Boots", "made in USA", "70", ["Shoes"], "1000", immediate.toString())
         this.addProduct(tom_id, zara_id, "Shoes", "Made form plastic", "800", ["Shoes"], "1000", immediate.toString())
->>>>>>> 182de701bdd5f35562c0f63eb7878238af719f5d
 
         const someone = SystemImpl.getInstance().performLogin("a@gmail.com", "123456") as number
         this.makeOffer(someone, nvidia_id, "1", "2", "3")

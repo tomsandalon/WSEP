@@ -14,13 +14,10 @@ const AddProduct = () => {
   const { storeID, storeName } = useParams();
   const [name, setName] = useState();
   const [amount, setAmount] = useState();
-<<<<<<< HEAD
-=======
   const purchaseTypeOptions = [
     { label: "Immediate Purchase", value: 0 },
     { label: "Offer", value: 1 },
   ];
->>>>>>> 182de701bdd5f35562c0f63eb7878238af719f5d
   const [purchaseType, setPurchaseType] = useState(purchaseTypeOptions[0]);
   const [description, setDescription] = useState();
   const [categories, setCategories] = useState();
@@ -29,10 +26,6 @@ const AddProduct = () => {
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
   const history = useHistory();
-<<<<<<< HEAD
- 
-=======
->>>>>>> 182de701bdd5f35562c0f63eb7878238af719f5d
   const isUser = () => {
     const requestOptions = {
       method: "GET",
