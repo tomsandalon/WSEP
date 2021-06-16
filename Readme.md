@@ -112,3 +112,4 @@ The system configuration is located in 'Logic/Config.json'. This is a JSON file 
         - user: User to log with
         - password: Password to use
         - charset: Charset to use
+        - port: Port of the SQL server
