@@ -159,10 +159,5 @@ describe('Rollback', async () => {
             const res = purchasesAreRestored(purchases, UserPurchaseHistoryImpl.getInstance().history)
             expect(res).to.be.true
         })
-        it("Check active offers restored", async () => {
-            await SystemImpl.rollback()
-            const res = activeOffersAreRestored(shops, SystemImpl.getInstance().shops, users, SystemImpl.getInstance().login.existing_users)
-            expect(res).to.be.true
-        })
     })
 })
