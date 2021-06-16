@@ -55,9 +55,9 @@ const EditableItem = (props) => {
         </div>
         <figcaption className="info align-self-center">
           <h4 className="center">{name}</h4>
+          <h4>{"Price: " + price}</h4>
           <h4>{"Amount: " + amount}</h4>
           <h4>{"Purchase Type: " + numToType(purchaseType)}</h4>
-          <h4>{"Price: " + price}</h4>
           <Link to={`/editproduct/${storeID}/${storeName}/${id}`}>
             <button className="btn btn-outline-primary btn-sm">
               Edit Item <i className="fa fa-edit"></i>
