@@ -15,6 +15,7 @@ router.get('/',(request: any, response: any) => {
     response.setHeader("Content-Type", "application/json");
     if (session_data == undefined) {
         session_id = Session.session_id_specifier++;
+        console.log("connection to a new guest sid - ", session_id);
         Session.sessions[session_id] = {
             user_id: service.openSession(),
             socket: null

@@ -7,6 +7,10 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
 const AddProduct = () => {
+  const purchaseTypeOptions = [
+    { label: "Immediate Purchase", value: 0 },
+    { label: "Offer", value: 1 },
+  ];
   const { storeID, storeName } = useParams();
   const [name, setName] = useState();
   const [amount, setAmount] = useState();
