@@ -65,7 +65,7 @@ router.post(user_offer, (request: any, response: any) => {
         response.send(result);
         response.end()
     } else {
-        console.log("Offer accepted");
+        // console.log("Offer accepted");
         response.status(OK);
         response.end();
     }
@@ -97,12 +97,12 @@ router.put(user_offer, (request: any, response: any) => {
             result = 'Bad action on offer as user';
     }
     if (typeof result === 'string') {
-        console.log("Deny offer failed");
+        // console.log("Deny offer failed");
         response.status(BadRequest);
         response.setHeader("Content-Type", "text/html");
         response.send(result);
     } else {
-        console.log("Deny offer success");
+        // console.log("Deny offer success");
         response.status(OK);
         response.end();
     }

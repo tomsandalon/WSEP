@@ -18,7 +18,7 @@ export class Service {
     }
 
     public initData(resume?: boolean) {
-        if (resume) return;
+        // if (resume) return;
         db.turnBlockDBON();
         const immediate: Purchase_Type = Purchase_Type.Immediate
         const offer: Purchase_Type = Purchase_Type.Offer
@@ -234,7 +234,6 @@ export class Service {
     }
 
     displayShops(): string | string[] {
-        console.log("displaying shops");
         return SystemImpl.getInstance().displayShops()
     }
 
@@ -326,7 +325,6 @@ export class Service {
     }
 
     openSession(): number {
-        console.log("in open session");
         return SystemImpl.getInstance().openSession()
     }
 
@@ -374,7 +372,7 @@ export class Service {
             if (typeof payment_info == "string") info = payment_info
             else info = JSON.stringify(info)
             const parsed_info: Purchase_Info = JSON.parse(info);
-            console.log("parsed info - ", parsed_info);
+            // console.log("parsed info - ", parsed_info);
             if (Service.isValidPurchaseInfo(parsed_info)) return parsed_info
             return payment_info
         } catch (e) {
