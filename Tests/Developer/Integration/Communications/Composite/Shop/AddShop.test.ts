@@ -1,16 +1,17 @@
-import {app} from "../../../Server";
-const expect = require('chai').expect;
-import {chai, cookie_prefix, SessionTest} from "../../Setup";
+import {app} from "../../../../../../Logic/Communication/Server";
+import {cookie_prefix, SessionTest} from "../../Setup";
 import {beforeEach} from "mocha";
-import {BadRequest, OK} from "../../../Config/Config";
-import {route_shop} from "../../../Routes";
+import {BadRequest, OK} from "../../../../../../Logic/Communication/Config/Config";
+import {route_shop} from "../../../../../../Logic/Communication/Routes";
+
+const expect = require('chai').expect;
 const request = require('supertest');
 
 describe('Add Shop tests', () => {
-    beforeEach(() =>{
+    beforeEach(() => {
         expect(SessionTest.sess_id).not.equal('')
     })
-    it('Add Shop unsuccessfully - no name',  (done) =>{
+    it('Add Shop unsuccessfully - no name', (done) => {
         request(app).post(route_shop)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({

@@ -1,9 +1,10 @@
-import {app} from "../../Server";
+import {app} from "../../../../../Logic/Communication/Server";
+import {cookie_prefix, SessionTest} from "../Setup";
+import {before} from "mocha";
+import {OK} from "../../../../../Logic/Communication/Config/Config";
+import {route_login, route_register} from "../../../../../Logic/Communication/Routes";
+
 const expect = require('chai').expect;
-import {chai, cookie_prefix, SessionTest} from "../Setup";
-import {before, beforeEach} from "mocha";
-import {BadRequest, OK} from "../../Config/Config";
-import {route_login, route_logout, route_register} from "../../Routes";
 const request = require('supertest');
 
 export const mainUser = "TomAndSons@gmail.com";

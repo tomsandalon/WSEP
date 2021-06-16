@@ -1,18 +1,16 @@
-import {app} from "../../../Server";
-const expect = require('chai').expect;
+import {app} from "../../../../../../Logic/Communication/Server";
 import {cookie_prefix, SessionTest} from "../../Setup";
 import {before, beforeEach} from "mocha";
-import {
-    BadRequest,
-    OK, sid,
-} from "../../../Config/Config";
+import {BadRequest, OK, sid,} from "../../../../../../Logic/Communication/Config/Config";
 import {
     route_guest,
-    route_login, route_register,
+    route_login,
+    route_register,
     route_shop,
-    route_shop_management,
     route_shop_ownership_assign_manager
-} from "../../../Routes";
+} from "../../../../../../Logic/Communication/Routes";
+
+const expect = require('chai').expect;
 const request = require('supertest');
 
 describe('Add Manager to Shop tests', () => {

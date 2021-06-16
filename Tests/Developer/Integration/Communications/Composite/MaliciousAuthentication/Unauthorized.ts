@@ -1,16 +1,14 @@
-import {app} from "../../../Server";
-const expect = require('chai').expect;
+import {app} from "../../../../../../Logic/Communication/Server";
 import {cookie_prefix, SessionTest} from "../../Setup";
 import {before, beforeEach} from "mocha";
-import {
-    BadRequest,
-    OK, sid, Unauthorized,
-} from "../../../Config/Config";
+import {BadRequest, sid, Unauthorized,} from "../../../../../../Logic/Communication/Config/Config";
 import {mainUser, mainUser_pass} from "../Setup";
-import {route_guest, route_login, route_register, route_shop_management} from "../../../Routes";
+import {route_guest, route_login, route_register} from "../../../../../../Logic/Communication/Routes";
+
+const expect = require('chai').expect;
 const request = require('supertest');
 let second_user_sid = '';
-describe('Add Manager to Shop tests', () =>{
+describe('Add Manager to Shop tests', () => {
     const dummyUser = 'annaBanana@gmail.com';
     const dummyUser_password = 'qwerty';
     before(done => {

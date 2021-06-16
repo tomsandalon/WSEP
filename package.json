@@ -21,8 +21,8 @@
     "build-web": "npm --prefix Logic/Presentation run start",
     "test-web": "npm --prefix Logic/Presentation run start",
     "eject-web": "npm --prefix Logic/Presentation run start",
-    "server-tests": "ts-mocha 'Logic/Communication/Tests/**/*.ts' --recursive",
-    "server-notification-tests": "ts-mocha 'Logic/Communication/Tests/Notifications/Appointee/*.ts' --exit"
+    "server-tests": "ts-mocha 'Tests/Developer/Integration/Communications/**/*.ts' --recursive",
+    "server-notification-tests": "ts-mocha 'Tests/Developer/Integration/Communications/Notifications/Appointee/*.ts' --exit"
   },
   "keywords": [],
   "author": "",

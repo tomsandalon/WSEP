@@ -1,20 +1,14 @@
-import {app, server} from "../../Server";
+import {app} from "../../../../../Logic/Communication/Server";
+import {localhost, OK, sid} from "../../../../../Logic/Communication/Config/Config";
 import {
-    localhost,
-    OK, sid
-} from "../../Config/Config";
-import {afterEach, before, beforeEach} from "mocha";
-import {SessionTest} from "../Setup";
-import {
-    route_cart,
     route_guest,
     route_login,
     route_register,
     route_shop,
     route_shop_manage_product
-} from "../../Routes";
-import {acknowledge_for_notifications, get_notifications, hello, send_notifications} from "../../WSEvents";
-import lookup from "socket.io-client";
+} from "../../../../../Logic/Communication/Routes";
+import {acknowledge_for_notifications, hello, send_notifications} from "../../../../../Logic/Communication/WSEvents";
+
 const async = require('async')
 const fs = require('fs')
 const https = require('https');

@@ -1,16 +1,17 @@
-import {app} from "../../Server";
-const expect = require('chai').expect;
-import {chai, cookie_prefix, SessionTest} from "../Setup";
+import {app} from "../../../../../Logic/Communication/Server";
+import {cookie_prefix, SessionTest} from "../Setup";
 import {beforeEach} from "mocha";
-import {BadRequest, OK, Unauthorized} from "../../Config/Config";
-import {route_register} from "../../Routes";
+import {BadRequest, OK} from "../../../../../Logic/Communication/Config/Config";
+import {route_register} from "../../../../../Logic/Communication/Routes";
+
+const expect = require('chai').expect;
 const request = require('supertest');
 
 describe('Registration tests', () => {
-    beforeEach(() =>{
+    beforeEach(() => {
         expect(SessionTest.sess_id).not.equal('')
     })
-    it('Registration unsuccessful - bad email - no @',  (done) =>{
+    it('Registration unsuccessful - bad email - no @', (done) => {
         request(app).post(route_register)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
             .send({

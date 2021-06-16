@@ -12,7 +12,7 @@ import * as DBCommand from "../../../../Logic/Domain/DBCommand"
 
 DBCommand.turnBlockDBON()
 
-describe('Authentication Tests', () => {
+describe('Authentication Communications', () => {
     it('should return a hashed password ', () => {
         let handler = Authentication.getInstance();
         expect(handler.hash("password")).to.not.equal("password")
@@ -35,7 +35,7 @@ describe('Authentication Tests', () => {
         expect(handler.verify("12345",hashed2)).eq(false);
     });
 });
-describe('RegisterImpl Tests', () => {
+describe('RegisterImpl Communications', () => {
     it('Registering with invalid email format ', () => {
         let value = RegisterImpl.getInstance();
         expect(value.register("liorpev", "123456")).eq(false)
@@ -52,19 +52,16 @@ describe('RegisterImpl Tests', () => {
 });
 
 
-
-
-describe('LoginImpl Tests', () => {
+describe('LoginImpl Communications', () => {
     it('Registering and trying to login ', () => {
         let reg = RegisterImpl.getInstance();
-        reg.register("liorpev@gmail.com","123456");
+        reg.register("liorpev@gmail.com", "123456");
         let log = LoginImpl.getInstance();
         const user = (log.login("liorpev@gmail.com", "123456"));
-        if(typeof user == "string")
+        if (typeof user == "string")
             assert.fail()
-        else
-            { // @ts-ignore
-                const value = log.retrieveUser(user);
+        else { // @ts-ignore
+            const value = log.retrieveUser(user);
                 if(typeof value == "string")
                     assert.fail()
                 expect(value.user_email === "liorpev@gmail.com").eq(true)
@@ -148,15 +145,15 @@ describe('Guest testing', () => {
     });
 });
 
-describe('User Tests', () => {
+describe('User Communications', () => {
     SystemImpl.getInstance(true)
 
     it('Registering login and add item to basket ', () => {
         let reg = RegisterImpl.getInstance();
         let log = LoginImpl.getInstance();
-        reg.register("liorpev1888@gmail.com","123456");
+        reg.register("liorpev1888@gmail.com", "123456");
         const user = (log.login("liorpev1888@gmail.com", "123456"));
-        if(typeof user == "string")
+        if (typeof user == "string")
             assert.fail()
         else
         {

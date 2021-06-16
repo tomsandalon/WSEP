@@ -1,5 +1,5 @@
-import {app, server} from "../Server";
-import {sid} from "../Config/Config";
+import {app, server} from "../../../../Logic/Communication/Server";
+import {sid} from "../../../../Logic/Communication/Config/Config";
 import {afterEach, beforeEach} from "mocha";
 
 const fs = require('fs')

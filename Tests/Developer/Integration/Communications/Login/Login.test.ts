@@ -1,11 +1,12 @@
-import {app} from "../../Server";
-const expect = require('chai').expect;
-import {chai, cookie_prefix, SessionTest} from "../Setup";
+import {app} from "../../../../../Logic/Communication/Server";
+import {cookie_prefix, SessionTest} from "../Setup";
 import {beforeEach} from "mocha";
-import {OK, Unauthorized} from "../../Config/Config";
-import {route_login, route_register} from "../../Routes";
+import {OK, Unauthorized} from "../../../../../Logic/Communication/Config/Config";
+import {route_login, route_register} from "../../../../../Logic/Communication/Routes";
+
+const expect = require('chai').expect;
 const request = require('supertest');
-describe('Login Tests', function () {
+describe('Login Communications', function () {
     before(function (done) {
         request(app).post(route_register)
             .set('Cookie', cookie_prefix + SessionTest.sess_id)
@@ -15,7 +16,7 @@ describe('Login Tests', function () {
             })
             .expect(OK, done);
     });
-    beforeEach(() =>{
+    beforeEach(() => {
         expect(SessionTest.sess_id).not.equal('')
     })
     it('Login successful',  (done) =>{

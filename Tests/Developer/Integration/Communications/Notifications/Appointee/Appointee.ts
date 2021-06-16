@@ -1,37 +1,18 @@
-import {app,
-} from "../../../Server";
-const expect = require('chai').expect;
-import {
-    chai,
-    cleanUsers,
-    client,
-    cookie_prefix,
-    NotificationTest,
-    product,
-    secondUser,
-    setupUsers,
-    thirdUser
-} from "../Setup";
+import {cleanUsers, client, cookie_prefix, NotificationTest, secondUser, setupUsers, thirdUser} from "../Setup";
 import {beforeEach} from "mocha";
+import {OK} from "../../../../../../Logic/Communication/Config/Config";
 import {
-    localhost,
-    OK, options, port,
-    Unauthorized
-} from "../../../Config/Config";
-import {
-    route_cart,
-    route_login,
-    route_notifications,
-    route_purchase,
-    route_register,
-    route_shop_ownership_assign_manager, route_shop_ownership_assign_owner
-} from "../../../Routes";
-import {acknowledge_for_notifications, get_notifications} from "../../../WSEvents";
+    route_shop_ownership_assign_manager,
+    route_shop_ownership_assign_owner
+} from "../../../../../../Logic/Communication/Routes";
+import {get_notifications} from "../../../../../../Logic/Communication/WSEvents";
+
+const expect = require('chai').expect;
 const async = require('async');
 const request = require('supertest');
 const fs = require('fs');
-describe('Fire Appointee Tests', function () {
-    beforeEach(() =>{
+describe('Fire Appointee Communications', function () {
+    beforeEach(() => {
         expect(NotificationTest.user_one_sess_id).not.equal('')
         expect(NotificationTest.user_two_sess_id).not.equal('')
         expect(NotificationTest.user_one_socket).not.equal(undefined)

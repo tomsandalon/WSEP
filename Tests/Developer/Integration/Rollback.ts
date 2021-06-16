@@ -73,7 +73,7 @@ describe('Rollback', async () => {
             await system.init()
             system.performRegister("Test@test.com", "TESTER");
             originOwner = system.performLogin("Test@test.com", "TESTER") as number
-            shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+            shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
             system.addPurchaseType(originOwner, shopID, Purchase_Type.Offer)
 
             system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)

@@ -121,9 +121,9 @@ describe('Guest:2.6: Search - search an item by detail and get all the shops tha
         system = await SystemDriver.getSystem(true)
         system.performRegister("Test@test.com", "TESTER");
         let originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        let shopID1 = system.addShop(originOwner as number, "TestShop 1", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        let shopID2 = system.addShop(originOwner as number, "TestShop 2", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        let shopID3 = system.addShop(originOwner as number, "TestShop 3", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        let shopID1 = system.addShop(originOwner as number, "TestShop 1", "shop for Communications", "Beer Sheva", "En li kesef") as number
+        let shopID2 = system.addShop(originOwner as number, "TestShop 2", "shop for Communications", "Beer Sheva", "En li kesef") as number
+        let shopID3 = system.addShop(originOwner as number, "TestShop 3", "shop for Communications", "Beer Sheva", "En li kesef") as number
 
         system.addProduct(originOwner, shopID1, "TV1", "Best desc", 1110, ["not monitors"], 111)
         system.addProduct(originOwner, shopID2, "TV2", "Best desc", 2202, ["monitors"], 222)
@@ -160,7 +160,7 @@ describe('Guest:2.7: Basket - add a product to the basket', async () => {
         system = await SystemDriver.getSystem(true)
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
         system.performRegister("newUser@test.com", "TESTER");
         user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -189,7 +189,7 @@ describe('Guest:2.8: Information - get info and edit the shopping basket', async
         system = await SystemDriver.getSystem(true)
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID, "TV", "Best desc", 10000, ["monitors"], 1000)
         system.performRegister("newUser@test.com", "TESTER");
         user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -221,7 +221,7 @@ describe('Guest:2.9.1: Purchase - buy a specific basket', () => {
         system = await SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
         system.addProduct(originOwner, shopID, "4KTV", "Best desc", 1, ["monitors"], 1000)
         system.addProduct(originOwner, shopID, "8KTV", "Best desc", 0, ["monitors"], 1000)
@@ -315,7 +315,7 @@ describe('Guest:2.9.4: Offer -  credit card charged, product added to purchase h
         system = await SystemDriver.getSystem(true);
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
         system.performRegister("newUser@test.com", "TESTER");
         user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -397,7 +397,7 @@ describe('Guest:2.9.7: Discount - price changed by discount policy', async () =>
         userID = system.performLogin("Test@test.com", "TESTER") as number
         badUI = system.performLogin("Test1@test.com", "TESTER") as number
 
-        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
 
         system.addProduct(userID, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
 
@@ -479,7 +479,7 @@ describe('Registered:3.7: Information - get the purchase history', async () => {
         system = await SystemDriver.getSystem(true)
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
         system.performRegister("newUser@test.com", "TESTER");
         user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -513,7 +513,7 @@ describe('Owner:4.1.1: Product - add a new product to the shop', async () => {
         system = await SystemDriver.getSystem(true)
         reg = system.performRegister("Test@test.com", "TESTER");
         userID = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         items = system.getItemsFromShop(shopID) as string[]
     })
     // expect(items.some(p=>p.includes("TV"))).to.be.false
@@ -544,7 +544,7 @@ describe('Owner:4.1.2: Product - remove a product from the shop', async () => {
         system = await SystemDriver.getSystem(true)
         reg = system.performRegister("Test@test.com", "TESTER");
         userID = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         res = system.addProduct(userID, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
     })
 
@@ -572,7 +572,7 @@ describe('Owner:4.2.1: Purchase policy - add a new purchase policy to the shop',
         system.performRegister("Test1@test.com", "TESTER");
         userID = system.performLogin("Test@test.com", "TESTER") as number
         badUI = system.performLogin("Test1@test.com", "TESTER") as number
-        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
     })
 
     it('Happy', () => {
@@ -603,7 +603,7 @@ describe('Owner:4.2.2: Discount policy - add a new discount policy to the shop',
         system.performRegister("Test1@test.com", "TESTER");
         userID = system.performLogin("Test@test.com", "TESTER") as number
         badUI = system.performLogin("Test1@test.com", "TESTER") as number
-        shopID = system.addShop(userID as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(userID as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
     })
 
     it('Happy', () => {
@@ -857,7 +857,7 @@ describe('Admin:6.4.1: Information - gets a purchase history of a given user', a
         system = await SystemDriver.getSystem(true)
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
         system.performRegister("newUser@test.com", "TESTER");
         user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -891,7 +891,7 @@ describe('Admin:6.4.2: Information - gets a purchase history of a given shop', a
         system = await SystemDriver.getSystem(true)
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
         system.addProduct(originOwner, shopID, "TV", "Best desc", 1000, ["monitors"], 1000)
         system.performRegister("newUser@test.com", "TESTER");
         user = system.performLogin("newUser@test.com", "TESTER") as number
@@ -977,8 +977,17 @@ describe('Services: delivery', () => {
         system = await SystemDriver.getSystem(true)
         system.performRegister("Test@test.com", "TESTER");
         originOwner = system.performLogin("Test@test.com", "TESTER") as number
-        shopID = system.addShop(originOwner as number, "TestShop", "shop for Tests", "Beer Sheva", "En li kesef") as number
-        system.addProduct(originOwner, shopID,"8KTV", "Best desc", 0, ["monitors"],1000, { expiration_date: new Date(), percent: 0, applyDiscount(price: number): number { return 0; }, can_be_applied(value: any): boolean { return false;  } })
+        shopID = system.addShop(originOwner as number, "TestShop", "shop for Communications", "Beer Sheva", "En li kesef") as number
+        system.addProduct(originOwner, shopID, "8KTV", "Best desc", 0, ["monitors"], 1000, {
+            expiration_date: new Date(),
+            percent: 0,
+            applyDiscount(price: number): number {
+                return 0;
+            },
+            can_be_applied(value: any): boolean {
+                return false;
+            }
+        })
         system.performRegister("newUser@test.com", "TESTER");
         user = system.performLogin("newUser@test.com", "TESTER") as number
         system.addItemToBasket(user, 0, shopID, 500)
