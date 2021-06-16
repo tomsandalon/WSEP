@@ -21,6 +21,7 @@ import {
     route_user_management
 } from "./Routes";
 import {configWebSocket} from "./User/Notification";
+import {panicLogger} from "../Domain/Logger";
 
 const socket_io = require('socket.io');
 const fs = require('fs')
@@ -87,4 +88,5 @@ if(isLoaded() || loadConfig()) {
     initServer(process.argv[Math.max(2, process.argv.length - 1)] != undefined); //check if load flag is on
 } else {
     console.log("Server cannot read config file\nAborting...")
+    panicLogger.Critical("Server cannot read config file\nAborting...")
 }

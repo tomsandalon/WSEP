@@ -1,28 +1,43 @@
 import 'mocha';
+import {assert, expect} from 'chai';
 import {Service} from "../../Logic/Service/Service";
+import {validInput} from "./ValidInput";
+import {invalidInput} from "./InvalidInput";
 
 const {initData} = require("../../Logic/Init.ts");
 const fs = require('fs');
 const path = require('path');
 
-const writeToConfig = (data: string) => fs.writeFileSync(path.join(__dirname, '..', '..', 'Logic', 'Actions.json'), data)
+const writeToInit = (data: string) => fs.writeFileSync(path.join(__dirname, '..', '..', 'Actions.json'), data)
 describe('Init file tests', () => {
+    after(() => {
+        writeToInit(validInput)
+    })
     it('Load Init file with good JSON syntax', async () => {
-        // try{
-        //     writeToConfig(validInput)
-        // } catch (e) {
-        //     assert.fail('Error in writing to file\n' + e)
-        // }
+        writeToInit(validInput)
         const service = new Service();
-        await initData(service)
-        let temp = 0;
+        try{
+            await service.init()
+        } catch (e) {
+            assert.fail('Error system initialization')
+        }
+        try {
+            await initData(service)
+        } catch (e) {
+            assert.fail('init data failed')
+        }
     });
-    // it('Load config file with bad JSON syntax', () => {
-    //     try{
-    //         writeToConfig(invalidInput)
-    //     } catch (e) {
-    //         assert.fail('Error in writing to file\n' + e)
-    //     }
-    //
-    // });
+    it('Load init file with bad JSON syntax', async () => {
+        writeToInit(invalidInput)
+        const service = new Service();
+        try{
+            await service.init()
+        } catch (e) {
+            assert.fail('Error system initialization')
+        }
+        try{
+            await initData(service)
+            assert.fail('System should not load successfully')
+        } catch (_) {}
+    });
 });
