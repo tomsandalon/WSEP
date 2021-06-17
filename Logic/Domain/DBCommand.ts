@@ -45,7 +45,7 @@ export const RemoveManager = (target_email: string, shop_id: number) => blockDB 
 
 export const RemainingManagement = (management_emails: string[], shop_id: number) => blockDB ? Promise.resolve(true) : API.RemainingManagement(management_emails, shop_id)
 
-export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) => blockDB ? Promise.resolve(true) : API.UpdatePermissions(manager_id, shop_id, new_permissions)
+export const UpdatePermissions = (appointer_id:number,manager_id: number, shop_id: number, new_permissions: Permission[]) => blockDB ? Promise.resolve(true) : API.UpdatePermissions(appointer_id,manager_id, shop_id, new_permissions)
 
 export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) => blockDB ? Promise.resolve(true) : API.AddPurchasePolicy(shop_id, policy_id, condition)
 

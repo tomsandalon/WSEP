@@ -310,10 +310,10 @@ const _RemainingManagement = ([management_emails, shop_id]: [string[], number], 
         .then(success)
         .catch(new_err => handler('RemainingManagement', new_err, _RemainingManagement, [management_emails, shop_id], attempts))
 
-export const UpdatePermissions = (manager_id: number, shop_id: number, new_permissions: Permission[]) =>
-    _UpdatePermissions([manager_id, shop_id, new_permissions], 3)
+export const UpdatePermissions = (appointer_id:number,manager_id: number, shop_id: number, new_permissions: Permission[]) =>
+    _UpdatePermissions([appointer_id,manager_id, shop_id, new_permissions], 3)
 
-const _UpdatePermissions = ([manager_id, shop_id, new_permissions]:[number, number, Permission[]], attempts: number) =>
+const _UpdatePermissions = ([appointer_id,manager_id, shop_id, new_permissions]:[number,number, number, Permission[]], attempts: number) =>
     getDB().transaction((trx: any) =>
         trx(manages.name).select(permission.pk).whereIn(permission.pk, new_permissions)
             .then((used_permissions: any) =>
@@ -325,12 +325,13 @@ const _UpdatePermissions = ([manager_id, shop_id, new_permissions]:[number, numb
                     perm in used_permissions ? acc : acc.concat([
                         trx(manages.name).insert({
                             shop_id: shop_id,
-                            manager_id: manager_id,
+                            user_id: manager_id,
+                            appointer_id:appointer_id,
                             permission_id: perm,
                         })]), []))))
     )
         .then(success)
-        .catch(new_err => handler('UpdatePermissions', new_err, _UpdatePermissions, [manager_id, shop_id, new_permissions], attempts))
+        .catch(new_err => handler('UpdatePermissions', new_err, _UpdatePermissions, [appointer_id,manager_id, shop_id, new_permissions], attempts))
 
 export const AddPurchasePolicy = (shop_id: number, policy_id: number, condition: PurchaseSimpleCondition | PurchaseCompositeCondition) =>
     _AddPurchasePolicy([shop_id, policy_id, condition], 3)

@@ -747,7 +747,7 @@ export class SystemImpl implements System {
             return `Target email ${target_email} doesnt belong to a registered user`
         const ret = shop.addPermissions(user_email, target_email, [action])
         if (typeof ret != 'string')
-            UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
+            UpdatePermissions(user_id,(this.login.existing_users.find(u => u.user_email == target_email) as UserImpl).user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
                     if (!r) {
                         panicLogger.Error(`Failed to update permissions by user ${user_id} in ${shop_id}. Performing a rollback`)
@@ -765,7 +765,7 @@ export class SystemImpl implements System {
             return `Target email ${target_email} doesnt belong to a registered user`
         const ret = shop.removePermission(user_email, target_email, action)
         if (typeof ret != 'string')
-            UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
+            UpdatePermissions(user_id,(this.login.existing_users.find(u => u.user_email == target_email) as UserImpl).user_id ,shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
                     if (!r) {
                         panicLogger.Error(`Failed to remove permissions by user ${user_id} in ${shop_id}. Performing a rollback`)
@@ -824,7 +824,7 @@ export class SystemImpl implements System {
             return `Target email ${target_email} doesnt belong to a registered user`
         const ret = shop.editPermissions(user_email, target_email, actions)
         if (typeof ret != 'string')
-            UpdatePermissions(user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
+            UpdatePermissions(user_id,(this.login.existing_users.find(u => u.user_email == target_email ) as UserImpl).user_id, shop_id, permission_to_numbers(shop.getRealPermissions(user_email)))
                 .then(r => {
                     if (!r) {
                         panicLogger.Error(`Failed to edit permissions for user ${user_id} in ${shop_id}. Performing a rollback`)

@@ -42,6 +42,7 @@ function App() {
     setCounter(counter + 1);
   },[]);
   socket.on("Unavailable",(message) =>{
+    console.log("imhere")
     window.location.assign("/error")
   })
   return (
